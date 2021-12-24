@@ -1,0 +1,19 @@
+<div class="gridster-container">
+    <div class="dashboard-edit">
+        <button mat-icon-button (click)="addItemToDashboard()" *ngIf="editMode">
+            <mat-icon matTooltip="Add widget">add</mat-icon>
+        </button>
+        <button mat-stroked-button (click)="editGrid()" [ngStyle]="{'visibility': mobile? 'hidden' : 'visible'}">{{ editGridText }}</button>
+    </div>
+    <gridster [options]="editMode? optionsEdit : options" [ngClass]="editMode? 'gridster-edit' : 'gridster'">
+      <gridster-item [item]="item" *ngFor="let item of dashboard; let i = index" class="gridster-item">
+        <div class="dashboard-item" *ngIf="!editMode">
+            <dashboard-item [configIndex]="i" (openFullscreen)="openFullscreen($event)"></dashboard-item>
+        </div>
+        <button mat-icon-button mat-raised-button (mousedown)="removeItem($event, item)"
+                (touchstart)="removeItem($event, item)" *ngIf="editMode">
+          <mat-icon matTooltip="Remove widget">delete</mat-icon>
+        </button>
+      </gridster-item>
+    </gridster>
+  </div>

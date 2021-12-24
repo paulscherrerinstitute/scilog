@@ -1,0 +1,49 @@
+.logbook-card {
+  width: 300px;
+  height: 400px;
+  /* text-align: center; */
+}
+
+.mat-card-content {
+  padding: 15px;
+  
+  height: 170px;
+  overflow-y: scroll;
+}
+
+.mat-card-header .mat-card-title {
+  /* font-size: 16px; */
+  width: 100%;
+  height: 30px;
+  display: inline-flex;
+
+}
+
+.image-container {
+  text-align: center;
+}
+
+.logbook-card img {
+  max-width: 250px;
+  height: 80px;
+  box-shadow: 0 1px 4px 0 rgba(0, 0, 0, .2), 0 2px 8px 0 rgba(0, 0, 0, .14), 0 4px 8px -1px rgba(0, 0, 0, .12);
+
+
+}
+
+.mat-fab-top-right {
+  position: absolute;
+  top: 5px;
+  right: 1px;
+  z-index: 100;
+  display: flex;
+  flex-direction: column-reverse;
+  align-items: center;
+}
+
+.mat-card-actions {
+  width: 300px;
+  align-items: center;
+  text-align: center;
+
+}

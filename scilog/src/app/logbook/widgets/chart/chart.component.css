@@ -1,0 +1,5 @@
+.graph{
+    height:calc(100% - 70px);
+    /* overflow: scroll; */
+        /* padding-bottom:20px */
+}

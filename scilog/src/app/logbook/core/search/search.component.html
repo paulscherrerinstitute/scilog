@@ -1,0 +1,24 @@
+<mat-form-field class="search-form-field">
+    <mat-label>
+      Search <mat-icon>search</mat-icon>
+    </mat-label>
+    <input #searchSnippets matInput type="text" [(ngModel)]="searchString">
+    <button mat-button *ngIf="searchString" matSuffix mat-icon-button aria-label="Clear" (click)="searchString=''">
+      <mat-icon>close</mat-icon>
+    </button>
+  </mat-form-field>
+  <div class="helpContainer">
+      <div class="helpTagList">
+        <header>
+            I'm looking for...
+        </header>
+      </div>
+      <div class="helpRecentSearches">
+        <header>
+            Recent searches
+        </header>
+      </div>
+  </div>
+  <div class="resultContainer">
+
+  </div>

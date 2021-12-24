@@ -1,0 +1,218 @@
+@import '../../../../styles/shadows';
+
+.logbook {
+  margin-bottom: 1px;
+  margin-left: 20px;
+  margin-right: 20px;
+  margin-top: 1px;
+  min-height: 100%;
+  text-align: left;
+  border-radius: 2px;
+  padding: 20px 0px;
+  @include default-shadow;
+}
+
+.snippet {
+  margin-bottom: 0px;
+  margin-left: 20px;
+  margin-right: 20px;
+  /* margin-top: 1px; */
+  min-height: 100%;
+  text-align: left;
+  border-radius: 2px;
+  padding: 10px 0px;
+  background-color: var(--snippet-color);
+  color: var(--default-text-color);
+}
+
+.messages {
+  background-color: rgb(39, 117, 163) !important;
+  margin-bottom: 5px;
+  margin-left: 80px;
+  margin-right: 20px;
+  margin-top: 1px;
+  min-height: 100%;
+  text-align: left;
+  border-radius: 10px;
+  border-color: rgb(39, 117, 163);
+  color: var(--default-text-color);
+  padding: 20px 0px;
+  @include default-shadow;
+  /* width: fit-content; */
+  /* float:right; */
+}
+
+.messagesReply {
+  background-color: rgb(238, 238, 238) !important;
+  margin-bottom: 5px;
+  margin-left: 20px;
+  margin-right: 80px;
+  margin-top: 1px;
+  min-height: 100%;
+  text-align: left;
+  border-radius: 10px;
+  /* border-color: rgb(39, 117, 163); */
+  padding: 20px 0px;
+  @include default-shadow;
+  /* width: fit-content; */
+  /* float: left; */
+}
+
+.snippetComment {
+  margin-bottom: 1px;
+  margin-left: 60px;
+  margin-right: 20px;
+  /* margin-top: 1px; */
+  min-height: 100%;
+  text-align: left;
+  border-radius: 2px;
+  padding: 10px 0px;
+  background-color: rgb(247, 242, 197) !important;
+}
+
+.snippetQuote {
+  margin-bottom: 1px;
+  margin-left: -25px;
+  margin-right: -5px;
+  margin-top: -8px;
+  min-height: 100%;
+  text-align: left;
+  border-radius: 2px;
+  padding: 10px 0px;
+  opacity: 0.9;
+  border-left: 4px solid #86a7b1;
+  border-right: 4px solid #86a7b1;
+  background-color: #ebebeb !important;
+}
+
+.mat-fab-top-right {
+  position: absolute;
+  opacity: 0.1;
+  top: 5px;
+  right: 1px;
+  /* z-index: 100; */
+  display: flex;
+  flex-direction: column-reverse;
+  align-items: center;
+}
+
+.mat-fab-top-right:hover {
+  position: absolute;
+  opacity: 1;
+  top: 5px;
+  right: 1px;
+  /* z-index: 10; */
+  display: flex;
+  flex-direction: column-reverse;
+  align-items: center;
+}
+.mat-fab-top-right-star {
+  position: absolute;
+  /* width: 20px; */
+  /* height: 20px; */
+  /* line-height: 14px; */
+  /* font-size: 14px; */
+  top: 4px;
+  left: 4px;
+  z-index: 100;
+  display: flex;
+  flex-direction: column-reverse;
+  align-items: center;
+  /* opacity: 0.1; */
+}
+.mat-fab-top-right-user{
+  position: absolute;
+  top: 4px;
+  left: 3px;
+  z-index: 100;
+  display: flex;
+  flex-direction: column-reverse;
+  align-items: center;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%
+}
+
+.mat-card-content {
+  /* margin-bottom: 2px; */
+  padding-left: 20px;
+  padding-right: 20px;
+  margin-right: 20px;
+  margin-left: 8px;
+}
+
+.imageSnippet {
+  /* height: 150px; adjust as needed */
+  /* max-width: max-content; */
+  background-size: cover;
+  max-width: 90%;
+  display: block;
+  /* align-items: center; */
+
+  /* background-size: cover; */
+}
+
+.snippet-tags-container {
+  font-size-adjust: 0.4;
+  text-align: right;
+  padding-right: 45px;
+  opacity: 0.4;
+  display: inline;
+}
+
+.snippet-tag{
+  background-color: #e0e0e0;
+  color: rgba(0, 0, 0, 0.87);
+  width: max-content;
+  border-radius: 5px;
+  padding: 2px;
+  float: right;
+  margin: 1px;  
+}
+
+.card-header{
+  position: absolute;
+  display: inline;
+  top: 4px;
+  left: 3px;
+  width: 100%;
+}
+
+.message-avatar {
+  /* position: absolute; */
+  /* top: 4px; */
+  /* left: 3px; */
+  /* z-index: 100; */
+  /* display: flex; */
+  /* flex-direction: column-reverse; */
+  /* align-items: center; */
+  width: 20px;
+  height: 20px;
+  border-radius: 50%
+}
+
+.message-timestamp{
+  /* top: 4px; */
+  /* left: 3px; */
+  /* padding-left: 2px; */
+  width: 100%;
+  font-size-adjust: 0.4;
+  text-align: center;
+  opacity: 1;
+  align-items: center;
+}
+
+.snippet-header{
+  width: 100%;
+  font-size-adjust: 0.4;
+  opacity: 0.6;
+  position: absolute;
+  left: 10px;
+  top: 2px;
+}
+
+/* .mat-card-header {
+  background: #002d3b;
+  padding: 10px 15px;
+  color: #ffffff;
+} */

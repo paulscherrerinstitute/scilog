@@ -1,0 +1,69 @@
+<div #logbookTitle class='logbook-name-tag' *ngIf='isLogbookOpen' style="font-size: 18px;">
+  {{ logbookName }}
+</div>
+<mat-toolbar>
+
+  <div [ngClass]="(showMenuIcon)?'logo-center':'logo'">
+    <img src="../../assets/logo.png" alt="SciLog" width="50" height="50" />
+  </div>
+  <div>
+    <button mat-icon-button *ngIf='showMenuIcon' (click)='openSideMenu()'>
+      <mat-icon>menu</mat-icon>
+    </button>
+  </div>
+  <div *ngIf='showSearch' class="searchWindow">
+    <search-window #searchWindow [configsArray]='config' (close)="closeSearch()" (selectedSnippet)="selectedSearchEntry($event)"></search-window>
+  </div>
+  <div class="flexExpand">
+    <button mat-icon-button class='searchButton' (click)="openSearch()" *ngIf="!showMenuIcon && isLogbookOpen">
+        <mat-icon class='searchIcon'>
+          search
+        </mat-icon>
+        <span>
+          Search 
+        </span>
+    </button>
+  </div>
+  <span>
+    <span class="version-info" *ngIf="showVersionInfo" matTooltip="v0.1">
+      {{ versionInfo }}
+    </span>
+    <button mat-icon-button *ngIf="showMenuIcon && isLogbookOpen" (click)="openSearch()">
+      <mat-icon matTooltip="Search">search</mat-icon>
+    </button>
+    <button mat-icon-button [matMenuTriggerFor]="menuViews" *ngIf="isLogbookOpen">
+      <mat-icon>preview</mat-icon>
+    </button>
+    <mat-menu #menuViews="matMenu">
+      <ng-container *ngFor="let view of views; let i=index;">
+        <button mat-menu-item (click)="loadView(i)">
+          <mat-icon>visibility</mat-icon>
+          <span [ngStyle]="{'font-weight':view.id == currentView ? 'bold' : 'normal' }">{{ view.name }}</span>
+        </button>
+      </ng-container>
+      <button mat-menu-item (click)="openViewSettings()">
+        <mat-icon>save</mat-icon>
+        <span>Save/Edit</span>
+      </button>
+    </mat-menu>
+    <button mat-icon-button *ngIf="!showMenuIcon">
+      <mat-icon matTooltip="Help" (click)="openHelp()">help</mat-icon>
+    </button>
+    <button mat-icon-button [matMenuTriggerFor]="menu">
+      <!-- <img src="https://material.angular.io/assets/img/examples/shiba1.jpg" alt="SciLog" class="avatar-image"/> -->
+      <svg class="avatar-image" [data-jdenticon-value]="avatarHash"></svg>
+      <!-- <mat-icon matTooltip="Profile">account_circle</mat-icon> -->
+    </button>
+    <mat-menu #menu="matMenu">
+      <button mat-menu-item (click)="openSettings()">
+        <mat-icon>settings</mat-icon>
+        <span>Settings</span>
+      </button>
+      <!-- <button mat-menu-item disabled> -->
+      <button mat-menu-item (click)="logout()">
+        <mat-icon>logout</mat-icon>
+        <span>Logout</span>
+      </button>
+    </mat-menu>
+  </span>
+</mat-toolbar>

@@ -1,0 +1,58 @@
+
+@import '~@angular/material/theming';
+@include mat-core();
+  
+
+
+$scilog-colors: (
+    50 : #f0f0f0, // background
+    100 : #b3c9d0,
+    200 : #80a6b1,
+    300 : #4d8292,
+    400 : #26677a,
+    500 : #004c63,
+    600 : #00455b,
+    700 : #003c51,
+    800 : #003347,
+    900 : #002435,
+    A100 : #6dc1ff,
+    A200 : #3aacff,
+    A400 : #0796ff,
+    A700 : #ec2300,
+    contrast: (
+        50 : #000000,
+        100 : #000000,
+        200 : #000000,
+        300 : #ffffff,
+        400 : #ffffff,
+        500 : #ffffff,
+        600 : #ffffff,
+        700 : #ffffff,
+        800 : #ffffff,
+        900 : #ffffff,
+        A100 : #000000,
+        A200 : #000000,
+        A400 : #ffffff,
+        A700 : #ffffff,
+    )
+);
+  
+
+/* ======== Angular material custom themes ======== */ 
+$my-custom-primary: mat-palette($scilog-colors, 900, 700, 900);
+$my-custom-accent: mat-palette($scilog-colors, 500, 200, A100);
+$my-custom-warn: mat-palette($scilog-colors, A700);
+
+$my-custom-theme: mat-light-theme($my-custom-primary, $my-custom-accent, $my-custom-warn);
+
+@include angular-material-theme($my-custom-theme);
+
+
+.warning-snackbar {
+    background: rgb(236, 55, 9);
+    color: rgb(255, 255, 255)
+  }
+.resolved-snackbar {
+    background: rgb(13, 153, 24);
+    color: rgb(255, 255, 255)
+  }

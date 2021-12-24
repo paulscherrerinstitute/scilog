@@ -1,0 +1,35 @@
+<mat-card class="logbook-card">
+    <mat-card-header >
+        <mat-card-title #cardHeader style="font-size: 18px;">{{ logbook?.name }}</mat-card-title>
+        <mat-card-subtitle>{{ logbook?.ownerGroup }}</mat-card-subtitle>
+        <button mat-icon-button [matMenuTriggerFor]="menu" aria-label="Example icon-button with a menu"
+        class="mat-fab-top-right" *ngIf='enableEdit'>
+        <mat-icon>more_vert</mat-icon>
+      </button>
+      <mat-menu #menu="matMenu">
+        <button mat-menu-item (click)="editLogbook()" [disabled]="!enableEdit? 'disabled' : null">
+          <mat-icon>edit</mat-icon>
+          <span>Edit</span>
+        </button>
+        <button mat-menu-item (click)="deleteLogbook()" [disabled]="!enableEdit? 'disabled' : null">
+          <mat-icon>delete</mat-icon>
+          <span>Delete</span>
+        </button>
+      </mat-menu>
+    </mat-card-header>
+    <div class="image-container">
+        <img [src]="imageToShow" alt="" *ngIf="!isImageLoading">
+    </div>
+    <!-- <img mat-card-image src="https://material.angular.io/assets/img/examples/shiba2.jpg" alt="Photo of a Shiba Inu"> -->
+    <mat-card-content>
+        <p>
+            {{ logbook?.description }}
+        </p>
+    </mat-card-content>
+    <mat-divider></mat-divider>
+    <mat-card-actions class="mat-card-actions">
+        <button mat-button (click)="selection($event)" [routerLink]="['/logbooks', logbook?.id, 'dashboard']">
+            Open
+        </button>
+    </mat-card-actions>
+</mat-card>

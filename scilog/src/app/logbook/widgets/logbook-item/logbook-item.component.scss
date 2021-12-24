@@ -1,0 +1,190 @@
+@import '../../../../styles/shadows';
+@import '../../../../styles/fab-button';
+@import '../../../../styles/editor';
+
+@include fab-mini-button;
+
+.button-toggle-group-view {
+  position: absolute;
+  z-index: 900;
+  /* top: 55px; */
+  right: 20px;
+  /* box-shadow: 0 1px 4px 0 rgba(0, 0, 0, .2), 0 2px 8px 0 rgba(0, 0, 0, .14), 0 4px 8px -1px rgba(0, 0, 0, .12); */
+}
+
+.searchComponent{
+  z-index: 1000;
+  position: absolute;
+  top: 15px;
+  left: 0px;
+  background-color: var(--sidenav-color);
+  opacity: 0.98;
+  height: 50vh;
+  width: 100%;
+  border-radius: 5px;
+  @include default-shadow;
+}
+
+.mat-fab-bottom-right {
+  position: fixed;
+  bottom: 10px;
+  right: 15px;
+  z-index: 100;
+  display: flex;
+  flex-direction: column-reverse;
+  align-items: center;
+}
+
+  ::ng-deep .mat-focused .mat-form-field-label {
+    /*change color of label*/
+    color: var(--button-accent) !important;
+   }
+  
+   ::ng-deep.mat-form-field-underline {
+    /*change color of underline*/
+    background-color: var(--button-accent) !important;
+  } 
+  
+  ::ng-deep.mat-form-field-ripple {
+   /*change color of underline when focused*/
+   background-color: var(--button-accent) !important;;
+  }
+
+  ::ng-deep .mat-form-field-appearance-legacy .mat-form-field-label{
+    color: var(--default-text-color);
+  }
+
+  .search-form-field{
+    padding-left: 20px;
+    color:var(--default-text-color);
+  }
+
+  .content-editor {
+    width: calc(92%); 
+    // background-color: var(--ck-toolbar-color-background);
+    // padding-bottom: 15px;
+    margin: 10px;
+    // border-radius: 5px;
+  }
+
+  .metadata{
+    box-shadow: unset;
+    background-color: var(--ck-toolbar-color-background);
+  }
+
+  
+  .editor-container{
+    position: fixed;
+    /* left: 5px; */
+    right: 0px;
+    bottom: 0px;
+    width: calc(100%);
+    background-color: var(--editor);
+    padding-bottom: 5px;
+    @include default-shadow;
+    width: 100%;
+    border-radius: 4px;
+  }
+
+  .editor-container-no-border{
+    position: fixed;
+    /* left: 5px; */
+    right: 0px;
+    bottom: 0px;
+    background-color: var(--editor);
+    padding-bottom: 5px;
+    border: 1px var(--default-text-color) solid;
+    margin: 7px;
+    width: calc(100% - 20px);
+    border-radius: 4px !important;
+  }
+
+.mat-standard-chip.mat-chip-with-trailing-icon {
+  font-size: 10px;
+  border-radius: 10px;
+  padding-top: 2px;
+  padding-bottom: 2px;
+  padding-right: 3px;
+  padding-left: 7px;
+}
+
+.logbook-content {
+  /* padding-bottom: 80px; */
+  /* padding-top: 20px; */
+  height: 400px;
+  overflow-y: scroll;
+}
+
+/* .editor-fixed{
+    height: 800px;
+  } */
+
+.addButton {
+  padding: 5px;
+  float: right;
+}
+
+.accessSettings {
+  display: flex;
+  padding-bottom: 5px;
+  font-size: 12px;
+}
+.tagsContainer {
+  display: flex;
+  padding-left: 8px;
+  font-size: 12px;
+  border: 1px solid var(--ck-toolbar-border-color);
+  border-bottom-left-radius: 5px;
+  border-bottom-right-radius: 5px;
+  background-color: var(--ck-toolbar-color-background);
+  /* width: 100%; */
+}
+
+.logbook-container{
+  padding-top: 25px;
+}
+
+ ::ng-deep .ck.ck-toolbar {
+    font-size: 12px;
+    background-color: var(--ck-toolbar-color-background);
+  }
+  .tagEditor {
+    flex: 1 1 auto !important;
+    display: flex;
+    align-items: center;
+    /* width: 100%; */
+  }
+
+::ng-deep .ck-rounded-corners .ck.ck-toolbar {
+  border-color: var(--ck-toolbar-border-color);
+}
+
+::ng-deep .ck.ck-toolbar > .ck-toolbar__items > :not(.ck-toolbar__line-break), .ck.ck-toolbar > .ck.ck-toolbar__grouped-dropdown {
+  color: var(--default-text-color);
+}
+
+:host ::ng-deep .ck-editor__editable_inline {
+  max-height: 40vh !important;
+}
+
+::ng-deep .fileLink {
+  background-color: #113657;
+  color: rgba(255, 255, 255, 0.87);
+  border-radius: 3px;
+  padding: 4px;
+  margin: 1px;
+  text-decoration: none;
+
+}
+@supports (-moz-appearance:none) {
+  ::ng-deep .fileLink { display: block;
+    word-wrap: break-word; }
+  }
+
+::ng-deep .fileLink::before {
+  font-family: "Material Icons";
+  content: "attach_file";
+  display: inline-block;
+  font-size: initial;
+  vertical-align: middle;
+}

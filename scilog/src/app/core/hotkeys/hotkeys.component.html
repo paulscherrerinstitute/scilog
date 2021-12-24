@@ -1,0 +1,13 @@
+<table>
+
+	<tbody *ngFor="let group of hotkeyGroups">
+		<h3>{{ group }}</h3>
+		<tr *ngFor="let keys of hotkeysSorted[group]">
+			<td>{{ keys["label"] }}</td>
+
+			<td class="text-right">
+				<kbd>{{ keys["key"] }}</kbd>
+      </td>
+    </tr>
+  </tbody>
+</table>

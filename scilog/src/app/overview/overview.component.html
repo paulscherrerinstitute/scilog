@@ -1,0 +1,31 @@
+<app-toolbar></app-toolbar>
+<div class="overview-container">
+  <mat-form-field class="example-form-field">
+    <mat-label>
+      Search <mat-icon>search</mat-icon>
+    </mat-label>
+    <input matInput type="text" [(ngModel)]="searchString">
+    <button mat-button *ngIf="searchString" matSuffix mat-icon-button aria-label="Clear" (click)="searchString=''">
+      <mat-icon>close</mat-icon>
+    </button>
+  </mat-form-field>
+  <!-- <div *ngIf="searchString==''">
+    <h1>Collection</h1>
+    <button (click)='addCollectionLogbook("collection")'>Add collection</button><br>
+    <div *ngFor="let collection of collections" class="logbook-card">
+      <app-collection-widget [collection]="collection" (collectionSelection)="collectionSelected($event)"></app-collection-widget>
+    </div>
+  </div> -->
+  <!-- <div *ngIf="showViewSelection"> -->
+  <div>
+    <!-- <mat-divider></mat-divider> -->
+    <h1>Logbooks</h1>
+    <button (click)='addCollectionLogbook("logbook")'>Add logbook</button><br>
+    <div *ngFor="let logbook of (logbooks | logbookSearch:(searchString))" class="logbook-card">
+      <app-logbook-cover [logbook]="logbook" (logbookEdit)="editLogbook($event)" (logbookSelection)="logbookSelected($event)" (logbookDelete)="deleteLogbook($event)"></app-logbook-cover>
+    </div>
+  </div>
+</div>
+
+
+<!-- <button #upload (click)="file.click()">Upload file</button> -->

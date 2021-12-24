@@ -1,0 +1,28 @@
+<div class="header" [ngStyle]="{'padding':dashboardView === true ? '0px' : '10px' }">
+    <span class="headerTitle">
+        {{ config?.general.title }}
+    </span>
+    <span class="flexExpand"></span>
+    <span>
+        <button mat-icon-button aria-label="Export"  (click)='exportLogbook()' *ngIf="config?.general.type=='logbook'">
+            <mat-icon matTooltip="Export logbook">save_alt</mat-icon>
+        </button>
+        <button mat-icon-button aria-label="Edit"  (click)='requestFullscreen()' *ngIf="dashboardView">
+            <mat-icon matTooltip="Switch to full screen mode">fullscreen</mat-icon>
+        </button>
+        <button mat-icon-button aria-label="Edit" (click)='openPreferences()'>
+            <mat-icon matTooltip="Open widget preferences">settings</mat-icon>
+        </button>
+    </span>
+
+</div>
+<ng-container [ngSwitch]="config?.general.type" class="item-container">
+    <logbook-item *ngSwitchCase="'logbook'" [config]="config" [configIndex]="configIndex"></logbook-item>
+    <chat *ngSwitchCase="'chat'" [configIndex]="configIndex"></chat>
+    <chart *ngSwitchCase="'graph'" [configIndex]="configIndex"></chart>
+    <todos *ngSwitchCase="'tasks'" [configIndex]="configIndex"></todos>
+    <snippet-viewer *ngSwitchCase="'snippetViewer'" [configIndex]="configIndex"></snippet-viewer>
+    <div *ngSwitchDefault>
+        No content specified.
+    </div>
+</ng-container>

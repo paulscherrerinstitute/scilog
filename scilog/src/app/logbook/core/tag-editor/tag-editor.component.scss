@@ -1,0 +1,62 @@
+.tagOption {
+    height: 25px;
+}
+
+.tagContainer {
+    width: 100%;
+}
+:host ::ng-deep .mat-form-field-appearance-legacy .mat-form-field-underline {
+    display: none;
+}
+
+:host ::ng-deep .mat-form-field-appearance-legacy .mat-form-field-wrapper {
+    padding-bottom: 0px;
+}
+
+:host ::ng-deep .mat-form-field-infix{
+    width: 50%;
+    border-top-width: 0px;
+}
+
+:host ::ng-deep .mat-form-field{
+    max-width: 80%;
+}
+.tag {
+    background-color: #e0e0e0;
+    color: rgba(0, 0, 0, 0.87);
+    width: max-content;
+    border-radius: 5px;
+    padding: 2px 2px !important;
+    float: right;
+    margin: 1px;
+}
+
+:host ::ng-deep .mat-chip-list-wrapper {
+    margin: -6px;
+}
+
+:host ::ng-deep .mat-chip-list-wrapper input.mat-input-element{
+    padding: 0px;
+}
+
+:host ::ng-deep .mat-chip-list-wrapper input.mat-input-element,
+.mat-chip-list-wrapper .mat-standard-chip {
+    padding-top: 2px;
+}
+.renewButton {
+    border: none;
+    background-color: var(--ck-toolbar-color-background);
+    margin: var(--ck-spacing-small);
+    padding: unset;
+    height: 28px;
+    width: 28px;
+    vertical-align: middle;
+}
+.renewButton:hover {
+    background-color: var(--ck-color-list-button-hover-background);
+    border-radius: var(--ck-border-radius);
+}
+.renewButtonIcon {
+    font-size: 18px;
+    line-height: unset;
+}

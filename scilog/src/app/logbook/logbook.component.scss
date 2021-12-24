@@ -1,0 +1,62 @@
+@import '../../styles/shadows';
+@import '../../styles/fab-button';
+
+.loading-circle {
+    display: flex;
+    justify-content: center;
+  }
+ 
+
+  .left-sidenav {
+    position: fixed;
+    background: var(--sidenav-color);
+    color: var(--sidenav-text-color);
+    top: 50px;
+    @include default-shadow;
+    // box-shadow: 0 1px 4px 0 rgba(0, 0, 0, .2), 0 2px 8px 0 rgba(0, 0, 0, .14), 0 4px 8px -1px rgba(0, 0, 0, .12);
+
+  }
+
+  .main-content {
+    top: 60px;
+    /* padding-bottom: 60px; */
+    /* padding-top: 10px; */
+    background: var(--main-background);
+    /* min-height: 100vh; */
+  }
+
+
+    .mat-drawer-container{
+      display: block;
+      height: 100%;
+      background-color: var(--main-background);
+      /* margin-bottom: 20px; */
+    }
+    /* .mat-drawer-backdrop{
+      height: 100%;
+    } */
+    .mat-divider {
+      margin-top: 20px;
+      margin-bottom: 20px;
+      border-top-color: var(--toolbar-color);
+      @include default-shadow;
+      // box-shadow: 0 1px 4px 0 rgba(0, 0, 0, .2), 0 2px 8px 0 rgba(0, 0, 0, .14), 0 4px 8px -1px rgba(0, 0, 0, .12);
+
+    }
+    
+
+    .divButtons{
+      margin:10px;
+      display: block;
+    }
+
+    .divButtons-button{
+      @include default-shadow;
+      // box-shadow: 0 1px 4px 0 rgba(0, 0, 0, .2), 0 2px 8px 0 rgba(0, 0, 0, .14), 0 4px 8px -1px rgba(0, 0, 0, .12);
+    }
+
+    
+
+
+
+

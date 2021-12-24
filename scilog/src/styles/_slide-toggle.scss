@@ -1,0 +1,17 @@
+@mixin slide-toggle {
+    ::ng-deep .mat-slide-toggle.mat-checked:not(.mat-disabled) .mat-slide-toggle-thumb {
+      background-color: var(--slider-checked); /*replace with your color*/
+    }
+    ::ng-deep .mat-slide-toggle.mat-checked .mat-ripple-element {
+        background-color: var(--slider-not-checked-bg);
+    }
+    ::ng-deep .mat-slide-toggle.mat-checked:not(.mat-disabled) .mat-slide-toggle-bar {
+      background-color: var(--slider-checked-bg);  /*replace with your color*/
+    }
+    ::ng-deep .mat-slide-toggle-thumb {
+        background-color: var(--slider-not-checked);
+    }
+    ::ng-deep .mat-slide-toggle-bar {
+        background-color: var(--slider-not-checked-bg);
+    }
+    }

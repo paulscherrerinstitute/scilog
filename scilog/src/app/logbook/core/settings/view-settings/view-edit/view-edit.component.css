@@ -1,0 +1,84 @@
+.settings-container {
+    width: calc(100%);
+    height: 80vh;
+}
+
+.sidenav-container{
+    height: calc(100%);
+}
+
+.left-sidenav {
+    background: #69828a;
+    color: #ffffff;
+    box-shadow: 0 1px 4px 0 rgba(0, 0, 0, .2), 0 2px 8px 0 rgba(0, 0, 0, .14), 0 4px 8px -1px rgba(0, 0, 0, .12);
+    width:fit-content;
+    padding-right: 10px;
+    max-width: 20vh;
+
+}
+
+::ng-deep .mat-dialog-container{
+padding: 0px;
+border-radius: 8px;
+}
+
+.main-content {
+
+    /* padding-bottom: 60px; */
+    /* padding-top: 10px; */
+    background: #f0f0f0;
+    padding: 20px;
+    width: inherit;
+    /* min-height: 100vh; */
+}
+
+.divButtons {
+    margin: 10px;
+    display: block;
+}
+
+.saveMessage{
+    color: rgb(194, 0, 0);
+    font-size: smaller;
+}
+
+.saveTab{
+    display: flex;
+    justify-content: center;
+    width: 100%;
+    align-items: center;
+}
+
+.headerSave {
+    padding-top: 20px;
+    font-size: large;
+    text-align: center;
+}
+
+.header {
+    padding-top: 20px;
+    font-size: large;
+    text-align: center;
+}
+
+.headerTitle {
+    color: #004c63;
+    /* padding: 5px; */
+    opacity: 0.9;
+    font-weight: bold;
+}
+
+
+.saveButton{
+    display: flex;
+    padding: 20px;
+    align-items: center;
+    justify-content: right;
+}
+
+.advancedSlider{
+    display: flex;
+    padding: 20px;
+    align-items: center;
+    justify-content: right;
+}

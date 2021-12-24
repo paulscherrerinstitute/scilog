@@ -1,0 +1,89 @@
+<div [ngSwitch]="viewOption" class="logbook-container" (resized)="onResized($event)">
+  <!-- <div #searchBar>
+    <button (click)="toggleSearch()" >
+      Search <mat-icon>search</mat-icon>
+    </button>
+  </div> -->
+  <!-- <div *ngIf='showSearch' class='searchComponent' [@searchExpand]="showSearchExpanded ? 'end' : 'start'">
+    <app-search></app-search>
+  </div>
+  <mat-form-field class="search-form-field">
+    <mat-label>
+      Search <mat-icon>search</mat-icon>
+    </mat-label>
+    <input #searchSnippets matInput type="text" [(ngModel)]="searchString">
+    <button mat-button *ngIf="searchString" matSuffix mat-icon-button aria-label="Clear" (click)="searchString=''">
+      <mat-icon>close</mat-icon>
+    </button>
+  </mat-form-field> -->
+  <div #snippetContainer class="logbook-content">
+    <div *uiScroll="let snippet of logbookScrollService.datasource; let i = index">
+      <snippet [snippet]="snippet" [updatedAt]="snippet.updatedAt" [index]=i+1 [config]="config" (isLoading)="logbookScrollService.setItemStatus(snippet.id, $event)">
+      </snippet>
+    </div>
+  </div>
+
+  <div *ngIf="!mobile && !isReadOnly" [ngClass]="isLightMode == true ? 'editor-container' : 'editor-container-no-border'">
+    <div #editor class="content-editor"
+      [ngStyle]="{'padding-left':dashboardView === true ? '0px' : '78px', 'width': dashboardView === true ? '97%' : '92%'}"
+      (resized)="onResized($event)">
+      <div class='accessSettings'>
+        <span [ngStyle]="{'flex':'1 1 auto'}"></span>
+        <span matTooltip="ownerGroup">
+          <span [ngStyle]="{'vertical-align':'middle'}">
+            <mat-icon [inline]='true'>person</mat-icon>
+          </span>
+          <span>{{ logbookInfo.logbookInfo.ownerGroup}}</span>
+        </span>
+        <span *ngIf='logbookInfo.logbookInfo.accessGroups.length>0' matTooltip='accessGroups'>
+          <span> / </span>
+          <span [ngStyle]="{'vertical-align':'middle'}">
+            <mat-icon [inline]='true'>group</mat-icon>
+          </span>
+          <span> {{ logbookInfo.logbookInfo.accessGroups}}</span>
+        </span>
+      </div>
+      <ckeditor #contentEditor [config]="editorConfig" [editor]="Editor" [data]="dataEditor"
+        (ready)="onEditorReady($event)"></ckeditor>
+        <div class='tagsContainer'>
+          <span class='tagEditor'>
+            <tag-editor [ngStyle]="{'width': '100%'}" #tagEditor [tagIn]="tag" [configIndex]="configIndex"></tag-editor>
+          </span>
+            <span class="addButton">
+              <button mat-mini-fab (click)="addContent()">
+                <mat-icon matTooltip="Send">send</mat-icon>
+              </button>
+              <button mat-mini-fab (click)="addMessage()" *ngIf="messagesEnabled">
+                <mat-icon matTooltip="Send as message">message</mat-icon>
+              </button>
+          </span>
+        </div>
+
+    </div>
+
+  </div>
+
+</div>
+<ng-container *ngIf="mobile && !isReadOnly">
+  <button mat-fab color="accent" aria-label="Add snippet" class="mat-fab-bottom-right" (click)="toggle()"
+    [@rotatedState]="isOpen ? 'rotated' : 'default'" (focusout)="closeToolSelection()" style="z-index: 1001;">
+    <mat-icon>add</mat-icon>
+  </button>
+  <button #editButton mat-fab color="accent" aria-label="Edit" class="mat-fab-bottom-right"
+    [@buttonEdit]="isOpen ? 'end' : 'start'" (click)="addSnippet($event)" style="z-index: 1000;">
+    <mat-icon>edit</mat-icon>
+  </button>
+  <!-- <button #taskButton mat-fab color="accent" aria-label="Edit" class="mat-fab-bottom-right"
+    [@buttonTask]="isOpen ? 'end' : 'start'" (click)="addSnippet($event)" style="z-index: 1000;">
+    <mat-icon>add_task</mat-icon>
+  </button> -->
+  <input style="display: none" type="file" (change)="onFileChanged($event)" #fileInput>
+  <button #photoButton mat-fab color="accent" aria-label="Photo" class="mat-fab-bottom-right"
+    [@buttonPhoto]="isOpen ? 'end' : 'start'" (click)="fileInput.click()" style="z-index: 1000;">
+    <mat-icon>add_a_photo</mat-icon>
+  </button>
+  <!-- <button #fileButton mat-fab color="accent" aria-label="File" class="mat-fab-bottom-right"
+    [@buttonFile]="isOpen ? 'end' : 'start'" (click)="addSnippet($event)">
+    <mat-icon>attach_file</mat-icon>
+  </button> -->
+</ng-container>

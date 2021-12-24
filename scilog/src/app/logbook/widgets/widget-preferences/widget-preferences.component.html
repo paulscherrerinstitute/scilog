@@ -1,0 +1,167 @@
+<div class="header">
+  <span class="headerTitle">
+    Widget preferences
+  </span>
+
+</div>
+<div class="preferences-container">
+
+  <form [formGroup]="options">
+    <mat-divider></mat-divider>
+
+    <mat-form-field appearance="standard" required>
+      <mat-label>Title</mat-label>
+      <input matInput placeholder="Title" [formControl]="title">
+    </mat-form-field>
+    <mat-form-field appearance="standard">
+      <mat-label>Widget type</mat-label>
+      <mat-select (selectionChange)="selectedWidgetType($event)" [formControl]="widgetType">
+        <mat-option value="logbook">Logbook</mat-option>
+        <!-- <mat-option value="chat">Chat</mat-option> -->
+        <mat-option value="graph">Graph</mat-option>
+        <mat-option value="tasks">Tasks</mat-option>
+        <mat-option value="snippetViewer">Snippet viewer</mat-option>
+
+      </mat-select>
+    </mat-form-field>
+    <mat-divider></mat-divider>
+    <div [ngSwitch]="widgetType.value">
+
+      <div *ngSwitchCase="'logbook'">
+        <div>
+          <mat-slide-toggle [formControl]="readOnlyLogbook">Read-only</mat-slide-toggle>
+        </div>
+        <ng-container *ngIf='!readOnlyLogbook.value'>
+          <header class="subHeader">
+            <span matTooltip="New entries will be appended to this logbook.">Target logbook</span> 
+          </header>
+            <div>
+              <mat-form-field appearance="standard" style="width: 45%;">
+                <mat-label>Logbook</mat-label>
+                <textarea matInput placeholder="Logbook" [matAutocomplete]="autoLogbook"
+                  [formControl]="filterBasics.get('logbook')"
+                  cdkTextareaAutosize
+              #autosize="cdkTextareaAutosize"
+              cdkAutosizeMinRows="1"
+              cdkAutosizeMaxRows="5"></textarea>
+                <mat-autocomplete #autoLogbook="matAutocomplete" [displayWith]="displayFnLogbookSelection">
+                  <mat-option *ngFor="let logbook of filteredLogbooks | async" [value]="logbook">
+                    {{logbook.name}}
+                  </mat-option>
+                </mat-autocomplete>
+              </mat-form-field>
+              <mat-form-field appearance="standard" >
+                <mat-label>ownerGroup</mat-label>
+                <input matInput placeholder="ownerGroup" [matAutocomplete]="autoOwnerGroup"
+                  [formControl]="filterBasics.get('ownerGroup')">
+                <mat-autocomplete #autoOwnerGroup="matAutocomplete">
+                  <mat-option *ngFor="let group of filteredOwnerGroups | async" [value]="group">
+                    {{group}}
+                  </mat-option>
+                </mat-autocomplete>
+              </mat-form-field>
+            </div>
+            <div style="width: 100%;">
+              <mat-form-field appearance="fill" style="width: 100%;">
+                <mat-label>Logbook description</mat-label>
+                <textarea matInput [formControl]="filterBasics.get('description')"   
+                cdkTextareaAutosize
+                #autosize="cdkTextareaAutosize"
+                cdkAutosizeMinRows="1"
+                cdkAutosizeMaxRows="5"></textarea>
+              </mat-form-field>
+            </div>
+        </ng-container>
+        
+        <mat-divider></mat-divider>
+        <header class="subHeader">
+          Filter settings
+        </header>
+        <header class="subSubHeader">
+          Additional logbooks
+        </header>
+        <mat-form-field [floatLabel]="'never'" class="chipList">
+          <mat-chip-list #chipListLogbook aria-label="Logbook selection">
+            <mat-chip *ngFor="let logbookItem of additionalLogbooks" [selectable]="selectable" [removable]="removable"
+              (removed)="removeLogbook(logbookItem)" [value]="logbookItem" [matTooltip]="'Group: ' + logbookItem.ownerGroup + '; Description: ' + logbookItem.description">
+              {{ logbookItem.name }}
+              <mat-icon matChipRemove *ngIf="removable">cancel</mat-icon>
+            </mat-chip>
+            <input #logbookInput placeholder="Add logbooks" [matChipInputFor]="chipListLogbook" [matAutocomplete]="autoLogbookChip"
+              [matChipInputSeparatorKeyCodes]="separatorKeysCodes" [matChipInputAddOnBlur]="addOnBlur" [formControl]="additionalLogbooksCtrl">
+          </mat-chip-list>
+          <mat-autocomplete #autoLogbookChip="matAutocomplete" [displayWith]="displayFnLogbookSelection" (optionSelected)="addLogbook($event)">
+            <mat-option *ngFor="let logbook of filteredAdditionalLogbooks | async" [value]="logbook" [matTooltip]="'Group: ' + logbook.ownerGroup + '; Description: ' + logbook.description">
+              {{logbook.name}} ({{logbook.ownerGroup}})
+            </mat-option>
+          </mat-autocomplete>
+        </mat-form-field>
+
+        <header class="subSubHeader">
+          Data must include the following tags
+        </header>
+        <div class="chips">
+          <mat-chip-list #chipList aria-label="Tag selection">
+            <mat-chip *ngFor="let tagItem of tag" [selectable]="selectable" [removable]="removable"
+              (removed)="removeTag(tagItem)">
+              {{ tagItem.name }}
+              <mat-icon matChipRemove *ngIf="removable">cancel</mat-icon>
+            </mat-chip>
+            <input placeholder="Add tags" [matChipInputFor]="chipList"
+              [matChipInputSeparatorKeyCodes]="separatorKeysCodes" [matChipInputAddOnBlur]="addOnBlur"
+              (matChipInputTokenEnd)="addTag($event)">
+          </mat-chip-list>
+        </div>
+        <mat-divider></mat-divider>
+        <header class="subHeader">
+          View settings
+        </header>
+        <div>
+          <mat-slide-toggle [formControl]="hideMetadata">Hide metadata</mat-slide-toggle>
+        </div>
+        <div>
+          <mat-slide-toggle [formControl]="showSnippetHeader">Show timestamp and author information</mat-slide-toggle>
+        </div>
+        <div>
+          <mat-slide-toggle [formControl]="descendingOrder">Show data in descending order</mat-slide-toggle>
+        </div>
+
+      </div>
+      <div *ngSwitchCase="'chat'">
+        Chat
+      </div>
+      <div *ngSwitchCase="'graph'">
+        <mat-form-field class="example-full-width">
+          <input type="text" placeholder="Select plot" aria-label="Name" matInput
+            [formControl]="plotControl" [matAutocomplete]="auto">
+          <mat-autocomplete autoActiveFirstOption #auto="matAutocomplete" [displayWith]="displayFnSnippetSelectionPlot">
+            <mat-option *ngFor="let plot of filteredOptionsPlot | async" [value]="plot">
+              {{plot["name"]}}
+            </mat-option>
+          </mat-autocomplete>
+        </mat-form-field>
+      </div>
+      <div *ngSwitchCase="'snippetViewer'">
+        <mat-form-field class="example-full-width">
+          <input type="text" placeholder="Select snippet" aria-label="Name" matInput
+            [formControl]="snippetViewerControl" [matAutocomplete]="auto">
+          <mat-autocomplete autoActiveFirstOption #auto="matAutocomplete" [displayWith]="displayFnSnippetSelection">
+            <mat-option *ngFor="let dashboardName of filteredOptions | async" [value]="dashboardName">
+              {{dashboardName.dashboardName}}
+            </mat-option>
+          </mat-autocomplete>
+        </mat-form-field>
+
+        <!-- <div *ngFor="let snippet of (snippetViewerOptions | async)?.dashboardName">
+            {{snippet.id}}
+              
+          </div> -->
+      </div>
+
+    </div>
+  </form>
+</div>
+<mat-dialog-actions align="end">
+  <button mat-button (click)="close()">Cancel</button>
+  <button mat-button (click)="applyChanges($event)">Apply</button>
+</mat-dialog-actions>

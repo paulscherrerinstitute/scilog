@@ -1,0 +1,18 @@
+<ng-container>
+    <div class="messages-container">
+        <div *ngFor="let snippet of array; let i = index">
+              <snippet [snippet]="snippet" [isLogbook]=false [updatedAt]="snippet.updatedAt" [index]=i+1></snippet>
+        </div>
+    </div>
+    <div class='input'>
+        <textarea matInput class="message-text"></textarea>
+        <button mat-icon-button aria-label="Send" >
+            <mat-icon>send</mat-icon>
+        </button>
+    </div>
+</ng-container>
+
+
+
+
+

@@ -1,0 +1,11 @@
+<h1 mat-dialog-title>Snippet info</h1>
+<div mat-dialog-content>
+  <snippet-info-section [data]='data' [infoSnippets]='infoFieldsGeneral'></snippet-info-section>
+  <snippet-info-section [data]='data' [infoSnippets]='infoFieldsPermissions'></snippet-info-section>
+  <snippet-info-section [data]='data' [infoSnippets]='infoFieldsType'></snippet-info-section>
+  <snippet-info-section [data]='data' [infoSnippets]='infoFieldsCreated'></snippet-info-section>
+  <snippet-info-section [data]='data' [infoSnippets]='infoFieldsUpdated'></snippet-info-section>
+</div>
+<div mat-dialog-actions>
+  <button mat-button (click)="closeInfo()" cdkFocusInitial>Close</button>
+</div>

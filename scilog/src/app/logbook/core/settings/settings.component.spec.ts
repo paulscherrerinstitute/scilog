@@ -1,0 +1,35 @@
+import { async, ComponentFixture, TestBed } from '@angular/core/testing';
+import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
+
+import { SettingsComponent } from './settings.component';
+import { Router } from '@angular/router';
+
+describe('SettingsComponent', () => {
+  let component: SettingsComponent;
+  let fixture: ComponentFixture<SettingsComponent>;
+  let routerSpy: any;
+
+  routerSpy = jasmine.createSpyObj("Router", ["navigate"]);
+
+  beforeEach(async(() => {
+    TestBed.configureTestingModule({
+      declarations: [ SettingsComponent ],
+      providers: [
+        { provide: MatDialogRef, useValue: {} },
+        { provide: MAT_DIALOG_DATA, useValue: {} },
+        {provide: Router, useValue:routerSpy},
+      ]
+    })
+    .compileComponents();
+  }));
+
+  beforeEach(() => {
+    fixture = TestBed.createComponent(SettingsComponent);
+    component = fixture.componentInstance;
+    fixture.detectChanges();
+  });
+
+  it('should create', () => {
+    expect(component).toBeTruthy();
+  });
+});

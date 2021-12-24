@@ -1,0 +1,41 @@
+@import '../../../styles/_shadows.scss';
+
+::ng-deep  .gridster{
+    background-color:var(--main-background);
+    /* margin-top: 80px; */
+  }
+  ::ng-deep  .gridster-edit{
+    background-color:#ca000093;
+    /* margin-top: 80px; */
+  }
+  
+  .gridster-item{
+    padding: 10px 15px;
+    background-color: var(--dashboard-item);
+    color: var(--default-text-color);
+    border-radius: 12px; 
+    overflow: hidden;
+    @include default-shadow;
+  }
+  
+  .gridster-container{
+    /* top: 50px; */
+    padding-bottom: 100px;
+    padding-right: 20px;
+    padding-left: 20px;
+
+    height: calc(100vh - 120px);
+    width: 100wh;
+    overflow: hidden;
+  }
+
+  .dashboard-item{
+    height:inherit;
+    overflow: inherit;
+    
+  }
+
+  .dashboard-edit{
+    float: right;
+    height: 36px;
+  }

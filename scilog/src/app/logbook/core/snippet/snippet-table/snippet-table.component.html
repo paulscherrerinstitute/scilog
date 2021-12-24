@@ -1,0 +1,25 @@
+<mat-table [dataSource]="snippets">
+    <ng-container matColumnDef="index">
+        <mat-header-cell *matHeaderCellDef> Id </mat-header-cell>
+        <mat-cell *matCellDef="let element; let i = index;">{{i}}</mat-cell>
+    </ng-container>
+    <ng-container matColumnDef="content">
+        <mat-header-cell *matHeaderCellDef> Content</mat-header-cell>
+        <mat-cell *matCellDef="let element"> {{sanitizer.sanitize(secContext.HTML, element)}} </mat-cell>
+    </ng-container>
+    <ng-container matColumnDef="action">
+        <mat-header-cell *matHeaderCellDef></mat-header-cell>
+        <mat-cell *matCellDef="let element"> 
+            <button mat-button [matMenuTriggerFor]="menu"><mat-icon>more_vert</mat-icon>
+            </button>
+              <mat-menu #menu="matMenu">
+                <button mat-menu-item >Edit</button>
+                <button mat-menu-item >Go to current family</button>
+                <button mat-menu-item >Create new family</button>
+                <button mat-menu-item >Delete</button>              
+              </mat-menu>
+          </mat-cell>
+    </ng-container>
+    <mat-header-row *matHeaderRowDef="displayedColumns"></mat-header-row>
+    <mat-row *matRowDef="let row; columns: displayedColumns;"></mat-row>
+</mat-table>

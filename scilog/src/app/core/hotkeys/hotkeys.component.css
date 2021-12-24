@@ -1,0 +1,39 @@
+    table {
+      border-collapse: collapse;
+      width: 100%;
+      margin-bottom: 1rem;
+      color: #212529;
+    }
+  
+     th {
+       font-weight: 500;
+       text-align: left;
+       vertical-align: bottom;
+        padding: .75rem;
+        border-top: 1px solid #dee2e6;
+        border-bottom: 2px solid #dee2e6;
+    }
+  
+    td {
+      padding: .75rem;
+      vertical-align: top;
+      border-top: 1px solid #dee2e6;
+      padding-left: 0;
+    }
+  
+    kbd {
+      margin-right: 6px;
+      background-color: #fafbfc;
+      border: 1px solid #d1d5da;
+      border-bottom-color: #c6cbd1;
+      border-radius: 3px;
+      box-shadow: inset 0 -1px 0 #c6cbd1;
+      color: #444d56;
+      display: inline-block;
+      font-size: 12px;
+      line-height: 10px;
+      padding: 3px 5px;
+      vertical-align: middle;
+    }
+  
+  

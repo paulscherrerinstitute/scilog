@@ -1,0 +1,55 @@
+<!-- [(ngModel)]="newTodo.title" (keyup.enter)="addTodo()" -->
+<div class="counter" *ngIf="tasks.length > 0">
+  <span><strong>{{numTasks}}</strong> {{tasks.length == 1 ? 'item' : 'items'}} left</span>
+</div>
+<mat-form-field class="add-task">
+  <input matInput class="new-task" placeholder="Add task" autofocus="" (keydown.shift.enter)="addTasks()" (keydown.enter)="addTasks()" [formControl]="newTask">
+</mat-form-field>
+
+<div class="task-container">
+ <div *ngFor="let task of tasks; let i=index" >
+  <mat-card class="task-mat-card">
+    <mat-card-content class="task-content">
+        <mat-checkbox (change)="toggleTaskIsDone(i)" [checked]="task.isDone" >
+          <div >
+            
+          </div>
+        </mat-checkbox>
+        <span [ngStyle]="{'text-decoration': task.isDone? 'line-through' : 'none', 'opacity': task.isDone? '0.6' : '1'}" class='task-text'>
+          {{ task.content }}
+        </span>
+      <span class="flexExpand"></span>
+      <span>
+        <button mat-icon-button (click)="deleteTask(i)">
+          <mat-icon>delete</mat-icon>
+        </button>
+      </span>
+
+
+    </mat-card-content>
+  </mat-card>
+</div> 
+</div>
+
+
+
+<!-- <section class="todoapp">
+    <header class="header">
+      <h1>Todos</h1>
+      <input class="new-todo" placeholder="What needs to be done?" autofocus="" [(ngModel)]="newTodo.title" (keyup.enter)="addTodo()">
+    </header>
+    <section class="main" *ngIf="todos.length > 0">
+      <ul class="todo-list">
+        <li *ngFor="let todo of todos" [class.completed]="todo.complete">
+          <div class="view">
+            <input class="toggle" type="checkbox" (click)="toggleTodoComplete(todo)" [checked]="todo.complete">
+            <label>{{todo.title}}</label>
+            <button class="destroy" (click)="removeTodo(todo)"></button>
+          </div>
+        </li>
+      </ul>
+    </section>
+    <footer class="footer" *ngIf="todos.length > 0">
+      <span class="todo-count"><strong>{{todos.length}}</strong> {{todos.length == 1 ? 'item' : 'items'}} left</span>
+    </footer>
+  </section> -->

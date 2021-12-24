@@ -1,0 +1,33 @@
+<div class="background-image"></div>
+<div class="login-form-flex">
+    <mat-card class='mat-card'>
+      
+      <mat-card-title>
+          <img src="assets/scilog_logo.png" alt="SciLog" width="120" height="120">
+      </mat-card-title>
+      <mat-card-content class="content-container">
+        <form [formGroup]="form" (keyup.enter)="login()">
+        <mat-form-field appearance="outline" class="mat-form-field">
+          <mat-label>User name</mat-label>
+          <input matInput [type]="'text'" formControlName="email">
+        </mat-form-field>
+        <br/>
+        <mat-form-field appearance="outline" class="mat-form-field">
+            <mat-label>Enter your password</mat-label>
+            <input matInput [type]="hide ? 'password' : 'text'" formControlName="password">
+            <button mat-icon-button matSuffix (mousedown)="hide = !hide" [attr.aria-label]="'Hide password'" [attr.aria-pressed]="hide">
+            <mat-icon>{{hide ? 'visibility_off' : 'visibility'}}</mat-icon>
+            </button>
+          </mat-form-field>
+          <div class="errorText">
+            {{ loginMessage }}
+          </div>
+        </form>
+      </mat-card-content>
+      <mat-card-actions class="mat-card-actions">
+          <button mat-raised-button color="primary" (click)="login()">Login</button>          
+      </mat-card-actions>
+    </mat-card>
+  </div>
+
+

@@ -1,0 +1,120 @@
+<div class="settings-container">
+  <mat-sidenav-container class="sidenav-container">
+
+    <mat-tab-group mat-align-tabs="center">
+      <mat-tab label="Save">
+        <div class="header">
+          <span class="headerTitle">
+            Save current view
+          </span>
+        </div>
+        <div class="saveTab">
+          <form [formGroup]="viewFormGroup" style="width: 80%;">
+            <mat-form-field appearance="standard" required>
+              <mat-label>Title</mat-label>
+              <input matInput placeholder="Title of the view" [formControl]="viewFormGroup.get('name')">
+              <mat-error *ngIf="viewFormGroup.get('name').hasError('required')">Please specify a name.</mat-error>
+              <mat-error *ngIf="viewFormGroup.get('name').hasError('forbiddenName')">_personal is a protected suffix.
+              </mat-error>
+              <mat-error *ngIf="viewFormGroup.get('name').hasError('existingName')">A view with this name already exists.
+            </mat-error>
+            </mat-form-field>
+            <div class="advancedSlider">
+              <mat-slide-toggle [formControl]="viewFormGroup.get('enableAdvanced')">
+                Advanced
+              </mat-slide-toggle>
+            </div>
+            <mat-divider></mat-divider>
+            <div class="sharingSettings" *ngIf="viewFormGroup.get('enableAdvanced').value; else elseBlock">
+              <div>
+                <mat-form-field appearance="standard">
+                  <mat-label>Location</mat-label>
+                  <mat-select [formControl]="viewFormGroup.get('location')" (selectionChange)="selectLocation($event)">
+                    <ng-container *ngFor="let location of availLocations">
+                      <mat-option [(value)]="location.id">{{ location?.location }}</mat-option>
+                    </ng-container>
+                  </mat-select>
+                  <mat-error *ngIf="viewFormGroup.get('location').hasError('required')">Please select a location.
+                  </mat-error>
+                </mat-form-field>
+              </div>
+              <div>
+                <mat-form-field appearance="standard" required>
+                  <mat-label>ownerGroup</mat-label>
+                  <input matInput placeholder="ownerGroup" [matAutocomplete]="autoOwnerGroup" [formControl]="viewFormGroup.get('ownerGroup')">
+                  <mat-error *ngIf="viewFormGroup.get('ownerGroup').hasError('required')">Please specify the owner
+                    group.
+                  </mat-error>
+                  <mat-error *ngIf="viewFormGroup.get('ownerGroup').hasError('forbiddenGroup')">You are not a member of this group.
+                  </mat-error>
+                  <mat-autocomplete #autoOwnerGroup="matAutocomplete">
+                    <mat-option *ngFor="let group of filteredAccessGroups | async" [value]="group">
+                      {{group}}
+                    </mat-option>
+                  </mat-autocomplete>
+                </mat-form-field>
+              </div>
+              <div>
+                <mat-form-field>
+                  <mat-chip-list #accessGroupsChipList aria-label="AccessGroups selection">
+                    <mat-chip *ngFor="let group of accessGroupsSelected" [selectable]="selectable"
+                      [removable]="removable" (removed)="removeAccessGroup(group)">
+                      {{group}}
+                      <mat-icon matChipRemove *ngIf="removable">cancel</mat-icon>
+                    </mat-chip>
+                    <input placeholder="accessGroups" #accessGroupsInput [formControl]="viewFormGroup.get('accessGroupsCtrl')"
+                      [matAutocomplete]="autoAccessGroups" [matChipInputFor]="accessGroupsChipList"
+                      [matChipInputSeparatorKeyCodes]="separatorKeysCodes"
+                      (matChipInputTokenEnd)="addAccessGroup($event)">
+                      <mat-error *ngIf="viewFormGroup.get('accessGroupsCtrl').hasError('forbiddenGroup')">You are not a member of this group.
+                    </mat-error>
+                  </mat-chip-list>
+                  <mat-autocomplete #autoAccessGroups="matAutocomplete" (optionSelected)="selectedAccessGroup($event)">
+                    <mat-option *ngFor="let group of filteredAccessGroups | async" [value]="group">
+                      {{group}}
+                    </mat-option>
+                  </mat-autocomplete>
+                </mat-form-field>
+              </div>
+            </div>
+            <ng-template #elseBlock>
+              <div>
+                <mat-slide-toggle [formControl]="viewFormGroup.get('shareWithLogbook')"
+                  (change)='shareWithLogbookSlide()'>
+                  Share with all members of the logbook
+                </mat-slide-toggle>
+              </div>
+              <div>
+                <mat-slide-toggle [formControl]="viewFormGroup.get('shareWithLocation')"  (change)='shareWithLocationSlide()'
+                  [matTooltip]="viewFormGroup.get('shareWithLocation').enabled? '' : 'You have to be a member of the location to share views.'">
+                  Share with all users of the location {{ currentLocation.location }}
+                </mat-slide-toggle>
+              </div>
+            </ng-template>
+            <mat-divider></mat-divider>
+            <div class="saveButton">
+              <button mat-button (click)="saveLogbook()">Save</button>
+            </div>
+            <div *ngIf="showSaveMessage" class="saveMessage">
+              <div>
+                {{ saveMessage }}
+              </div>
+          </div>
+
+          </form>
+        </div>
+      </mat-tab>
+
+
+      <mat-tab label="Edit">
+        <view-edit [views]="views" [currentView]="viewService.view" [logbook]="logbook" [availLocations]="availLocations"></view-edit>
+      </mat-tab>
+    </mat-tab-group>
+
+
+
+    <!-- </mat-sidenav-content> -->
+
+  </mat-sidenav-container>
+
+</div>

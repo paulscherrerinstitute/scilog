@@ -1,0 +1,8 @@
+mat-form-field{
+    width: 50vh;
+}
+
+
+textarea:disabled {
+	color: rgba(0, 0, 0, 1);
+}

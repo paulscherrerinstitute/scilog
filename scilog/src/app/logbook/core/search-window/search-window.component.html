@@ -1,0 +1,100 @@
+<div class='windowContainer'>
+    <mat-toolbar class='searchBarTop'>
+        <span class="searchInput">
+            <mat-form-field class="search-form-field" floatLabel="never">
+                <mat-label>
+                    Search <mat-icon>search</mat-icon>
+                </mat-label>
+                <input #searchSnippets matInput type="text" [(ngModel)]="searchString">
+                <!-- <button mat-button *ngIf="searchString" matSuffix mat-icon-button aria-label="Clear"
+                    (click)="searchString=''">
+                    <mat-icon>close</mat-icon>
+                </button> -->
+            </mat-form-field>
+        </span>
+        <span>
+            <button mat-icon-button (click)="closeSearch()">
+                <mat-icon>close</mat-icon>
+            </button>
+        </span>
+
+    </mat-toolbar>
+    <div class="searchHelp" *ngIf="showHelp">
+        <mat-divider></mat-divider>
+        <div class="header">
+            Suggestions...
+            <div>
+                Created by:
+                <button class="suggestion-button" (click)="addToSearch('@' + _sample_user)">
+                    @{{_sample_user}}
+                </button>
+            </div>
+            <div>
+                Tag:
+                <span *ngFor="let tag of tags.slice(0,3)">
+                    <button class="suggestion-button" (click)="addToSearch('#' + tag)">
+                        #{{tag}}
+                    </button>
+                </span>
+                
+    
+            </div>
+            <div>
+                Global search:
+                <button class="suggestion-button" (click)="addToSearch(':global')">
+                    :global
+                </button>
+            </div>
+            <div>
+                Owner:
+                <button class="suggestion-button" (click)="addToSearch('$' + _sample_user)">
+                    ${{_sample_user}}
+                </button>
+            </div>
+        </div>
+        <mat-divider></mat-divider>
+        <div class="header">
+            Examples:
+            <div>
+                Search everywhere for entries created by "{{_sample_user}}" that contain the word "alignment" and have a tag "{{tags[0]}}":
+                <button class="suggestion-button" (click)="addToSearch(':global' + ' #' + tags[0] + ' @' + _sample_user + ' alignment')">
+                    :global #{{tags[0]}} @{{_sample_user}} alignment
+                </button>
+            </div>
+        </div>
+
+    </div>
+    <div class="searchResults" *ngIf=showResults>
+        <div class="header">
+            Logbook view:
+            <div class="searchContainer">
+                <div *uiScroll="let snippet of searchScrollService.datasource; let i = index">
+                    <snippet [snippet]="snippet" [updatedAt]="snippet.updatedAt" [index]=i+1 [config]="config"
+                        [showEditButtonsMenu]="false" (selected)="selectedSnippet($event)">
+                    </snippet>
+                </div>
+            </div>
+        </div>
+        <!-- <div class="header">
+            Tasks:
+            <div *uiScroll="let snippet of searchScrollService.datasource; let i = index">
+                <snippet [snippet]="snippet" [updatedAt]="snippet.updatedAt" [index]=i+1 [config]="config"
+                    [showEditButtonsMenu]="false" (selected)="selectedSnippet($event)">
+                </snippet>
+            </div>
+        </div> -->
+
+        
+    </div>
+
+</div>
+<div class="statusMessage" *ngIf=showResults>
+    <mat-divider></mat-divider>
+    <div>
+        Showing results for:
+        <span>
+            {{searchString}}
+        </span>
+    </div>
+
+</div>

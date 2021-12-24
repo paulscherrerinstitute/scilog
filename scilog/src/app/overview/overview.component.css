@@ -1,0 +1,25 @@
+
+  .logbook-card {
+    display: inline-flex;
+    /* justify-content: space-between; */
+    padding: 10px;
+  }
+
+  .overview-container{
+    position: relative;
+    top: 40px;
+    padding: 20px; 
+
+  }
+
+   
+  ::ng-deep .mat-toolbar{
+    z-index: 998;
+    position: fixed;
+    height: 50px;
+    flex: 1 1 auto;
+  }
+
+  .flexExpand {
+    flex: 1 1 auto;
+  }

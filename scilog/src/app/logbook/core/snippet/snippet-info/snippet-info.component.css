@@ -1,0 +1,7 @@
+.info-container{
+    overflow-y: scroll;
+    overflow-x: hidden;
+    max-height: calc(80vh);
+    height: 50vh;
+    width: 50vw;
+}
