@@ -16,11 +16,11 @@ def authenticated(func):
             kwargs["headers"] = {}
         kwargs["headers"]["Authorization"] = client.token
         return func(client, *args, **kwargs)
+
     return authenticated_call
 
 
 class HttpClient(AuthMixin):
-
     def __init__(self, address):
         self.address = address
         self._verify_certificate = True
@@ -28,10 +28,7 @@ class HttpClient(AuthMixin):
         super().__init__(address)
 
     def authenticate(self, username, password):
-        auth_payload = {
-            "principal": username,
-            "password":  password
-        }
+        auth_payload = {"principal": username, "password": password}
         res = self._login(auth_payload, HEADER_JSON)
         try:
             token = "Bearer " + res["token"]
@@ -42,7 +39,13 @@ class HttpClient(AuthMixin):
 
     @authenticated
     def get_request(self, url, params=None, headers=None, timeout=10):
-        response = requests.get(url, params=params, headers=headers, timeout=timeout, verify=self._verify_certificate)
+        response = requests.get(
+            url,
+            params=params,
+            headers=headers,
+            timeout=timeout,
+            verify=self._verify_certificate,
+        )
         if response.ok:
             return response.json()
         else:
@@ -51,14 +54,49 @@ class HttpClient(AuthMixin):
             raise response.raise_for_status()
 
     @authenticated
-    def post_request(self, url, payload=None, headers=None, timeout=10):
-        return requests.post(url, json=payload, headers=headers, timeout=timeout, verify=self._verify_certificate).json()
+    def post_request(self, url, payload=None, files=None, headers=None, timeout=10):
+        req = requests.post(
+            url,
+            json=payload,
+            files=files,
+            headers=headers,
+            timeout=timeout,
+            verify=self._verify_certificate,
+        )
+        req.raise_for_status()
+        return req.json()
+
+    @authenticated
+    def patch_request(self, url, payload=None, files=None, headers=None, timeout=10):
+        req = requests.patch(
+            url,
+            json=payload,
+            files=files,
+            headers=headers,
+            timeout=timeout,
+            verify=self._verify_certificate,
+        )
+        req.raise_for_status()
+        return {}
 
     def _login(self, payload=None, headers=None, timeout=10):
-        return requests.post(self.login_path, json=payload, headers=headers, timeout=timeout, verify=self._verify_certificate).json()
+        return requests.post(
+            self.login_path,
+            json=payload,
+            headers=headers,
+            timeout=timeout,
+            verify=self._verify_certificate,
+        ).json()
 
     @staticmethod
-    def make_filter(where:dict=None, limit:int=0, skip:int=0, fields:dict=None, include:dict=None, order:list=None):
+    def make_filter(
+        where: dict = None,
+        limit: int = 0,
+        skip: int = 0,
+        fields: dict = None,
+        include: dict = None,
+        order: list = None,
+    ):
         filt = dict()
         if where is not None:
             items = [where.copy()]
@@ -73,6 +111,3 @@ class HttpClient(AuthMixin):
             filt["order"] = order
         filt = json.dumps(filt)
         return {"filter": filt}
-
-
-
