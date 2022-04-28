@@ -1,6 +1,8 @@
 import {TokenService} from '@loopback/authentication';
 import {TokenServiceBindings} from '@loopback/authentication-jwt';
+import { AnyObject } from '@loopback/repository';
 import {SciLogDbApplication} from '../application';
+import { MongoDataSource } from '../datasources';
 
 export interface WebsocketClient {
   ws?: any,
@@ -127,9 +129,10 @@ export async function startWebsocket(app: SciLogDbApplication) {
     }
   })();
 
-  Mongo.MongoClient.connect("mongodb://localhost:27017", {useUnifiedTopology: true})
+  const dataSourceSettings: AnyObject = (app.getSync('datasources.mongo') as MongoDataSource).settings;
+  Mongo.MongoClient.connect(dataSourceSettings.url, {useUnifiedTopology: dataSourceSettings.useUnifiedTopology})
     .then((client: any) => {
-      const db = client.db("scilog");
+      const db = client.db(dataSourceSettings.database);
       const collection = db.collection("Basesnippet");
       const changeStream = collection.watch();//[{'$match': {'fullDocument.ownerGroup': 'p17301'}}]
       // console.log(collection);
