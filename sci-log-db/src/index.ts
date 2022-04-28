@@ -23,6 +23,7 @@ if (require.main === module) {
     rest: {
       port,
       host: process.env.HOST,
+      basePath: process.env.BASE_PATH || "",
       // The `gracePeriodForClose` provides a graceful close for http/https
       // servers with keep-alive clients. The default value is `Infinity`
       // (don't force-close). If you want to immediately destroy all sockets
@@ -31,13 +32,7 @@ if (require.main === module) {
       gracePeriodForClose: 5000, // 5 seconds
       openApiSpec: {
         // useful when used with OpenAPI-to-GraphQL to locate your application
-        setServersFromRequest: false,
-        servers: [
-           {
-              url: "https://lnode2.psi.ch/api/v1",
-              description: "Development lnode2 server"
-           }
-        ]
+        setServersFromRequest: true,
       },
       websocket: {port},
     },

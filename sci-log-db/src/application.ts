@@ -8,7 +8,7 @@ import {JWTAuthenticationComponent, TokenServiceBindings} from '@loopback/authen
 import {AuthorizationComponent} from '@loopback/authorization';
 import {BootMixin} from '@loopback/boot';
 import {ApplicationConfig, BindingKey, createBindingFromClass} from '@loopback/core';
-import {model, property, RepositoryMixin, SchemaMigrationOptions} from '@loopback/repository';
+import {AnyObject, model, property, RepositoryMixin, SchemaMigrationOptions} from '@loopback/repository';
 import {RestApplication} from '@loopback/rest';
 import {RestExplorerBindings, RestExplorerComponent} from '@loopback/rest-explorer';
 import {ServiceMixin} from '@loopback/service-proxy';
@@ -124,6 +124,18 @@ export class SciLogDbApplication extends BootMixin(
     this.bind(UserServiceBindings.USER_SERVICE).toClass(LDAPUserService);
 
     this.add(createBindingFromClass(SecuritySpecEnhancer));
+
+    // Bind datasource config
+    this.configureDatasourceFromFile("../datasource.json", "datasources.config.mongo")
+  }
+
+  configureDatasourceFromFile(datasourceFile: string, datasourceConfigBindingKey: string): void {
+    try {
+      const mongoConfig: AnyObject = require(datasourceFile);
+      this.bind(datasourceConfigBindingKey).to(mongoConfig);
+    } catch {
+      console.debug("missing datasource config file, applying defaults");
+    }
   }
 
   // Unfortunately, TypeScript does not allow overriding methods inherited
