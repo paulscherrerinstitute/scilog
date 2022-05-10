@@ -1,5 +1,5 @@
 import { BrowserModule } from '@angular/platform-browser';
-import { NgModule } from '@angular/core';
+import { APP_INITIALIZER, NgModule } from "@angular/core";
 
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
@@ -81,6 +81,11 @@ import {MatSnackBarModule} from '@angular/material/snack-bar';
 import { DownloadComponent } from '@shared/download/download.component';
 import { SearchComponent } from '@shared/search/search.component';
 import { SearchWindowComponent } from '@shared/search-window/search-window.component';
+import { AppConfigService } from "./app-config.service";
+
+const appConfigInitializerFn = (appConfig: AppConfigService) => {
+  return () => appConfig.loadAppConfig();
+};
 
 @NgModule({
   declarations: [
@@ -166,6 +171,13 @@ import { SearchWindowComponent } from '@shared/search-window/search-window.compo
   ],
   entryComponents: [HotkeysComponent],
   providers: [
+    AppConfigService,
+    {
+      provide: APP_INITIALIZER,
+      useFactory: appConfigInitializerFn,
+      multi: true,
+      deps: [AppConfigService],
+    },
     {
       provide: HTTP_INTERCEPTORS,
       useClass: AuthInterceptor,

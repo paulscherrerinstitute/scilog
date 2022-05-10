@@ -1,34 +1,22 @@
 import { Injectable } from '@angular/core';
+import { AppConfigService } from "../../app-config.service";
 
 @Injectable({
   providedIn: 'root'
 })
 export class ServerSettingsService {
+  appConfig = this.appConfigService.getConfig();
 
-  constructor() { }
-
-  public serverType: string = "production";
+  constructor(
+    private appConfigService: AppConfigService,
+  ) { }
 
   getServerAddress(){
-    switch (this.serverType) {
-      case "production":
-        return "https://lnode2.psi.ch/api/v1/";
-      case "kwHome":
-        return "http://[::1]:3000/"; 
-      default:
-        break;
-    }
+    return this.appConfig.lbBaseURL || 'http://[::1]:3000/';
   }
 
   getSocketAddress(){
-    switch (this.serverType) {
-      case "production":
-        return 'wss://lnode2.psi.ch/api/v1';
-      case "kwHome":
-        return "ws://localhost:3000/"; 
-      default:
-        break;
-    }
+      return `ws://${this.appConfig.lbBaseURL.split('://').pop() || 'localhost:3000/'}`;
   }
 
 
