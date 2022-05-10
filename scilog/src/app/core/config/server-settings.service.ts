@@ -1,34 +1,23 @@
 import { Injectable } from '@angular/core';
+import { AppConfigService } from "../../app-config.service";
 
 @Injectable({
   providedIn: 'root'
 })
 export class ServerSettingsService {
 
-  constructor() { }
-
-  public serverType: string = "production";
+  constructor(
+    private appConfigService: AppConfigService,
+  ) { }
 
   getServerAddress(){
-    switch (this.serverType) {
-      case "production":
-        return "https://lnode2.psi.ch/api/v1/";
-      case "kwHome":
-        return "http://[::1]:3000/"; 
-      default:
-        break;
-    }
+    return this.appConfigService.getConfig().lbBaseURL || 'http://[::1]:3000/';
   }
 
   getSocketAddress(){
-    switch (this.serverType) {
-      case "production":
-        return 'wss://lnode2.psi.ch/api/v1';
-      case "kwHome":
-        return "ws://localhost:3000/"; 
-      default:
-        break;
-    }
+    const lbBaseURL = this.appConfigService.getConfig().lbBaseURL || 'http://localhost:3000/';
+    if (!lbBaseURL.startsWith('http')) throw new Error('BaseURL must use the http or https protocol');
+    return `ws${lbBaseURL.substring(4)}`;
   }
 
 
