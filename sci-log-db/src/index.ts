@@ -32,13 +32,7 @@ if (require.main === module) {
       gracePeriodForClose: 5000, // 5 seconds
       openApiSpec: {
         // useful when used with OpenAPI-to-GraphQL to locate your application
-        setServersFromRequest: false,
-        servers: [
-           {
-              url: "https://lnode2.psi.ch/api/v1",
-              description: "Development lnode2 server"
-           }
-        ]
+        setServersFromRequest: true,
       },
       websocket: {port},
     },

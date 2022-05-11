@@ -34,7 +34,7 @@ export class CreateFunctionalAccountsObserver implements LifeCycleObserver {
     // Add your logic for start
 
     var fs = require('fs');
-    let path = '/root/scilog/sci-log-db/src/scilog_config_PSI/functionalAccounts.json';
+    let path = '../../functionalAccounts.json';
     let pathLocal = './src/scilog_config_PSI/functionalAccounts.json';
     var accounts = [];
     if (fs.existsSync(path)) {
