@@ -4,7 +4,7 @@ WORKDIR /frontend
 COPY package*.json /frontend/
 RUN npm install
 COPY . /frontend/
-RUN npx ng build
+RUN npx ng build --output-path=dist
 
 FROM nginx:1.21-alpine
 RUN rm -rf /usr/share/nginx/html*
