@@ -5,18 +5,17 @@ import { AppConfigService } from "../../app-config.service";
   providedIn: 'root'
 })
 export class ServerSettingsService {
-  appConfig = this.appConfigService.getConfig();
 
   constructor(
     private appConfigService: AppConfigService,
   ) { }
 
   getServerAddress(){
-    return this.appConfig.lbBaseURL || 'http://[::1]:3000/';
+    return this.appConfigService.getConfig().lbBaseURL || 'http://[::1]:3000/';
   }
 
   getSocketAddress(){
-      return `ws://${this.appConfig.lbBaseURL.split('://').pop() || 'localhost:3000/'}`;
+      return `ws://${this.appConfigService.getConfig().lbBaseURL.split('://').pop() || 'localhost:3000/'}`;
   }
 
 
