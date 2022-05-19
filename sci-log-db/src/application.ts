@@ -3,7 +3,7 @@
 // This file is licensed under the MIT License.
 // License text available at https://opensource.org/licenses/MIT
 
-import {AuthenticationComponent} from '@loopback/authentication';
+import {AuthenticationComponent, registerAuthenticationStrategy} from '@loopback/authentication';
 import {JWTAuthenticationComponent, TokenServiceBindings} from '@loopback/authentication-jwt';
 import {AuthorizationComponent} from '@loopback/authorization';
 import {BootMixin} from '@loopback/boot';
@@ -16,7 +16,7 @@ import fs from 'fs';
 import _ from 'lodash';
 import multer from 'multer';
 import path from 'path';
-import {FILE_UPLOAD_SERVICE, PasswordHasherBindings, STORAGE_DIRECTORY, UserServiceBindings} from './keys';
+import {FILE_UPLOAD_SERVICE, PasswordHasherBindings, STORAGE_DIRECTORY} from './keys';
 import {User} from './models';
 import {UserRepository} from './repositories';
 import {MySequence} from './sequence';
@@ -27,7 +27,32 @@ import {LDAPUserService} from './services/ldap-user-service';
 import {startWebsocket} from './utils/websocket';
 
 
+import {
+  Application,
+  Constructor,
+  Provider,
+} from '@loopback/core';
+import {ExpressRequestHandler, toInterceptor} from '@loopback/rest';
+import passport from 'passport';
+import {
+  SessionAuth,
+  OIDCInterceptor
+} from './authentication-interceptors';
+import {
+  OIDCAuthentication
+} from './authentication-strategies';
+import {
+  OIDCExpressMiddleware, OIDCProvider
+} from './authentication-strategy-providers';
+import {UserServiceBindings} from './services';
+import session from 'express-session'
+const expressSessionInterceptor = toInterceptor(session({secret: "someSecret",
+resave: false,
+saveUninitialized: true}));
+
+
 import YAML = require('yaml');
+import { PassportUserIdentityService } from './services/user-service';
 
 export {ApplicationConfig};
 
@@ -58,6 +83,9 @@ export class SciLogDbApplication extends BootMixin(
   constructor(options: ApplicationConfig = {}) {
     super(options);
 
+    this.expressMiddleware(session, {secret: "someSecret",
+    resave: false,
+    saveUninitialized: false, proxy: true}, {key: 'middleware.express-session'})
     // Bind authentication component related elements
     this.component(AuthenticationComponent);
     this.component(JWTAuthenticationComponent);
@@ -115,18 +143,65 @@ export class SciLogDbApplication extends BootMixin(
 
   setUpBindings(): void {
     // Bind package.json to the application context
-    this.bind(PackageKey).to(pkg);
+    // this.bind(PackageKey).to(pkg);
 
-    // Bind bcrypt hash services
+    // // Bind bcrypt hash services
     this.bind(PasswordHasherBindings.ROUNDS).to(10);
     this.bind(PasswordHasherBindings.PASSWORD_HASHER).toClass(BcryptHasher);
-    this.bind(TokenServiceBindings.TOKEN_SERVICE).toClass(JWTService);
-    this.bind(UserServiceBindings.USER_SERVICE).toClass(LDAPUserService);
+    // this.bind(TokenServiceBindings.TOKEN_SERVICE).toClass(JWTService);
+    // this.bind(UserServiceBindings.USER_SERVICE).toClass(LDAPUserService);
 
-    this.add(createBindingFromClass(SecuritySpecEnhancer));
+    // this.add(createBindingFromClass(SecuritySpecEnhancer));
 
     // Bind datasource config
     this.configureDatasourceFromFile("../datasource.json", "datasources.config.mongo")
+    
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    passport.serializeUser(function (user: any, done) {
+      done(null, user);
+    });
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    passport.deserializeUser(function (user: any, done) {
+      done(null, user);
+    });
+    this
+      .bind(UserServiceBindings.PASSPORT_USER_IDENTITY_SERVICE)
+      .toClass(PassportUserIdentityService);
+  
+    // passport strategies
+    const passportStrategies: Record<string, Constructor<unknown>> = {
+      oidcStrategy: OIDCProvider,
+    };
+    for (const key in passportStrategies) {
+      this.add(createBindingFromClass(passportStrategies[key], {key}));
+    }
+    // registerAuthenticationStrategy(this, OIDCAuthentication);
+  
+    // passport express middleware
+    const middlewareMap: Record<
+      string,
+      Constructor<Provider<ExpressRequestHandler>>
+    > = {
+      oidcStrategyMiddleware: OIDCExpressMiddleware,
+    };
+    for (const key in middlewareMap) {
+      this.add(createBindingFromClass(middlewareMap[key], {key}));
+    }
+  
+    // LoopBack 4 style authentication strategies
+    const strategies: Constructor<unknown>[] = [
+      OIDCAuthentication
+    ];
+    for (const s of strategies) {
+      this.add(createBindingFromClass(s));
+    }
+  
+    // Express style middleware interceptors
+    this.bind('passport-init-mw').to(toInterceptor(passport.initialize()));
+    // this.bind('passport-session-mw').to(toInterceptor(passport.session()));
+    this.bind('passport-oidc').toProvider(OIDCInterceptor);
+    // this.bind('set-session-user').toProvider(SessionAuth);
+  
   }
 
   configureDatasourceFromFile(datasourceFile: string, datasourceConfigBindingKey: string): void {

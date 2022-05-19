@@ -5,8 +5,8 @@ import {AnyObject, juggler} from '@loopback/repository';
 const config = {
   "name": "mongo",
   "connector": "mongodb",
-  "url": "",
-  "host": "127.0.0.1",
+  "url": "mongodb://mongodb:27017/scilog",
+  "host": "mongodb",
   "port": 27017,
   "user": "",
   "password": "",
