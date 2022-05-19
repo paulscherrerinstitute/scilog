@@ -8,3 +8,4 @@ export * from './file-download.controller';
 export * from './file-upload.controller';
 export * from './user.controller';
 export * from './user-preference.controller';
+export * from './oidc.controller';

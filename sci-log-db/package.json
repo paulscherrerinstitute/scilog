@@ -31,7 +31,7 @@
     "openapi-spec": "node ./dist/openapi-spec",
     "prestart": "npm run build",
     "clean": "lb-clean dist *.tsbuildinfo .eslintcache",
-    "start": "pm2 start ecosystem.config.js --env production",
+    "start": "node -r source-map-support/register .",
     "stop": "pm2 stop ecosystem.config.js --env production",
     "logs": "pm2 logs",
     "delete-pm2": "pm2 delete 0",
@@ -51,6 +51,7 @@
   "dependencies": {
     "@loopback/authentication": "^7.0.7",
     "@loopback/authentication-jwt": "^0.7.7",
+    "@loopback/authentication-passport": "^5.0.0",
     "@loopback/authorization": "^0.7.7",
     "@loopback/boot": "^3.2.1",
     "@loopback/core": "^2.14.1",
@@ -59,6 +60,7 @@
     "@loopback/rest-explorer": "^3.1.0",
     "@loopback/service-proxy": "^3.0.7",
     "@types/multer": "^1.4.4",
+    "express-session": "^1.17.3",
     "html-to-latex": "^0.8.0",
     "isemail": "^3.2.0",
     "jsdom": "^16.4.0",
@@ -66,6 +68,7 @@
     "ldapjs-promise": "^1.0.3",
     "loopback-connector-mongodb": "^5.4.0",
     "multer": "^1.4.2",
+    "passport-openidconnect": "^0.1.1",
     "pm2": "^4.5.4",
     "socket.io": "^2.3.0",
     "tslib": "^2.0.0"
@@ -75,8 +78,10 @@
     "@loopback/eslint-config": "^10.0.5",
     "@loopback/testlab": "^3.2.12",
     "@types/formidable": "^2.0.5",
+    "@types/express-session": "^1.17.4",
     "@types/ldapjs": "^1.0.9",
     "@types/node": "^10.17.51",
+    "@types/passport": "^1.0.7",
     "eslint": "^7.18.0",
     "source-map-support": "^0.5.19",
     "typescript": "~4.1.3"

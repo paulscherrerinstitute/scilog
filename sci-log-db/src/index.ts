@@ -1,3 +1,4 @@
+import * as fs from 'fs';
 import {ApplicationConfig} from '@loopback/core';
 import {SciLogDbApplication} from './application';
 
@@ -5,6 +6,7 @@ export * from './application';
 
 export async function main(options: ApplicationConfig = {}) {
   const app = new SciLogDbApplication(options);
+  app.bind('oidcOptions').to(options.oidcOptions);
   await app.boot();
   await app.start();
   await app.startWebsocket();
@@ -23,7 +25,7 @@ if (require.main === module) {
     rest: {
       port,
       host: process.env.HOST,
-      basePath: process.env.BASE_PATH || "",
+      basePath: process.env.BASE_PATH ?? "",
       // The `gracePeriodForClose` provides a graceful close for http/https
       // servers with keep-alive clients. The default value is `Infinity`
       // (don't force-close). If you want to immediately destroy all sockets
@@ -37,6 +39,7 @@ if (require.main === module) {
       websocket: {port},
     },
     databaseSeeding: false,
+    oidcOptions: fs.existsSync('../oidc.json')? require('../oidc.json'): {},
   }
 
   main(config).catch(err => {
