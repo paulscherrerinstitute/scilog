@@ -5,6 +5,7 @@ export * from './application';
 
 export async function main(options: ApplicationConfig = {}) {
   const app = new SciLogDbApplication(options);
+  app.bind('oidcOptions').to(options.oidcOptions);
   await app.boot();
   await app.start();
   await app.startWebsocket();
@@ -37,6 +38,7 @@ if (require.main === module) {
       websocket: {port},
     },
     databaseSeeding: false,
+    oidcOptions: require('../providers.json').keycloak,
   }
 
   main(config).catch(err => {
