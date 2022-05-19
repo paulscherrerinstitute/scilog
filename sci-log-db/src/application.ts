@@ -3,7 +3,7 @@
 // This file is licensed under the MIT License.
 // License text available at https://opensource.org/licenses/MIT
 
-import {AuthenticationComponent} from '@loopback/authentication';
+import {AuthenticationComponent, registerAuthenticationStrategy} from '@loopback/authentication';
 import {JWTAuthenticationComponent, TokenServiceBindings} from '@loopback/authentication-jwt';
 import {AuthorizationComponent} from '@loopback/authorization';
 import {BootMixin} from '@loopback/boot';
@@ -16,16 +16,23 @@ import fs from 'fs';
 import _ from 'lodash';
 import multer from 'multer';
 import path from 'path';
-import {FILE_UPLOAD_SERVICE, PasswordHasherBindings, STORAGE_DIRECTORY, UserServiceBindings} from './keys';
+import {FILE_UPLOAD_SERVICE, PasswordHasherBindings, STORAGE_DIRECTORY} from './keys';
 import {User} from './models';
 import {UserRepository} from './repositories';
 import {MySequence} from './sequence';
 import {BcryptHasher} from './services/hash.password.bcryptjs';
 import {JWTService} from './services/jwt-service';
 import {SecuritySpecEnhancer} from './services/jwt-spec.enhancer';
-import {LDAPUserService} from './services/ldap-user-service';
+import {MyUserService} from './services/user-service';
 import {startWebsocket} from './utils/websocket';
 
+
+import {toInterceptor} from '@loopback/rest';
+import passport from 'passport';
+import {
+  OIDCAuthentication
+} from './authentication-strategies';
+import {UserServiceBindings} from './keys';
 
 import YAML = require('yaml');
 
@@ -117,16 +124,36 @@ export class SciLogDbApplication extends BootMixin(
     // Bind package.json to the application context
     this.bind(PackageKey).to(pkg);
 
-    // Bind bcrypt hash services
+    // // Bind bcrypt hash services
     this.bind(PasswordHasherBindings.ROUNDS).to(10);
     this.bind(PasswordHasherBindings.PASSWORD_HASHER).toClass(BcryptHasher);
     this.bind(TokenServiceBindings.TOKEN_SERVICE).toClass(JWTService);
-    this.bind(UserServiceBindings.USER_SERVICE).toClass(LDAPUserService);
+    this.bind(UserServiceBindings.USER_SERVICE).toClass(MyUserService);
 
     this.add(createBindingFromClass(SecuritySpecEnhancer));
 
     // Bind datasource config
     this.configureDatasourceFromFile("../datasource.json", "datasources.config.mongo")
+    
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    passport.serializeUser(function (user: any, done) {
+      done(null, user);
+    });
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    passport.deserializeUser(function (user: any, done) {
+      done(null, user);
+    });
+  
+    registerAuthenticationStrategy(this, OIDCAuthentication);
+    
+    // LoopBack 4 style authentication strategies
+    this.add(createBindingFromClass(OIDCAuthentication));
+  
+    // Express style middleware interceptors
+    this.bind('passport-init-mw').to(toInterceptor(passport.initialize()));
+    this.bind('passport-session-mw').to(toInterceptor(passport.session()));
+    this.bind('passport-oidc').to(toInterceptor(passport.authenticate('openidconnect')));
+  
   }
 
   configureDatasourceFromFile(datasourceFile: string, datasourceConfigBindingKey: string): void {

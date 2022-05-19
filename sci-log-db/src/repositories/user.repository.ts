@@ -6,7 +6,6 @@
 import {Getter, inject} from '@loopback/core';
 import {
   DefaultCrudRepository,
-  HasManyRepositoryFactory,
   HasOneRepositoryFactory,
   juggler,
   repository,
