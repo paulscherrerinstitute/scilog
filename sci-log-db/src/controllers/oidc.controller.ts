@@ -8,7 +8,7 @@ import {
   } from '@loopback/rest';
   import {authenticate, AuthenticationBindings} from '@loopback/authentication';
   import {SecurityBindings, UserProfile} from '@loopback/security';
-  import {inject} from '@loopback/core';
+  import {inject, intercept} from '@loopback/core';
 import { OIDCInterceptExpressMiddleware } from '../authentication-interceptors';
   
 //   import {SecurityBindings, UserProfile} from '@loopback/security';
@@ -63,10 +63,10 @@ import { OIDCInterceptExpressMiddleware } from '../authentication-interceptors';
       @inject(RestBindings.Http.REQUEST) request: RequestWithSession,
       @inject(RestBindings.Http.RESPONSE) response: Response,
     ) {
-      const profile = {
-        ...user.profile,
-      };
-      request.session.user = profile;
+      // const profile = {
+      //   ...user.profile,
+      // };
+      // request.session.user = profile;
       response.redirect('/auth/account');
       return response;
     }

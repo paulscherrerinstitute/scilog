@@ -3,8 +3,9 @@
 // This file is licensed under the MIT License.
 // License text available at https://opensource.org/licenses/MIT
 
-import {Entity, hasOne, model, property} from '@loopback/repository';
+import {Entity, hasMany, hasOne, model, property} from '@loopback/repository';
 import {UserCredentials} from './user-credentials.model';
+import { UserIdentity } from './user-identity.model';
 
 @model({
   settings: {
@@ -51,6 +52,9 @@ export class User extends Entity {
 
   @hasOne(() => UserCredentials)
   userCredentials: UserCredentials;
+
+  @hasMany(() => UserIdentity)
+  profiles?: UserIdentity[];
 
   @property({
     type: 'array',

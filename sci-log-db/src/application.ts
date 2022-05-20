@@ -198,9 +198,9 @@ export class SciLogDbApplication extends BootMixin(
   
     // Express style middleware interceptors
     this.bind('passport-init-mw').to(toInterceptor(passport.initialize()));
-    // this.bind('passport-session-mw').to(toInterceptor(passport.session()));
+    this.bind('passport-session-mw').to(toInterceptor(passport.session()));
     this.bind('passport-oidc').toProvider(OIDCInterceptor);
-    // this.bind('set-session-user').toProvider(SessionAuth);
+    this.bind('set-session-user').toProvider(SessionAuth);
   
   }
 
