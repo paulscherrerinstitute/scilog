@@ -15,11 +15,10 @@ import {composeInterceptors, intercept} from '@loopback/core';
 export function OIDCInterceptExpressMiddleware() {
   return intercept(
     composeInterceptors(
-      'middleware.express-session',
-      'passport-init-mw',
+      // 'passport-init-mw',
       // 'passport-session-mw',
       'passport-oidc',
-      // 'set-session-user',
+      'set-session-user',
     ),
   );
 }

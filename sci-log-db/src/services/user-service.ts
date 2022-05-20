@@ -160,8 +160,10 @@ export class MyUserService implements UserService<User, Credentials> {
      });
    }
    if (!userId) console.log('user id is empty');
-    throw 'user id is empty'
- }
+   return this.userRepository.findById(userId, {
+    include: ['profiles'],
+  });
+}
 
  /**
   * create a copy of the external profile
@@ -172,11 +174,12 @@ export class MyUserService implements UserService<User, Credentials> {
    userId: string,
    userIdentity: PassportProfile,
  ): Promise<void> {
+   const provider = 'oidc';
    await this.userIdentityRepository.create({
      id: userIdentity.id,
-     provider: userIdentity.provider,
-     authScheme: userIdentity.provider,
-     userId: parseInt(userId),
+     provider: provider,
+     authScheme: provider,
+     userId: require('mongodb').ObjectID(userId),
      profile: {
        emails: userIdentity.emails,
      },

@@ -16,8 +16,7 @@ export type ProfileFunction = (
 ) => void;
 
 export type VerifyFunction = (
-  accessToken: string,
-  refreshToken: string,
+  claimIss: string,
   profile: Profile,
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   done: (error: any, user?: any, info?: any) => void,
@@ -60,8 +59,7 @@ export const verifyFunctionFactory = function (
   userService: UserIdentityService<Profile, User>,
 ): VerifyFunction {
   return function (
-    accessToken: string,
-    refreshToken: string,
+    claimIss: string,
     profile: Profile,
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     done: (error: any, user?: any, info?: any) => void,

@@ -38,8 +38,12 @@ export class UserIdentity extends Entity {
   })
   created?: Date;
 
-  @belongsTo(() => User)
-  userId: number;
+  @belongsTo(() => User,
+   {},
+   {
+    mongodb: {dataType: 'ObjectId'}
+  })
+  userId: string;
 
   constructor(data?: Partial<UserIdentity>) {
     super(data);
