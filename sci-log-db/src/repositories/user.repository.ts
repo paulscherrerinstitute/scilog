@@ -6,14 +6,12 @@
 import {Getter, inject} from '@loopback/core';
 import {
   DefaultCrudRepository,
-  HasManyRepositoryFactory,
   HasOneRepositoryFactory,
   juggler,
   repository,
 } from '@loopback/repository';
-import {User, UserCredentials, UserIdentity} from '../models';
+import {User, UserCredentials} from '../models';
 import {UserCredentialsRepository} from './user-credentials.repository';
-import { UserIdentityRepository } from './user-identity.repository';
 
 // principal can either be an account name or an email address
 export type Credentials = {
@@ -26,11 +24,6 @@ export class UserRepository extends DefaultCrudRepository<
   typeof User.prototype.id
 > {
 
-  public readonly profiles: HasManyRepositoryFactory<
-    UserIdentity,
-    typeof User.prototype.id
-  >;
-
   public readonly userCredentials: HasOneRepositoryFactory<
     UserCredentials,
     typeof User.prototype.id
@@ -42,15 +35,8 @@ export class UserRepository extends DefaultCrudRepository<
     protected userCredentialsRepositoryGetter: Getter<
       UserCredentialsRepository
     >,
-    @repository.getter('UserIdentityRepository')
-    protected UserIdentityRepositoryGetter: Getter<UserIdentityRepository>,
   ) {
     super(User, dataSource);
-    this.profiles = this.createHasManyRepositoryFactoryFor(
-      'profiles',
-      UserIdentityRepositoryGetter,
-    );
-    this.registerInclusionResolver('profiles', this.profiles.inclusionResolver);
     this.userCredentials = this.createHasOneRepositoryFactoryFor(
       'userCredentials',
       userCredentialsRepositoryGetter,

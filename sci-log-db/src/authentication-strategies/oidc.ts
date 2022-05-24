@@ -1,11 +1,15 @@
 import {asAuthStrategy, AuthenticationStrategy} from '@loopback/authentication';
 import {StrategyAdapter} from '@loopback/authentication-passport';
-import {extensionFor, inject, injectable} from '@loopback/core';
+import {inject, injectable} from '@loopback/core';
 import {RedirectRoute, Request} from '@loopback/rest';
 import {UserProfile} from '@loopback/security';
 import {Strategy} from 'passport';
+const oidcStrategy = require('passport-openidconnect');
 import {User} from '../models';
-import {mapProfile, PassportAuthenticationBindings} from './types';
+import {mapProfile, verifyFunctionFactory} from './types';
+import {UserRepository} from '../repositories';
+import {repository} from '@loopback/repository';
+const passport = require('passport');
 
 @injectable(
   asAuthStrategy,
@@ -18,14 +22,21 @@ export class OIDCAuthentication implements AuthenticationStrategy {
    * create an oidc strategy
    */
   constructor(
-    @inject('oidcStrategy')
-    public passportstrategy: Strategy,
+    @inject('oidcOptions')
+    public oidcOptions: any,
+    @repository(UserRepository) 
+    public userRepository: UserRepository,
   ) {
+    const strategy: Strategy = new oidcStrategy(
+      this.oidcOptions,
+      verifyFunctionFactory(this.userRepository),
+    );
     this.strategy = new StrategyAdapter(
-      this.passportstrategy,
+      strategy,
       this.name,
       mapProfile.bind(this),
     );
+    passport.use(strategy)
   }
 
   /**

@@ -38,7 +38,7 @@ if (require.main === module) {
       websocket: {port},
     },
     databaseSeeding: false,
-    oidcOptions: require('../providers.json').keycloak,
+    oidcOptions: require('../oidc.json'),
   }
 
   main(config).catch(err => {
