@@ -3,50 +3,33 @@
 // This file is licensed under the MIT License.
 // License text available at https://opensource.org/licenses/MIT
 
-import axios from 'axios';
 import {Profile} from 'passport';
-import {UserIdentityService} from '@loopback/authentication';
 import {User} from '../models';
 import {UserProfile, securityId} from '@loopback/security';
+import {UserRepository} from '../repositories';
 
-export type ProfileFunction = (
-  accessToken: string,
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  done: (err?: Error | null, profile?: any) => void,
-) => void;
+type ProfileUser = {
+  email: string,
+  firstName: string,
+  lastName: string,
+  username: string | undefined,
+  roles: string[]
+} 
+
+type UserRolesProfile = Profile & {_json: {roles: string[]}}
 
 export type VerifyFunction = (
   claimIss: string,
-  profile: Profile,
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  profile: UserRolesProfile,
+  idProfile: ProfileUser,
+  context: any,
+  idToken: string,
+  accessToken: string,
+  refreshToken: string,
+  params: any,
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
   done: (error: any, user?: any, info?: any) => void,
 ) => void;
-
-export namespace PassportAuthenticationBindings {
-  export const OIDC_STRATEGY = 'passport.authentication.oidc.strategy';
-}
-
-export const oidcProfileFunction: ProfileFunction = (
-  accessToken: string,
-  done,
-) => {
-  // call the profile url in the mock authorization app with the accessToken
-  axios
-    .get('http://localhost:9000/verify?access_token=' + accessToken, {
-      headers: {Authorization: accessToken},
-    })
-    .then(response => {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const profile: any = response.data;
-      profile.id = profile.userId;
-      profile.emails = [{value: profile.email}];
-      profile.provider = 'custom-oauth2';
-      done(null, profile);
-    })
-    .catch(err => {
-      done(err);
-    });
-};
 
 /**
  * provides an appropriate verify function for oauth2 strategies
@@ -55,24 +38,42 @@ export const oidcProfileFunction: ProfileFunction = (
  * @param profile
  * @param done
  */
+
 export const verifyFunctionFactory = function (
-  userService: UserIdentityService<Profile, User>,
+  userRepo: UserRepository,
 ): VerifyFunction {
   return function (
     claimIss: string,
-    profile: Profile,
+    profile: UserRolesProfile,
+    idProfile: ProfileUser,
+    context: any,
+    idToken: string,
+    accessToken: string,
+    refreshToken: string,
+    params: any,
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     done: (error: any, user?: any, info?: any) => void,
   ) {
     // look up a linked user for the profile
-    userService
-      .findOrCreateUser(profile)
-      .then((user: User) => {
-        done(null, user);
-      })
-      .catch((err: Error) => {
-        done(err);
-      });
+    if (!profile.emails || !profile.emails.length) {
+      throw new Error('email-id is required in returned profile to login');
+    } 
+    const name = profile.name?.givenName
+    ? profile.name.givenName + ' ' + profile.name.familyName
+    : profile.displayName;
+    const [firstName, lastName] = (name || JSON.stringify(profile.name)).split(' ')
+    const user = {
+      email: profile.emails[0].value,
+      firstName: firstName,
+      lastName: lastName,
+      username: profile.username,
+      roles: [...profile._json.roles, 'customer', profile.username as string]
+    }
+    findOrCreateUser(userRepo, user).then((user: User) => {
+      done(null, user);
+    }).catch((err: Error) => {
+      done(err);
+    });
   };
 };
 
@@ -82,10 +83,25 @@ export const verifyFunctionFactory = function (
  */
 export const mapProfile = function (user: User): UserProfile {
   const userProfile: UserProfile = {
-    [securityId]: '' + user.id,
-    profile: {
-      ...user,
-    },
+    [securityId]: user.id,
+    name: `${user.firstName} ${user.lastName}`.trim(),
+    id: user.id,
+    roles: user.roles,
+    email: user.email
   };
   return userProfile;
 };
+
+export const findOrCreateUser = async function (userRepo: UserRepository, user: ProfileUser): Promise<User> {
+  var foundUser = await userRepo.findOne({
+    where: { username: user.username },
+  });
+  if (!foundUser) {
+    console.log("User not yet known, create it", JSON.stringify(user, null, 3))
+    foundUser = await userRepo.create(user);
+  } else {
+    // update roles for current user
+    await userRepo.updateById(foundUser.id, { 'roles': user.roles, 'username': user.username }); // username can be removed later
+  }
+  return foundUser
+}

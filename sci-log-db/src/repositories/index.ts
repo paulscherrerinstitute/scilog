@@ -4,7 +4,6 @@ export * from './logbook.repository';
 export * from './paragraph.repository';
 export * from './task.repository';
 export * from './user-credentials.repository';
-export * from './user-identity.repository';
 export * from './user-preference.repository';
 export * from './user.repository';
 export * from './view.repository';
