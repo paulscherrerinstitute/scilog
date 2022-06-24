@@ -3,6 +3,7 @@ import { Injectable } from "@angular/core";
 
 export interface AppConfig {
   lbBaseURL?: string;
+  oAuth2Endpoint?: {displayText: string, authURL: string, displayImage?: string};
 }
 
 @Injectable()
