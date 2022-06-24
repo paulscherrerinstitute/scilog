@@ -1,8 +1,10 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, Inject, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators, FormControl } from '@angular/forms';
-import { Router } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { Subscription } from 'rxjs';
 import { AuthService } from '@shared/auth-services/auth.service';
+import { AppConfig, AppConfigService } from '../app-config.service';
+import { DOCUMENT } from '@angular/common';
 
 @Component({
   selector: 'app-login',
@@ -14,21 +16,35 @@ export class LoginComponent implements OnInit {
   hide = true;
   form: FormGroup;
   loginMessage = ' ';
+  appConfig: AppConfig = this.appConfigService.getConfig();
+  oAuth2Endpoint: {displayText: string, authURL: string, displayImage?: string};
 
   
-  constructor(private fb: FormBuilder,
+  constructor(
+    private appConfigService: AppConfigService,
+    private fb: FormBuilder,
     private authService: AuthService,
-    private router: Router) {
+    private router: Router,
+    private route: ActivatedRoute,
+    @Inject(DOCUMENT) public document: Document,
+    ) {
     this.form = this.fb.group({
       email: ['', Validators.required],
       password: ['', Validators.required]
     });
+    this.oAuth2Endpoint = this.appConfig.oAuth2Endpoint;
   }
 
   ngOnInit(): void {
     if (this.authService.forceReload){
       window.location.reload();
     }
+    this.route.queryParams.subscribe((params) => {
+      if (!!params.token) {
+        this.authService.setSession({token: params.token})
+        this.router.navigateByUrl('/overview');
+      }
+    })
   }
 
   async login() {
@@ -53,6 +69,10 @@ export class LoginComponent implements OnInit {
         }
       }
     }
+  }
+
+  redirectOIDC(authURL: string) {
+    this.document.location.href = `${this.appConfig.lbBaseURL}/${authURL}`;
   }
 
 }

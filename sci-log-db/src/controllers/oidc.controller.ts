@@ -49,25 +49,8 @@ export class OIDCController {
   }
 
   @intercept('passport-oidc')
-  @get('/auth/{provider}/callback',  {
-    responses: {
-      '200': {
-        description: 'Token',
-        content: {
-          'application/json': {
-            schema: {
-              type: 'object',
-              properties: {
-                token: {
-                  type: 'string',
-                },
-              },
-            },
-          },
-        },
-      },
-    },
-  })
+  @get('/auth/{provider}/callback',  
+  )
   /**
    * This method uses the passport strategies as express middleware
    *
@@ -79,6 +62,7 @@ export class OIDCController {
     @param.path.string('provider') provider: string,
     // @inject(SecurityBindings.USER) user: UserProfile,
     @inject(RestBindings.Http.REQUEST) request: RequestWithSession,
+    @inject('oidcOptions') oidcOptions: any,
     @inject(RestBindings.Http.RESPONSE) response: Response,
   ) {
     if (!request.user)
@@ -88,10 +72,9 @@ export class OIDCController {
     // create a JSON Web Token based on the user profile
     const token = await this.jwtService.generateToken(userProfile);
 
-    return {token};
+    response.redirect(`${oidcOptions.successRedirect}?token=${token}`);
+    return response;
 
-    // response.redirect('/auth/account');
-    // return response;
   }
 
 }
