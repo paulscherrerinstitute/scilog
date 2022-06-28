@@ -21,11 +21,10 @@ def authenticated(func):
 
 
 class HttpClient(AuthMixin):
-    def __init__(self, address):
-        self.address = address
+    def __init__(self, *args, **kwargs):
         self._verify_certificate = True
-        self.login_path = self.address + "/users/login"
-        super().__init__(address)
+        super().__init__(*args, **kwargs)
+        self.login_path = self._login_path or (self.address + "/users/login")
 
     def authenticate(self, username, password):
         auth_payload = {"principal": username, "password": password}
