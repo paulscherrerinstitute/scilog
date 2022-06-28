@@ -1,11 +1,10 @@
 #!/usr/bin/env python3
 
-import urllib3
+import os
 
-urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
+from dotenv import load_dotenv
 
-
-from scicat import SciCat, SciLog
+from scilog import SciCat, SciLog
 
 
 def prepare_location_snippet(log):
@@ -13,7 +12,7 @@ def prepare_location_snippet(log):
 
     if snips:
         assert len(snips) == 1
-        loc_id = snips[0]["id"]
+        loc_id = snips[0].id
         return loc_id
 
     new_loc = {
@@ -25,7 +24,7 @@ def prepare_location_snippet(log):
     }
 
     snip = log.post_snippet(**new_loc)
-    loc_id = snip["id"]
+    loc_id = snip.id
     return loc_id
 
 
@@ -89,7 +88,7 @@ def _update_locations(log, loc_id, locations):
         if "thumbnail" in loc:
             new_snip["file"] = loc["thumbnail"]
 
-        snip = log.post_request(**new_snip)
+        snip = log.post_snippet(**new_snip)
         locationStorage[loc] = snip
 
     return locationStorage
@@ -104,16 +103,16 @@ def _update_proposals(log, locationStorage, proposalsStorage):
 
         new_snip = {
             "ownerGroup": ownerGroup,
-            "accessGroups": [loc["ownerGroup"]],
+            "accessGroups": [loc.ownerGroup],
             "isPrivate": False,
             "name": proposal["title"],
-            "location": loc["id"],
+            "location": loc.id,
             "description": proposal["abstract"],
             "snippetType": "logbook"
         }
 
-        if "file" in loc:
-            new_snip["thumbnail"] = loc["file"]
+        if loc.file:
+            new_snip["thumbnail"] = loc.file
         if not new_snip["name"]:
             new_snip["name"] = ownerGroup
         if not new_snip["description"]:
@@ -129,20 +128,26 @@ def _update_proposals(log, locationStorage, proposalsStorage):
         snip = log.post_snippet(**new_snip)
         print(snip)
 
-
-
+class ClientSettingsFromEnv: 
+    def __init__(self, name):
+        self.address = os.environ[f"{name}_URL"]
+        self.options = {
+            "username": os.environ[f"{name}_USERNAME"],
+            "password": os.environ[f"{name}_PWD"],
+            "login_path": "/".join([self.address.strip("/"), os.environ[f"{name}_LOGIN"].strip("/")]),
+        }
 
 
 if __name__ == "__main__":
-    url = "https://dacat.psi.ch/api/v3/"
-    cat = SciCat(url)
+    load_dotenv()
+    scicat = ClientSettingsFromEnv("SCICAT")
+
+    scilog = ClientSettingsFromEnv("SCILOG")
+
+    cat = SciCat(**scicat.__dict__)
     props = cat.proposals
 
-    url = "https://lnode2.psi.ch/api/v1"
-    log = SciLog(url)
+    log = SciLog(**scilog.__dict__)
     loc_id = prepare_location_snippet(log)
 
     update_locations_and_proposals(log, loc_id, props)
-
-
-

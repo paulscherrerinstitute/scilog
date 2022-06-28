@@ -30,14 +30,13 @@ def pinned_to_logbook(logbook_keys):
 
 
 class SciLogRestAPI(HttpClient):
-    def __init__(self, url):
-        super().__init__(url)
-        self._verify_certificate = False
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
 
 
 class SciLog:
-    def __init__(self, url="https://lnode2.psi.ch/api/v1"):
-        self.http_client = SciLogRestAPI(url)
+    def __init__(self, *args, **kwargs):
+        self.http_client = SciLogRestAPI(*args, **kwargs)
         self.logbook = None
         self.image_types = ["png", "jpg", "jpeg"]
 
