@@ -3,9 +3,9 @@ from .httpclient import HttpClient
 
 
 class SciCatRestAPI(HttpClient):
-    def __init__(self, url):
-        super().__init__(url)
-        self.login_path = "https://dacat.psi.ch/auth/msad"
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.login_path = self._login_path or "https://dacat.psi.ch/auth/msad"
 
     def authenticate(self, username, password):
         auth_payload = {
@@ -14,7 +14,7 @@ class SciCatRestAPI(HttpClient):
         }
         res = self._login(auth_payload, HEADER_JSON)
         try:
-            token = res["access_token"]
+            token = res["id"]
         except KeyError as e:
             raise SciCatAuthError(res) from e
         else:
@@ -22,8 +22,8 @@ class SciCatRestAPI(HttpClient):
 
 class SciCat():
 
-    def __init__(self, url="https://dacat.psi.ch/api/v3/"):
-        self.http_client = SciCatRestAPI(url)
+    def __init__(self, *args, **kwargs):
+        self.http_client = SciCatRestAPI(*args, **kwargs)
 
 
     @property

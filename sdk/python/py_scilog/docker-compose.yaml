@@ -1,0 +1,11 @@
+version: "3.8"
+services:
+    app:
+        build:
+            context: .
+            target: dev
+        volumes:
+            - .:/usr/src/app
+            - .env:/usr/src/app/.env
+        # infinite loop to keep the container running
+        command: /bin/sh -c "while sleep 1000; do :; done"
