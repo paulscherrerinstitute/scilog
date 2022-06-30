@@ -15,7 +15,9 @@ export class ServerSettingsService {
   }
 
   getSocketAddress(){
-      return `ws://${this.appConfigService.getConfig().lbBaseURL.split('://').pop() || 'localhost:3000/'}`;
+    const lbBaseURL = this.appConfigService.getConfig().lbBaseURL || 'http://localhost:3000/';
+    if (!lbBaseURL.startsWith('http')) throw new Error('BaseURL must use the http or https protocol');
+    return `ws${lbBaseURL.substring(4)}`;
   }
 
 
