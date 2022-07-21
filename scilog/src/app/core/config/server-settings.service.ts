@@ -7,7 +7,7 @@ export class ServerSettingsService {
 
   constructor() { }
 
-  public serverType: string = "production";
+  public serverType: string = "kwHome";
 
   getServerAddress(){
     switch (this.serverType) {

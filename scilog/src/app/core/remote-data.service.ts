@@ -59,17 +59,12 @@ export class RemoteDataService {
   }
 
   protected async postFilesnippet(payload:Filesnippet, file:File){
-    let headers = new HttpHeaders();
-    headers = headers.set('Content-Type', 'application/json; charset=utf-8');
-    let data = await this.postSnippet<Filesnippet>("filesnippet", JSON.stringify(payload), headers).toPromise();
-    let filenameStorage: string = data.id + "." + payload.fileExtension;
-            
     let formData = new FormData();
     let headersFile = new HttpHeaders();
     headersFile = headersFile.append('accept', 'application/json');
-    formData.append('file', file, filenameStorage);
-    await this.uploadFile(formData, headersFile).toPromise();
-    return data;
+    formData.append('file', file);
+    formData.append('fields', JSON.stringify(payload));
+    return this.postSnippet<Filesnippet>("filesnippet/files", formData, headersFile).toPromise();
   }
 
   // getFile(imageSnippetUrl: string): Promise<Blob> {
@@ -166,9 +161,11 @@ export class LogbookItemDataService extends RemoteDataService {
 
   async getImage(id:string){
     // first retrieve image snippet, then filesnippet and then file
-    let fileSnippet = await this.getFilesnippet(id);
-    console.log(fileSnippet)
-    return this.getSnippets<Blob>("files/" + fileSnippet.id + "." + fileSnippet.fileExtension, { responseType: 'blob' }).toPromise();
+    // let fileSnippet = await this.getFilesnippet(id);
+    // console.log(fileSnippet)
+    // let headers = new HttpHeaders();
+    // headers = headers.set('Accept', 'application/json');
+    return this.getSnippets<Blob>("filesnippet/" + id + "/files", { responseType: 'blob'}).toPromise();
   }
 
   getFilesnippet(id:string){

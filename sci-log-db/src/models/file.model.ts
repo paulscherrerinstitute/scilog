@@ -37,6 +37,18 @@ export class Filesnippet extends Basesnippet {
   })
   fileExtension: string;
 
+  @property({
+    type: 'string',
+    description: 'Content type of the file, e.g. image/jpeg'
+  })
+  contentType: string;
+
+  @property({
+    type: 'string',
+    description: 'File id of the file'
+  })
+  _fileId: string;
+
   @hasMany(() => Image, {keyTo: 'fileId'})
   subsnippets?: Image[];
 

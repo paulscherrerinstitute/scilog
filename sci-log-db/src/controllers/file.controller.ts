@@ -2,14 +2,22 @@ import {authenticate} from '@loopback/authentication';
 import {authorize} from '@loopback/authorization';
 import {inject} from '@loopback/core';
 import {Count, CountSchema, Filter, FilterExcludingWhere, repository, Where} from '@loopback/repository';
-import {del, get, getModelSchemaRef, HttpErrors, param, patch, post, put, requestBody, Response, RestBindings} from '@loopback/rest';
+import {del, get, getModelSchemaRef, HttpErrors, param, patch, post, put, Request, requestBody, Response, RestBindings} from '@loopback/rest';
 import {SecurityBindings, UserProfile} from '@loopback/security';
-import path from 'path';
+import formidable from 'formidable';
+import fs from 'fs';
+import _ from 'lodash';
 import {STORAGE_DIRECTORY} from '../keys';
 import {Filesnippet} from '../models/file.model';
 import {FileRepository} from '../repositories/file.repository';
 import {basicAuthorization} from '../services/basic.authorizor';
 import {OPERATION_SECURITY_SPEC} from '../utils/security-spec';
+
+const Mongo = require('mongodb');
+interface FormData {
+  fields: any,
+  files: any
+}
 
 @authenticate('jwt')
 @authorize({allowedRoles: ['customer'], voters: [basicAuthorization]})
@@ -19,7 +27,7 @@ export class FileController {
     @repository(FileRepository)
     public fileRepository: FileRepository,
     @inject(STORAGE_DIRECTORY) private storageDirectory: string
-  ) {}
+  ) { }
 
   @post('/filesnippet', {
     security: OPERATION_SECURITY_SPEC,
@@ -45,6 +53,47 @@ export class FileController {
   ): Promise<Filesnippet> {
     return this.fileRepository.create(file, {currentUser: this.user});
   }
+
+  @post('/filesnippet/files', {
+    security: OPERATION_SECURITY_SPEC,
+    responses: {
+      200: {
+        content: {
+          'application/json': {
+            schema: {
+              type: 'object',
+            },
+          },
+        },
+        description: 'Files and fields',
+      },
+    },
+  })
+  async fileUpload(
+    @requestBody.file()
+    request: Request
+  ): Promise<Object> {
+    var form = new formidable.IncomingForm();
+
+    var formData: FormData = await new Promise(function (resolve, reject) {
+      form.parse(request, (err: any, fields: any, files: any) => {
+        if (err) {
+          reject(err);
+          return;
+        }
+        resolve({fields: JSON.parse(fields?.fields), files: files});
+      });
+    });
+    return this.uploadToGridfs(formData, async (formData, resolve, reject) => {
+      return this.fileRepository.create(_.omit(formData.fields, ['id']), {currentUser: this.user}).then((file) => {
+        resolve(file);
+      }).catch((err: HttpErrors.HttpError) => {
+        reject(err);
+      });
+    });
+  }
+
+
 
   @get('/filesnippet/count', {
     security: OPERATION_SECURITY_SPEC,
@@ -126,7 +175,7 @@ export class FileController {
     return this.fileRepository.findById(id, filter, {currentUser: this.user});
   }
 
-  @get('/filesnippet/{id}/file', {
+  @get('/filesnippet/{id}/files', {
     security: OPERATION_SECURITY_SPEC,
     responses: {
       '200': {
@@ -142,25 +191,13 @@ export class FileController {
   ) {
     let data = await this.fileRepository.findById(id, filter, {currentUser: this.user})
     console.log(data);
-    if (true) {
-      const file = this.validateFileName('6053648475ee78951a266b9c.png');
-      response.download(file, '6053648475ee78951a266b9c.png');
-    } else {
-      throw new HttpErrors.BadRequest(`Invalid image file for id: ${id}`);
+    if (typeof data._fileId == 'undefined') {
+      throw new HttpErrors.BadRequest(`Retrieving sandbox data is deprecated.`);
     }
-
+    let bucket = new Mongo.GridFSBucket(this.fileRepository.dataSource.connector?.db);
+    response.set('Content-Type', data.contentType);
+    bucket.openDownloadStream(data._fileId).pipe(response);
     return response;
-  }
-
-  /**
- * Validate file names to prevent them goes beyond the designated directory
- * @param fileName - File name
- */
-  private validateFileName(fileName: string) {
-    const resolved = path.resolve(this.storageDirectory, fileName);
-    if (resolved.startsWith(this.storageDirectory)) return resolved;
-    // The resolved file is outside sandbox
-    throw new HttpErrors.BadRequest(`Invalid file name: ${fileName}`);
   }
 
   @patch('/filesnippet/{id}', {
@@ -183,6 +220,48 @@ export class FileController {
     file: Filesnippet,
   ): Promise<void> {
     await this.fileRepository.updateById(id, file, {currentUser: this.user});
+  }
+
+  @patch('/filesnippet/{id}/files', {
+    security: OPERATION_SECURITY_SPEC,
+    responses: {
+      204: {
+        content: {
+          'application/json': {
+            schema: {
+              type: 'object',
+            },
+          },
+        },
+        description: 'Files and fields',
+      },
+    },
+  })
+  async updateByIdWithFile(
+    @param.path.string('id') id: string,
+    @requestBody.file() request: Request,
+  ): Promise<void> {
+    var form = new formidable.IncomingForm();
+    interface FormData {
+      fields: any,
+      files: any
+    }
+    var formData: FormData = await new Promise(function (resolve, reject) {
+      form.parse(request, (err: any, fields: any, files: any) => {
+        if (err) {
+          reject(err);
+          return;
+        }
+        resolve({fields: JSON.parse(fields?.filesnippet), files: files});
+      });
+    });
+    return this.uploadToGridfs(formData, async (formData, resolve, reject) => {
+      return this.fileRepository.updateById(id, _.omit(formData.fields, ['id']), {currentUser: this.user}).then(() => {
+        resolve();
+      }).catch((err: HttpErrors.HttpError) => {
+        reject(err);
+      });
+    })
   }
 
   @put('/filesnippet/{id}', {
@@ -210,5 +289,26 @@ export class FileController {
   })
   async deleteById(@param.path.string('id') id: string): Promise<void> {
     await this.fileRepository.deleteById(id, {currentUser: this.user});
+  }
+
+  uploadToGridfs(formData: FormData, cb: (formData: FormData, resolve: (value?: any | PromiseLike<any>) => void, reject: (reason?: any) => void) => Promise<any>): Promise<any> {
+    return new Promise((resolve, reject) => {
+      var bucket = new Mongo.GridFSBucket(this.fileRepository.dataSource.connector?.db);
+      let readStream = fs.createReadStream(formData.files.file.path);
+      let uploadStream = bucket.openUploadStream(formData.files.file.path);
+      readStream.pipe(uploadStream);
+      let id = uploadStream.id;
+      uploadStream.
+        on('error', (error: any) => {
+          console.log(error);
+          reject({error: error});
+        }).
+        on('finish', async () => {
+          console.log('done!');
+          formData.fields['_fileId'] = id;
+          formData.fields['contentType'] = formData.files.file.type;
+          cb(formData, resolve, reject)
+        });
+    });
   }
 }
