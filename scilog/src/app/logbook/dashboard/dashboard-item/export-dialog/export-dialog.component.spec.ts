@@ -4,7 +4,7 @@ import { ExportDialogComponent } from './export-dialog.component';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { LogbookItemDataService } from '@shared/remote-data.service';
 import { of } from 'rxjs';
-import { ElementRef } from '@angular/core';
+import { AppConfigService } from 'src/app/app-config.service';
 
 const mockDialogRef = {
   close: jasmine.createSpy('close')
@@ -16,6 +16,8 @@ class NativeElementMock {
   click(){}
 
 }
+
+const getConfig = () => ({});
 
 describe('ExportDialogComponent', () => {
   let component: ExportDialogComponent;
@@ -29,7 +31,8 @@ describe('ExportDialogComponent', () => {
       providers: [
         { provide: MatDialogRef, useValue: mockDialogRef },
         { provide: MAT_DIALOG_DATA, useValue: {} },
-        { provide: LogbookItemDataService, useValue: logbookItemDataSpy}
+        { provide: LogbookItemDataService, useValue: logbookItemDataSpy},
+        { provide: AppConfigService, useValue: { getConfig } },
       ],
       declarations: [ ExportDialogComponent ]
     })

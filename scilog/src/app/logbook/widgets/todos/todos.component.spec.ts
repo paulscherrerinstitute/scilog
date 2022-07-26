@@ -5,6 +5,8 @@ import { LogbookInfoService } from '@shared/logbook-info.service';
 import { TasksService } from '@shared/tasks.service';
 import { of } from 'rxjs';
 import { ChangeStreamService } from '@shared/change-stream.service';
+import { AppConfigService } from 'src/app/app-config.service';
+import { HttpClientTestingModule } from '@angular/common/http/testing';
 
 class ChangeStreamServiceMock {
   getNotification(id:string){
@@ -25,6 +27,9 @@ class LogbookInfoMock {
   currentLogbookInfo = of({});
 
 }
+
+const getConfig = () => ({});
+
 describe('TodosComponent', () => {
   let component: TodosComponent;
   let fixture: ComponentFixture<TodosComponent>;
@@ -36,8 +41,9 @@ describe('TodosComponent', () => {
         {provide: LogbookInfoService, useClass: LogbookInfoMock},
         {provide: TasksService, useClass: TasksServiceMock},
         { provide: ChangeStreamService, useClass: ChangeStreamServiceMock },
-
+        { provide: AppConfigService, useValue: { getConfig } },
       ],
+      imports: [HttpClientTestingModule],
       declarations: [ TodosComponent ]
     })
     .compileComponents();

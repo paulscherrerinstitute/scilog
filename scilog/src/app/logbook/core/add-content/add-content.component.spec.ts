@@ -6,6 +6,7 @@ import { AddContentService } from '@shared/add-content.service';
 import { of } from 'rxjs';
 import { ChangeStreamNotification } from '@shared/changestreamnotification.model';
 import { LinkType } from '@model/paragraphs';
+import { AppConfigService } from 'src/app/app-config.service';
 
 class AddContentServiceMock {
   currentMessage = of({});
@@ -13,6 +14,7 @@ class AddContentServiceMock {
 
 }
 
+const getConfig = () => ({});
 
 describe('AddContentComponent', () => {
   let component: AddContentComponent;
@@ -67,7 +69,8 @@ describe('AddContentComponent', () => {
       providers: [
         { provide: MAT_DIALOG_DATA, useValue: {} },
         { provide: MatDialogRef, useValue: {} },
-        { provide: AddContentService, useClass: AddContentServiceMock}
+        { provide: AddContentService, useClass: AddContentServiceMock},
+        { provide: AppConfigService, useValue: { getConfig } }
       ],
       declarations: [ AddContentComponent ]
     })
