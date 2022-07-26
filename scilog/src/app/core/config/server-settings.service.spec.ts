@@ -1,12 +1,17 @@
 import { TestBed } from '@angular/core/testing';
+import { AppConfigService } from 'src/app/app-config.service';
 
 import { ServerSettingsService } from './server-settings.service';
+
+const getConfig = () => ({});
 
 describe('ServerSettingsService', () => {
   let service: ServerSettingsService;
 
   beforeEach(() => {
-    TestBed.configureTestingModule({});
+    TestBed.configureTestingModule({
+      providers: [{ provide: AppConfigService, useValue: { getConfig } }],
+    });
     service = TestBed.inject(ServerSettingsService);
   });
 

@@ -5,6 +5,9 @@ import { RouterTestingModule } from '@angular/router/testing';
 import { MatMenuModule } from '@angular/material/menu';
 
 import { ToolbarComponent } from './toolbar.component';
+import { AppConfigService } from 'src/app/app-config.service';
+
+const getConfig = () => ({});
 
 describe('ToolbarComponent', () => {
   let component: ToolbarComponent;
@@ -14,6 +17,7 @@ describe('ToolbarComponent', () => {
     TestBed.configureTestingModule({
       declarations: [ ToolbarComponent ],
       imports: [RouterTestingModule, HttpClientTestingModule, MatDialogModule, MatMenuModule],
+      providers: [{provide: AppConfigService, useValue: { getConfig }},]
     })
     .compileComponents();
   }));

@@ -10,20 +10,17 @@ import { LogbookInfoService } from '@shared/logbook-info.service';
 import { MatSnackBarModule } from '@angular/material/snack-bar';
 import { SnackbarService } from '@shared/snackbar.service';
 import { ActivatedRoute, UrlSegment } from '@angular/router';
-import { Observable, BehaviorSubject, Subscription } from 'rxjs';
+import { Observable, BehaviorSubject } from 'rxjs';
 import { of } from 'rxjs';
 import { ParamMap } from '@angular/router';
 import { WidgetConfig } from '@model/config';
 import { Views } from '@model/views';
 import { Logbooks } from '@model/logbooks';
-import { Datasource, IDatasource } from 'ngx-ui-scroll';
+import { Datasource } from 'ngx-ui-scroll';
 import { ChangeStreamNotification } from '@shared/changestreamnotification.model';
-import { QueryList } from '@angular/core';
-import { SnippetComponent } from '@shared/snippet/snippet.component';
 import { LogbookDataService } from '@shared/remote-data.service';
-import { MatFormFieldModule } from '@angular/material/form-field';
-import { TagService } from '@shared/tag.service';
 import { LogbookScrollService } from '@shared/logbook-scroll.service';
+import { AppConfigService } from 'src/app/app-config.service';
 
 class ChangeStreamServiceMock {
 
@@ -44,6 +41,8 @@ class LogbookInfoServiceMock {
   }
 
 }
+
+const getConfig = () => ({});
 
 export class ViewsServiceMock {
   widgetConfigs: WidgetConfig[] = [];
@@ -233,10 +232,8 @@ describe('LogbookItemComponent', () => {
         { provide: ActivatedRoute, useValue: activatedRouteMock },
         { provide: Datasource, useClass: DatasourceMock},
         { provide: LogbookDataService, useValue: logbookItemDataServiceSpy},
-        { provide: LogbookScrollService, useValue: scrollServiceSpy}
-
-
-
+        { provide: LogbookScrollService, useValue: scrollServiceSpy},
+        { provide: AppConfigService, useValue: { getConfig } },
       ],
       declarations: [LogbookItemComponent]
 
