@@ -7,7 +7,7 @@ import { AuthDataService } from '@shared/remote-data.service';
   providedIn: "root"
 })
 export class AuthService {
-  forceReload = false;     
+  forceReload = false;
   constructor(private dataService: AuthDataService) {
 
   }
@@ -21,7 +21,7 @@ export class AuthService {
       );
   }
         
-  private setSession(authResult) {
+  setSession(authResult) {
     console.log(authResult);
     // it would be good to get an expiration date for the token...
       localStorage.setItem('id_token', authResult.token);

@@ -1,8 +1,15 @@
 import { HttpClient } from "@angular/common/http";
 import { Injectable } from "@angular/core";
 
+
+export interface Oauth2Endpoint {
+  displayText: string, 
+  authURL: string, 
+  displayImage?: string,
+}
 export interface AppConfig {
   lbBaseURL?: string;
+  oAuth2Endpoint?: Oauth2Endpoint;
 }
 
 @Injectable()

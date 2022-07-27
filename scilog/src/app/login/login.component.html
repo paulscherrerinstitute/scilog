@@ -6,6 +6,23 @@
           <img src="assets/scilog_logo.png" alt="SciLog" width="120" height="120">
       </mat-card-title>
       <mat-card-content class="content-container">
+        <div *ngIf="oAuth2Endpoint">
+          <button
+            class="oauth-login-button"
+            mat-raised-button
+            type="submit"
+            (click)="redirectOIDC(oAuth2Endpoint.authURL)"
+          >
+            <img
+              class="oauth-login-image"
+              *ngIf="oAuth2Endpoint.displayImage"
+              [src]="oAuth2Endpoint.displayImage"
+            />
+            Login with {{ oAuth2Endpoint.displayText }}
+          </button>
+          <br />
+        </div>
+        <br />
         <form [formGroup]="form" (keyup.enter)="login()">
         <mat-form-field appearance="outline" class="mat-form-field">
           <mat-label>User name</mat-label>
