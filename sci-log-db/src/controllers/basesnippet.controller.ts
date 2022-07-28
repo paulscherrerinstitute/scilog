@@ -144,15 +144,14 @@ export class BasesnippetController {
     }
 
     let jobEntity = await this.jobRepository.create(job, {currentUser: this.user});
-    let basePath = "/root/scilog/sci-log-db/.sandbox/";
-    // let basePath = ".sandbox/"
+    let basePath = "/tmp/"
     var fs = require('fs');
     this.exportDir = basePath + jobEntity.id;
     if (!fs.existsSync(this.exportDir)) {
       fs.mkdirSync(this.exportDir);
     }
 
-    let src = await this.exportService.prepareLateXSourceFile(snippets, jobEntity.id, pdfOnly, basePath);
+    let src = await this.exportService.prepareLateXSourceFile(snippets, jobEntity.id, pdfOnly, basePath,this.user);
     await this.exportService.compilePDF();
     let downloadFile = "";
     if (pdfOnly) {

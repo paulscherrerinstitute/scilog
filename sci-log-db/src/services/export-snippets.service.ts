@@ -1,6 +1,10 @@
 import {bind, BindingScope, ContextTags} from '@loopback/core';
+import { MongoDataSource } from '../datasources';
 import {EXPORT_SERVICE} from '../keys';
+import {FileRepository} from '../repositories/file.repository';
+import {UserProfile} from '@loopback/security';
 
+const Mongo = require('mongodb');
 
 interface LateXTag {
   header: string;
@@ -28,16 +32,20 @@ export class ExportService {
   jobId: string;
   imagePathLaTeX: string;
   basePath: string;
+  user: UserProfile;
+  filerepository: FileRepository;
 
+  constructor() {
+    this.filerepository=new FileRepository(new MongoDataSource)
+  }
 
-  constructor() {}
-
-  prepareLateXSourceFile(snippets: any, jobId: string, pdfOnly: boolean, basePath: string): Promise<string> {
+  prepareLateXSourceFile(snippets: any, jobId: string, pdfOnly: boolean, basePath: string, user: UserProfile): Promise<string> {
     return new Promise<string>(async (resolve, reject) => {
       this.fs = require('fs')
       this.pdfOnly = pdfOnly;
       this.jobId = jobId;
       this.basePath = basePath;
+      this.user = user;
       this.imagePath = this.pdfOnly ? this.basePath : this.basePath + jobId + "/images/";
       this.imagePathLaTeX = this.pdfOnly ? "../" : "./images/";
       if (!this.pdfOnly) {
@@ -51,19 +59,17 @@ export class ExportService {
       })
       // const html2Latex = require('html-to-latex');
 
-
       let src = "";
       fileExport.write(this.prepareHeader() + "\r\n");
       for (let index = 0; index < snippets.length; index++) {
         this.currentDataSnippet = snippets[index];
-
-
+        // console.log("Handling snippet index type ",index, this.currentDataSnippet.snippetType)
         // write the quotes first
         if (this.currentDataSnippet?.subsnippets) {
           for (let subIndex = 0; subIndex < snippets[index].subsnippets.length; subIndex++) {
             this.currentDataSnippet = snippets[index].subsnippets[subIndex];
             if ((this.currentDataSnippet?.textcontent) && (this.currentDataSnippet.linkType == "quote")) {
-              let latexData: string = this.translate2LaTeX(this.currentDataSnippet.textcontent);
+              let latexData: string = await this.translate2LaTeX(this.currentDataSnippet.textcontent);
 
               fileExport.write(latexData + "\r\n");
               console.log("resetting file counter");
@@ -75,7 +81,7 @@ export class ExportService {
         this.currentDataSnippet = snippets[index];
         if (this.currentDataSnippet?.textcontent) {
           // console.log(this.currentDataSnippet.textcontent);
-          let latexData: string = this.translate2LaTeX(this.currentDataSnippet.textcontent);
+          let latexData: string = await this.translate2LaTeX(this.currentDataSnippet.textcontent);
           // console.log(this.currentDataSnippet.subsnippets)
           // console.log(latexData);
           fileExport.write(latexData + "\r\n");
@@ -87,8 +93,7 @@ export class ExportService {
           for (let subIndex = 0; subIndex < snippets[index].subsnippets.length; subIndex++) {
             this.currentDataSnippet = snippets[index].subsnippets[subIndex];
             if ((this.currentDataSnippet?.textcontent) && (this.currentDataSnippet.linkType == "comment")) {
-              let latexData: string = this.translate2LaTeX(this.currentDataSnippet.textcontent);
-
+              let latexData: string = await this.translate2LaTeX(this.currentDataSnippet.textcontent);
               fileExport.write(latexData + "\r\n");
               // console.log("resetting file counter");
               this.fileCounter = 0;
@@ -210,7 +215,7 @@ export class ExportService {
     return footer
   }
 
-  private translate2LaTeX(inputString: string): string {
+  private async translate2LaTeX(inputString: string): Promise<string> {
     let out: string = '';
     const jsdom = require("jsdom");
     const {JSDOM} = jsdom;
@@ -218,19 +223,19 @@ export class ExportService {
     let element = dom.window.document.querySelector("body");
     let treeObject = {};
     if ((this.currentDataSnippet.linkType == "comment") || (this.currentDataSnippet.linkType == "quote")) {
-      let tag = this.translateHTMLTags(this.currentDataSnippet.linkType);
+      let tag = await this.translateHTMLTags(this.currentDataSnippet.linkType);
       out += tag.header;
-      out += this.unpackHTML(element, treeObject);
+      out += await this.unpackHTML(element, treeObject);
       out += tag.footer;
 
     } else {
-      out += this.unpackHTML(element, treeObject);
+      out += await this.unpackHTML(element, treeObject);
     }
 
     return out;
   }
 
-  private unpackHTML(element: any, object: any): string {
+  private async unpackHTML(element: any, object: any): Promise<string> {
     var nodeList = element.childNodes;
     var content = ""
     if (nodeList != null) {
@@ -238,8 +243,8 @@ export class ExportService {
         object[element.nodeName] = []; // IMPT: empty [] array for parent node to push non-text recursivable elements (see below)
 
         for (var i = 0; i < nodeList.length; i++) {
-          console.log("nodeName", nodeList[i].className);
-          let nodeTag = this.translateHTMLTags(nodeList[i].nodeName, nodeList[i]);
+          // console.log("nodeName", nodeList[i].className);
+          let nodeTag = await this.translateHTMLTags(nodeList[i].nodeName, nodeList[i]);
           this.checkTableCounter(nodeList[i].nodeName);
           let tmpContent = "";
           if (nodeList[i].nodeType == 3) { // if child node is **final base-case** text node
@@ -249,12 +254,12 @@ export class ExportService {
             // content += tmpContent;
           } else {
             object[element.nodeName].push({}); // push {} into empty [] array where {} for recursivable elements
-            tmpContent = this.unpackHTML(nodeList[i], object[element.nodeName][object[element.nodeName].length - 1]);
+            tmpContent = await this.unpackHTML(nodeList[i], object[element.nodeName][object[element.nodeName].length - 1]);
           }
           if (nodeTag.waitUntilRead) {
             // recalculate nodeTag before appending the content
             this.updateFileCounter = false;
-            nodeTag = this.translateHTMLTags(nodeList[i].nodeName, nodeList[i]);
+            nodeTag = await this.translateHTMLTags(nodeList[i].nodeName, nodeList[i]);
             this.updateFileCounter = true;
           }
           content += nodeTag.header;
@@ -288,7 +293,7 @@ export class ExportService {
     }
   }
 
-  private translateHTMLTags(nodeName: string, node: any = null): LateXTag {
+  private async translateHTMLTags(nodeName: string, node: any = null): Promise<LateXTag> {
     let out: LateXTag = {
       header: "",
       footer: "",
@@ -327,9 +332,6 @@ export class ExportService {
 
         break;
       case "IMG":
-        // FIXME: multiple files per snippet are currently not supported
-        // console.log("line 244:", this.currentDataSnippet);
-        console.log("fileCounter:", this.fileCounter);
         // console.log(this.currentDataSnippet.files[this.fileCounter].style.width);
         let width: string;
         let currentFile = this.currentDataSnippet.files.find((file: any) => {
@@ -345,13 +347,18 @@ export class ExportService {
         }
         let fileExt: string;
         fileExt = currentFile.fileExtension.split("/")[1];
-        // console.log(fileExt);
-        let filename = currentFile.fileId + "." + fileExt;
-        if ((!this.pdfOnly) && this.updateFileCounter) {
-          // copy files into current directory
-          this.fs.copyFileSync(this.basePath + filename, this.imagePath + filename);
+
+        // translate snippet fileid to gridfs fileid from _fileid
+        let data = await this.filerepository.findById(currentFile.fileId, undefined, {currentUser: this.user})
+        let filename=data._fileId
+
+        // copy gridfs contained images to temporary export folder
+        if (this.updateFileCounter) {
+          let bucket = new Mongo.GridFSBucket(this.filerepository.dataSource.connector?.db);
+          // the file extension needs to be added to make latex happy
+          bucket.openDownloadStream(filename).pipe(this.fs.createWriteStream(this.imagePath + filename + "." + fileExt));
         }
-        out.header = "\\includegraphics[width=" + width + "\\linewidth]{" + this.imagePathLaTeX + filename + "}\r\n"
+        out.header = "\\includegraphics[width=" + width + "\\linewidth]{" + this.imagePathLaTeX + filename + "." + fileExt+"}\r\n"
         if (this.updateFileCounter) {
           this.fileCounter++;
         }
