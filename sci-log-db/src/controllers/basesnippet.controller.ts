@@ -105,22 +105,15 @@ export class BasesnippetController {
       },
     },
   })
-  @oas.response.file()
+  // @oas.response.file()
   async prepareExport(
     @param.path.string('exportType') exportType: string, @inject(RestBindings.Http.RESPONSE) response: Response, @param.filter(Basesnippet) filter?: Filter<Basesnippet>,
   ) {
-    var pdfOnly: boolean;
-    switch (exportType) {
-      case "zip":
-        pdfOnly = false;
-        break;
-      case "pdf":
-      default:
-        pdfOnly = true;
-        break;
-    }
+    var createPDF: boolean;
+    createPDF=(exportType=="pdf")
+
     let snippets = await this.basesnippetRepository.find(filter, {currentUser: this.user});
-    console.log(filter);
+    // console.log(filter);
     let job: Object = {};
     if (snippets.length > 0) {
       if (snippets[0]?.parentId) {
@@ -144,18 +137,17 @@ export class BasesnippetController {
     }
 
     let jobEntity = await this.jobRepository.create(job, {currentUser: this.user});
-    let basePath = "/root/scilog/sci-log-db/.sandbox/";
-    // let basePath = ".sandbox/"
+    let basePath = "/tmp/"
     var fs = require('fs');
     this.exportDir = basePath + jobEntity.id;
     if (!fs.existsSync(this.exportDir)) {
-      fs.mkdirSync(this.exportDir);
+      fs.mkdirSync(this.exportDir, {recursive: true});
     }
 
-    let src = await this.exportService.prepareLateXSourceFile(snippets, jobEntity.id, pdfOnly, basePath);
+    let src = await this.exportService.prepareLateXSourceFile(snippets, this.exportDir, this.user);
     await this.exportService.compilePDF();
     let downloadFile = "";
-    if (pdfOnly) {
+    if (createPDF) {
       downloadFile = this.exportDir + "/export.pdf";
     } else {
       downloadFile = await this.exportService.createZipFile();
@@ -191,7 +183,7 @@ export class BasesnippetController {
   ): Promise<any> {
     let index = new Promise<any>(async (resolve, reject) => {
       let snippets = await this.basesnippetRepository.find(filter, {currentUser: this.user});
-      console.log(snippets)
+      // console.log(snippets)
       resolve(snippets.findIndex((snippet) => {
         return (snippet.id == id);
       }))
@@ -395,7 +387,7 @@ export class BasesnippetController {
       if (snippet?.parentId) {
         let parent = await this.basesnippetRepository.findById(snippet.parentId, {}, {currentUser: this.user});
         let parentHistory = await this.getHistorySnippet(parent);
-        console.log(parentHistory);
+        console.log("deleteById:parentHistory:",parentHistory);
       }
     }
     await this.basesnippetRepository.updateById(id, {deleted: true}, {currentUser: this.user});
