@@ -25,9 +25,10 @@ import {
 } from '@loopback/rest';
 import {SecurityBindings, UserProfile} from '@loopback/security';
 import {Task} from '../models';
-import {TaskRepository} from '../repositories';
+import {BasesnippetRepository, TaskRepository} from '../repositories';
 import {basicAuthorization} from '../services/basic.authorizor';
 import {OPERATION_SECURITY_SPEC} from '../utils/security-spec';
+import {BasesnippetController} from './basesnippet.controller';
 
 @authenticate('jwt')
 @authorize({allowedRoles: ['customer'], voters: [basicAuthorization]})
@@ -36,6 +37,10 @@ export class TaskController {
     @inject(SecurityBindings.USER) private user: UserProfile,
     @repository(TaskRepository)
     public taskRepository: TaskRepository,
+    @repository(BasesnippetRepository)
+    public basesnippetRepository: BasesnippetRepository,
+    @inject('controllers.BasesnippetController')
+    public basesnippetController: BasesnippetController,
   ) { }
 
   @post('/tasks', {
@@ -195,14 +200,14 @@ export class TaskController {
     // Two steps:
     // 1. set snippet to 'deleted=true'
     // 2. inside websocket and after informing the clients, replace the parentId or delete the snippet
-    // let snippet = await this.taskRepository.findById(id, {}, {currentUser: this.user});
-    // if (snippet?.versionable) {
-    //   if (snippet?.parentId) {
-    //     let parent = await this.taskRepository.findById(snippet.parentId, {}, {currentUser: this.user});
-    //     let parentHistory = await this.getHistorySnippet(parent);
-    //     console.log(parentHistory);
-    //   }
-    // }
+    let snippet = await this.taskRepository.findById(id, {}, {currentUser: this.user});
+    if (snippet?.versionable) {
+      if (snippet?.parentId) {
+        let parent = await this.basesnippetRepository.findById(snippet.parentId, {}, {currentUser: this.user});
+        let parentHistory = await this.basesnippetController.getHistorySnippet(parent);
+        console.log(parentHistory);
+      }
+    }
     await this.taskRepository.updateById(id, {deleted: true}, {currentUser: this.user});
   }
 }
