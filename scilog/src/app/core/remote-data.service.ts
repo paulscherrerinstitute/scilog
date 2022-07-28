@@ -15,8 +15,8 @@ import { Images } from '@model/images';
 import _ from 'lodash';
 import { TagsStat } from '@model/tags';
 
-interface Count{
-  "count":number;
+interface Count {
+  "count": number;
 }
 
 @Injectable({
@@ -51,14 +51,14 @@ export class RemoteDataService {
     return this.httpClient.get<T>(this.serverSettings.getServerAddress() + snippetPath, options);
   }
 
-  protected async postImage(payloadImage:Images){
+  protected async postImage(payloadImage: Images) {
     let headers = new HttpHeaders();
     headers = headers.set('Content-Type', 'application/json; charset=utf-8');
     let data = await this.postSnippet<Images>("images", JSON.stringify(payloadImage), headers).toPromise();
     return data;
   }
 
-  protected async postFilesnippet(payload:Filesnippet, file:File){
+  protected async postFilesnippet(payload: Filesnippet, file: File) {
     let formData = new FormData();
     let headersFile = new HttpHeaders();
     headersFile = headersFile.append('accept', 'application/json');
@@ -88,45 +88,45 @@ export class LogbookItemDataService extends RemoteDataService {
   }
 
 
-  static _prepareFilters(config: WidgetItemConfig, index: number=0, count: number=Infinity): Object {
+  static _prepareFilters(config: WidgetItemConfig, index: number = 0, count: number = Infinity): Object {
     let httpFilter: Object = {};
-    if (typeof config.view.order != 'undefined'){
+    if (typeof config.view.order != 'undefined') {
       httpFilter["order"] = config.view.order;
     } else {
       httpFilter["order"] = ["defaultOrder ASC"];
     }
-    
-    let whereFilter: Object[] = []; 
+
+    let whereFilter: Object[] = [];
     whereFilter.push({ "or": [{ "snippetType": "paragraph" }, { "snippetType": "image" }] });
 
     let parentIds: string[] = [];
-    if ((config.filter?.targetId) && (config.filter.targetId.length>1)){
+    if ((config.filter?.targetId) && (config.filter.targetId.length > 1)) {
       parentIds.push(config.filter.targetId);
     }
-    if (config.filter.additionalLogbooks.length > 0){
+    if (config.filter.additionalLogbooks.length > 0) {
       parentIds.push(...config.filter.additionalLogbooks);
     }
-    if (parentIds.length>0){
+    if (parentIds.length > 0) {
       let parentFilter = [];
       for (let parent of parentIds) {
-        parentFilter.push({ "parentId": {"eq": parent }});
+        parentFilter.push({ "parentId": { "eq": parent } });
       }
-      whereFilter.push({ "or" : parentFilter});
+      whereFilter.push({ "or": parentFilter });
     }
 
 
     if ((config.filter.tags) && (config.filter.tags.length > 0)) {
-      config.filter.tags.forEach(tag=>{
-        whereFilter.push({"tags": tag})
+      config.filter.tags.forEach(tag => {
+        whereFilter.push({ "tags": tag })
       })
-      
-    }
-    httpFilter["where"] = {"and": whereFilter};
 
-    if (count < Infinity){
+    }
+    httpFilter["where"] = { "and": whereFilter };
+
+    if (count < Infinity) {
       httpFilter["limit"] = count;
     }
-    if (index > 0){
+    if (index > 0) {
       httpFilter["skip"] = index;
     }
     // console.log(httpFilter);
@@ -135,7 +135,7 @@ export class LogbookItemDataService extends RemoteDataService {
     return httpFilter;
   }
 
-  static _prepareParams(config: WidgetItemConfig, index: number=0, count: number=Infinity): HttpParams {
+  static _prepareParams(config: WidgetItemConfig, index: number = 0, count: number = Infinity): HttpParams {
     let params = new HttpParams();
     params = params.set('filter', JSON.stringify(LogbookItemDataService._prepareFilters(config, index, count)));
     return params;
@@ -159,16 +159,16 @@ export class LogbookItemDataService extends RemoteDataService {
     return this.getSnippets<Blob>(imageSnippetUrl, { responseType: 'blob' }).toPromise();
   }
 
-  async getImage(id:string){
+  async getImage(id: string) {
     // first retrieve image snippet, then filesnippet and then file
     // let fileSnippet = await this.getFilesnippet(id);
     // console.log(fileSnippet)
     // let headers = new HttpHeaders();
     // headers = headers.set('Accept', 'application/json');
-    return this.getSnippets<Blob>("filesnippet/" + id + "/files", { responseType: 'blob'}).toPromise();
+    return this.getSnippets<Blob>("filesnippet/" + id + "/files", { responseType: 'blob' }).toPromise();
   }
 
-  getFilesnippet(id:string){
+  getFilesnippet(id: string) {
     let headers = new HttpHeaders();
     headers = headers.set('Content-Type', 'application/json; charset=utf-8');
     return this.getSnippets<Filesnippet>('filesnippet/' + id, { headers: headers }).toPromise();
@@ -182,7 +182,7 @@ export class LogbookItemDataService extends RemoteDataService {
     return this.deleteSnippet("basesnippets", snippetId).toPromise();
   }
 
-  getBasesnippet(id:string){
+  getBasesnippet(id: string) {
     let headers = new HttpHeaders();
     headers = headers.set('Content-Type', 'application/json; charset=utf-8');
     let httpFilter: Object = {};
@@ -191,28 +191,28 @@ export class LogbookItemDataService extends RemoteDataService {
     let params = new HttpParams();
     params = params.set('filter', JSON.stringify(httpFilter));
 
-    return this.getSnippets<Basesnippets>('basesnippets/' + id, {headers: headers, params:params}).toPromise();
+    return this.getSnippets<Basesnippets>('basesnippets/' + id, { headers: headers, params: params }).toPromise();
   }
 
-  async getCount(config:any){
+  async getCount(config: any) {
     let filter = LogbookItemDataService._prepareFilters(config);
     // let whereFilter = filter["where"];
     console.log(filter);
     let params = new HttpParams();
     params = params.set('where', JSON.stringify(filter["where"]));
     // let count:Count = await this.getSnippets<Count>('basesnippets/count', {params:params}).toPromise();
-    return this.getSnippets<Count>('basesnippets/count', {params:params}).toPromise()
+    return this.getSnippets<Count>('basesnippets/count', { params: params }).toPromise()
   }
 
-  async getIndex(id:string, config:any){
+  async getIndex(id: string, config: any) {
     let filter = LogbookItemDataService._prepareFilters(config);
     console.log(filter);
     let params = new HttpParams();
     params = params.set('filter', JSON.stringify(filter));
-    return this.getSnippets<number>('basesnippets/index=' + id, {params:params}).toPromise()
+    return this.getSnippets<number>('basesnippets/index=' + id, { params: params }).toPromise()
   }
 
-  private async _uploadImageFile(payload: ChangeStreamNotification) : Promise<ChangeStreamNotification>{
+  private async _uploadImageFile(payload: ChangeStreamNotification): Promise<ChangeStreamNotification> {
     if (payload.files) {
       console.log(payload);
       await Promise.all(payload.files.map(async file => {
@@ -224,7 +224,7 @@ export class LogbookItemDataService extends RemoteDataService {
           let dataFile = await this.postFilesnippet(filePayload, file.file);
           console.log(filePayload)
           delete file.file;
-          
+
           console.log(file);
           // imgPayload.className = file.className;
           // imgPayload.childTag = file.childTag;
@@ -273,10 +273,10 @@ export class LogbookItemDataService extends RemoteDataService {
     }
   }
 
-  exportLogbook(exportType:string, config: any, skip: number, limit: number):Promise<Blob>{
+  exportLogbook(exportType: string, config: any, skip: number, limit: number): Promise<Blob> {
     let headers = new HttpHeaders();
     headers = headers.set('Content-Type', 'application/json');
-    return this.getSnippets<Blob>("basesnippets/export=" + exportType + "", {headers:headers, responseType: 'blob', params:LogbookItemDataService._prepareParams(config, skip, limit)}).toPromise();
+    return this.getSnippets<Blob>("basesnippets/export=" + exportType + "", { headers: headers, responseType: 'blob', params: LogbookItemDataService._prepareParams(config, skip, limit) }).toPromise();
   }
 }
 
@@ -317,16 +317,16 @@ export class LogbookDataService extends RemoteDataService {
     return this.getSnippets<Basesnippets[]>('basesnippets', { headers: headers, params: params }).toPromise();
   }
 
-  _getLogbookInfo(id:string):Promise<Logbooks>{
+  _getLogbookInfo(id: string): Promise<Logbooks> {
     let headers = new HttpHeaders();
     headers = headers.set('Content-Type', 'application/json; charset=utf-8');
-    return this.getSnippets<Logbooks>('logbooks/' + id, {headers:headers}).toPromise();
+    return this.getSnippets<Logbooks>('logbooks/' + id, { headers: headers }).toPromise();
   }
 
-  _getAvailLogbooks():Promise<Logbooks[]>{
+  _getAvailLogbooks(): Promise<Logbooks[]> {
     let headers = new HttpHeaders();
     headers = headers.set('Content-Type', 'application/json; charset=utf-8');
-    return this.getSnippets<Logbooks[]>('logbooks', {headers:headers}).toPromise();
+    return this.getSnippets<Logbooks[]>('logbooks', { headers: headers }).toPromise();
   }
 
 }
@@ -336,24 +336,24 @@ export class LogbookDataService extends RemoteDataService {
 })
 export class WidgetPreferencesDataService extends RemoteDataService {
 
-  getSnippetsForLogbook(logbookId:string): Promise<Basesnippets[]>{
+  getSnippetsForLogbook(logbookId: string): Promise<Basesnippets[]> {
     let params = new HttpParams();
     let httpFilter: Object = {};
-    httpFilter["where"] = {"parentId": logbookId};
+    httpFilter["where"] = { "parentId": logbookId };
     params = params.set('filter', JSON.stringify(httpFilter));
     let headers = new HttpHeaders();
     headers = headers.set('Content-Type', 'application/json; charset=utf-8');
-    return this.getSnippets<Basesnippets[]>('basesnippets', {headers: headers, params: params}).toPromise();
+    return this.getSnippets<Basesnippets[]>('basesnippets', { headers: headers, params: params }).toPromise();
   }
 
-  getPlotSnippets(logbookId:string): Promise<Basesnippets[]>{
+  getPlotSnippets(logbookId: string): Promise<Basesnippets[]> {
     let params = new HttpParams();
     let httpFilter: Object = {};
-    httpFilter["where"] = {"parentId": logbookId, "snippetType": "plot"};
+    httpFilter["where"] = { "parentId": logbookId, "snippetType": "plot" };
     params = params.set('filter', JSON.stringify(httpFilter));
     let headers = new HttpHeaders();
     headers = headers.set('Content-Type', 'application/json; charset=utf-8');
-    return this.getSnippets<Basesnippets[]>('basesnippets', {headers: headers, params: params}).toPromise();
+    return this.getSnippets<Basesnippets[]>('basesnippets', { headers: headers, params: params }).toPromise();
   }
 }
 
@@ -361,14 +361,14 @@ export class WidgetPreferencesDataService extends RemoteDataService {
   providedIn: 'root'
 })
 export class SnippetViewerDataService extends RemoteDataService {
-  getSnippetViewerData(snippetId:string): Promise<Basesnippets[]>{
+  getSnippetViewerData(snippetId: string): Promise<Basesnippets[]> {
     let params = new HttpParams();
     let httpFilter: Object = {};
     httpFilter["where"] = { "id": snippetId };
     params = params.set('filter', JSON.stringify(httpFilter));
     let headers = new HttpHeaders();
     headers = headers.set('Content-Type', 'application/json; charset=utf-8');
-    return this.getSnippets<Basesnippets[]>('basesnippets', {headers: headers, params: params}).toPromise();
+    return this.getSnippets<Basesnippets[]>('basesnippets', { headers: headers, params: params }).toPromise();
   }
 }
 
@@ -376,14 +376,14 @@ export class SnippetViewerDataService extends RemoteDataService {
   providedIn: 'root'
 })
 export class PlotDataService extends RemoteDataService {
-  getPlotSnippets(snippetId:string): Promise<Basesnippets[]>{
+  getPlotSnippets(snippetId: string): Promise<Basesnippets[]> {
     let params = new HttpParams();
     let httpFilter: Object = {};
     httpFilter["where"] = { "id": snippetId };
     params = params.set('filter', JSON.stringify(httpFilter));
     let headers = new HttpHeaders();
     headers = headers.set('Content-Type', 'application/json; charset=utf-8');
-    return this.getSnippets<Basesnippets[]>("basesnippets", {headers:headers, params:params}).toPromise();
+    return this.getSnippets<Basesnippets[]>("basesnippets", { headers: headers, params: params }).toPromise();
   }
 }
 
@@ -391,10 +391,10 @@ export class PlotDataService extends RemoteDataService {
   providedIn: 'root'
 })
 export class AuthDataService extends RemoteDataService {
-  login(principal:string, password:string){
+  login(principal: string, password: string) {
     let headers = new HttpHeaders();
     headers = headers.set('Content-Type', 'application/json; charset=utf-8');
-    return this.postSnippet<User>('users/login', {principal, password}, headers)
+    return this.postSnippet<User>('users/login', { principal, password }, headers)
   }
 }
 
@@ -404,23 +404,27 @@ export class AuthDataService extends RemoteDataService {
 })
 export class TaskDataService extends RemoteDataService {
 
-  getTasksData(id:string) : Promise<Tasks[]>{
+  getTasksData(id: string): Promise<Tasks[]> {
     const headers = new HttpHeaders().set('Content-Type', 'application/json');
     let httpFilter: Object = {};
     httpFilter["where"] = { "parentId": id };
     let params = new HttpParams();
     params = params.set('filter', JSON.stringify(httpFilter));
-    return this.getSnippets<Tasks[]>("tasks", {headers:headers, params:params}).toPromise();
+    return this.getSnippets<Tasks[]>("tasks", { headers: headers, params: params }).toPromise();
   }
 
-  addTask(task:Tasks):Promise<any>{
+  addTask(task: Tasks): Promise<any> {
     const headers = new HttpHeaders().set('Content-Type', 'application/json');
     return this.postSnippet<any>('tasks', JSON.stringify(task), headers).toPromise();
   }
 
-  patchTask(task:Object, id: string):Promise<any>{
+  patchTask(task: Object, id: string): Promise<any> {
     const headers = new HttpHeaders().set('Content-Type', 'application/json');
     return this.patchSnippet<any>('tasks', id, JSON.stringify(task), headers).toPromise();
+  }
+
+  deleteTask(id: string): Promise<any> {
+    return this.deleteSnippet('tasks', id).toPromise();
   }
 }
 
@@ -428,23 +432,23 @@ export class TaskDataService extends RemoteDataService {
   providedIn: 'root'
 })
 export class TagDataService extends RemoteDataService {
-  private isValidTag(tag:string){
-    if (tag.includes("_delete_")){
+  private isValidTag(tag: string) {
+    if (tag.includes("_delete_")) {
       return false;
     }
     return true;
   }
-  async getTags(id:string) : Promise<TagsStat[]>{
+  async getTags(id: string): Promise<TagsStat[]> {
     let httpFilter: Object = {};
     httpFilter["where"] = { "parentId": id };
-    httpFilter["fields"] = {"tags": true};
+    httpFilter["fields"] = { "tags": true };
     let params = new HttpParams();
     params = params.set('filter', JSON.stringify(httpFilter));
     const headers = new HttpHeaders().set('Content-Type', 'application/json');
-    let data = await this.getSnippets<Basesnippets[]>("basesnippets/", {headers:headers, params:params}).toPromise();
+    let data = await this.getSnippets<Basesnippets[]>("basesnippets/", { headers: headers, params: params }).toPromise();
     let tags = _.compact(data.map(x => {
-      if ((x.tags)&&(x.tags.length>0)){
-        return x.tags.filter(tag=>{return this.isValidTag(tag)});
+      if ((x.tags) && (x.tags.length > 0)) {
+        return x.tags.filter(tag => { return this.isValidTag(tag) });
       } else {
         return null;
       }
@@ -455,23 +459,23 @@ export class TagDataService extends RemoteDataService {
     tags.forEach(snippet => {
       snippet.forEach(tag => {
         let entry = res.find(e => e.name == tag);
-        typeof entry == 'undefined' ? res.push({name: tag, count: 1}) : entry.count += 1;
+        typeof entry == 'undefined' ? res.push({ name: tag, count: 1 }) : entry.count += 1;
       })
     })
     return _.orderBy(res, ['count'], ['desc']);
-    
+
   }
-  getLastEntry(config:WidgetItemConfig){
+  getLastEntry(config: WidgetItemConfig) {
     let headers = new HttpHeaders();
     headers = headers.set('Content-Type', 'application/json; charset=utf-8');
     console.log(config);
     let _config = JSON.parse(JSON.stringify(config));
-    if (typeof _config.view.order != 'undefined'){
+    if (typeof _config.view.order != 'undefined') {
       let order = _config.view.order[0].split(" ");
       _config.view.order = order[0] + " DESC";
     } else {
       _config.view.order = ["defaultOrder DESC"];
-    }    
+    }
     console.log(_config);
     return this.getSnippets<any[]>('basesnippets', { headers: headers, params: LogbookItemDataService._prepareParams(_config, 0, 1) }).toPromise();
   }
@@ -483,22 +487,22 @@ export class TagDataService extends RemoteDataService {
 })
 export class UserPreferencesDataService extends RemoteDataService {
 
-  getUserPreferences(){
+  getUserPreferences() {
     const headers = new HttpHeaders().set('Content-Type', 'application/json');
-    return this.getSnippets<UserPreferences[]>('user-preferences', {headers:headers});
+    return this.getSnippets<UserPreferences[]>('user-preferences', { headers: headers });
   }
 
-  getUserInfo(){
+  getUserInfo() {
     const headers = new HttpHeaders().set('Content-Type', 'application/json');
-    return this.getSnippets<UserInfo>('users/me', {headers:headers}).toPromise();
+    return this.getSnippets<UserInfo>('users/me', { headers: headers }).toPromise();
   }
 
-  postUserPreferences(payload:Object):Promise<any>{
+  postUserPreferences(payload: Object): Promise<any> {
     const headers = new HttpHeaders().set('Content-Type', 'application/json');
     return this.postSnippet<any>('user-preferences', JSON.stringify(payload), headers).toPromise();
   }
 
-  deleteUserPreferences(id:string):Promise<any>{
+  deleteUserPreferences(id: string): Promise<any> {
     return this.deleteSnippet('user-preferences', id).toPromise();
   }
 
@@ -509,28 +513,28 @@ export class UserPreferencesDataService extends RemoteDataService {
 })
 export class ViewDataService extends RemoteDataService {
 
-  getViews(id:string):Promise<Views[]>{
+  getViews(id: string): Promise<Views[]> {
     let params = new HttpParams();
     let httpFilter: Object = {};
     let headers = new HttpHeaders();
     headers = headers.set('Content-Type', 'application/json; charset=utf-8');
     httpFilter["where"] = { "parentId": id };
     params = params.set('filter', JSON.stringify(httpFilter));
-    return this.getSnippets<Views[]>("views", {headers:headers, params:params}).toPromise();
+    return this.getSnippets<Views[]>("views", { headers: headers, params: params }).toPromise();
   }
 
-  postView(payload:any):Promise<Views>{
+  postView(payload: any): Promise<Views> {
     let headers = new HttpHeaders();
     headers = headers.set('Content-Type', 'application/json');
     return this.postSnippet<Views>("views", JSON.stringify(payload), headers).toPromise();
   }
 
-  patchView(payload:any, id:string):Promise<Views>{
+  patchView(payload: any, id: string): Promise<Views> {
     let headers = new HttpHeaders();
     headers = headers.set('Content-Type', 'application/json');
     return this.patchSnippet<Views>('views', id, JSON.stringify(payload), headers).toPromise();
   }
-  
+
 }
 
 
@@ -561,5 +565,5 @@ export class SearchDataService extends RemoteDataService {
     }
 
   }
-  
+
 }
