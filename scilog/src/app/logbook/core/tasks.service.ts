@@ -30,7 +30,7 @@ export class TasksService {
     }))
   }
 
-  async getTasks(id:string){
+  async getTasks(id: string) {
     this.tasks = await this.dataService.getTasksData(id);
     this.tasksSource.next(this.tasks);
   }
@@ -40,11 +40,8 @@ export class TasksService {
     await this.dataService.addTask(task);
   }
 
-  deleteTask(id: string) {
-    let payload: ChangeStreamNotification = {
-      tags: ["_delete_" + id]
-    };
-    this.updateTask(payload, id);
+  async deleteTask(id: string) {
+    await this.dataService.deleteTask(id);
   }
 
   async updateTask(payload: Object, id: string) {
@@ -59,40 +56,41 @@ export class TasksService {
 
   taskChange(data: ChangeStreamNotification) {
     // console.log(data)
-    if (data.id) {
-      switch (data.operationType) {
-        case 'insert':
-          if (data.content.snippetType == "task"){
-            this.tasks.push(data.content);
-            this.tasksSource.next(this.tasks);
+    if (!data.id) {
+      return;
+    }
+    switch (data.operationType) {
+      case 'insert':
+        if (data.content.snippetType == "task") {
+          this.tasks.push(data.content);
+          this.tasksSource.next(this.tasks);
+        }
+        break;
+      case 'update':
+        let updateIndex: number = -1;
+        for (let taskIndex = 0; taskIndex < this.tasks.length; taskIndex++) {
+          if (data.id == this.tasks[taskIndex].id) {
+            updateIndex = taskIndex;
+            break;
           }
-          break;
-        case 'update':
-          let updateIndex: number = -1;
-          for (let taskIndex = 0; taskIndex < this.tasks.length; taskIndex++) {
-            if (data.id == this.tasks[taskIndex].id) {
-              updateIndex = taskIndex;
-              break;
+        }
+        if (updateIndex >= 0) {
+          if (data.content.deleted) {
+            this.tasks.splice(updateIndex, 1);
+          } else {
+            let updateEntry = this.tasks[updateIndex];
+            for (const key in data.content) {
+              updateEntry[key] = data.content[key];
             }
+            this.tasks[updateIndex] = updateEntry;
           }
-          if (updateIndex >= 0) {
-            if (data.content.tags && data.content.tags == '_delete_' + data.id) {
-              this.tasks.splice(updateIndex, 1);
-            } else {
-              let updateEntry = this.tasks[updateIndex];
-              for (const key in data.content) {
-                updateEntry[key] = data.content[key];
-              }
-              this.tasks[updateIndex] = updateEntry;
-            }
-            console.log(data)
-            console.log(updateIndex)
-            this.tasksSource.next(this.tasks);
-          }
-          break;
-        default:
-          break;
-      }
+          console.log(data)
+          console.log(updateIndex)
+          this.tasksSource.next(this.tasks);
+        }
+        break;
+      default:
+        break;
     }
 
   }

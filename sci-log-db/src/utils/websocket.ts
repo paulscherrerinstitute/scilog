@@ -161,7 +161,8 @@ export async function startWebsocket(app: SciLogDbApplication) {
               //      an update of the document is requested and the tags are
               //      set to _delete_.
               if (change.operationType == 'update') {
-                if (change.updateDescription.updatedFields.deleted) {
+                let updatedFields = change.updateDescription.updatedFields
+                if (updatedFields.deleted) {
                   console.log("delete");
                   console.log("updated doc", doc);
                   if (doc?.versionable) {

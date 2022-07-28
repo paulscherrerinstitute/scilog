@@ -1,5 +1,6 @@
-import { authenticate } from '@loopback/authentication';
-import { authorize } from '@loopback/authorization';
+import {authenticate} from '@loopback/authentication';
+import {authorize} from '@loopback/authorization';
+import {inject} from '@loopback/core';
 import {
   Count,
   CountSchema,
@@ -22,15 +23,14 @@ import {
 
   requestBody
 } from '@loopback/rest';
-import { Task } from '../models';
-import { TaskRepository } from '../repositories';
-import { basicAuthorization } from '../services/basic.authorizor';
-import { OPERATION_SECURITY_SPEC } from '../utils/security-spec';
-import { SecurityBindings, UserProfile } from '@loopback/security';
-import {inject} from '@loopback/core';
+import {SecurityBindings, UserProfile} from '@loopback/security';
+import {Task} from '../models';
+import {TaskRepository} from '../repositories';
+import {basicAuthorization} from '../services/basic.authorizor';
+import {OPERATION_SECURITY_SPEC} from '../utils/security-spec';
 
 @authenticate('jwt')
-@authorize({ allowedRoles: ['customer'], voters: [basicAuthorization] })
+@authorize({allowedRoles: ['customer'], voters: [basicAuthorization]})
 export class TaskController {
   constructor(
     @inject(SecurityBindings.USER) private user: UserProfile,
@@ -43,7 +43,7 @@ export class TaskController {
     responses: {
       '200': {
         description: 'Task model instance',
-        content: { 'application/json': { schema: getModelSchemaRef(Task) } },
+        content: {'application/json': {schema: getModelSchemaRef(Task)}},
       },
     },
   })
@@ -60,7 +60,7 @@ export class TaskController {
     })
     task: Omit<Task, 'id'>,
   ): Promise<Task> {
-    return this.taskRepository.create(task, { currentUser: this.user });
+    return this.taskRepository.create(task, {currentUser: this.user});
   }
 
   @get('/tasks/count', {
@@ -68,14 +68,14 @@ export class TaskController {
     responses: {
       '200': {
         description: 'Task model count',
-        content: { 'application/json': { schema: CountSchema } },
+        content: {'application/json': {schema: CountSchema}},
       },
     },
   })
   async count(
     @param.where(Task) where?: Where<Task>,
   ): Promise<Count> {
-    return this.taskRepository.count(where, { currentUser: this.user });
+    return this.taskRepository.count(where, {currentUser: this.user});
   }
 
   @get('/tasks', {
@@ -87,7 +87,7 @@ export class TaskController {
           'application/json': {
             schema: {
               type: 'array',
-              items: getModelSchemaRef(Task, { includeRelations: true }),
+              items: getModelSchemaRef(Task, {includeRelations: true}),
             },
           },
         },
@@ -97,7 +97,7 @@ export class TaskController {
   async find(
     @param.filter(Task) filter?: Filter<Task>,
   ): Promise<Task[]> {
-    return this.taskRepository.find(filter, { currentUser: this.user });
+    return this.taskRepository.find(filter, {currentUser: this.user});
   }
 
   @patch('/tasks', {
@@ -105,7 +105,7 @@ export class TaskController {
     responses: {
       '200': {
         description: 'Task PATCH success count',
-        content: { 'application/json': { schema: CountSchema } },
+        content: {'application/json': {schema: CountSchema}},
       },
     },
   })
@@ -113,14 +113,14 @@ export class TaskController {
     @requestBody({
       content: {
         'application/json': {
-          schema: getModelSchemaRef(Task, { partial: true }),
+          schema: getModelSchemaRef(Task, {partial: true}),
         },
       },
     })
     task: Task,
     @param.where(Task) where?: Where<Task>,
   ): Promise<Count> {
-    return this.taskRepository.updateAll(task, where, { currentUser: this.user });
+    return this.taskRepository.updateAll(task, where, {currentUser: this.user});
   }
 
   @get('/tasks/{id}', {
@@ -130,7 +130,7 @@ export class TaskController {
         description: 'Task model instance',
         content: {
           'application/json': {
-            schema: getModelSchemaRef(Task, { includeRelations: true }),
+            schema: getModelSchemaRef(Task, {includeRelations: true}),
           },
         },
       },
@@ -138,9 +138,9 @@ export class TaskController {
   })
   async findById(
     @param.path.string('id') id: string,
-    @param.filter(Task, { exclude: 'where' }) filter?: FilterExcludingWhere<Task>
+    @param.filter(Task, {exclude: 'where'}) filter?: FilterExcludingWhere<Task>
   ): Promise<Task> {
-    return this.taskRepository.findById(id, filter, { currentUser: this.user });
+    return this.taskRepository.findById(id, filter, {currentUser: this.user});
   }
 
   @patch('/tasks/{id}', {
@@ -156,13 +156,13 @@ export class TaskController {
     @requestBody({
       content: {
         'application/json': {
-          schema: getModelSchemaRef(Task, { partial: true }),
+          schema: getModelSchemaRef(Task, {partial: true}),
         },
       },
     })
     task: Task,
   ): Promise<void> {
-    await this.taskRepository.updateById(id, task, { currentUser: this.user });
+    await this.taskRepository.updateById(id, task, {currentUser: this.user});
   }
 
   @put('/task/{id}', {
@@ -177,7 +177,7 @@ export class TaskController {
     @param.path.string('id') id: string,
     @requestBody() task: Task,
   ): Promise<void> {
-    await this.taskRepository.replaceById(id, task, { currentUser: this.user });
+    await this.taskRepository.replaceById(id, task, {currentUser: this.user});
   }
 
   @del('/tasks/{id}', {
@@ -188,7 +188,21 @@ export class TaskController {
       },
     },
   })
+  // async deleteById(@param.path.string('id') id: string): Promise<void> {
+  //   await this.taskRepository.deleteById(id, { currentUser: this.user });
+  // }
   async deleteById(@param.path.string('id') id: string): Promise<void> {
-    await this.taskRepository.deleteById(id, { currentUser: this.user });
+    // Two steps:
+    // 1. set snippet to 'deleted=true'
+    // 2. inside websocket and after informing the clients, replace the parentId or delete the snippet
+    // let snippet = await this.taskRepository.findById(id, {}, {currentUser: this.user});
+    // if (snippet?.versionable) {
+    //   if (snippet?.parentId) {
+    //     let parent = await this.taskRepository.findById(snippet.parentId, {}, {currentUser: this.user});
+    //     let parentHistory = await this.getHistorySnippet(parent);
+    //     console.log(parentHistory);
+    //   }
+    // }
+    await this.taskRepository.updateById(id, {deleted: true}, {currentUser: this.user});
   }
 }
