@@ -140,8 +140,8 @@ export async function startWebsocket(app: SciLogDbApplication) {
         if (change.operationType != 'delete') {
           getId.parentId(db, change.documentKey._id, (async (id: string) => {
             if (id != null) {
-              console.log("sending data to group ", id);
-              console.log("change: ", change);
+              // console.log("sending data to group ", id);
+              // console.log("change: ", change);
 
               // make sure all subscribers have the permission to read the changestream
               let doc = await collection.findOne({'_id': Mongo.ObjectId(change.documentKey._id)});
