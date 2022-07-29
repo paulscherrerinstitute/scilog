@@ -9,7 +9,7 @@ const oidcStrategy = require('passport-openidconnect');
 import { RequestContext, RestBindings } from '@loopback/rest';
 import { InvocationContext, Next } from '@loopback/core';
 import { verifyFunctionFactory } from '../../authentication-strategies/types';
-import { setupApplication } from './test-helper';
+import { oidcOptions, setupApplication } from './test-helper';
 
 
 describe('OIDC services', function (this: Suite) {
@@ -38,16 +38,7 @@ describe('OIDC services', function (this: Suite) {
     username: 'unittest',
     roles: ['aRole', 'customer', 'unittest'],
   };
-  function createOidcBinding() {
-    app.bind('oidcOptions').to({
-      issuer: "issuer",
-      authorizationURL: "oidc-authorization-url",
-      tokenURL: "tokenURL",
-      clientID: "clientID",
-      successRedirect: 'success-redirect'
-    });
-  }
-  
+
   async function clearDatabase() {
     await userRepo.deleteAll()
   }
@@ -55,9 +46,8 @@ describe('OIDC services', function (this: Suite) {
   const sandbox = createSandbox();
 
   before('setupApplication', async () => {
-    ({app, client} = await setupApplication());
+    ({app, client} = await setupApplication({oidcOptions: oidcOptions}));
   });
-  before(createOidcBinding)
   before('userRepo', async () => {
     userRepo = await app.get('repositories.UserRepository')
   })
