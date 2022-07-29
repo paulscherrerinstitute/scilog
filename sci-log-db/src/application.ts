@@ -144,16 +144,17 @@ export class SciLogDbApplication extends BootMixin(
       done(null, user);
     });
   
-    registerAuthenticationStrategy(this, OIDCAuthentication);
-    
     // LoopBack 4 style authentication strategies
-    this.add(createBindingFromClass(OIDCAuthentication));
   
     // Express style middleware interceptors
-    this.bind('passport-init-mw').to(toInterceptor(passport.initialize()));
-    this.bind('passport-session-mw').to(toInterceptor(passport.session()));
-    this.bind('passport-oidc').to(toInterceptor(passport.authenticate('openidconnect')));
-  
+    if (this.options.oidcOptions) {
+      this.bind('oidcOptions').to(this.options.oidcOptions);
+      registerAuthenticationStrategy(this, OIDCAuthentication);
+      this.add(createBindingFromClass(OIDCAuthentication));
+      this.bind('passport-init-mw').to(toInterceptor(passport.initialize()));
+      this.bind('passport-session-mw').to(toInterceptor(passport.session()));
+      this.bind('passport-oidc').to(toInterceptor(passport.authenticate('openidconnect')));
+    }
   }
 
   configureDatasourceFromFile(datasourceFile: string, datasourceConfigBindingKey: string): void {

@@ -1,16 +1,15 @@
 import * as fs from 'fs';
 import {ApplicationConfig} from '@loopback/core';
 import {SciLogDbApplication} from './application';
+const path = require('path');
 
 export * from './application';
 
 export async function main(options: ApplicationConfig = {}) {
   const app = new SciLogDbApplication(options);
-  app.bind('oidcOptions').to(options.oidcOptions);
   await app.boot();
   await app.start();
   await app.startWebsocket();
-
   const url = app.restServer.url;
   console.log(`Server is running at ${url}`);
   console.log(`Try ${url}/ping`);
@@ -39,7 +38,7 @@ if (require.main === module) {
       websocket: {port},
     },
     databaseSeeding: false,
-    oidcOptions: fs.existsSync('../oidc.json')? require('../oidc.json'): {},
+    oidcOptions: fs.existsSync(path.resolve(__dirname, '../oidc.json'))? require('../oidc.json'): undefined,
   }
 
   main(config).catch(err => {
