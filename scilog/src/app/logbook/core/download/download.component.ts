@@ -21,22 +21,22 @@ export class DownloadComponent implements OnInit {
     this.exportData();
   }
 
-  async exportData(){
+  async exportData() {
     // console.log(this.config)
     // this.inProgress = true;
     // console.log(exportType);
     console.log("exportData")
     let fileSnippet = await this.logbookItemDataService.getFilesnippet(this.route.snapshot.params.fileId);
-    const blob = await this.logbookItemDataService.getFile("files/" + fileSnippet.id + "." + fileSnippet.fileExtension);
+    const blob = await this.logbookItemDataService.getImage(this.route.snapshot.params.fileId);
     console.log("blob:", blob);
-    if ((typeof blob != undefined) && (blob != null)){
+    if ((typeof blob != undefined) && (blob != null)) {
       const url = window.URL.createObjectURL(blob);
-      console.log(fileSnippet);
+      // console.log(fileSnippet);
       const link = this.downloadLink.nativeElement;
       link.href = url;
       link.download = fileSnippet.id + '.' + fileSnippet.fileExtension;
       link.click();
-    
+
       window.URL.revokeObjectURL(url);
     }
 
