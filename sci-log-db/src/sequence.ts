@@ -2,10 +2,12 @@ import { AuthenticateFn, AuthenticationBindings } from '@loopback/authentication
 import { inject } from '@loopback/core';
 import {ExpressRequestHandler, FindRoute, InvokeMethod, InvokeMiddleware, ParseParams, Reject, RequestContext, RestBindings, Send, SequenceHandler} from '@loopback/rest';
 import session from 'express-session';
+import cors from 'cors';
 
 const SequenceActions = RestBindings.SequenceActions;
 
 const middlewareList: ExpressRequestHandler[] = [
+    cors(),
     session({secret: "someSecret",
       resave: false,
       saveUninitialized: true}),
