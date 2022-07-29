@@ -1,12 +1,15 @@
 from __future__ import annotations
+
 import functools
+import json
+import os
 import uuid
 import warnings
-import os
+from typing import Any
 
-from .authmixin import AuthError, HEADER_JSON
+from .authmixin import HEADER_JSON, AuthError
 from .httpclient import HttpClient
-from .snippet import Filesnippet, Snippet, Basesnippet, Paragraph
+from .snippet import Basesnippet, Filesnippet, Paragraph, Snippet
 
 
 def pinned_to_logbook(logbook_keys):
@@ -40,7 +43,7 @@ class SciLog:
         self.logbook = None
         self.image_types = ["png", "jpg", "jpeg"]
 
-    def select_logbook(self, logbook: type(Basesnippet)):
+    def select_logbook(self, logbook: Basesnippet):
         self.logbook = logbook
 
     @pinned_to_logbook(["parentId", "ownerGroup", "accessGroups"])
@@ -52,6 +55,32 @@ class SciLog:
             self.http_client.get_request(url, params=params, headers=headers)
         )
 
+    @staticmethod
+    def _replace_json_placeholder(snippet: dict, field: str, data: Any) -> dict:
+        if isinstance(snippet[field], list):
+            if "default" in snippet[field]:
+                data = set(data) | set(group for group in snippet[field] if group)
+                snippet[field] = list(data)
+            return snippet
+
+        if isinstance(snippet[field], str):
+            if snippet[field] == "default":
+                snippet[field] = data
+            return snippet
+
+        raise ValueError("The used placeholder type is not supported. ")
+
+    @pinned_to_logbook(["parentId", "ownerGroup", "accessGroups"])
+    def import_from_dict(self, snippet: dict, **kwargs):
+        msg = snippet.pop("textcontent")
+        snippet = self._replace_json_placeholder(
+            snippet, "accessGroups", kwargs.get("accessGroups", [])
+        )
+        snippet = self._replace_json_placeholder(
+            snippet, "ownerGroup", kwargs.get("ownerGroup", "")
+        )
+        self.send_message(msg, **snippet)
+
     @pinned_to_logbook(["parentId", "ownerGroup", "accessGroups"])
     def send_message(self, msg, **kwargs):
         url = self.http_client.address + "/basesnippets"
@@ -60,41 +89,53 @@ class SciLog:
         snippet.textcontent = msg
         payload = snippet.to_dict(include_none=False)
         print(HEADER_JSON, payload, url)
-        return Paragraph.from_http_response(
-            self.http_client.post_request(url, payload=payload, headers=HEADER_JSON)
-        )
+        return self.post_snippet(**payload)
 
     @pinned_to_logbook(["parentId", "ownerGroup", "accessGroups"])
     def post_snippet(self, **kwargs):
         url = self.http_client.address + "/basesnippets"
         payload = kwargs
+        if payload.get("files"):
+            payload = self.upload_files(payload)
         return Paragraph.from_http_response(
             self.http_client.post_request(url, payload=payload, headers=HEADER_JSON)
         )
 
+    def upload_files(self, payload):
+        for file in payload.get("files"):
+            fs = self._post_filesnippet(file["filepath"])
+            file["fileId"] = fs.id
+            file.pop("filepath")
+        return payload
+
     @pinned_to_logbook(["ownerGroup", "accessGroups"])
-    def _post_filesnippet(self, file_extension, **kwargs):
-        url = self.http_client.address + "/filesnippet"
+    def _post_filesnippet(self, filepath, **kwargs):
+        url = self.http_client.address + "/filesnippet/files"
+
+        file_extension = os.path.splitext(filepath)[-1]
+        if not file_extension:
+            raise ValueError("filepath must be pointing to a file, not a directory.")
+        file_extension = file_extension[1:]
+
         snippet = Filesnippet()
         snippet.import_dict(kwargs)
         snippet.fileExtension = file_extension
         payload = snippet.to_dict(include_none=False)
-        return Filesnippet.from_http_response(
-            self.http_client.post_request(url, payload=payload, headers=HEADER_JSON)
-        )
 
-    def _file_upload(self, filepath, filename, file_extension):
-        url = self.http_client.address + "/files"
         file_descriptor = "image" if file_extension in self.image_types else "file"
-
-        files = {
-            "target_filename": (
-                filename + "." + file_extension,
+        multipart_form_data = {
+            "file": (
+                filepath + "." + file_extension,
                 open(filepath, "rb"),
                 f"{file_descriptor}/{file_extension}",
-            )
+            ),
+            "fields": (None, json.dumps(payload)),
         }
-        return self.http_client.post_request(url, files=files, headers={})
+        return Filesnippet.from_http_response(
+            self.http_client.post_request(
+                url, files=multipart_form_data, headers={"Accept": "application/json"}
+            )
+        )
 
     @pinned_to_logbook(["ownerGroup", "accessGroups"])
     def post_file(self, filepath: str, **kwargs) -> Filesnippet:
@@ -112,18 +153,13 @@ class SciLog:
         """
         if not os.path.exists(filepath):
             raise FileNotFoundError("Specified file does not exist.")
-        file_extension = os.path.splitext(filepath)[-1]
-        if not file_extension:
-            raise ValueError("filepath must be pointing to a file, not a directory.")
-        file_extension = file_extension[1:]
-        fsnippet = self._post_filesnippet(file_extension)
-        ret = self._file_upload(filepath, fsnippet.id, file_extension)
+
+        fsnippet = self._post_filesnippet(filepath)
+        # ret = self._file_upload(filepath, fsnippet.id, file_extension)
         return fsnippet
 
     @pinned_to_logbook(["ownerGroup", "accessGroups"])
-    def append_files_to_snippet(
-        self, snippet: Paragraph, filepaths: list, **kwargs
-    ) -> Paragraph:
+    def append_files_to_snippet(self, snippet: Paragraph, filepaths: list, **kwargs) -> Paragraph:
         """Append files or images to an already existing snippet. Files and images will be appended following the order given in 'filepaths'.
 
         Args:
@@ -145,7 +181,9 @@ class SciLog:
                 snippet.files = []
 
             if file_extension in self.image_types:
-                snippet.textcontent += f'<figure class="image image_resized"><img src="" title="{file_hash}"></figure>'
+                snippet.textcontent += (
+                    f'<figure class="image image_resized"><img src="" title="{file_hash}"></figure>'
+                )
                 snippet.files.append(
                     {
                         "fileHash": file_hash,
