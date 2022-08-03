@@ -1,18 +1,20 @@
 #!/usr/bin/env python
 
-from glob import iglob
 import json
-import uuid
+import os
+from glob import iglob
+
+from scilog.scilog import SciLog
+
 
 def json_load(filename, *args, **kwargs):
     with open(filename, "r") as f:
         return json.load(f, *args, **kwargs)
 
+
 def json_save(what, filename, *args, indent=4, sort_keys=True, **kwargs):
     with open(filename, "w") as f:
         json.dump(what, f, *args, indent=indent, sort_keys=sort_keys, **kwargs)
-
-
 
 
 default_pgroup = "default"
@@ -20,44 +22,39 @@ default_author = "default"
 
 
 mapped = {
-#    "Author": "createdBy",
+    #    "Author": "createdBy",
     "Date": "timestamp",
-#    "message": "textcontent",
-#    "P-Group": "ownerGroup"
+    #    "message": "textcontent",
+    #    "P-Group": "ownerGroup"
 }
 
 ignored = [
-    "Encoding", # seems to be always HTML
-    "MID", # message ID
-    "Section", # seems to be always the endstation
-    "When" # unclear how this differs from Date
+    "Encoding",  # seems to be always HTML
+    "MID",  # message ID
+    "Section",  # seems to be always the endstation
+    "When",  # unclear how this differs from Date
 ]
 
-special = [
-    "Author",
-    "attachments",
-    "P-Group",
-    "message",
-    "Title"
-]
+special = ["Author", "attachments", "P-Group", "message", "Title"]
 
 tags = [
     "Component",
     "Entry",
     "System",
-
     "Category",
     "Domain",
     "Effect",
     "Valid until",
     "Group",
-    "Type"
+    "Type",
 ]
 
 
 authors = json_load("authors.json")
 
-fns = sorted(iglob("dump/msg*.json"))
+dump_path = "./elogdump/"
+
+fns = sorted(iglob(f"{dump_path}/dump/msg*.json"))
 res = []
 for fn in fns:
     data_out = {}
@@ -93,7 +90,6 @@ for fn in fns:
 
     data_out["accessGroups"] = [author, pgroup]
 
-
     mesg = data_in.pop("message")
     title = data_in.pop("Title")
     title = title.strip()
@@ -105,20 +101,16 @@ for fn in fns:
     attchs = data_in.pop("attachments")
     if attchs:
         for fn in attchs:
-            f_hash = str(uuid.uuid4())
-            f_id = str(uuid.uuid4())
-            filepath = f"./dump/attachments/{fn}"
-            f_ext = fn.split(".")[-1]
-            textcontent += (
-                f'<p><a class="fileLink" target="_blank" href="file:{f_hash}">{fn}</a></p>'
-            )
-            files.append({"fileHash": f_hash, "fileId": f_id, "fileExtension": f"file/{f_ext}", "filepath": filepath})
+            filepath = os.path.abspath(f"{dump_path}/dump/attachments/{fn}")
+            file_info, file_textcontent = SciLog.prepare_file_content(filepath)
+            files.append(file_info)
+            textcontent += file_textcontent
 
     data_out["textcontent"] = textcontent
     data_out["files"] = files
 
     if data_in:
-        raise ValueError(f"there are unassigned entries in \"{fn}\": {data_in}")
+        raise ValueError(f'there are unassigned entries in "{fn}": {data_in}')
 
     data_out["snippetType"] = data_out["linkType"] = "paragraph"
 
@@ -126,6 +118,3 @@ for fn in fns:
 
 
 json_save(res, "scilog.json")
-
-
-
