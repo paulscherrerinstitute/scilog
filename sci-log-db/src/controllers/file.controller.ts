@@ -15,8 +15,27 @@ import {OPERATION_SECURITY_SPEC} from '../utils/security-spec';
 
 const Mongo = require('mongodb');
 interface FormData {
-  fields: any,
+  fields: Filesnippet,
   files: any
+}
+
+const formDataSchema = {
+  type: 'object' as const,
+  properties: {
+    fields: getModelSchemaRef(Filesnippet),
+    file: {
+      type: 'string' as const,
+      format: 'binary'
+    },
+  }
+}
+
+class MissingFileError extends Error {
+  constructor(message: string = 'A file must be provided') {
+    super(message)
+  }
+  statusCode = 422
+  name = 'ValidationError'
 }
 
 @authenticate('jwt')
@@ -70,18 +89,30 @@ export class FileController {
     },
   })
   async fileUpload(
-    @requestBody.file()
+    @requestBody({required: true, 
+      content: {
+        'multipart/form-data': {
+          schema: 
+          formDataSchema, 
+          'x-parser': 'stream'
+        }
+      }
+    })
     request: Request
   ): Promise<Object> {
     var form = new formidable.IncomingForm();
-
     var formData: FormData = await new Promise(function (resolve, reject) {
       form.parse(request, (err: any, fields: any, files: any) => {
         if (err) {
           reject(err);
           return;
         }
-        resolve({fields: JSON.parse(fields?.fields), files: files});
+        if (!files.file) {
+          const error = new MissingFileError();
+          reject(error);
+          return error;
+        }
+        resolve({fields: JSON.parse(fields?.fields || '{}'), files: files});
       });
     });
     return this.uploadToGridfs(formData, async (formData, resolve, reject) => {
@@ -92,8 +123,6 @@ export class FileController {
       });
     });
   }
-
-
 
   @get('/filesnippet/count', {
     security: OPERATION_SECURITY_SPEC,
@@ -200,6 +229,62 @@ export class FileController {
     return response;
   }
 
+  @patch('/filesnippet/{id}/files', {
+    security: OPERATION_SECURITY_SPEC,
+    responses: {
+      204: {
+        content: {
+          'application/json': {
+            schema: {
+              type: 'object',
+            },
+          },
+        },
+        description: 'Files and fields',
+      },
+    },
+  })
+  async updateByIdWithFile(
+    @param.path.string('id') id: string,
+    @requestBody({required: true, 
+      content: {
+        'multipart/form-data': {
+          schema: 
+          formDataSchema, 
+          'x-parser': 'stream'
+        }
+      }
+    })
+    request: Request
+  ): Promise<void> {
+    var form = new formidable.IncomingForm();
+    interface FormData {
+      fields: any,
+      files: any
+    }
+    var formData: FormData = await new Promise(function (resolve, reject) {
+      form.parse(request, (err: any, fields: any, files: any) => {
+        if (err) {
+          reject(err);
+          return;
+        }
+        if (!files.file) {
+          const error = new MissingFileError();
+          reject(error);
+          return error;
+        }
+        resolve({fields: JSON.parse(fields?.fields), files: files});
+      });
+    });
+    return this.uploadToGridfs(formData, async (formData, resolve, reject) => {
+      return this.fileRepository.updateById(id, _.omit(formData.fields, ['id']), {currentUser: this.user}).then(() => {
+        resolve();
+      }).catch((err: HttpErrors.HttpError) => {
+        reject(err);
+      });
+    })
+  }
+
   @patch('/filesnippet/{id}', {
     security: OPERATION_SECURITY_SPEC,
     responses: {
@@ -222,47 +307,6 @@ export class FileController {
     await this.fileRepository.updateById(id, file, {currentUser: this.user});
   }
 
-  @patch('/filesnippet/{id}/files', {
-    security: OPERATION_SECURITY_SPEC,
-    responses: {
-      204: {
-        content: {
-          'application/json': {
-            schema: {
-              type: 'object',
-            },
-          },
-        },
-        description: 'Files and fields',
-      },
-    },
-  })
-  async updateByIdWithFile(
-    @param.path.string('id') id: string,
-    @requestBody.file() request: Request,
-  ): Promise<void> {
-    var form = new formidable.IncomingForm();
-    interface FormData {
-      fields: any,
-      files: any
-    }
-    var formData: FormData = await new Promise(function (resolve, reject) {
-      form.parse(request, (err: any, fields: any, files: any) => {
-        if (err) {
-          reject(err);
-          return;
-        }
-        resolve({fields: JSON.parse(fields?.filesnippet), files: files});
-      });
-    });
-    return this.uploadToGridfs(formData, async (formData, resolve, reject) => {
-      return this.fileRepository.updateById(id, _.omit(formData.fields, ['id']), {currentUser: this.user}).then(() => {
-        resolve();
-      }).catch((err: HttpErrors.HttpError) => {
-        reject(err);
-      });
-    })
-  }
 
   @put('/filesnippet/{id}', {
     security: OPERATION_SECURITY_SPEC,

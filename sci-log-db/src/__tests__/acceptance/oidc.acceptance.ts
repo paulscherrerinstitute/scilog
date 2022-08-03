@@ -91,6 +91,7 @@ describe('OIDC services', function (this: Suite) {
     expect(verifiedUser).to.have.property('email').and.to.be.eql(userData.email);
     expect(verifiedUser).to.have.property('name').and.to.be.eql(`${userData.firstName} ${userData.lastName}`);
     expect(verifiedUser).to.have.property('roles').and.to.be.eql(userData.roles);
+    await userRepo.find()
     const {id, ...user} = await userRepo.findOne({where: {email: userData.email}}) as User;
     expect(user).to.be.eql(userData);
   })

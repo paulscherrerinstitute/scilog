@@ -5,12 +5,23 @@ import {
   Client,
 } from '@loopback/testlab';
 import { testdb } from '../testdb.datasource';
+import { PasswordHasherBindings } from '../../keys';
+import { User, UserRepository } from '@loopback/authentication-jwt';
 import { ApplicationConfig } from '@loopback/core';
 
 export interface AppWithClient {
   app: SciLogDbApplication;
   client: Client;
 }
+
+export const userPassword = 'p4ssw0rd';
+
+const userData = {
+  email: 'test@loopback.io',
+  firstName: 'Example',
+  lastName: 'User',
+  roles: ['customer'],
+};
 
 export const oidcOptions = {
   issuer: "issuer",
@@ -32,3 +43,17 @@ export async function setupApplication(options: ApplicationConfig = {}): Promise
   const client = createRestAppClient(app);
   return {app, client}
 };
+
+export async function createAUser(app: SciLogDbApplication): Promise<User> {
+  const passwordHasher = await app.get(PasswordHasherBindings.PASSWORD_HASHER);
+  const encryptedPassword = await passwordHasher.hashPassword(userPassword);
+  const userRepo: UserRepository = await app.get('repositories.UserRepository');
+  const newUser = await userRepo.create(userData);
+  newUser.id = newUser.id.toString();
+
+  await userRepo.userCredentials(newUser.id).create({
+    password: encryptedPassword,
+  });
+
+  return newUser;
+}
