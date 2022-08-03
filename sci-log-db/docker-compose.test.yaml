@@ -1,0 +1,15 @@
+services:
+  mongodb:
+    image: bitnami/mongodb:4.2
+    volumes:
+      - "mongodb_data:/bitnami"
+  scilog:
+    build:
+        context: .
+    command: npm run test
+    depends_on:
+        - mongodb
+
+volumes:
+  mongodb_data:
+    driver: local
