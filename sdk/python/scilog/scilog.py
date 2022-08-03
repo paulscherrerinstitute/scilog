@@ -5,7 +5,7 @@ import json
 import os
 import uuid
 import warnings
-from typing import Any
+from typing import Any, Tuple
 
 from .authmixin import HEADER_JSON, AuthError
 from .httpclient import HttpClient
@@ -38,10 +38,11 @@ class SciLogRestAPI(HttpClient):
 
 
 class SciLog:
+    IMAGE_TYPES = ["png", "jpg", "jpeg"]
+
     def __init__(self, *args, **kwargs):
         self.http_client = SciLogRestAPI(*args, **kwargs)
         self.logbook = None
-        self.image_types = ["png", "jpg", "jpeg"]
 
     def select_logbook(self, logbook: Basesnippet):
         self.logbook = logbook
@@ -122,7 +123,7 @@ class SciLog:
         snippet.fileExtension = file_extension
         payload = snippet.to_dict(include_none=False)
 
-        file_descriptor = "image" if file_extension in self.image_types else "file"
+        file_descriptor = "image" if file_extension in self.IMAGE_TYPES else "file"
         multipart_form_data = {
             "file": (
                 filepath + "." + file_extension,
@@ -173,36 +174,45 @@ class SciLog:
         for filepath in filepaths:
             fsnippet = self.post_file(filepath)
 
-            # if we reach this point, we can assume that filepath has been checked (cf. self.post_file)
-            file_extension = filepath.split(".")[-1].lower()
-            file_hash = str(uuid.uuid4())
-
             if not isinstance(snippet.files, list):
                 snippet.files = []
 
-            if file_extension in self.image_types:
-                snippet.textcontent += (
-                    f'<figure class="image image_resized"><img src="" title="{file_hash}"></figure>'
-                )
-                snippet.files.append(
-                    {
-                        "fileHash": file_hash,
-                        "fileExtension": f"image/{file_extension}",
-                        "fileId": f"{fsnippet.id}",
-                        "style": {"width": "82.25%", "height": ""},
-                    }
-                )
-            else:
-                snippet.textcontent += f'<p><a class="fileLink" target="_blank" href="file:{file_hash}">{os.path.basename(filepath)}</a></p>'
-                snippet.files.append(
-                    {
-                        "fileHash": file_hash,
-                        "fileExtension": f"file/{file_extension}",
-                        "fileId": f"{fsnippet.id}",
-                    }
-                )
+            # if we reach this point, we can assume that filepath has been checked (cf. self.post_file)
+            file_info, file_textcontent = self.prepare_file_content(
+                filepath=filepath, id=fsnippet.id
+            )
+            snippet.textcontent += file_textcontent
+            snippet.files.append(file_info)
 
         return self.patch_snippet(snippet)
+
+    @staticmethod
+    def prepare_file_content(filepath: str, id: str = None) -> Tuple:
+        file_extension = filepath.split(".")[-1].lower()
+        file_hash = str(uuid.uuid4())
+        file_id = id if id else str(uuid.uuid4())
+
+        if file_extension in SciLog.IMAGE_TYPES:
+            textcontent = (
+                f'<figure class="image image_resized"><img src="" title="{file_hash}"></figure>'
+            )
+            file_info = {
+                "fileHash": file_hash,
+                "filepath": filepath,
+                "fileExtension": f"image/{file_extension}",
+                "fileId": f"{file_id}",
+                "style": {"width": "82.25%", "height": ""},
+            }
+
+        else:
+            textcontent = f'<p><a class="fileLink" target="_blank" href="file:{file_hash}">{os.path.basename(filepath)}</a></p>'
+            file_info = {
+                "fileHash": file_hash,
+                "filepath": filepath,
+                "fileExtension": f"file/{file_extension}",
+                "fileId": f"{file_id}",
+            }
+        return (file_info, textcontent)
 
     def patch_snippet(self, snippet: Paragraph, **kwargs) -> Paragraph:
         """Update (patch) snippet with given snippet.
