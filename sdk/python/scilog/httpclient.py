@@ -1,8 +1,10 @@
 import functools
 import json
-import requests
 
-from .authmixin import AuthMixin, AuthError, HEADER_JSON
+import requests
+from requests import HTTPError
+
+from .authmixin import HEADER_JSON, AuthError, AuthMixin
 
 
 def authenticated(func):
@@ -18,6 +20,18 @@ def authenticated(func):
         return func(client, *args, **kwargs)
 
     return authenticated_call
+
+
+def formatted_http_error(func):
+    @functools.wraps(func)
+    def formatted_call(*args, **kwargs):
+        try:
+            out = func(*args, **kwargs)
+        except HTTPError as exc:
+            raise HTTPError(f"{exc.response.reason} Error Message: {exc.response.text}")
+        return out
+
+    return formatted_call
 
 
 class HttpClient(AuthMixin):
@@ -37,6 +51,7 @@ class HttpClient(AuthMixin):
             return token
 
     @authenticated
+    @formatted_http_error
     def get_request(self, url, params=None, headers=None, timeout=10):
         response = requests.get(
             url,
@@ -53,6 +68,7 @@ class HttpClient(AuthMixin):
             raise response.raise_for_status()
 
     @authenticated
+    @formatted_http_error
     def post_request(self, url, payload=None, files=None, headers=None, timeout=10):
         req = requests.post(
             url,
@@ -66,6 +82,7 @@ class HttpClient(AuthMixin):
         return req.json()
 
     @authenticated
+    @formatted_http_error
     def patch_request(self, url, payload=None, files=None, headers=None, timeout=10):
         req = requests.patch(
             url,
