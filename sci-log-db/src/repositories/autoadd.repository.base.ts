@@ -56,17 +56,27 @@ export class AutoAddRepository<
                 ctx.data.updatedAt = new Date();
                 ctx.data.updatedBy = currentUser?.email ?? 'unknown user';
             } else {
-
                 if (ctx.isNewInstance) {
                     // POST case
                     // console.error("POST case")
                     ctx.instance.defaultOrder = ctx.instance.defaultOrder ?? Date.now() * 1000;
-                    ctx.instance.createdAt = new Date();
-                    ctx.instance.createdBy = currentUser?.email ?? 'unknown user';
+                // only admin may override createdAt/updateAt etc fields
+                    if (currentUser.roles.includes('admin')){
+                       ctx.instance.createdAt = ctx.instance.createdAt ?? new Date();                 
+                       ctx.instance.createdBy = ctx.instance.createdBy ?? currentUser?.email ?? 'unknown user';
+                       ctx.instance.updatedAt = ctx.instance.updatedAt ?? new Date();                 
+                       ctx.instance.updatedBy = ctx.instance.updatedBy ?? currentUser?.email ?? 'unknown user';
+                    } else {
+                       ctx.instance.createdAt = new  Date();
+                       ctx.instance.createdBy = currentUser?.email ?? 'unknown user';
+                       ctx.instance.updatedAt = new Date();
+                       ctx.instance.updatedBy = currentUser?.email ?? 'unknown user';
+                    }
+                    
                     if (typeof ctx.instance.expiresAt == 'undefined') {
-                        // default expiration time is 3 days
-                        ctx.instance.expiresAt = new Date()
-                        ctx.instance.expiresAt.setDate(ctx.instance.expiresAt.getDate() + 3);
+                    // default expiration time is 3 days
+                       ctx.instance.expiresAt = new Date()
+                       ctx.instance.expiresAt.setDate(ctx.instance.expiresAt.getDate() + 3);
                     }
                 } else {
                     // PUT case
@@ -74,9 +84,7 @@ export class AutoAddRepository<
                     // TODO restore auto generated fields, which would otherwise be lost
                     // ctx.instance.unsetAttribute('id')
                 }
-                // POST and PUT case
-                ctx.instance.updatedAt = new Date();
-                ctx.instance.updatedBy = currentUser?.email ?? 'unknown user';
+
             }
             //console.error("going to save:" + JSON.stringify(ctx, null, 3))
 
