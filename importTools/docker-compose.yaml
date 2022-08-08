@@ -3,7 +3,6 @@ services:
     app:
         build:
             context: .
-            target: dev
         volumes:
             - .:/usr/src/app
             - .env:/usr/src/app/.env
