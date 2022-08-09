@@ -82,8 +82,8 @@ export class UserController {
     })
     newUserRequest: NewUserRequest,
   ): Promise<User> {
-    // All new users have the "customer" role by default
-    newUserRequest.roles = ['customer'];
+    // All new users have the "any-authenticated-user" role by default
+    newUserRequest.roles = ['any-authenticated-user'];
     // ensure a valid email value and password value
     validateCredentials({principal: newUserRequest.email, password: newUserRequest.password });
 
@@ -131,7 +131,7 @@ export class UserController {
   })
   @authenticate('jwt')
   @authorize({
-    allowedRoles: ['admin', 'customer'],
+    allowedRoles: ['admin', 'any-authenticated-user'],
     voters: [basicAuthorization],
   })
   async set(
@@ -169,7 +169,7 @@ export class UserController {
   })
   @authenticate('jwt')
   @authorize({
-    allowedRoles: ['admin', 'support', 'customer'],
+    allowedRoles: ['admin', 'support', 'any-authenticated-user'],
     voters: [basicAuthorization],
   })
   async findById(@param.path.string('userId') userId: string): Promise<User> {

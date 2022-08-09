@@ -67,7 +67,7 @@ export const verifyFunctionFactory = function (
       firstName: firstName,
       lastName: lastName,
       username: profile.username,
-      roles: [...profile._json.roles ?? [], 'customer', profile.username as string]
+      roles: [...profile._json.roles ?? [], 'any-authenticated-user', profile.username as string]
     }
     findOrCreateUser(userRepo, user).then((user: User) => {
       done(null, user);

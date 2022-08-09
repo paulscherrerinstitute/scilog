@@ -1,0 +1,11 @@
+[{
+    "username": "scilog-admin",
+    "firstName": "Admin",
+    "lastName": "Scilog",
+    "password": "some-strong-passw0rd",
+    "email": "scilog-admin@YOURDOMAIN",
+    "roles": [
+        "admin",
+        "any-authenticated-user"
+    ]
+}]

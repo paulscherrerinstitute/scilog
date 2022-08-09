@@ -36,7 +36,7 @@ describe('OIDC services', function (this: Suite) {
     firstName: 'unit',
     lastName: 'test',
     username: 'unittest',
-    roles: ['aRole', 'customer', 'unittest'],
+    roles: ['aRole', 'any-authenticated-user', 'unittest'],
   };
 
   async function clearDatabase() {

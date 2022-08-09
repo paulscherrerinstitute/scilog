@@ -360,7 +360,7 @@ describe('LogbookItemComponent', () => {
     spyOn(component, "_preparePatchPayload").and.returnValue(jasmine.any(Object));
 
     let notificationMock:ChangeStreamNotification = {id: "123", parentId:"wrongID", snippetType: "image", tags:[], linkType:"paragraphs"};
-    component["logbookInfo"].logbookInfo = {ownerGroup: "p17301", accessGroups: ["customer", "slscsaxs"], isPrivate: false, tags: []}
+    component["logbookInfo"].logbookInfo = {ownerGroup: "p17301", accessGroups: ["any-authenticated-user", "slscsaxs"], isPrivate: false, tags: []}
     component.submitContent(notificationMock);
     expect(component._preparePatchPayload).toHaveBeenCalledWith(jasmine.any(Object), jasmine.any(Object));
     expect(component["logbookItemDataService"].uploadParagraph).toHaveBeenCalledWith(jasmine.any(Object), jasmine.any(String));
@@ -371,7 +371,7 @@ describe('LogbookItemComponent', () => {
     spyOn(component, "_preparePostPayload").and.returnValue(jasmine.any(Object));
 
     let notificationMock:ChangeStreamNotification= {parentId:"123546", snippetType: "image", tags:[], linkType:"paragraphs"};
-    component["logbookInfo"].logbookInfo = {ownerGroup: "p17301", accessGroups: ["customer", "slscsaxs"], isPrivate: false, tags: []}
+    component["logbookInfo"].logbookInfo = {ownerGroup: "p17301", accessGroups: ["any-authenticated-user", "slscsaxs"], isPrivate: false, tags: []}
     component.submitContent(notificationMock);
 
     expect(component._preparePostPayload).toHaveBeenCalledWith(jasmine.any(Object), jasmine.any(Object));
@@ -379,7 +379,7 @@ describe('LogbookItemComponent', () => {
   })
 
   it('should prepare payload with correct parameters', ()=>{
-    let referenceEntry = {ownerGroup: "p17301", accessGroups: ["slscsaxs", "customer"], isPrivate: false, tags: ["alignment"]}
+    let referenceEntry = {ownerGroup: "p17301", accessGroups: ["slscsaxs", "any-authenticated-user"], isPrivate: false, tags: ["alignment"]}
     let msg = {tags: ["alignment"], textcontent: "my new snippet text", files: [], isMessage: false, linkType: "paragraph"}
 
     let res = component._preparePatchPayload(referenceEntry, msg);

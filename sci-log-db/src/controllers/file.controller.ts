@@ -39,7 +39,7 @@ class MissingFileError extends Error {
 }
 
 @authenticate('jwt')
-@authorize({allowedRoles: ['customer'], voters: [basicAuthorization]})
+@authorize({allowedRoles: ['any-authenticated-user'], voters: [basicAuthorization]})
 export class FileController {
   constructor(
     @inject(SecurityBindings.USER) private user: UserProfile,

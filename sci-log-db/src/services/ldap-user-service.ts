@@ -139,7 +139,7 @@ export class LDAPUserService implements UserService<User, Credentials> {
         var ownerGroups = [...entry.memberOf].filter(isOwnerGroup).map(
           (value: string) => value.substring(3, value.indexOf(","))
         )
-        ownerGroups.push('customer')
+        ownerGroups.push('any-authenticated-user')
         // add linked pgroup to eaccounts
         if (/^e[0-9]{5}$/.test(principal)) {
           ownerGroups.push("p" + principal.substring(1))

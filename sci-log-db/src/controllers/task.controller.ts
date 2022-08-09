@@ -31,7 +31,7 @@ import {OPERATION_SECURITY_SPEC} from '../utils/security-spec';
 import {BasesnippetController} from './basesnippet.controller';
 
 @authenticate('jwt')
-@authorize({allowedRoles: ['customer'], voters: [basicAuthorization]})
+@authorize({allowedRoles: ['any-authenticated-user'], voters: [basicAuthorization]})
 export class TaskController {
   constructor(
     @inject(SecurityBindings.USER) private user: UserProfile,

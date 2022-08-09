@@ -14,7 +14,7 @@ import {ExportService} from '../services/export-snippets.service';
 import {OPERATION_SECURITY_SPEC} from '../utils/security-spec';
 
 @authenticate('jwt')
-@authorize({allowedRoles: ['customer'], voters: [basicAuthorization]})
+@authorize({allowedRoles: ['any-authenticated-user'], voters: [basicAuthorization]})
 export class BasesnippetController {
 
   exportDir: string = "";

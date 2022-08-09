@@ -24,7 +24,7 @@ describe('UserController', () => {
     email: 'test@loopback.io',
     firstName: 'Example',
     lastName: 'User',
-    roles: ['customer'],
+    roles: ['any-authenticated-user'],
   };
 
   const userPassword = 'p4ssw0rd';
