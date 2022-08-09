@@ -90,7 +90,7 @@ describe('File controller services', function (this: Suite) {
     const postResponse = await client.post('/filesnippet/files')
       .set('Authorization', 'Bearer ' + token)
       .type('form')
-      .field('fields', '{"ownerGroup": "customer"}')
+      .field('fields', '{"ownerGroup": "any-authenticated-user"}')
       .attach('file', __filename)
       .then()
       .catch((err) => {
@@ -113,7 +113,7 @@ describe('File controller services', function (this: Suite) {
     const postResponse = await client.post('/filesnippet/files')
       .set('Authorization', 'Bearer ' + token)
       .type('form')
-      .field('fields', '{"ownerGroup": "customer"}')
+      .field('fields', '{"ownerGroup": "any-authenticated-user"}')
       .attach('file', __filename)
       .then()
       .catch((err) => {

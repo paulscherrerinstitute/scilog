@@ -10,7 +10,7 @@ import {basicAuthorization} from '../services/basic.authorizor';
 import {OPERATION_SECURITY_SPEC} from '../utils/security-spec';
 
 @authenticate('jwt')
-@authorize({allowedRoles: ['customer'], voters: [basicAuthorization]})
+@authorize({allowedRoles: ['any-authenticated-user'], voters: [basicAuthorization]})
 export class LogbookController {
   constructor(
     @inject(SecurityBindings.USER) private user: UserProfile,

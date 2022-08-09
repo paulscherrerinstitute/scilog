@@ -17,7 +17,7 @@ def prepare_location_snippet(log):
 
     new_loc = {
         "ownerGroup": "admin",
-        "accessGroups": ["customer"],
+        "accessGroups": ["any-authenticated-user"],
         "isPrivate": True,
         "title": "location",
         "snippetType": "paragraph",
@@ -75,7 +75,7 @@ def _update_locations(log, loc_id, locations):
         group = loc[5:].replace("/", "").lower()
         new_snip = {
             "ownerGroup": group,
-            "accessGroups": ["customer"],
+            "accessGroups": ["any-authenticated-user"],
             "isPrivate": True,
             "title": loc.split("/")[-1],
             "location": loc,

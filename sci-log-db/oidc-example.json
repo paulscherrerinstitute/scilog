@@ -1,0 +1,17 @@
+{
+    "session": false,
+    "provider": "oidc",
+    "authScheme": "openid connect",
+    "module": "passport-openidconnect",
+    "failureFlash": true,
+    "issuer": "https://kc.YOURDOMAIN/auth/realms/awi",
+    "authorizationURL": "https://kc.YOURDOMAIN/auth/realms/awi/protocol/openid-connect/auth",
+    "tokenURL": "https://kc.YOURDOMAIN/auth/realms/awi/protocol/openid-connect/token",
+    "userInfoURL": "https://kc.YOURDOMAIN/auth/realms/awi/protocol/openid-connect/userinfo",
+    "clientID": "scilog",
+    "clientSecret": "YOUR-CLIENT-SECRET",
+    "callbackURL": "http://localhost:3000/auth/keycloak/callback/",
+    "scope": ["email", "profile", "openid"],
+    "successRedirect": "http://localhost:4200/login",
+    "skipUserProfile": false
+}

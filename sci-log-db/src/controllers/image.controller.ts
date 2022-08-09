@@ -26,7 +26,7 @@ import { SecurityBindings, UserProfile } from '@loopback/security';
 import {inject} from '@loopback/core';
 
 @authenticate('jwt')
-@authorize({ allowedRoles: ['customer'], voters: [basicAuthorization] })
+@authorize({ allowedRoles: ['any-authenticated-user'], voters: [basicAuthorization] })
 export class ImageController {
   constructor(
     @inject(SecurityBindings.USER) private user: UserProfile,
