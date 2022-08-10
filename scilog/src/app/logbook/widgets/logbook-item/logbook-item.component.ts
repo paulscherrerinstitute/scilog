@@ -172,7 +172,7 @@ export class LogbookItemComponent implements OnInit {
     this.subscriptions.push(this.hotkeys.addShortcut({ keys: 'control.shift.n', description: { label: 'Set focus to editor', group: "Logbook" } }).subscribe(() => {
       this.setFocusToEditor();
     }));
-    this.subscriptions.push(this.hotkeys.addShortcut({ keys: 'shift.enter', description: { label: 'Submit content', group: "Logbook" } }).subscribe(() => {
+    this.subscriptions.push(this.hotkeys.addShortcut({ keys: 'control.enter', description: { label: 'Submit content', group: "Logbook" } }).subscribe(() => {
       this.addContent();
     }));
     this.subscriptions.push(this.hotkeys.addShortcut({ keys: 'shift.alt.enter', description: { label: 'Submit message', group: "Logbook" } }).subscribe(() => {
