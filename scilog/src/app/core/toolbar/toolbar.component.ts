@@ -28,7 +28,7 @@ export class ToolbarComponent implements OnInit {
   isLogbookOpen = false;
   avatarHash: string = "UserHash";
   showVersionInfo = true;
-  versionInfo = 'ALPHA';
+  versionInfo = 'BETA';
   currentView: string = "";
   showSearch = false;
   config: WidgetConfig[];
