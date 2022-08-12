@@ -54,7 +54,7 @@ export class AutoAddRepository<
             if (ctx.data) {
                 // console.error("PATCH case")
                 ctx.data.updatedAt = new Date();
-                ctx.data.updatedBy = currentUser?.email ?? 'unknown user';
+                ctx.data.updatedBy = currentUser?.email ?? 'unknown@domain.org';
             } else {
                 if (ctx.isNewInstance) {
                     // POST case
@@ -63,14 +63,14 @@ export class AutoAddRepository<
                 // only admin may override createdAt/updateAt etc fields
                     if (currentUser.roles.includes('admin')){
                        ctx.instance.createdAt = ctx.instance.createdAt ?? new Date();                 
-                       ctx.instance.createdBy = ctx.instance.createdBy ?? currentUser?.email ?? 'unknown user';
+                       ctx.instance.createdBy = ctx.instance.createdBy ?? currentUser?.email ?? 'unknown@domain.org';
                        ctx.instance.updatedAt = ctx.instance.updatedAt ?? new Date();                 
-                       ctx.instance.updatedBy = ctx.instance.updatedBy ?? currentUser?.email ?? 'unknown user';
+                       ctx.instance.updatedBy = ctx.instance.updatedBy ?? currentUser?.email ?? 'unknown@domain.org';
                     } else {
                        ctx.instance.createdAt = new  Date();
-                       ctx.instance.createdBy = currentUser?.email ?? 'unknown user';
+                       ctx.instance.createdBy = currentUser?.email ?? 'unknown@domain.org';
                        ctx.instance.updatedAt = new Date();
-                       ctx.instance.updatedBy = currentUser?.email ?? 'unknown user';
+                       ctx.instance.updatedBy = currentUser?.email ?? 'unknown@domain.org';
                     }
                     
                     if (typeof ctx.instance.expiresAt == 'undefined') {

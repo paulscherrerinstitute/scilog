@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 
 import argparse
+import imghdr
 
 parser = argparse.ArgumentParser(
     description="Dump an elog ...",
@@ -55,6 +56,7 @@ class ELogScraper:
 
         mids = self.lb.get_message_ids()
         self.mids = sorted(mids)
+        # to selectively dump messages: self.mids = sorted(i for i in mids if i <= 13120)
         self.nmsgs = nmsgs = len(mids)
         self.counter_width = len(str(nmsgs))
 
@@ -130,8 +132,8 @@ def sanitize_attributes(i, attributes):
     return attributes
 
 def sanitize_attachments(attachments, url):
-    if attachments == [url]: #TODO: WTF?!
-        attachments = []
+#    if attachments == [url]: #TODO: WTF?!
+#        attachments = []
     return attachments
 
 def build_entry(i, message, attributes, attachments):
@@ -159,8 +161,15 @@ class FileDownloader:
     def get_file(self, url):
         fname = extract_filename(url)
         full_fname = os.path.join(self.folder, fname)
-#        print(f"{url} -> {fname}")
-        download(url, full_fname)
+        # fix missing extensions here
+        if fname != "":
+            pathname, extension = os.path.splitext(fname)
+            if extension== '' :
+                extension='png' # for now assume its a png file, TODO imghdr.what(attachment)
+                fname=pathname+'.'+extension
+                print(f"After =========== {fname}")
+            print(f"{url} -> {fname}")
+            download(url, full_fname)
         return fname
 
 
@@ -173,6 +182,7 @@ def extract_filename(url):
 
 def download(url, fname):
     with http.request("GET", url, preload_content=False) as resp:
+        print(f"{url} -> {fname}")
         with open(fname, "wb") as f:
             shutil.copyfileobj(resp, f)
     resp.release_conn()

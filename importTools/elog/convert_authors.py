@@ -4,6 +4,7 @@ DEFAULT_SEP = " : "
 
 
 import argparse
+from subprocess import Popen, PIPE
 
 parser = argparse.ArgumentParser(description="Convert collected and mapped authors to json ...")
 
@@ -19,7 +20,9 @@ clargs = parser.parse_args()
 
 from pathlib import Path
 import json
+import ldap
 
+con=ldap.initialize('ldaps://d.psi.ch')
 
 def author_load(fname, sep, default):
     data = text_load(fname)
@@ -28,9 +31,21 @@ def author_load(fname, sep, default):
         line = line.split(sep)
         old, new = line
         if new == "":
-            print(f"Warning: will use default ({default}) for author \"{old}\".")
-            new = default
-        res[old] = new
+            if len(old.split(' ')) <2:
+                continue
+            surname=old.split(' ')[0]
+            givenName=old.split(' ')[1]
+            print("Will try to map author to email address using ldap",surname,givenName)
+            ldapres =con.search_s(f"ou=users,ou=psi,dc=d,dc=psi,dc=ch", ldap.SCOPE_SUBTREE,f"(&(sn={surname})(givenName={givenName}*))",['cn','mail','sn','givenName'])
+            print("Res:",ldapres)
+            if ldapres ==[]:
+                new=f"{givenName}.{surname}@psi.ch"
+            else:
+                for dn,entry in ldapres:
+                    new=entry["mail"][0].decode()
+                    # print(repr(entry["mail"][0]),repr(entry["sn"]))
+            res[old] = new
+            print("Resulting email:",new)
     return res
 
 def text_load(fname):
