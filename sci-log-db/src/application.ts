@@ -25,7 +25,7 @@ import {JWTService} from './services/jwt-service';
 import {SecuritySpecEnhancer} from './services/jwt-spec.enhancer';
 import {MyUserService} from './services/user-service';
 import {startWebsocket} from './utils/websocket';
-
+import * as crypto from "crypto";
 
 import {toInterceptor} from '@loopback/rest';
 import passport from 'passport';
@@ -128,6 +128,7 @@ export class SciLogDbApplication extends BootMixin(
     this.bind(PasswordHasherBindings.ROUNDS).to(10);
     this.bind(PasswordHasherBindings.PASSWORD_HASHER).toClass(BcryptHasher);
     this.bind(TokenServiceBindings.TOKEN_SERVICE).toClass(JWTService);
+    this.bind(TokenServiceBindings.TOKEN_SECRET).to(process.env.JWT_SECRET as string ?? crypto.randomBytes(12).toString('hex'));
     this.bind(UserServiceBindings.USER_SERVICE).toClass(MyUserService);
 
     this.add(createBindingFromClass(SecuritySpecEnhancer));
