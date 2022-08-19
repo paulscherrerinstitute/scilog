@@ -3,8 +3,9 @@
 import os
 
 from dotenv import load_dotenv
-
 from scilog import SciCat, SciLog
+
+from psi_webpage_icon_extractor import PSIWebpageIconExtractor
 
 
 def prepare_location_snippet(log):
@@ -15,15 +16,16 @@ def prepare_location_snippet(log):
         loc_id = snips[0].id
         return loc_id
 
-    new_loc = {
+    filepath = os.environ["SCILOG_DEFAULT_LOGBOOK_ICON"]
+    location_snippet = {
         "ownerGroup": "admin",
         "accessGroups": ["any-authenticated-user"],
         "isPrivate": True,
         "title": "location",
         "snippetType": "paragraph",
+        "files": [{"filepath": filepath}],
     }
-
-    snip = log.post_snippet(**new_loc)
+    snip = log.post_snippet(**location_snippet)
     loc_id = snip.id
     return loc_id
 
@@ -46,12 +48,14 @@ def _collect_data(proposals):
         loc = prop["MeasurementPeriodList"][0]["instrument"]
         locations.add(loc)
 
-        proposalsStorage.append({
-            "ownerGroup": prop["ownerGroup"],
-            "abstract": prop["abstract"],
-            "title": prop["title"],
-            "location": prop["MeasurementPeriodList"][0]["instrument"]
-        })
+        proposalsStorage.append(
+            {
+                "ownerGroup": prop["ownerGroup"],
+                "abstract": prop["abstract"],
+                "title": prop["title"],
+                "location": prop["MeasurementPeriodList"][0]["instrument"],
+            }
+        )
 
     return accessGroups, locations, proposalsStorage
 
@@ -59,8 +63,10 @@ def _collect_data(proposals):
 def _update_locations(log, loc_id, locations):
     locationStorage = dict()
 
+    locations_snippet = log.get_snippets(id=loc_id)[0]
+
     for loc in locations:
-        #TODO: move this to the first loop?
+        # TODO: move this to the first loop?
         if loc[:4] != "/PSI":
             raise RuntimeError("Unexpected facility prefix")
 
@@ -73,6 +79,19 @@ def _update_locations(log, loc_id, locations):
             continue
 
         group = loc[5:].replace("/", "").lower()
+        files = None
+        try:
+            img = PSIWebpageIconExtractor(
+                "https://www.psi.ch/", f"en/{loc[5:].lower()}", loc[5:].split("/")[-1]
+            )
+            filepath = os.path.abspath(img.filepath)
+            files = [{"filepath": filepath}]
+        except IndexError as exc:
+            print(exc)
+
+        if not files:
+            files = locations_snippet.files
+
         new_snip = {
             "ownerGroup": group,
             "accessGroups": ["any-authenticated-user"],
@@ -82,11 +101,8 @@ def _update_locations(log, loc_id, locations):
             "contact": group + "@psi.ch",
             "snippetType": "image",
             "parentId": loc_id,
-            "file": "files/default_logbook_icon.jpg"
+            "files": files,
         }
-
-        if "thumbnail" in loc:
-            new_snip["file"] = loc["thumbnail"]
 
         snip = log.post_snippet(**new_snip)
         locationStorage[loc] = snip
@@ -108,11 +124,11 @@ def _update_proposals(log, locationStorage, proposalsStorage):
             "name": proposal["title"],
             "location": loc.id,
             "description": proposal["abstract"],
-            "snippetType": "logbook"
+            "snippetType": "logbook",
         }
 
-        if loc.file:
-            new_snip["thumbnail"] = loc.file
+        if loc.files:
+            new_snip["thumbnail"] = loc.files[0]["fileId"]
         if not new_snip["name"]:
             new_snip["name"] = ownerGroup
         if not new_snip["description"]:
@@ -128,18 +144,22 @@ def _update_proposals(log, locationStorage, proposalsStorage):
         snip = log.post_snippet(**new_snip)
         print(snip)
 
-class ClientSettingsFromEnv: 
+
+class ClientSettingsFromEnv:
     def __init__(self, name):
         self.address = os.environ[f"{name}_URL"]
         self.options = {
             "username": os.environ[f"{name}_USERNAME"],
             "password": os.environ[f"{name}_PWD"],
-            "login_path": "/".join([self.address.strip("/"), os.environ[f"{name}_LOGIN"].strip("/")]),
+            "login_path": "/".join(
+                [self.address.strip("/"), os.environ[f"{name}_LOGIN"].strip("/")]
+            ),
         }
 
 
 if __name__ == "__main__":
-    load_dotenv()
+    # load_dotenv("./SCICAT.env")
+    # load_dotenv("./SCILOG.env")
     scicat = ClientSettingsFromEnv("SCICAT")
 
     scilog = ClientSettingsFromEnv("SCILOG")
