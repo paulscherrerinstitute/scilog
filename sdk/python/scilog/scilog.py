@@ -104,8 +104,14 @@ class SciLog:
 
     def upload_files(self, payload):
         for file in payload.get("files"):
-            fs = self._post_filesnippet(file["filepath"])
-            file["fileId"] = fs.id
+            if "fileId" in file:
+                continue
+            filesnippet = self._post_filesnippet(
+                file["filepath"],
+                ownerGroup=payload.get("ownerGroup"),
+                accessGroups=payload.get("accessGroups"),
+            )
+            file["fileId"] = filesnippet.id
             file.pop("filepath")
         return payload
 
@@ -155,7 +161,7 @@ class SciLog:
         if not os.path.exists(filepath):
             raise FileNotFoundError("Specified file does not exist.")
 
-        fsnippet = self._post_filesnippet(filepath)
+        fsnippet = self._post_filesnippet(filepath, **kwargs)
         # ret = self._file_upload(filepath, fsnippet.id, file_extension)
         return fsnippet
 
