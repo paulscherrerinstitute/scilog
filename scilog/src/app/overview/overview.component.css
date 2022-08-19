@@ -9,9 +9,13 @@
     position: relative;
     top: 40px;
     padding: 20px; 
-
   }
 
+  .logbook-container {
+    padding: 20px;
+    overflow: scroll;
+    height: calc(100vh - 280px);
+  }
    
   ::ng-deep .mat-toolbar{
     z-index: 998;
