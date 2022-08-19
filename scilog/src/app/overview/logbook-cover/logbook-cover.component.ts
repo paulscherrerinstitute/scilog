@@ -58,7 +58,7 @@ export class LogbookWidgetComponent implements OnInit {
 
   async getImageFromService() {
     this.isImageLoading = true;
-    let data = await this.logbookItemDataService.getFile(this.logbook.thumbnail);
+    let data = await this.logbookItemDataService.getImage(this.logbook.thumbnail);
     this.createImageFromBlob(data);
     this.isImageLoading = false;
   }
