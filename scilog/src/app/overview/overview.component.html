@@ -22,9 +22,11 @@
     <h1>Logbooks</h1>
     <button (click)='addCollectionLogbook("logbook")'>Add logbook</button><br>
     <div class="logbook-container">
-      <div *uiScroll="let logbook of logbookIconScrollService.datasource; let i = index" class="logbook-card">
-        <app-logbook-cover [logbook]="logbook" (logbookEdit)="editLogbook($event)"
-          (logbookSelection)="logbookSelected($event)" (logbookDelete)="deleteLogbook($event)"></app-logbook-cover>
+      <div *uiScroll="let logbookGroup of logbookIconScrollService.datasource; let i = index" class="logbook-card">
+        <span *ngFor="let logbook of logbookGroup">
+          <app-logbook-cover [logbook]="logbook" (logbookEdit)="editLogbook($event)"
+            (logbookSelection)="logbookSelected($event)" (logbookDelete)="deleteLogbook($event)"></app-logbook-cover>
+        </span>
       </div>
     </div>
 
