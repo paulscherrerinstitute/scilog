@@ -8,6 +8,7 @@ from datetime import datetime
 from glob import iglob
 from os import walk
 
+import requests
 from scilog.scilog import SciLog
 
 
@@ -167,16 +168,27 @@ for fn in fns:
                     try:
                         file_extension = [
                             ext
-                            for ext in ["png", "jpg", "jpeg"]
+                            for ext in ["png", "jpg", "jpeg", "http"]
                             if ext in source_attachment.split(",")[0]
                         ]
                         if len(file_extension) != 1:
                             raise ValueError("Unknown file extension.")
-                        attachment = f"{os.path.basename(fn).split('.')[0]}_{str(uuid.uuid4())}.{file_extension[0]}"
-                        source_attachment = source_attachment.split(",")[1][0:-1].replace("_", "/")
-                        with open(f"{attachments_path}{attachment}", "wb") as file_stream:
-                            file_stream.write(base64.decodebytes(source_attachment.encode()))
-                    except Exception:
+                        file_extension = file_extension[0]
+                        if file_extension == "http":
+                            attachment = (
+                                f"{os.path.basename(fn).split('.')[0]}_{str(uuid.uuid4())}.png"
+                            )
+                            r = requests.get(source_attachment[1:-1].replace("_", "/"))
+                            with open(attachment, "wb") as output:
+                                output.write(r.content)
+                        else:
+                            attachment = f"{os.path.basename(fn).split('.')[0]}_{str(uuid.uuid4())}.{file_extension}"
+                            source_attachment = source_attachment.split(",")[1][0:-1].replace(
+                                "_", "/"
+                            )
+                            with open(f"{attachments_path}{attachment}", "wb") as file_stream:
+                                file_stream.write(base64.decodebytes(source_attachment.encode()))
+                    except Exception as e:
                         print("Failed to parse embedded image.")
                         attachment = None
 
