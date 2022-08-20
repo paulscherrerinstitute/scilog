@@ -6,6 +6,7 @@ import os
 import uuid
 from datetime import datetime
 from glob import iglob
+from os import walk
 
 from scilog.scilog import SciLog
 
@@ -64,6 +65,9 @@ tags = [
 authors = json_load("authors.json")
 
 dump_path = "./"
+attachments_path = f"{dump_path}/dump/attachments/"
+
+attachment_lib = next(walk(attachments_path), (None, None, []))[2]
 
 fns = sorted(iglob(f"{dump_path}/dump/msg*.json"))
 res = []
@@ -155,20 +159,26 @@ for fn in fns:
             if index:
                 attachment = attchs.pop(index)
             else:
-                try:
-                    file_extension = [
-                        ext
-                        for ext in ["png", "jpg", "jpeg"]
-                        if ext in source_attachment.split(",")[0]
-                    ]
-                    if len(file_extension) != 1:
-                        raise ValueError("Unknown file extension.")
-                    attachment = f"{os.path.basename(fn).split('.')[0]}_{str(uuid.uuid4())}.{file_extension[0]}"
-                    source_attachment = source_attachment.split(",")[1][0:-1].replace("_", "/")
-                    with open(f"{dump_path}/dump/attachments/{attachment}", "wb") as file_stream:
-                        file_stream.write(base64.decodebytes(source_attachment.encode()))
-                except Exception:
-                    print("Failed to parse embedded image.")
+                for att in attachment_lib:
+                    if att in source_attachment:
+                        attachment = att
+                        break
+                if not attachment:
+                    try:
+                        file_extension = [
+                            ext
+                            for ext in ["png", "jpg", "jpeg"]
+                            if ext in source_attachment.split(",")[0]
+                        ]
+                        if len(file_extension) != 1:
+                            raise ValueError("Unknown file extension.")
+                        attachment = f"{os.path.basename(fn).split('.')[0]}_{str(uuid.uuid4())}.{file_extension[0]}"
+                        source_attachment = source_attachment.split(",")[1][0:-1].replace("_", "/")
+                        with open(f"{attachments_path}{attachment}", "wb") as file_stream:
+                            file_stream.write(base64.decodebytes(source_attachment.encode()))
+                    except Exception:
+                        print("Failed to parse embedded image.")
+                        attachment = None
 
             if attachment:
                 filepath = os.path.abspath(f"{dump_path}/dump/attachments/{attachment}")
