@@ -1,7 +1,9 @@
 #!/usr/bin/env python
 
+import base64
 import json
 import os
+import uuid
 from datetime import datetime
 from glob import iglob
 
@@ -122,11 +124,10 @@ for fn in fns:
         data_out["tags"] = tmp
 
     # treat special entries
-    # treat special entries
-    # author = data_in.pop("Author")
-    # author = authors.get(author, default_author)
-    # data_out["createdBy"] = author
-    # data_out["updatedBy"] = author
+    author = data_in.pop("Author")
+    author = authors.get(author, default_author)
+    data_out["createdBy"] = author
+    data_out["updatedBy"] = author
 
     pgroup = data_in.pop("P-Group", default_pgroup)
     data_out["ownerGroup"] = pgroup
@@ -142,14 +143,38 @@ for fn in fns:
 
     if len(mesg_parts) > 1:
         for msg in mesg_parts[1:]:
+            attachment = None
             msg_parts = msg.split("/>")
             source_attachment = get_image_src(msg_parts[0])
-            index = [att in source_attachment for att in attchs].index(True)
-            attachment = attchs.pop(index)
-            filepath = os.path.abspath(f"{dump_path}/dump/attachments/{attachment}")
-            file_info, file_textcontent = SciLog.prepare_file_content(filepath)
-            files.append(file_info)
-            mesg += file_textcontent
+            index = None
+            for ii, att in enumerate(attchs):
+                if att in source_attachment:
+                    index = ii
+                    break
+
+            if index:
+                attachment = attchs.pop(index)
+            else:
+                try:
+                    file_extension = [
+                        ext
+                        for ext in ["png", "jpg", "jpeg"]
+                        if ext in source_attachment.split(",")[0]
+                    ]
+                    if len(file_extension) != 1:
+                        raise ValueError("Unknown file extension.")
+                    attachment = f"{os.path.basename(fn).split('.')[0]}_{str(uuid.uuid4())}.{file_extension[0]}"
+                    source_attachment = source_attachment.split(",")[1][0:-1].replace("_", "/")
+                    with open(f"{dump_path}/dump/attachments/{attachment}", "wb") as file_stream:
+                        file_stream.write(base64.decodebytes(source_attachment.encode()))
+                except Exception:
+                    print("Failed to parse embedded image.")
+
+            if attachment:
+                filepath = os.path.abspath(f"{dump_path}/dump/attachments/{attachment}")
+                file_info, file_textcontent = SciLog.prepare_file_content(filepath)
+                files.append(file_info)
+                mesg += file_textcontent
             mesg += "".join(msg_parts[1:])
 
     title = data_in.pop("Title", None)
