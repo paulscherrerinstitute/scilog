@@ -179,7 +179,7 @@ for fn in fns:
                                 f"{os.path.basename(fn).split('.')[0]}_{str(uuid.uuid4())}.png"
                             )
                             r = requests.get(source_attachment[1:-1].replace("_", "/"))
-                            with open(attachment, "wb") as output:
+                            with open(f"{attachments_path}{attachment}", "wb") as output:
                                 output.write(r.content)
                         else:
                             attachment = f"{os.path.basename(fn).split('.')[0]}_{str(uuid.uuid4())}.{file_extension}"
