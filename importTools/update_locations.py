@@ -10,8 +10,8 @@ from psi_webpage_icon_extractor import PSIWebpageIconExtractor
 
 def prepare_location_snippet(log):
     snips = log.get_snippets(title="location", ownerGroup="admin")
-
     if snips:
+        print("location snippet exists already:",snips[0].id)
         assert len(snips) == 1
         loc_id = snips[0].id
         return loc_id
@@ -42,6 +42,8 @@ def _collect_data(proposals):
     proposalsStorage = []
 
     for prop in proposals:
+        # if (not(prop["ownerGroup"] in ["p18539", "p18713","p18711", "p18763","p18915", "p19160","p19303","p19318","p19319","p19320","p19321","p19704","p19740", "p19741","p19742","p20230"])):
+        #     continue
         for ag in prop["accessGroups"]:
             accessGroups.add(ag)
 
@@ -58,7 +60,6 @@ def _collect_data(proposals):
         )
 
     return accessGroups, locations, proposalsStorage
-
 
 def _update_locations(log, loc_id, locations):
     locationStorage = dict()
@@ -85,7 +86,7 @@ def _update_locations(log, loc_id, locations):
                 "https://www.psi.ch/", f"en/{loc[5:].lower()}", loc[5:].split("/")[-1]
             )
             filepath = os.path.abspath(img.filepath)
-            files = [{"filepath": filepath}]
+            files = [{"filepath": filepath}] 
         except IndexError as exc:
             print(exc)
 
@@ -98,7 +99,7 @@ def _update_locations(log, loc_id, locations):
             "isPrivate": True,
             "title": loc.split("/")[-1],
             "location": loc,
-            "contact": group + "@psi.ch",
+            # "contact": group + "@psi.ch",
             "snippetType": "image",
             "parentId": loc_id,
             "files": files,

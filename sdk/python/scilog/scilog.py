@@ -89,7 +89,6 @@ class SciLog:
         snippet.import_dict(kwargs)
         snippet.textcontent = msg
         payload = snippet.to_dict(include_none=False)
-        print(HEADER_JSON, payload, url)
         return self.post_snippet(**payload)
 
     @pinned_to_logbook(["parentId", "ownerGroup", "accessGroups"])
@@ -104,8 +103,9 @@ class SciLog:
 
     def upload_files(self, payload):
         for file in payload.get("files"):
-            if "fileId" in file:
+            if "fileId" in file and file["fileId"] is not None:
                 continue
+            print("Posting from filepath:",file["filepath"])
             filesnippet = self._post_filesnippet(
                 file["filepath"],
                 ownerGroup=payload.get("ownerGroup"),
@@ -196,7 +196,7 @@ class SciLog:
     def prepare_file_content(filepath: str, id: str = None) -> Tuple:
         file_extension = filepath.split(".")[-1].lower()
         file_hash = str(uuid.uuid4())
-        file_id = id if id else str(uuid.uuid4())
+        file_id = id if id else None #  str(uuid.uuid4())
 
         if file_extension in SciLog.IMAGE_TYPES:
             textcontent = (
@@ -206,7 +206,7 @@ class SciLog:
                 "fileHash": file_hash,
                 "filepath": filepath,
                 "fileExtension": f"image/{file_extension}",
-                "fileId": f"{file_id}",
+                "fileId": file_id,
                 "style": {"width": "82.25%", "height": ""},
             }
 
@@ -216,7 +216,7 @@ class SciLog:
                 "fileHash": file_hash,
                 "filepath": filepath,
                 "fileExtension": f"file/{file_extension}",
-                "fileId": f"{file_id}",
+                "fileId": file_id,
             }
         return (file_info, textcontent)
 

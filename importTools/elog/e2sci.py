@@ -11,6 +11,8 @@ from os import walk
 import requests
 from scilog.scilog import SciLog
 
+import pprint
+pp = pprint.PrettyPrinter(indent=4)
 
 def json_load(filename, *args, **kwargs):
     with open(filename, "r") as f:
@@ -28,7 +30,6 @@ def get_image_src(html_input: str):
     return attachment
 
 
-default_pgroup = "any-authenticated-user"
 default_author = "unknown@domain.org"
 
 
@@ -84,7 +85,7 @@ ranges = [
     {"pgroup": "p19319", "start": 9149, "end": 9664},
     {"pgroup": "p19320", "start": 9850, "end": 10290},
     {"pgroup": "p19321", "start": 10437, "end": 11009},
-    {"pgroup": "p19525", "start": 11425, "end": 12090},
+    # {"pgroup": "p19525", "start": 11425, "end": 12090},
     {"pgroup": "p19704", "start": 12735, "end": 13219},
     {"pgroup": "p19740", "start": 14065, "end": 14412},
     {"pgroup": "p19741", "start": 14443, "end": 15178},
@@ -102,12 +103,17 @@ for fn in fns:
             continue
         print(fn, "has unassigned key:", k, "=", repr(v))
 
+    default_pgroup = "any-authenticated-user"
     # check the chosen range
     for range in ranges:
         if range["start"] <= data_in["MID"] <= range["end"]:
             default_pgroup = range["pgroup"]
             break
 
+    if default_pgroup == "any-authenticated-user":
+        continue
+
+    print ("This msg is selected")
     # remove ignored entries
     for i in ignored:
         data_in.pop(i, None)
@@ -140,12 +146,15 @@ for fn in fns:
     data_out["accessGroups"] = []
 
     attchs = data_in.pop("attachments")
+    # remove empty entries which seem sometimes to appear
+    while '' in attchs:
+       attchs.remove('')
+
     mesg = data_in.pop("message")
 
     mesg_parts = mesg.split("<img")
     mesg = mesg_parts[0]
     files = []
-
     if len(mesg_parts) > 1:
         for msg in mesg_parts[1:]:
             attachment = None
@@ -156,15 +165,16 @@ for fn in fns:
                 if att in source_attachment:
                     index = ii
                     break
-
             if index:
-                attachment = attchs.pop(index)
+                attachment = attchs.pop(index) 
             else:
+                # image not contained as attachment
                 for att in attachment_lib:
                     if att in source_attachment:
                         attachment = att
                         break
                 if not attachment:
+                    print("File not found in dumped attachment files")
                     try:
                         file_extension = [
                             ext
@@ -179,6 +189,7 @@ for fn in fns:
                                 f"{os.path.basename(fn).split('.')[0]}_{str(uuid.uuid4())}.png"
                             )
                             r = requests.get(source_attachment[1:-1].replace("_", "/"))
+                            print("==== adding missing http external file to attachments:",f"{attachments_path}{attachment}")
                             with open(f"{attachments_path}{attachment}", "wb") as output:
                                 output.write(r.content)
                         else:
@@ -186,12 +197,12 @@ for fn in fns:
                             source_attachment = source_attachment.split(",")[1][0:-1].replace(
                                 "_", "/"
                             )
+                            print("==== adding base64 file to attachments:",f"{attachments_path}{attachment}")
                             with open(f"{attachments_path}{attachment}", "wb") as file_stream:
                                 file_stream.write(base64.decodebytes(source_attachment.encode()))
                     except Exception as e:
                         print("Failed to parse embedded image.")
                         attachment = None
-
             if attachment:
                 filepath = os.path.abspath(f"{dump_path}/dump/attachments/{attachment}")
                 file_info, file_textcontent = SciLog.prepare_file_content(filepath)
