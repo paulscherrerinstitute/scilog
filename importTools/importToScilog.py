@@ -31,6 +31,8 @@ for snippet in snippets:
     pgroup=snippet["ownerGroup"]
     if pgroup == "any-authenticated-user":
         continue
+    # if pgroup < "p19000" :
+    #    continue
     logbooks = log.get_logbooks(ownerGroup=pgroup)
     assert len(logbooks) >= 1
     logbook = logbooks[0]
