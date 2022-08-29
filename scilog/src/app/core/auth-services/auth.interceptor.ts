@@ -8,7 +8,30 @@ import {
   HttpErrorResponse
 } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import {tap} from 'rxjs/operators';
+import { tap } from 'rxjs/operators';
+
+function logout() {
+  localStorage.removeItem("id_token");
+  localStorage.removeItem('id_session');
+  sessionStorage.removeItem('scilog-auto-selection-logbook');
+  location.href = '/login';
+};
+
+function handle_request(handler: HttpHandler, req: HttpRequest<any>) {
+  return handler.handle(req).pipe(tap((event: HttpEvent<any>) => {
+    if (event instanceof HttpResponse) {
+      // console.log(cloned);
+      // console.log("Service Response thr Interceptor");
+    }
+  }, (err: any) => {
+    if (err instanceof HttpErrorResponse) {
+      console.log("err.status", err);
+      if (err.status === 401) {
+        logout();
+      }
+    }
+  }));
+}
 
 @Injectable()
 export class AuthInterceptor implements HttpInterceptor {
@@ -24,26 +47,11 @@ export class AuthInterceptor implements HttpInterceptor {
           "Bearer " + idToken)
       });
 
-      return next.handle(cloned).pipe(tap((event: HttpEvent<any>) => {
-        if (event instanceof HttpResponse) {
-          // console.log(cloned);
-          // console.log("Service Response thr Interceptor");
-        }
-      }, (err: any) => {
-        if (err instanceof HttpErrorResponse) {
-          console.log("err.status", err);
-          if (err.status === 401) {
-            localStorage.removeItem("id_token");
-            localStorage.removeItem('id_session');
-            sessionStorage.removeItem('scilog-auto-selection-logbook');
-            location.href = '/login';
-          }
-        }
-      }));
-    
+      return handle_request(next, cloned);
+
     }
     else {
-      return next.handle(req);
+      return handle_request(next, req);
     }
   }
 }
