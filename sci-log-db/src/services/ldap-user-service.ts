@@ -10,15 +10,16 @@ import { HttpErrors } from '@loopback/rest';
 import { securityId, UserProfile } from '@loopback/security';
 import { PasswordHasherBindings } from '../keys';
 import { User } from '../models/user.model';
+import { ACLRepository } from '../repositories';
 import { Credentials, UserRepository } from '../repositories/user.repository';
 import { PasswordHasher } from './hash.password.bcryptjs';
 
 const ldap = require('ldapjs-promise');
 
-// TODO allow for customizable isOwnerGroup method
+// TODO allow for customizable isADGroup method
 // the following is PSI specific
 
-function isOwnerGroup(element: string) {
+function isADGroup(element: string) {
   return (element.startsWith("CN=a-") || element.startsWith("CN=p") || element.startsWith("CN=unx"));
 }
 
@@ -53,6 +54,7 @@ async function findLinkedBeamline(client: any, eaccount: string) {
 export class LDAPUserService implements UserService<User, Credentials> {
   constructor(
     @repository(UserRepository) public userRepository: UserRepository,
+    @repository(ACLRepository) public aclRepository: ACLRepository,
     @inject(PasswordHasherBindings.PASSWORD_HASHER) public passwordHasher: PasswordHasher,
   ) { }
 
@@ -136,23 +138,23 @@ export class LDAPUserService implements UserService<User, Credentials> {
     try {
       const results = await client.searchReturnAll(searchSubject, searchOptions);
       for (let entry of results.entries) {
-        var ownerGroups = [...entry.memberOf].filter(isOwnerGroup).map(
+        var adGroups = [...entry.memberOf].filter(isADGroup).map(
           (value: string) => value.substring(3, value.indexOf(","))
         )
-        ownerGroups.push('any-authenticated-user')
+        adGroups.push('any-authenticated-user')
         // add linked pgroup to eaccounts
         if (/^e[0-9]{5}$/.test(principal)) {
-          ownerGroups.push("p" + principal.substring(1))
+          adGroups.push("p" + principal.substring(1))
         }
         // add user itself to allow for single user ownership
         // always take login account name, not email
-        ownerGroups.push(entry.cn)
+        adGroups.push(entry.cn)
         u = {
           email: entry.userPrincipalName || entry.mail,  // eaccount only have mail field
           firstName: entry.givenName,
           lastName: entry.sn,
           username: entry.cn,
-          roles: ownerGroups,
+          roles: adGroups,
         }
       };
       var foundUser = await repo.findOne({
@@ -177,8 +179,8 @@ export class LDAPUserService implements UserService<User, Credentials> {
     }
   }
 
-  convertToUserProfile(user: User): UserProfile {
-    // console.error("Inside convertToUserProfile:" + JSON.stringify(user, null, 4))
+  async convertToUserProfile(user: User): Promise<UserProfile> {
+    console.error("Inside ldap convertToUserProfile:" + JSON.stringify(user, null, 4))
     // since first name and lastName are optional, no error is thrown if not provided
     let userName = '';
     if (user.firstName) userName = `${user.firstName}`;
@@ -186,14 +188,16 @@ export class LDAPUserService implements UserService<User, Credentials> {
       userName = user.firstName
         ? `${userName} ${user.lastName}`
         : `${user.lastName}`;
+    let acls=await this.aclRepository.find({where:{ read: {inq: user.roles}},fields:{id:true}})
     const userProfile = {
       [securityId]: user.id,
       name: userName,
       id: user.id,
       roles: user.roles,
-      email: user.email
+      email: user.email,
+      readACLs:[] //TODO put real stuff here
     };
-    // console.error("convertToUserProfile:", user, userProfile)
+    console.error("ldap convertToUserProfile:", user, userProfile)
     return userProfile;
   }
 }

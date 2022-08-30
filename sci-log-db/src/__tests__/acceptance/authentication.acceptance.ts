@@ -114,7 +114,7 @@ describe('authentication services', function (this: Suite) {
     );
   });
 
-  it('user service convertToUserProfile() succeeds', () => {
+  it('user service convertToUserProfile() succeeds', async () => {
     const expectedUserProfile = {
       email: newUser.email,
       [securityId]: newUser.id,
@@ -122,48 +122,48 @@ describe('authentication services', function (this: Suite) {
       name: `${newUser.firstName} ${newUser.lastName}`,
       roles: ['any-authenticated-user'],
     };
-    const userProfile = userService.convertToUserProfile(newUser);
+    const userProfile = await userService.convertToUserProfile(newUser);
     expect(userProfile).to.deepEqual(expectedUserProfile);
   });
 
-  it('user service convertToUserProfile() succeeds without optional fields : firstName, lastName', () => {
+  it('user service convertToUserProfile() succeeds without optional fields : firstName, lastName', async () => {
     const userWithoutFirstOrLastName = Object.assign({}, newUser);
     delete userWithoutFirstOrLastName.firstName;
     delete userWithoutFirstOrLastName.lastName;
 
-    const userProfile = userService.convertToUserProfile(
+    const userProfile = await userService.convertToUserProfile(
       userWithoutFirstOrLastName,
     );
     expect(userProfile[securityId]).to.equal(newUser.id);
     expect(userProfile.name).to.equal('');
   });
 
-  it('user service convertToUserProfile() succeeds without optional field : lastName', () => {
+  it('user service convertToUserProfile() succeeds without optional field : lastName', async () => {
     const userWithoutLastName = Object.assign({}, newUser);
     delete userWithoutLastName.lastName;
 
-    const userProfile = userService.convertToUserProfile(userWithoutLastName);
+    const userProfile = await userService.convertToUserProfile(userWithoutLastName);
     expect(userProfile[securityId]).to.equal(newUser.id);
     expect(userProfile.name).to.equal(newUser.firstName);
   });
 
-  it('user service convertToUserProfile() succeeds without optional field : firstName', () => {
+  it('user service convertToUserProfile() succeeds without optional field : firstName', async () => {
     const userWithoutFirstName = Object.assign({}, newUser);
     delete userWithoutFirstName.firstName;
 
-    const userProfile = userService.convertToUserProfile(userWithoutFirstName);
+    const userProfile = await userService.convertToUserProfile(userWithoutFirstName);
     expect(userProfile[securityId]).to.equal(newUser.id);
     expect(userProfile.name).to.equal(newUser.lastName);
   });
 
   it('token service generateToken() succeeds', async () => {
-    const userProfile = userService.convertToUserProfile(newUser);
+    const userProfile = await userService.convertToUserProfile(newUser);
     const token = await jwtService.generateToken(userProfile);
     expect(token).to.not.be.empty();
   });
 
   it('token service verifyToken() succeeds', async () => {
-    const userProfile = userService.convertToUserProfile(newUser);
+    const userProfile = await userService.convertToUserProfile(newUser);
     const token = await jwtService.generateToken(userProfile);
     const userProfileFromToken = await jwtService.verifyToken(token);
 

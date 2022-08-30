@@ -1,4 +1,5 @@
 import {belongsTo, Entity, hasMany, model, property} from '@loopback/repository';
+import { ACL } from './acl.model';
 
 @model({
   settings: {
@@ -13,19 +14,6 @@ export class Basesnippet extends Entity {
     mongodb: {dataType: 'ObjectId'}
   })
   id: string;
-
-  @property({
-    type: 'string',
-    description: 'Only members of the ownerGroup are allowed to see and work with this snippet',
-    index: true,
-  })
-  ownerGroup?: string;
-
-  @property.array(String, {
-    description: 'groups whose members have read access to this snippet',
-    index: true,
-  })
-  accessGroups?: string[];
 
   @property({
     type: 'string',
@@ -98,6 +86,12 @@ export class Basesnippet extends Entity {
     })
   parentId?: string;
 
+  @belongsTo(() => ACL,
+  {}, //relation metadata goes in here
+  {// property definition goes in here
+    mongodb: {dataType: 'ObjectId'}
+  })
+  aclId?: string;
 
   @property.array(String, {
     description: 'arbitrray strings meant as tags attached to this snippet'
