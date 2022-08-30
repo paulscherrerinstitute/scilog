@@ -12,9 +12,9 @@
   }
 
   .logbook-container {
-    padding: 20px;
     overflow: scroll;
-    height: calc(100vh - 280px);
+    height: calc(100vh - 250px);
+    width: calc(100vw - 20px);
   }
    
   ::ng-deep .mat-toolbar{

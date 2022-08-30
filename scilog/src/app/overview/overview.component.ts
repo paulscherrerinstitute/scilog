@@ -1,6 +1,6 @@
 import { Component, OnInit, ComponentFactoryResolver } from '@angular/core';
 import { Logbooks } from '@model/logbooks';
-import { Subscription } from 'rxjs';
+import { Subject, Subscription } from 'rxjs';
 import { UserPreferencesService } from '@shared/user-preferences.service';
 import { CollectionConfig, WidgetItemConfig } from '@model/config';
 import { MatDialog, MatDialogConfig, MatDialogRef } from '@angular/material/dialog';
@@ -11,6 +11,7 @@ import { CookiesService } from '@shared/cookies.service';
 import { Router } from '@angular/router';
 import { LogbookDataService } from '@shared/remote-data.service';
 import { LogbookIconScrollService } from './logbook-icon-scroll-service.service';
+import { debounceTime } from 'rxjs/operators';
 
 enum ContentType {
   COLLECTION = 'collection',
@@ -20,7 +21,8 @@ enum ContentType {
 @Component({
   selector: 'app-overview',
   templateUrl: './overview.component.html',
-  styleUrls: ['./overview.component.css']
+  styleUrls: ['./overview.component.css'],
+  providers: [LogbookIconScrollService]
 
 })
 export class OverviewComponent implements OnInit {
@@ -36,7 +38,9 @@ export class OverviewComponent implements OnInit {
 
   logbookSubscription: Subscription = null;
   subscriptions: Subscription[] = [];
-  searchString: string = '';
+  private _searchString: string = '';
+  searchStringSubject: Subject<any> = new Subject();
+
 
   constructor(
     public logbookIconScrollService: LogbookIconScrollService,
@@ -66,6 +70,11 @@ export class OverviewComponent implements OnInit {
       this.logbookIconScrollService.initialize(this.config);
       // this.getLogbookData();
     }));
+    this.subscriptions.push(this.searchStringSubject.pipe(debounceTime(500)).subscribe(() => {
+      this.logbookIconScrollService.config = this._prepareConfig();
+      this.logbookIconScrollService.reset();
+
+    }));
   }
 
   async getLogbookData() {
@@ -91,6 +100,15 @@ export class OverviewComponent implements OnInit {
     // this.views = [];
     console.log("selected collection: ", collection)
 
+  }
+
+  public get searchString(): string {
+    return this._searchString;
+  }
+  public set searchString(value: string) {
+    this._searchString = value;
+    this.searchStringSubject.next();
+    this.dataService.searchString = this._searchString;
   }
 
   logbookSelected(logbookID: string) {

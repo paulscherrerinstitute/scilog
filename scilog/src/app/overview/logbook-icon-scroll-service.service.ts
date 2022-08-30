@@ -24,7 +24,7 @@ export class LogbookIconScrollService extends ScrollBaseService {
           minIndex: 0,
           startIndex: this.startIndex,
           bufferSize: 9,
-          padding: 0.1,
+          padding: 0.5,
         }
       }));
     } else {
@@ -37,7 +37,7 @@ export class LogbookIconScrollService extends ScrollBaseService {
           minIndex: 0,
           startIndex: this.startIndex,
           bufferSize: 9,
-          padding: 0.1,
+          padding: 0.5,
         }
       });
     }
@@ -50,9 +50,8 @@ export class LogbookIconScrollService extends ScrollBaseService {
 
   async getData(index: number, count: number, config: any) {
     let data = [];
-    let buffer = await this.logbookDataService.getDataBuffer(index, count, config);
+    let buffer = await this.logbookDataService.getDataBuffer(index, count * 3, config);
     this.datasource.adapter.relax();
-    this.datasource.adapter.check();
     const groupedBuffer = [];
     while (buffer.length) groupedBuffer.push(buffer.splice(0, 3));
     return groupedBuffer
