@@ -1,20 +1,20 @@
-import {authenticate} from '@loopback/authentication';
-import {authorize} from '@loopback/authorization';
-import {inject} from '@loopback/core';
-import {Count, CountSchema, Filter, FilterExcludingWhere, repository, Where} from '@loopback/repository';
-import {del, get, getModelSchemaRef, HttpErrors, oas, param, patch, post, put, requestBody, Response, RestBindings} from '@loopback/rest';
-import {SecurityBindings, UserProfile} from '@loopback/security';
+import { authenticate } from '@loopback/authentication';
+import { authorize } from '@loopback/authorization';
+import { inject } from '@loopback/core';
+import { Count, CountSchema, Filter, FilterExcludingWhere, repository, Where } from '@loopback/repository';
+import { del, get, getModelSchemaRef, HttpErrors, oas, param, patch, post, put, requestBody, Response, RestBindings } from '@loopback/rest';
+import { SecurityBindings, UserProfile } from '@loopback/security';
 import _ from 'lodash';
-import {EXPORT_SERVICE} from '../keys';
-import {Basesnippet} from '../models';
-import {BasesnippetRepository} from '../repositories';
-import {JobRepository} from '../repositories/job.repository';
-import {basicAuthorization} from '../services/basic.authorizor';
-import {ExportService} from '../services/export-snippets.service';
-import {OPERATION_SECURITY_SPEC} from '../utils/security-spec';
+import { EXPORT_SERVICE } from '../keys';
+import { Basesnippet } from '../models';
+import { BasesnippetRepository } from '../repositories';
+import { JobRepository } from '../repositories/job.repository';
+import { basicAuthorization } from '../services/basic.authorizor';
+import { ExportService } from '../services/export-snippets.service';
+import { OPERATION_SECURITY_SPEC } from '../utils/security-spec';
 
 @authenticate('jwt')
-@authorize({allowedRoles: ['any-authenticated-user'], voters: [basicAuthorization]})
+@authorize({ allowedRoles: ['any-authenticated-user'], voters: [basicAuthorization] })
 export class BasesnippetController {
 
   exportDir: string = "";
@@ -25,14 +25,14 @@ export class BasesnippetController {
     public basesnippetRepository: BasesnippetRepository,
     @repository(JobRepository) private jobRepository: JobRepository,
     @inject(EXPORT_SERVICE) private exportService: ExportService
-  ) {}
+  ) { }
 
   @post('/basesnippets', {
     security: OPERATION_SECURITY_SPEC,
     responses: {
       '200': {
         description: 'Basesnippet model instance',
-        content: {'application/json': {schema: getModelSchemaRef(Basesnippet)}},
+        content: { 'application/json': { schema: getModelSchemaRef(Basesnippet) } },
       },
     },
   })
@@ -49,7 +49,7 @@ export class BasesnippetController {
     })
     basesnippet: Omit<Basesnippet, 'id'>,
   ): Promise<Basesnippet> {
-    return this.basesnippetRepository.create(basesnippet, {currentUser: this.user});
+    return this.basesnippetRepository.create(basesnippet, { currentUser: this.user });
   }
 
   @get('/basesnippets/count', {
@@ -57,14 +57,14 @@ export class BasesnippetController {
     responses: {
       '200': {
         description: 'Basesnippet model count',
-        content: {'application/json': {schema: CountSchema}},
+        content: { 'application/json': { schema: CountSchema } },
       },
     },
   })
   async count(
     @param.where(Basesnippet) where?: Where<Basesnippet>,
   ): Promise<Count> {
-    return this.basesnippetRepository.count(where, {currentUser: this.user});
+    return this.basesnippetRepository.count(where, { currentUser: this.user });
   }
 
   @get('/basesnippets', {
@@ -76,7 +76,7 @@ export class BasesnippetController {
           'application/json': {
             schema: {
               type: 'array',
-              items: getModelSchemaRef(Basesnippet, {includeRelations: true}),
+              items: getModelSchemaRef(Basesnippet, { includeRelations: true }),
             },
           },
         },
@@ -86,7 +86,7 @@ export class BasesnippetController {
   async find(
     @param.filter(Basesnippet) filter?: Filter<Basesnippet>,
   ): Promise<Basesnippet[]> {
-    return this.basesnippetRepository.find(filter, {currentUser: this.user});
+    return this.basesnippetRepository.find(filter, { currentUser: this.user });
   }
 
   @get('/basesnippets/export={exportType}', {
@@ -98,7 +98,7 @@ export class BasesnippetController {
           'application/json': {
             schema: {
               type: 'array',
-              items: getModelSchemaRef(Basesnippet, {includeRelations: true}),
+              items: getModelSchemaRef(Basesnippet, { includeRelations: true }),
             },
           },
         },
@@ -110,14 +110,14 @@ export class BasesnippetController {
     @param.path.string('exportType') exportType: string, @inject(RestBindings.Http.RESPONSE) response: Response, @param.filter(Basesnippet) filter?: Filter<Basesnippet>,
   ) {
     var createPDF: boolean;
-    createPDF=(exportType=="pdf")
+    createPDF = (exportType == "pdf")
 
-    let snippets = await this.basesnippetRepository.find(filter, {currentUser: this.user});
+    let snippets = await this.basesnippetRepository.find(filter, { currentUser: this.user });
     // console.log(filter);
     let job: Object = {};
     if (snippets.length > 0) {
       if (snippets[0]?.parentId) {
-        let parent = await this.basesnippetRepository.findById(snippets[0].parentId, filter, {currentUser: this.user});
+        let parent = await this.basesnippetRepository.findById(snippets[0].parentId, filter, { currentUser: this.user });
         job = {
           ownerGroup: parent.ownerGroup,
           accessGroups: parent.accessGroups,
@@ -136,12 +136,12 @@ export class BasesnippetController {
       throw new HttpErrors.RangeNotSatisfiable;
     }
 
-    let jobEntity = await this.jobRepository.create(job, {currentUser: this.user});
+    let jobEntity = await this.jobRepository.create(job, { currentUser: this.user });
     let basePath = "/tmp/"
     var fs = require('fs');
     this.exportDir = basePath + jobEntity.id;
     if (!fs.existsSync(this.exportDir)) {
-      fs.mkdirSync(this.exportDir, {recursive: true});
+      fs.mkdirSync(this.exportDir, { recursive: true });
     }
 
     let src = await this.exportService.prepareLateXSourceFile(snippets, this.exportDir, this.user);
@@ -157,7 +157,7 @@ export class BasesnippetController {
       console.log("file transferred successfully", err)
       var fs = require('fs');
       if (path.includes(basePath)) {
-        fs.rmdirSync(path, {recursive: true});
+        fs.rmdirSync(path, { recursive: true });
       }
     });
     return response;
@@ -171,7 +171,7 @@ export class BasesnippetController {
         content: {
           'application/json': {
             type: 'any',
-            schema: getModelSchemaRef(Basesnippet, {includeRelations: true}),
+            schema: getModelSchemaRef(Basesnippet, { includeRelations: true }),
           },
         },
       },
@@ -182,7 +182,7 @@ export class BasesnippetController {
     @param.filter(Basesnippet) filter?: Filter<Basesnippet>,
   ): Promise<any> {
     let index = new Promise<any>(async (resolve, reject) => {
-      let snippets = await this.basesnippetRepository.find(filter, {currentUser: this.user});
+      let snippets = await this.basesnippetRepository.find(filter, { currentUser: this.user });
       // console.log(snippets)
       resolve(snippets.findIndex((snippet) => {
         return (snippet.id == id);
@@ -200,7 +200,7 @@ export class BasesnippetController {
           'application/json': {
             schema: {
               type: 'array',
-              items: getModelSchemaRef(Basesnippet, {includeRelations: true}),
+              items: getModelSchemaRef(Basesnippet, { includeRelations: true }),
             },
           },
         },
@@ -230,48 +230,59 @@ export class BasesnippetController {
 
       // If we experience performance issues, the query can be split into junks of size <filter.limit>*<number_of_junks>.
       // For now it seems to be fine though...
-      let snippets = await this.basesnippetRepository.find(filter, {currentUser: this.user});
+      let snippets = await this.basesnippetRepository.find(filter, { currentUser: this.user });
       let snippetsFiltered: Basesnippet[] = [];
       let foundEntries = 0;
       for (let index = 0; index < snippets.length; index++) {
         const item: any = snippets[index];
-        if ((typeof item.textcontent != 'undefined') && (item.textcontent.length > 0)) {
-          let foundSubsnippetEntry = false;
-          if (item.subsnippets) {
-            item.subsnippets.forEach((it: any) => {
-              if ((typeof it.textcontent != 'undefined') && (it.textcontent.length > 0)) {
-                if (it.textcontent.toLowerCase().includes(search.toLowerCase())) {
-                  foundSubsnippetEntry = true;
-                } else if (includeTags) {
-                  if (it.tags.some((tag: string) => {
-                    if (tag.toLowerCase() == search.toLowerCase()) {
-                      return true;
-                    }
-                  })) {
-                    foundSubsnippetEntry = true;
+        // if ((typeof item.textcontent != 'undefined') && (item.textcontent.length > 0)) {
+        let foundSubsnippetEntry = false;
+        if (item.subsnippets) {
+          item.subsnippets.forEach((it: any) => {
+            if ((typeof it.textcontent != 'undefined') && (it.textcontent.length > 0)) {
+              if (it.textcontent.toLowerCase().includes(search.toLowerCase())) {
+                foundSubsnippetEntry = true;
+              } else if (includeTags) {
+                if (it.tags.some((tag: string) => {
+                  if (tag.toLowerCase() == search.toLowerCase()) {
+                    return true;
                   }
+                })) {
+                  foundSubsnippetEntry = true;
                 }
               }
-            })
-          }
-          let foundSnippetEntry = false;
-          if ((item?.textcontent.toLowerCase().includes(search.toLowerCase())) || ((includeTags) && (item.tags.some((item: string) => {
-            if (item.toLowerCase() == search.toLowerCase()) {
-              return true;
             }
-          })))) {
+          })
+        }
+        let foundSnippetEntry = false;
+
+        // look for search string in these fields
+        let fields = ["textcontent", "name", "description"];
+        for (let i = 0; i < fields.length; i++) {
+          if (!item.hasOwnProperty(fields[i])) {
+            continue;
+          }
+          if (item[fields[i]].toLowerCase().includes(search.toLowerCase())) {
             foundSnippetEntry = true;
           }
-          if ((foundSnippetEntry) || (foundSubsnippetEntry)) {
-            foundEntries++;
-            if (foundEntries > skip) {
-              snippetsFiltered.push(item);
-            }
-            if (foundEntries > limit + skip) {
-              break;
-            }
-          };
         }
+        if (((includeTags) && (item.tags.some((item: string) => {
+          if (item.toLowerCase() == search.toLowerCase()) {
+            return true;
+          }
+        })))) {
+          foundSnippetEntry = true;
+        }
+        if ((foundSnippetEntry) || (foundSubsnippetEntry)) {
+          foundEntries++;
+          if (foundEntries > skip) {
+            snippetsFiltered.push(item);
+          }
+          if (foundEntries > limit + skip) {
+            break;
+          }
+        };
+        // }
 
       }
       // console.log(snippetsFiltered)
@@ -286,7 +297,7 @@ export class BasesnippetController {
     responses: {
       '200': {
         description: 'Basesnippet PATCH success count',
-        content: {'application/json': {schema: CountSchema}},
+        content: { 'application/json': { schema: CountSchema } },
       },
     },
   })
@@ -294,14 +305,14 @@ export class BasesnippetController {
     @requestBody({
       content: {
         'application/json': {
-          schema: getModelSchemaRef(Basesnippet, {partial: true}),
+          schema: getModelSchemaRef(Basesnippet, { partial: true }),
         },
       },
     })
     basesnippet: Basesnippet,
     @param.where(Basesnippet) where?: Where<Basesnippet>,
   ): Promise<Count> {
-    return this.basesnippetRepository.updateAll(basesnippet, where, {currentUser: this.user});
+    return this.basesnippetRepository.updateAll(basesnippet, where, { currentUser: this.user });
   }
 
   @get('/basesnippets/{id}', {
@@ -311,7 +322,7 @@ export class BasesnippetController {
         description: 'Basesnippet model instance',
         content: {
           'application/json': {
-            schema: getModelSchemaRef(Basesnippet, {includeRelations: true}),
+            schema: getModelSchemaRef(Basesnippet, { includeRelations: true }),
           },
         },
       },
@@ -319,9 +330,9 @@ export class BasesnippetController {
   })
   async findById(
     @param.path.string('id') id: string,
-    @param.filter(Basesnippet, {exclude: 'where'}) filter?: FilterExcludingWhere<Basesnippet>
+    @param.filter(Basesnippet, { exclude: 'where' }) filter?: FilterExcludingWhere<Basesnippet>
   ): Promise<Basesnippet> {
-    return this.basesnippetRepository.findById(id, filter, {currentUser: this.user});
+    return this.basesnippetRepository.findById(id, filter, { currentUser: this.user });
   }
 
   @patch('/basesnippets/{id}', {
@@ -337,14 +348,14 @@ export class BasesnippetController {
     @requestBody({
       content: {
         'application/json': {
-          schema: getModelSchemaRef(Basesnippet, {partial: true}),
+          schema: getModelSchemaRef(Basesnippet, { partial: true }),
         },
       },
     })
     basesnippet: Basesnippet,
   ): Promise<void> {
     if ((typeof basesnippet.deleted == 'undefined') || (basesnippet.deleted == false)) {
-      let snippet = await this.basesnippetRepository.findById(id, {}, {currentUser: this.user});
+      let snippet = await this.basesnippetRepository.findById(id, {}, { currentUser: this.user });
       if (((typeof snippet?.expiresAt != 'undefined') && (snippet.expiresAt.getTime() < Date.now())) || (typeof snippet?.expiresAt == 'undefined')) {
         throw new HttpErrors.Forbidden('Cannot modify expired data snippet.')
       }
@@ -352,7 +363,7 @@ export class BasesnippetController {
         this.addToHistory(snippet);
       }
     }
-    await this.basesnippetRepository.updateById(id, basesnippet, {currentUser: this.user});
+    await this.basesnippetRepository.updateById(id, basesnippet, { currentUser: this.user });
   }
 
   @put('/basesnippets/{id}', {
@@ -367,7 +378,7 @@ export class BasesnippetController {
     @param.path.string('id') id: string,
     @requestBody() basesnippet: Basesnippet,
   ): Promise<void> {
-    await this.basesnippetRepository.replaceById(id, basesnippet, {currentUser: this.user});
+    await this.basesnippetRepository.replaceById(id, basesnippet, { currentUser: this.user });
   }
 
   @del('/basesnippets/{id}', {
@@ -382,15 +393,15 @@ export class BasesnippetController {
     // Two steps:
     // 1. set snippet to 'deleted=true'
     // 2. inside websocket and after informing the clients, replace the parentId or delete the snippet
-    let snippet = await this.basesnippetRepository.findById(id, {}, {currentUser: this.user});
+    let snippet = await this.basesnippetRepository.findById(id, {}, { currentUser: this.user });
     if (snippet?.versionable) {
       if (snippet?.parentId) {
-        let parent = await this.basesnippetRepository.findById(snippet.parentId, {}, {currentUser: this.user});
+        let parent = await this.basesnippetRepository.findById(snippet.parentId, {}, { currentUser: this.user });
         let parentHistory = await this.getHistorySnippet(parent);
-        console.log("deleteById:parentHistory:",parentHistory);
+        console.log("deleteById:parentHistory:", parentHistory);
       }
     }
-    await this.basesnippetRepository.updateById(id, {deleted: true}, {currentUser: this.user});
+    await this.basesnippetRepository.updateById(id, { deleted: true }, { currentUser: this.user });
   }
 
   @patch('/basesnippets/{id}/restore', {
@@ -404,14 +415,14 @@ export class BasesnippetController {
   async restoreDeletedId(
     @param.path.string('id') id: string,
   ): Promise<void> {
-    let snippet = await this.basesnippetRepository.findById(id, {}, {currentUser: this.user});
+    let snippet = await this.basesnippetRepository.findById(id, {}, { currentUser: this.user });
     if ((snippet?.deleted) && (snippet.parentId)) {
-      let historySnippet = await this.basesnippetRepository.findById(snippet.parentId, {}, {currentUser: this.user});
+      let historySnippet = await this.basesnippetRepository.findById(snippet.parentId, {}, { currentUser: this.user });
       let restoredSnippet = {
         deleted: false,
         parentId: historySnippet.parentId
       };
-      await this.basesnippetRepository.updateById(id, restoredSnippet, {currentUser: this.user});
+      await this.basesnippetRepository.updateById(id, restoredSnippet, { currentUser: this.user });
     }
 
   }
@@ -423,7 +434,7 @@ export class BasesnippetController {
       deleted: true,
       parentId: historySnippet.id
     };
-    await this.basesnippetRepository.updateById(snippet.id, deletedSnippet, {currentUser: this.user});
+    await this.basesnippetRepository.updateById(snippet.id, deletedSnippet, { currentUser: this.user });
   }
 
   async addToHistory(snippet: Basesnippet) {
@@ -431,17 +442,17 @@ export class BasesnippetController {
     let historySnippet = await this.getHistorySnippet(snippet);
     let snippetCopy = _.omit(snippet, 'id');
     snippetCopy.parentId = historySnippet.id;
-    snippetCopy = await this.basesnippetRepository.create(snippetCopy, {currentUser: this.user});
+    snippetCopy = await this.basesnippetRepository.create(snippetCopy, { currentUser: this.user });
   }
 
   async getHistorySnippet(snippet: Basesnippet): Promise<Basesnippet> {
-    let historySnippet = await this.basesnippetRepository.findOne({where: {snippetType: 'history', parentId: snippet.id}}, {currentUser: this.user});
+    let historySnippet = await this.basesnippetRepository.findOne({ where: { snippetType: 'history', parentId: snippet.id } }, { currentUser: this.user });
 
     if (historySnippet == null) {
       let historySnippetPayload: any = _.pick(snippet, ['isPrivate', 'ownerGroup', 'accessGroups']);
       historySnippetPayload.parentId = snippet.id;
       historySnippetPayload.snippetType = 'history';
-      historySnippet = await this.basesnippetRepository.create(historySnippetPayload, {currentUser: this.user});
+      historySnippet = await this.basesnippetRepository.create(historySnippetPayload, { currentUser: this.user });
     }
     return historySnippet;
   }

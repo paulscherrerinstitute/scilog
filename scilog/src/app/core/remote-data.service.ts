@@ -285,6 +285,15 @@ export class LogbookItemDataService extends RemoteDataService {
 })
 export class LogbookDataService extends RemoteDataService {
 
+  private _searchString = "";
+
+  public get searchString(): string {
+    return this._searchString;
+  }
+  public set searchString(value: string) {
+    this._searchString = value;
+  }
+
   deleteLogbook(logbookId: string): Promise<any> {
     return this.deleteSnippet("logbooks", logbookId).toPromise();
   }
@@ -329,6 +338,38 @@ export class LogbookDataService extends RemoteDataService {
     return this.getSnippets<Logbooks[]>('logbooks', { headers: headers }).toPromise();
   }
 
+  getDataBuffer(index: number, count: number, config: WidgetItemConfig) {
+    console.log(index, count)
+
+    let headers = new HttpHeaders();
+    headers = headers.set('Content-Type', 'application/json; charset=utf-8');
+    this._searchString = this._searchString.trim();
+
+
+    let httpFilter: Object = {};
+    httpFilter["order"] = ["defaultOrder DESC"];
+
+    let whereFilter: Object[] = [];
+    whereFilter.push({ "snippetType": "logbook" });
+
+    httpFilter["where"] = { "and": whereFilter };
+
+    if (count < Infinity) {
+      httpFilter["limit"] = count;
+    }
+    if (index > 0) {
+      httpFilter["skip"] = index;
+    }
+
+    let params = new HttpParams();
+    params = params.set('filter', JSON.stringify(httpFilter))
+
+    if (this._searchString.length == 0) {
+      return this.getSnippets<any[]>('basesnippets', { headers: headers, params: params }).toPromise();
+    } else {
+      return this.getSnippets<any[]>('basesnippets/search=' + this._searchString, { headers: headers, params: params }).toPromise();
+    }
+  }
 }
 
 @Injectable({

@@ -1,8 +1,8 @@
 import { Component, OnInit, ComponentFactoryResolver } from '@angular/core';
 import { Logbooks } from '@model/logbooks';
-import { Subscription } from 'rxjs';
+import { Subject, Subscription } from 'rxjs';
 import { UserPreferencesService } from '@shared/user-preferences.service';
-import { CollectionConfig } from '@model/config';
+import { CollectionConfig, WidgetItemConfig } from '@model/config';
 import { MatDialog, MatDialogConfig, MatDialogRef } from '@angular/material/dialog';
 import { AddCollectionComponent } from './add-collection/add-collection.component';
 import { AddLogbookComponent } from './add-logbook/add-logbook.component';
@@ -10,6 +10,8 @@ import { LogbookInfoService } from '@shared/logbook-info.service';
 import { CookiesService } from '@shared/cookies.service';
 import { Router } from '@angular/router';
 import { LogbookDataService } from '@shared/remote-data.service';
+import { LogbookIconScrollService } from './logbook-icon-scroll-service.service';
+import { debounceTime } from 'rxjs/operators';
 
 enum ContentType {
   COLLECTION = 'collection',
@@ -19,10 +21,13 @@ enum ContentType {
 @Component({
   selector: 'app-overview',
   templateUrl: './overview.component.html',
-  styleUrls: ['./overview.component.css']
+  styleUrls: ['./overview.component.css'],
+  providers: [LogbookIconScrollService]
 
 })
 export class OverviewComponent implements OnInit {
+
+  config: WidgetItemConfig;
 
   showViewSelection = false;
   collections: CollectionConfig[];
@@ -33,9 +38,12 @@ export class OverviewComponent implements OnInit {
 
   logbookSubscription: Subscription = null;
   subscriptions: Subscription[] = [];
-  searchString: string = '';
+  private _searchString: string = '';
+  searchStringSubject: Subject<any> = new Subject();
+
 
   constructor(
+    public logbookIconScrollService: LogbookIconScrollService,
     private userPreferences: UserPreferencesService,
     public dialog: MatDialog,
     private logbookInfo: LogbookInfoService,
@@ -55,16 +63,23 @@ export class OverviewComponent implements OnInit {
       if (this.collections.length == 1) {
         this.collectionSelected(this.collections[0]);
       }
-      if (this.logbookSubscription != null){
+      if (this.logbookSubscription != null) {
         this.logbookSubscription.unsubscribe();
       }
-      this.getLogbookData();
+      this.config = this._prepareConfig();
+      this.logbookIconScrollService.initialize(this.config);
+      // this.getLogbookData();
+    }));
+    this.subscriptions.push(this.searchStringSubject.pipe(debounceTime(500)).subscribe(() => {
+      this.logbookIconScrollService.config = this._prepareConfig();
+      this.logbookIconScrollService.reset();
+
     }));
   }
 
-  async getLogbookData(){
+  async getLogbookData() {
     await this.logbookInfo.getAvailLogbooks();
-    this.logbooks = this.logbookInfo.availLogbooks;
+    this.logbooks = this.logbookInfo.availLogbooks.slice(0, 500);
     console.log(this.logbooks);
     if (sessionStorage.getItem('scilog-auto-selection-logbook') == null) {
       sessionStorage.setItem('scilog-auto-selection-logbook', 'true');
@@ -85,6 +100,15 @@ export class OverviewComponent implements OnInit {
     // this.views = [];
     console.log("selected collection: ", collection)
 
+  }
+
+  public get searchString(): string {
+    return this._searchString;
+  }
+  public set searchString(value: string) {
+    this._searchString = value;
+    this.searchStringSubject.next();
+    this.dataService.searchString = this._searchString;
   }
 
   logbookSelected(logbookID: string) {
@@ -136,7 +160,7 @@ export class OverviewComponent implements OnInit {
     }));
   }
 
-  async deleteLogbook(logbookId:string){
+  async deleteLogbook(logbookId: string) {
     let logIndex: number = null;
     logIndex = this.logbooks.findIndex(logbook => {
       return logbook.id == logbookId;
@@ -169,6 +193,26 @@ export class OverviewComponent implements OnInit {
         this.logbooks.push(result);
       }
     }));
+  }
+
+  private _prepareConfig() {
+    // let searchResult = this._parseSearchString();
+    let _config: WidgetItemConfig = {
+      filter: {
+        targetId: "",
+      },
+      general: {
+        type: "logbook",
+        title: "",
+        readonly: true
+      },
+      view: {
+        order: ["defaultOrder DESC"],
+        hideMetadata: false,
+        showSnippetHeader: false
+      }
+    }
+    return _config;
   }
 
   ngOnDestroy(): void {
