@@ -21,9 +21,16 @@
     <!-- <mat-divider></mat-divider> -->
     <h1>Logbooks</h1>
     <button (click)='addCollectionLogbook("logbook")'>Add logbook</button><br>
-    <div *ngFor="let logbook of (logbooks | logbookSearch:(searchString))" class="logbook-card">
-      <app-logbook-cover [logbook]="logbook" (logbookEdit)="editLogbook($event)" (logbookSelection)="logbookSelected($event)" (logbookDelete)="deleteLogbook($event)"></app-logbook-cover>
+    <div class="logbook-container">
+      <div *uiScroll="let logbookGroup of logbookIconScrollService.datasource; let i = index">
+        <span *ngFor="let logbook of logbookGroup">
+          <app-logbook-cover [logbook]="logbook" (logbookEdit)="editLogbook($event)"
+            (logbookSelection)="logbookSelected($event)" (logbookDelete)="deleteLogbook($event)" class="logbook-card">
+          </app-logbook-cover>
+        </span>
+      </div>
     </div>
+
   </div>
 </div>
 
