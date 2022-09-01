@@ -5,20 +5,18 @@
 
 import {UserService} from '@loopback/authentication';
 import {inject} from '@loopback/context';
-import { asLifeCycleObserver } from '@loopback/core';
 import {repository} from '@loopback/repository';
 import {HttpErrors} from '@loopback/rest';
 import {securityId, UserProfile} from '@loopback/security';
 import {PasswordHasherBindings} from '../keys';
 import {User} from '../models';
-import {ACLRepository, Credentials, UserRepository} from '../repositories';
+import {Credentials, UserRepository} from '../repositories';
 import {PasswordHasher} from './hash.password.bcryptjs';
 
 
 export class MyUserService implements UserService<User, Credentials> {
   constructor(
     @repository(UserRepository) public userRepository: UserRepository,
-    @repository(ACLRepository) public aclRepository: ACLRepository,
     @inject(PasswordHasherBindings.PASSWORD_HASHER)
     public passwordHasher: PasswordHasher,
   ) {}
@@ -56,8 +54,8 @@ export class MyUserService implements UserService<User, Credentials> {
     return foundUser;
   }
 
-  async convertToUserProfile(user: User): Promise<UserProfile> {
-    console.error("Inside convertToUserProfile:"+JSON.stringify(user,null,4))
+  convertToUserProfile(user: User): UserProfile {
+    //console.error("Inside convertToUserProfile:"+JSON.stringify(user,null,4))
     // since first name and lastName are optional, no error is thrown if not provided
     let userName = '';
     if (user.firstName) userName = `${user.firstName}`;
@@ -65,18 +63,14 @@ export class MyUserService implements UserService<User, Credentials> {
       userName = user.firstName
         ? `${userName} ${user.lastName}`
         : `${user.lastName}`;
-    let acls=await this.aclRepository.find({where:{ read: {inq: user.roles}},fields:{id:true}})
-    console.log("ACLs:",acls)
     const userProfile = {
       [securityId]: user.id,
       name: userName,
       id: user.id,
       roles: user.roles,
-      email: user.email,
-      readACLs : acls.map(item=>item.id)
+      email: user.email
     };
-    console.error("convertToUserProfile:",user,userProfile)
-
+    // console.error("convertToUserProfile:",user,userProfile)
     return userProfile;
   }
 }

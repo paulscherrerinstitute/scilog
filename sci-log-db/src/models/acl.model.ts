@@ -20,13 +20,11 @@ export class ACL extends Entity {
   })
   create?: string[];
   
-  // TODO revert to string array again
-  @property({
-    type: 'string',
+  @property.array(String, {
     description: 'principals who can read items connected to this ACL',
     index: true,
   })
-  read?: string;  //TODO make array again
+  read: string[];
 
   @property.array(String, {
     description: 'principals who can update items connected to this ACL',
