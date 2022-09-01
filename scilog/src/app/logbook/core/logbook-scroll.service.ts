@@ -16,26 +16,37 @@ export class LogbookScrollService extends ScrollBaseService {
   subscriptions: Subscription[] = [];
   containerRef: ElementRef = null;
   scrollToEnd = false;
+  targetPosition = null;
 
   constructor(
     private logbookItemDataService: LogbookItemDataService,
   ) {
     super();
     this.subscriptions.push(this.isLoadedSubject.pipe(debounceTime(50)).subscribe(async () => {
+      await this.relax();
+      await this.datasource.adapter.check();
       let _isLoading = this.itemsLoading();
+      console.log("is loading: ")
+      console.log(_isLoading)
+      if (this.targetPosition == null) {
+        this.targetPosition = this.datasource.adapter.firstVisible;
+      }
       if (!_isLoading) {
         await this.relax();
-        console.log(this.datasource.adapter.firstVisible)
-        console.log(this.datasource.adapter.lastVisible)
-        await this.datasource.adapter.check();
+
+        if (this.targetPosition.$index != this.datasource.adapter.firstVisible.$index) {
+          this.containerRef.nativeElement.scrollTop = this.targetPosition.element.offsetTop;
+        }
+        this.targetPosition = null;
+
         console.log("setting loaded");
         console.log("scrolling to EOF:", this.scrollToEnd);
-        if (this.scrollToEnd){
+        if (this.scrollToEnd) {
           setTimeout(() => {
             console.log("scrolling to EOF");
             this.containerRef.nativeElement.scrollTop = this.containerRef.nativeElement.scrollHeight;
           }, 50);
-          if (!this.itemsLoading()){
+          if (!this.itemsLoading()) {
             this.scrollToEnd = false;
           }
         }
