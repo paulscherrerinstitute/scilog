@@ -1,11 +1,8 @@
 import { Injectable, ElementRef } from '@angular/core';
-import { IDatasource, Datasource } from 'ngx-ui-scroll';
-import { Subscription, Subject, Observable, BehaviorSubject } from 'rxjs';
+import { Subscription, Subject } from 'rxjs';
 import { LogbookItemDataService } from '@shared/remote-data.service';
-import { WidgetItemConfig } from '@model/config';
 import { ScrollBaseService } from './scroll-base.service';
 import _ from 'lodash';
-import { debounceTime } from 'rxjs/operators';
 
 @Injectable()
 export class LogbookScrollService extends ScrollBaseService {
@@ -22,36 +19,6 @@ export class LogbookScrollService extends ScrollBaseService {
     private logbookItemDataService: LogbookItemDataService,
   ) {
     super();
-    this.subscriptions.push(this.isLoadedSubject.pipe(debounceTime(50)).subscribe(async () => {
-      await this.relax();
-      await this.datasource.adapter.check();
-      let _isLoading = this.itemsLoading();
-      console.log("is loading: ")
-      console.log(_isLoading)
-      if (this.targetPosition == null) {
-        this.targetPosition = this.datasource.adapter.firstVisible;
-      }
-      if (!_isLoading) {
-        await this.relax();
-
-        if (this.targetPosition.$index != this.datasource.adapter.firstVisible.$index) {
-          this.containerRef.nativeElement.scrollTop = this.targetPosition.element.offsetTop;
-        }
-        this.targetPosition = null;
-
-        console.log("setting loaded");
-        console.log("scrolling to EOF:", this.scrollToEnd);
-        if (this.scrollToEnd) {
-          setTimeout(() => {
-            console.log("scrolling to EOF");
-            this.containerRef.nativeElement.scrollTop = this.containerRef.nativeElement.scrollHeight;
-          }, 50);
-          if (!this.itemsLoading()) {
-            this.scrollToEnd = false;
-          }
-        }
-      }
-    }));
   }
 
   getDataBuffer(index: number, count: number, config: any) {
@@ -81,8 +48,6 @@ export class LogbookScrollService extends ScrollBaseService {
       this.isLoadedSubject.next();
     }
   }
-
-
 
   itemsLoading() {
     // this.itemsStatus

@@ -105,7 +105,7 @@ class SciLog:
         for file in payload.get("files"):
             if "fileId" in file and file["fileId"] is not None:
                 continue
-            print("Posting from filepath:",file["filepath"])
+            print("Posting from filepath:", file["filepath"])
             filesnippet = self._post_filesnippet(
                 file["filepath"],
                 ownerGroup=payload.get("ownerGroup"),
@@ -185,7 +185,7 @@ class SciLog:
 
             # if we reach this point, we can assume that filepath has been checked (cf. self.post_file)
             file_info, file_textcontent = self.prepare_file_content(
-                filepath=filepath, id=fsnippet.id
+                filepath=filepath, fsnippet=fsnippet
             )
             snippet.textcontent += file_textcontent
             snippet.files.append(file_info)
@@ -193,10 +193,10 @@ class SciLog:
         return self.patch_snippet(snippet)
 
     @staticmethod
-    def prepare_file_content(filepath: str, id: str = None) -> Tuple:
+    def prepare_file_content(filepath: str, fsnippet: Filesnippet = None) -> Tuple:
         file_extension = filepath.split(".")[-1].lower()
         file_hash = str(uuid.uuid4())
-        file_id = id if id else None #  str(uuid.uuid4())
+        file_id = fsnippet.id if fsnippet.id else None  #  str(uuid.uuid4())
 
         if file_extension in SciLog.IMAGE_TYPES:
             textcontent = (
@@ -207,6 +207,7 @@ class SciLog:
                 "filepath": filepath,
                 "fileExtension": f"image/{file_extension}",
                 "fileId": file_id,
+                "accessHash": fsnippet.accessHash,
                 "style": {"width": "82.25%", "height": ""},
             }
 
@@ -217,6 +218,7 @@ class SciLog:
                 "filepath": filepath,
                 "fileExtension": f"file/{file_extension}",
                 "fileId": file_id,
+                "accessHash": fsnippet.accessHash,
             }
         return (file_info, textcontent)
 
