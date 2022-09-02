@@ -136,7 +136,6 @@ export class SnippetContentComponent implements OnInit {
           }
           let imageId = this.snippet.files[fileIndex].accessHash ?? this.snippet.files[fileIndex].fileId
           fig.firstChild['src'] = "http://localhost:3000/images/" + imageId;
-          // await this.load_file(fig, fileIndex);
           this.setFileLoaded(fileIndex);
         }
       }
@@ -162,26 +161,6 @@ export class SnippetContentComponent implements OnInit {
 
   get content() {
     return this._content;
-  }
-
-  async load_file(fig: HTMLElement, fileIndex: number) {
-    let data = await this.logbookItemDataService.getImage(this.snippet.files[fileIndex].fileId);
-    let reader = this.createImageFromBlob(data);
-    reader.addEventListener("load", () => {
-      fig.firstChild['src'] = reader.result;
-      if (this.snippet.files[fileIndex].style) {
-        let style = this.snippet.files[fileIndex].style;
-        if (style.width != "") {
-          fig.firstElementChild.setAttribute('width', this.snippet.files[fileIndex].style.width)
-        } else {
-          fig.firstElementChild.setAttribute('width', this.defaultFigureWidth)
-        }
-        if (style.height != "") {
-          fig.firstElementChild.setAttribute('height', this.snippet.files[fileIndex].style.height)
-        }
-      }
-      this.setFileLoaded(fileIndex);
-    }, false);
   }
 
   setFileLoaded(fileCounter: number) {
