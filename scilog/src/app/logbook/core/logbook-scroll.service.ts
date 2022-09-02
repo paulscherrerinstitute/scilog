@@ -22,36 +22,36 @@ export class LogbookScrollService extends ScrollBaseService {
     private logbookItemDataService: LogbookItemDataService,
   ) {
     super();
-    this.subscriptions.push(this.isLoadedSubject.pipe(debounceTime(50)).subscribe(async () => {
-      await this.relax();
-      await this.datasource.adapter.check();
-      let _isLoading = this.itemsLoading();
-      console.log("is loading: ")
-      console.log(_isLoading)
-      if (this.targetPosition == null) {
-        this.targetPosition = this.datasource.adapter.firstVisible;
-      }
-      if (!_isLoading) {
-        await this.relax();
+    // this.subscriptions.push(this.isLoadedSubject.pipe(debounceTime(50)).subscribe(async () => {
+    //   await this.relax();
+    //   await this.datasource.adapter.check();
+    //   let _isLoading = this.itemsLoading();
+    //   console.log("is loading: ")
+    //   console.log(_isLoading)
+    //   if (this.targetPosition == null) {
+    //     this.targetPosition = this.datasource.adapter.firstVisible;
+    //   }
+    //   if (!_isLoading) {
+    //     await this.relax();
 
-        if (this.targetPosition.$index != this.datasource.adapter.firstVisible.$index) {
-          this.containerRef.nativeElement.scrollTop = this.targetPosition.element.offsetTop;
-        }
-        this.targetPosition = null;
+    //     if (this.targetPosition.$index != this.datasource.adapter.firstVisible.$index) {
+    //       this.containerRef.nativeElement.scrollTop = this.targetPosition.element.offsetTop;
+    //     }
+    //     this.targetPosition = null;
 
-        console.log("setting loaded");
-        console.log("scrolling to EOF:", this.scrollToEnd);
-        if (this.scrollToEnd) {
-          setTimeout(() => {
-            console.log("scrolling to EOF");
-            this.containerRef.nativeElement.scrollTop = this.containerRef.nativeElement.scrollHeight;
-          }, 50);
-          if (!this.itemsLoading()) {
-            this.scrollToEnd = false;
-          }
-        }
-      }
-    }));
+    //     console.log("setting loaded");
+    //     console.log("scrolling to EOF:", this.scrollToEnd);
+    //     if (this.scrollToEnd) {
+    //       setTimeout(() => {
+    //         console.log("scrolling to EOF");
+    //         this.containerRef.nativeElement.scrollTop = this.containerRef.nativeElement.scrollHeight;
+    //       }, 50);
+    //       if (!this.itemsLoading()) {
+    //         this.scrollToEnd = false;
+    //       }
+    //     }
+    //   }
+    // }));
   }
 
   getDataBuffer(index: number, count: number, config: any) {
@@ -82,6 +82,16 @@ export class LogbookScrollService extends ScrollBaseService {
     }
   }
 
+
+  // async goToSnippetIndex(index: number, element:any, _cb_after_relax: (...args: any[]) => void = () => { }) {
+  //   // jump to index in viewport, starting with index 0
+  //   this.startIndex = index;
+  //   this.setupDatasource();
+  //   await this.datasource.adapter.reload();
+  //   await this.datasource.adapter.relax();
+  //   _cb_after_relax(this.startIndex + 1, ...arguments);
+
+  // }
 
 
   itemsLoading() {
