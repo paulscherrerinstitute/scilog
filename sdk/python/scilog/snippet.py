@@ -79,6 +79,48 @@ class Snippet:
         else:
             return cls.from_dict(response)
 
+class ACL():
+    def __init__(self):
+        self._properties = []
+        self.init_properties()
+
+    def init_properties(self, **kwargs):
+        for name, dtype in kwargs.items():
+            storage_name = "_" + name
+            cls = type(self)
+            setattr(cls, storage_name, None)
+            setattr(cls, name, property_maker(name, dtype))
+            self._properties.append(name)
+
+    def to_dict(self, include_none=True):
+        if include_none:
+            return {key: getattr(self, key) for key in self._properties}
+        else:
+            return {
+                key: getattr(self, key)
+                for key in self._properties
+                if getattr(self, key) is not None
+            }
+
+    def import_dict(self, properties):
+        for name, value in properties.items():
+            setattr(self, name, value)
+
+    @classmethod
+    def from_dict(cls, properties):
+        new = cls()
+        new.import_dict(properties)
+        return new
+
+    def __str__(self):
+        return typename(self)
+
+    @classmethod
+    def from_http_response(cls, response):
+        if isinstance(response, list):
+            return [cls.from_dict(resp) for resp in response]
+        else:
+            return cls.from_dict(response)
 
 class Basesnippet(Snippet):
     def __init__(self, snippetType="basesnippet"):
@@ -86,8 +128,7 @@ class Basesnippet(Snippet):
         self.init_properties(
             id=str,
             parentId=str,
-            ownerGroup=str,
-            accessGroups=list,
+            aclId=str,
             isPrivate=bool,
             createdAt=str,
             createdBy=str,

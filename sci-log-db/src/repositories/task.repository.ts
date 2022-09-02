@@ -1,4 +1,6 @@
 import {inject} from '@loopback/core';
+import { repository } from '@loopback/repository';
+import { ACLRepository } from './acl.repository';
 import {MongoDataSource} from '../datasources';
 import {Task, TaskRelations} from '../models';
 import {AutoAddRepository} from './autoadd.repository.base';
@@ -11,7 +13,9 @@ export class TaskRepository extends AutoAddRepository<
 
   constructor(
     @inject('datasources.mongo') dataSource: MongoDataSource,
+    @repository(ACLRepository)
+    public aclRepository: ACLRepository,
   ) {
-    super(Task, dataSource);
+    super(Task, dataSource, aclRepository);
   }
 }

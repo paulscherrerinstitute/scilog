@@ -7,4 +7,5 @@ export * from './user-credentials.model';
 export * from './user-preference.model';
 export * from './user.model';
 export * from './view.model';
+export * from './acl.model';
 
