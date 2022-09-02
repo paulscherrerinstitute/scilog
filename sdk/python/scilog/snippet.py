@@ -1,5 +1,6 @@
 import functools
 from typing import get_type_hints
+
 from .utils import typename
 
 
@@ -154,7 +155,7 @@ class Paragraph(Basesnippet):
 class Filesnippet(Basesnippet):
     def __init__(self, snippetType="paragraph"):
         super().__init__(snippetType=snippetType)
-        self.init_properties(fileExtension=str)
+        self.init_properties(fileExtension=str, accessHash=str)
 
 
 if __name__ == "__main__":

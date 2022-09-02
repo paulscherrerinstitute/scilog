@@ -9,6 +9,7 @@ export interface Filecontainer {
     fileId?: string;
     fileExtension?: string;
     fileHash?: string;
+    accessHash?: string;
 }
 
 export interface Basesnippets {

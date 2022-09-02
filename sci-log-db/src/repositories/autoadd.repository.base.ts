@@ -2,6 +2,7 @@ import {Getter, inject} from '@loopback/core';
 import {BelongsToAccessor, DefaultCrudRepository, Entity, HasManyRepositoryFactory, juggler, Model, repository} from '@loopback/repository';
 import {ACLRepository} from './acl.repository';
 
+
 export class AutoAddRepository<
     T extends Entity,
     ID,
@@ -63,23 +64,23 @@ export class AutoAddRepository<
                     // POST case
                     // console.error("POST case")
                     ctx.instance.defaultOrder = ctx.instance.defaultOrder ?? Date.now() * 1000;
-                // only admin may override createdAt/updateAt etc fields
-                    if (currentUser.roles.includes('admin')){
-                       ctx.instance.createdAt = ctx.instance.createdAt ?? new Date();                 
-                       ctx.instance.createdBy = ctx.instance.createdBy ?? currentUser?.email ?? 'unknown@domain.org';
-                       ctx.instance.updatedAt = ctx.instance.updatedAt ?? new Date();                 
-                       ctx.instance.updatedBy = ctx.instance.updatedBy ?? currentUser?.email ?? 'unknown@domain.org';
+                    // only admin may override createdAt/updateAt etc fields
+                    if (currentUser.roles.includes('admin')) {
+                        ctx.instance.createdAt = ctx.instance.createdAt ?? new Date();
+                        ctx.instance.createdBy = ctx.instance.createdBy ?? currentUser?.email ?? 'unknown@domain.org';
+                        ctx.instance.updatedAt = ctx.instance.updatedAt ?? new Date();
+                        ctx.instance.updatedBy = ctx.instance.updatedBy ?? currentUser?.email ?? 'unknown@domain.org';
                     } else {
-                       ctx.instance.createdAt = new  Date();
-                       ctx.instance.createdBy = currentUser?.email ?? 'unknown@domain.org';
-                       ctx.instance.updatedAt = new Date();
-                       ctx.instance.updatedBy = currentUser?.email ?? 'unknown@domain.org';
+                        ctx.instance.createdAt = new Date();
+                        ctx.instance.createdBy = currentUser?.email ?? 'unknown@domain.org';
+                        ctx.instance.updatedAt = new Date();
+                        ctx.instance.updatedBy = currentUser?.email ?? 'unknown@domain.org';
                     }
-                    
+
                     if (typeof ctx.instance.expiresAt == 'undefined') {
-                    // default expiration time is 3 days
-                       ctx.instance.expiresAt = new Date()
-                       ctx.instance.expiresAt.setDate(ctx.instance.expiresAt.getDate() + 3);
+                        // default expiration time is 3 days
+                        ctx.instance.expiresAt = new Date()
+                        ctx.instance.expiresAt.setDate(ctx.instance.expiresAt.getDate() + 3);
                     }
 
                     // TODO: if aclId is not defined take it from parent
@@ -101,6 +102,9 @@ export class AutoAddRepository<
 
         modelClass.observe('access', async ctx => {
             let currentUser: any;
+            if (ctx?.options.hasOwnProperty('openAccess') && ctx.options.openAccess) {
+                return;
+            }
             if (!ctx?.options.hasOwnProperty('currentUser')) {
                 throw new Error("Unexpected user context: Current user cannot be retrieved.")
             } else {

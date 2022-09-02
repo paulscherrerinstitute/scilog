@@ -1,14 +1,14 @@
-import {hasMany, model, property} from '@loopback/repository';
-import {Basesnippet} from './basesnippet.model';
-import {Image} from './image.model';
+import { hasMany, model, property } from '@loopback/repository';
+import { Basesnippet } from './basesnippet.model';
+import { Image } from './image.model';
 
 @model({
   settings: {
     strict: true,
     scope: {
-      where: {snippetType: 'image'}
+      where: { snippetType: 'image' }
     },
-    mongodb: {collection: 'Basesnippet'}
+    mongodb: { collection: 'Basesnippet' }
   }
 })
 export class Filesnippet extends Basesnippet {
@@ -45,11 +45,17 @@ export class Filesnippet extends Basesnippet {
 
   @property({
     type: 'string',
+    description: 'Access hash for directly accessing the resource.'
+  })
+  accessHash?: string;
+
+  @property({
+    type: 'string',
     description: 'File id of the file'
   })
   _fileId: string;
 
-  @hasMany(() => Image, {keyTo: 'fileId'})
+  @hasMany(() => Image, { keyTo: 'fileId' })
   subsnippets?: Image[];
 
   constructor(data?: Partial<Filesnippet>) {
