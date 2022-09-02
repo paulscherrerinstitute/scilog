@@ -14,6 +14,7 @@ import { Views } from '@model/views';
 import { Images } from '@model/images';
 import _ from 'lodash';
 import { TagsStat } from '@model/tags';
+import { ACL } from '@model/acl';
 
 interface Count {
   "count": number;
@@ -277,6 +278,17 @@ export class LogbookItemDataService extends RemoteDataService {
 @Injectable({
   providedIn: 'root'
 })
+export class ACLDataService extends RemoteDataService {
+  getACL(aclId: string) {
+    let headers = new HttpHeaders();
+    headers = headers.set('Content-Type', 'application/json; charset=utf-8');
+    return this.getSnippets<ACL>('acls/' + aclId, { headers: headers }).toPromise();
+  }
+}
+
+@Injectable({
+  providedIn: 'root'
+})
 export class LogbookDataService extends RemoteDataService {
 
   private _searchString = "";
@@ -310,7 +322,7 @@ export class LogbookDataService extends RemoteDataService {
     let params = new HttpParams();
     let httpFilter: Object = {};
     httpFilter["order"] = ["defaultOrder ASC"];
-    httpFilter["where"] = { "or": [{ "snippetType": "paragraph" }, { "snippetType": "image" }], "title": "location", "ownerGroup": "admin" };
+    httpFilter["where"] = { "or": [{ "snippetType": "paragraph" }, { "snippetType": "image" }], "title": "location" };
     httpFilter["include"] = [{ "relation": "subsnippets" }];
     // console.log(JSON.stringify(httpFilter));
     params = params.set('filter', JSON.stringify(httpFilter));

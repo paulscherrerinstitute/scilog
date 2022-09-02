@@ -35,92 +35,76 @@ def property_maker(name, dtype):
     return prop
 
 
-class Snippet:
+class EntityMixin:
+    def init_properties(self, **kwargs):
+        for name, dtype in kwargs.items():
+            storage_name = "_" + name
+            cls = type(self)
+            setattr(cls, storage_name, None)
+            setattr(cls, name, property_maker(name, dtype))
+            self._properties.append(name)
+
+    def to_dict(self, include_none=True):
+        if include_none:
+            return {key: getattr(self, key) for key in self._properties}
+
+        return {
+            key: getattr(self, key) for key in self._properties if getattr(self, key) is not None
+        }
+
+    def import_dict(self, properties):
+        for name, value in properties.items():
+            setattr(self, name, value)
+
+    @classmethod
+    def from_dict(cls, properties):
+        new = cls()
+        new.import_dict(properties)
+        return new
+
+    def __str__(self):
+        return typename(self)
+
+    def __repr__(self):
+        return f"{self.__class__.__name__}: {self.to_dict()}"
+
+    @classmethod
+    def from_http_response(cls, response):
+        if isinstance(response, list):
+            return [cls.from_dict(resp) for resp in response]
+        else:
+            return cls.from_dict(response)
+
+
+class Snippet(EntityMixin):
     def __init__(self, snippetType="snippet"):
+        super().__init__()
         self._properties = []
         self.init_properties(snippetType=str)
         self.snippetType = snippetType
 
-    def init_properties(self, **kwargs):
-        for name, dtype in kwargs.items():
-            storage_name = "_" + name
-            cls = type(self)
-            setattr(cls, storage_name, None)
-            setattr(cls, name, property_maker(name, dtype))
-            self._properties.append(name)
 
-    def to_dict(self, include_none=True):
-        if include_none:
-            return {key: getattr(self, key) for key in self._properties}
-        else:
-            return {
-                key: getattr(self, key)
-                for key in self._properties
-                if getattr(self, key) is not None
-            }
-
-    def import_dict(self, properties):
-        for name, value in properties.items():
-            setattr(self, name, value)
-
-    @classmethod
-    def from_dict(cls, properties):
-        new = cls()
-        new.import_dict(properties)
-        return new
-
-    def __str__(self):
-        return typename(self)
-
-    @classmethod
-    def from_http_response(cls, response):
-        if isinstance(response, list):
-            return [cls.from_dict(resp) for resp in response]
-        else:
-            return cls.from_dict(response)
-
-class ACL():
-    def __init__(self):
+class ACL(EntityMixin):
+    def __init__(self, **kwargs):
         self._properties = []
-        self.init_properties()
+        self.init_properties(
+            id=str,
+            parentId=str,
+            create=list,
+            read=list,
+            update=list,
+            delete=list,
+            share=list,
+            admin=list,
+            subAcls=list,
+        )
+        self.create = kwargs.get("create", [])
+        self.read = kwargs.get("read", [])
+        self.update = kwargs.get("update", [])
+        self.delete = kwargs.get("delete", [])
+        self.share = kwargs.get("share", [])
+        self.admin = kwargs.get("admin", [])
 
-    def init_properties(self, **kwargs):
-        for name, dtype in kwargs.items():
-            storage_name = "_" + name
-            cls = type(self)
-            setattr(cls, storage_name, None)
-            setattr(cls, name, property_maker(name, dtype))
-            self._properties.append(name)
-
-    def to_dict(self, include_none=True):
-        if include_none:
-            return {key: getattr(self, key) for key in self._properties}
-        else:
-            return {
-                key: getattr(self, key)
-                for key in self._properties
-                if getattr(self, key) is not None
-            }
-
-    def import_dict(self, properties):
-        for name, value in properties.items():
-            setattr(self, name, value)
-
-    @classmethod
-    def from_dict(cls, properties):
-        new = cls()
-        new.import_dict(properties)
-        return new
-
-    def __str__(self):
-        return typename(self)
-
-    @classmethod
-    def from_http_response(cls, response):
-        if isinstance(response, list):
-            return [cls.from_dict(resp) for resp in response]
-        else:
-            return cls.from_dict(response)
 
 class Basesnippet(Snippet):
     def __init__(self, snippetType="basesnippet"):
@@ -158,7 +142,7 @@ class Filesnippet(Basesnippet):
         self.init_properties(fileExtension=str, accessHash=str)
 
 
-if __name__ == "__main__":
-    tmp = Snippet(id=str, textcontent=str, defaultOrder=int)
-    print(tmp.id)
-    tmp.id = 2
+# if __name__ == "__main__":
+#     tmp = Snippet(id=str, textcontent=str, defaultOrder=int)
+#     print(tmp.id)
+#     tmp.id = 2

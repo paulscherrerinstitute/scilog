@@ -1,4 +1,4 @@
-import {belongsTo, Entity, hasMany, model, property} from '@loopback/repository';
+import { belongsTo, Entity, hasMany, model, property } from '@loopback/repository';
 
 @model({
   settings: {
@@ -10,7 +10,7 @@ export class ACL extends Entity {
     type: 'string',
     id: true,
     generated: true,
-    mongodb: {dataType: 'ObjectId'}
+    mongodb: { dataType: 'ObjectId' }
   })
   id: string;
 
@@ -18,8 +18,8 @@ export class ACL extends Entity {
     description: 'principals who can create items. Principals can be groups or emails.',
     index: true,
   })
-  create?: string[];
-  
+  create: string[];
+
   @property.array(String, {
     description: 'principals who can read items connected to this ACL',
     index: true,
@@ -30,35 +30,35 @@ export class ACL extends Entity {
     description: 'principals who can update items connected to this ACL',
     index: true,
   })
-  update?: string[];
+  update: string[];
 
   @property.array(String, {
     description: 'principals who can delete items connected to this ACL',
     index: true,
   })
-  delete?: string[];
+  delete: string[];
 
   @property.array(String, {
     description: 'principals who can share items connected to this ACL',
     index: true,
   })
-  share?: string[];
+  share: string[];
 
   @property.array(String, {
     description: 'principals who can administrate ACLs',
     index: true,
   })
-  admin?: string[];
+  admin: string[];
 
-  @hasMany(() => ACL, {keyTo: 'parentId'})
+  @hasMany(() => ACL, { keyTo: 'parentId' })
   subAcls?: ACL[];
 
   @belongsTo(() => ACL,
     {}, //relation metadata goes in here
     {// property definition goes in here
-      mongodb: {dataType: 'ObjectId'}
+      mongodb: { dataType: 'ObjectId' }
     })
-  parentId?: string; 
+  parentId?: string;
 
   constructor(data?: Partial<ACL>) {
     super(data);
