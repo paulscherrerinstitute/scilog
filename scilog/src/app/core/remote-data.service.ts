@@ -226,15 +226,9 @@ export class LogbookItemDataService extends RemoteDataService {
           delete file.file;
 
           console.log(file);
-          // imgPayload.className = file.className;
-          // imgPayload.childTag = file.childTag;
-          // imgPayload.width = file.style.width;
-          // imgPayload.height = file.style.height;
-          // imgPayload.fileId = dataFile.id;
-          // console.log(imgPayload)
-          // let dataImage = await this.postImage(imgPayload);
+
           file.fileId = dataFile.id;
-          // console.log(dataImage)
+          file.accessHash = dataFile.accessHash // TODO: remove this static assignment and instead retrieve the accessHash dynamically
         }
       }))
     }
