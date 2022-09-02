@@ -9,7 +9,7 @@ from typing import Any, Tuple
 
 from .authmixin import HEADER_JSON, AuthError
 from .httpclient import HttpClient
-from .snippet import Basesnippet, Filesnippet, Paragraph, Snippet
+from .snippet import Basesnippet, Filesnippet, Paragraph, ACL, Snippet
 
 
 def pinned_to_logbook(logbook_keys):
@@ -47,7 +47,7 @@ class SciLog:
     def select_logbook(self, logbook: Basesnippet):
         self.logbook = logbook
 
-    @pinned_to_logbook(["parentId", "ownerGroup", "accessGroups"])
+    @pinned_to_logbook(["parentId", "aclId"])
     def get_snippets(self, **kwargs):
         url = self.http_client.address + "/basesnippets"
         params = self.http_client.make_filter(where=kwargs)
@@ -71,18 +71,16 @@ class SciLog:
 
         raise ValueError("The used placeholder type is not supported. ")
 
-    @pinned_to_logbook(["parentId", "ownerGroup", "accessGroups"])
+    @pinned_to_logbook(["parentId", "aclId"])
     def import_from_dict(self, snippet: dict, **kwargs):
         msg = snippet.pop("textcontent")
         snippet = self._replace_json_placeholder(
-            snippet, "accessGroups", kwargs.get("accessGroups", [])
+            snippet, "aclId", kwargs.get("aclId", [])
         )
-        snippet = self._replace_json_placeholder(
-            snippet, "ownerGroup", kwargs.get("ownerGroup", "")
-        )
+
         self.send_message(msg, **snippet)
 
-    @pinned_to_logbook(["parentId", "ownerGroup", "accessGroups"])
+    @pinned_to_logbook(["parentId", "aclId"])
     def send_message(self, msg, **kwargs):
         url = self.http_client.address + "/basesnippets"
         snippet = Paragraph()
@@ -91,13 +89,20 @@ class SciLog:
         payload = snippet.to_dict(include_none=False)
         return self.post_snippet(**payload)
 
-    @pinned_to_logbook(["parentId", "ownerGroup", "accessGroups"])
+    @pinned_to_logbook(["parentId", "aclId"])
     def post_snippet(self, **kwargs):
         url = self.http_client.address + "/basesnippets"
         payload = kwargs
         if payload.get("files"):
             payload = self.upload_files(payload)
         return Paragraph.from_http_response(
+            self.http_client.post_request(url, payload=payload, headers=HEADER_JSON)
+        )
+
+    def post_acl(self, **kwargs):
+        url = self.http_client.address + "/acls"
+        payload = kwargs
+        return ACL.from_http_response(
             self.http_client.post_request(url, payload=payload, headers=HEADER_JSON)
         )
 
@@ -108,14 +113,13 @@ class SciLog:
             print("Posting from filepath:",file["filepath"])
             filesnippet = self._post_filesnippet(
                 file["filepath"],
-                ownerGroup=payload.get("ownerGroup"),
-                accessGroups=payload.get("accessGroups"),
+                aclId=payload.get("aclId"),
             )
             file["fileId"] = filesnippet.id
             file.pop("filepath")
         return payload
 
-    @pinned_to_logbook(["ownerGroup", "accessGroups"])
+    @pinned_to_logbook(["aclId"])
     def _post_filesnippet(self, filepath, **kwargs):
         url = self.http_client.address + "/filesnippet/files"
 
@@ -144,7 +148,7 @@ class SciLog:
             )
         )
 
-    @pinned_to_logbook(["ownerGroup", "accessGroups"])
+    @pinned_to_logbook(["aclId"])
     def post_file(self, filepath: str, **kwargs) -> Filesnippet:
         """Upload a file
 
@@ -165,7 +169,7 @@ class SciLog:
         # ret = self._file_upload(filepath, fsnippet.id, file_extension)
         return fsnippet
 
-    @pinned_to_logbook(["ownerGroup", "accessGroups"])
+    @pinned_to_logbook(["aclId"])
     def append_files_to_snippet(self, snippet: Paragraph, filepaths: list, **kwargs) -> Paragraph:
         """Append files or images to an already existing snippet. Files and images will be appended following the order given in 'filepaths'.
 

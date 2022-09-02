@@ -1,5 +1,6 @@
-import {Getter} from '@loopback/core';
-import {BelongsToAccessor, DefaultCrudRepository, Entity, HasManyRepositoryFactory, juggler, Model} from '@loopback/repository';
+import {Getter, inject} from '@loopback/core';
+import {BelongsToAccessor, DefaultCrudRepository, Entity, HasManyRepositoryFactory, juggler, Model, repository} from '@loopback/repository';
+import {ACLRepository} from './acl.repository';
 
 export class AutoAddRepository<
     T extends Entity,
@@ -23,6 +24,8 @@ export class AutoAddRepository<
             prototype: T;
         },
         dataSource: juggler.DataSource,
+        @repository(ACLRepository)
+        public aclRepository: ACLRepository,
     ) {
         super(entityClass, dataSource)
         this.subsnippets = this.createHasManyRepositoryFactoryFor(
@@ -105,15 +108,17 @@ export class AutoAddRepository<
             }
             console.log("current user:",currentUser)
             console.log("roles:", currentUser?.roles);
-            console.log("acls:", currentUser?.readACLs);
             // console.log("access case:", JSON.stringify(ctx, null, 3));
             // TODO move this calculation to login time
             let groups = [...ctx?.options?.currentUser?.roles]
-            let readAclList = [...ctx?.options?.currentUser?.readACLs]
+            let acls=await this.aclRepository.find({where:{ read: {inq: ctx?.options?.currentUser?.roles}},fields:{id:true}})
+            let readACLs=acls.map(item => item.id)
+            console.log("acls:", readACLs);
+
             if (!groups.includes('admin')) {
                 var groupCondition = {
                         aclId: {
-                            inq: readAclList
+                            inq: readACLs
                         }
                 };
                 if (!ctx.query.where) {
@@ -124,7 +129,7 @@ export class AutoAddRepository<
                     };
                 }
             }
-            // console.log("query:",JSON.stringify(ctx.query,null,3));
+            console.log("query:",JSON.stringify(ctx.query,null,3));
         })
         return modelClass;
     }

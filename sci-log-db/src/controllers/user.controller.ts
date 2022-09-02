@@ -224,30 +224,12 @@ export class UserController {
   async login(
     @requestBody(CredentialsRequestBody) credentials: Credentials,
   ): Promise<{ token: string }> {
-    console.log("Inside login")
     // ensure the user exists, and the password is correct
     const user = await this.userService.verifyCredentials(credentials);
-    console.log("Inside login", user)
 
     // convert a User object into a UserProfile object (reduced set of properties)
     const userProfile = this.userService.convertToUserProfile(user);
-    console.log("Inside login", userProfile)
-    // user.roles
-    // let role="p18539"
-    const acls = await this.aclRepository.find({ where: {read: { inq: user.roles }} })
-    console.log("Found acls:", acls)
-    //read: { inq: user.roles 
-    // const acls = await new Promise<ACL[]>((resolve, reject) => {
-    // function cb(err:any, data:any) {  if (err) reject(err);  else resolve(data.toArray());   }
-    // const filter={"where": { "read": { "$in": user.roles }}}
-    // this.userRepository.dataSource.connector?.execute?('ACL', 'find', filter   ]);
-    //let acls=this.aclRepository.find({where:{ read: {inq: user.roles}},fields:{id:true}})
-    // let readACLs=acls.map (item => item.id)
-    userProfile["readACLs"] = acls.map(item => item.id) //datasetIngestor"p12345"
-
-    console.log("updated user profile", userProfile)
-
-
+   
     // create a JSON Web Token based on the user profile
     const token = await this.jwtService.generateToken(userProfile);
 

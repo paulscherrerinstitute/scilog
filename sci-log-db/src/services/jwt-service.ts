@@ -43,7 +43,6 @@ export class JWTService implements TokenService {
           id: decodedToken.id,
           roles: decodedToken.roles,
           email: decodedToken.email,
-          readACLs: decodedToken.readACLs
         },
       );
     } catch (error) {
@@ -65,7 +64,6 @@ export class JWTService implements TokenService {
       name: userProfile.name,
       roles: userProfile.roles,
       email: userProfile.email,
-      readACLs: userProfile.readACLs
     };
     // console.error("Userinfo for token:"+JSON.stringify(userInfoForToken,null,3))
     // Generate a JSON Web Token
