@@ -1,7 +1,5 @@
-import {Getter, inject} from '@loopback/core';
-import {BelongsToAccessor, DefaultCrudRepository, Entity, HasManyRepositoryFactory, juggler, Model, repository} from '@loopback/repository';
-import {ACLRepository} from './acl.repository';
-
+import { Getter } from '@loopback/core';
+import { BelongsToAccessor, DefaultCrudRepository, Entity, HasManyRepositoryFactory, juggler, Model } from '@loopback/repository';
 
 export class AutoAddRepository<
     T extends Entity,
@@ -25,8 +23,6 @@ export class AutoAddRepository<
             prototype: T;
         },
         dataSource: juggler.DataSource,
-        @repository(ACLRepository)
-        public aclRepository: ACLRepository,
     ) {
         super(entityClass, dataSource)
         this.subsnippets = this.createHasManyRepositoryFactoryFor(
@@ -82,12 +78,6 @@ export class AutoAddRepository<
                         ctx.instance.expiresAt = new Date()
                         ctx.instance.expiresAt.setDate(ctx.instance.expiresAt.getDate() + 3);
                     }
-
-                    // TODO: if aclId is not defined take it from parent
-
-                    // TODO: if aclId is provided check for existence
-
-
                 } else {
                     // PUT case
                     // console.error("PUT case")
@@ -110,20 +100,22 @@ export class AutoAddRepository<
             } else {
                 currentUser = ctx.options.currentUser;
             }
-            console.log("current user:",currentUser)
-            console.log("roles:", currentUser?.roles);
+            // console.log("roles:", currentUser?.roles);
             // console.log("access case:", JSON.stringify(ctx, null, 3));
-            // TODO move this calculation to login time
             let groups = [...ctx?.options?.currentUser?.roles]
-            let acls=await this.aclRepository.find({where:{ read: {inq: ctx?.options?.currentUser?.roles}},fields:{id:true}})
-            let readACLs=acls.map(item => item.id)
-            console.log("acls:", readACLs);
-
             if (!groups.includes('admin')) {
                 var groupCondition = {
-                        aclId: {
-                            inq: readACLs
+                    or: [{
+                        ownerGroup: {
+                            inq: groups
                         }
+                    },
+                    {
+                        accessGroups: {
+                            inq: groups
+                        }
+                    }
+                    ]
                 };
                 if (!ctx.query.where) {
                     ctx.query.where = groupCondition;
@@ -133,7 +125,7 @@ export class AutoAddRepository<
                     };
                 }
             }
-            console.log("query:",JSON.stringify(ctx.query,null,3));
+            // console.log("query:",JSON.stringify(ctx.query,null,3));
         })
         return modelClass;
     }

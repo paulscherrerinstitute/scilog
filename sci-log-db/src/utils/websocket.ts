@@ -145,11 +145,11 @@ export async function startWebsocket(app: SciLogDbApplication) {
 
               // make sure all subscribers have the permission to read the changestream
               let doc = await collection.findOne({'_id': Mongo.ObjectId(change.documentKey._id)});
-              let acls = await collection.findOne({'_id': Mongo.ObjectId(doc.aclId)});
+              doc["accessGroups"].push(doc["ownerGroup"]);
               // console.log(websocketMap[id])
               if (typeof (websocketMap[id]) != 'undefined') {
                 websocketMap[id].forEach((client: any) => {
-                  if (acls.read.some((r: string) => client.user.roles.includes(r))) {
+                  if (doc["accessGroups"].some((r: string) => client.user.roles.includes(r))) {
                     if (matches_filter_settings(doc, client.config))
                       client.ws.send(JSON.stringify({'new-notification': change}));
                   }

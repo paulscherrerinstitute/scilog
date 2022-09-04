@@ -42,8 +42,8 @@ def _collect_data(proposals):
     proposalsStorage = []
 
     for prop in proposals:
-        if (not(prop["ownerGroup"] in ["p18539", "p18713","p18711", "p18763","p18915", "p19160","p19303","p19318","p19319","p19320","p19321","p19704","p19740", "p19741","p19742","p20230"])):
-             continue
+        # if (not(prop["ownerGroup"] in ["p18539", "p18713","p18711", "p18763","p18915", "p19160","p19303","p19318","p19319","p19320","p19321","p19704","p19740", "p19741","p19742","p20230"])):
+        #     continue
         for ag in prop["accessGroups"]:
             accessGroups.add(ag)
 
@@ -93,13 +93,9 @@ def _update_locations(log, loc_id, locations):
         if not files:
             files = locations_snippet.files
 
-        new_acl={"read":[group,'any-authenticated-user']}
-        acl = log.post_acl(**new_acl)
-        print("ACLid of location:",acl.id)
-        
-
         new_snip = {
-            "aclId":acl.id,
+            "ownerGroup": group,
+            "accessGroups": ["any-authenticated-user"],
             "isPrivate": True,
             "title": loc.split("/")[-1],
             "location": loc,
@@ -122,12 +118,9 @@ def _update_proposals(log, locationStorage, proposalsStorage):
         loc = proposal["location"]
         loc = locationStorage[loc]
 
-        new_acl={"read":[ownerGroup,'unx-stuff'],"create":[]}
-        acl = log.post_acl(**new_acl)
-        print("ACLid of logbook:",acl.id)
-
         new_snip = {
-            "aclId": acl.id,
+            "ownerGroup": ownerGroup,
+            "accessGroups": [loc.ownerGroup],
             "isPrivate": False,
             "name": proposal["title"],
             "location": loc.id,
