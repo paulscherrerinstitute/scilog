@@ -63,7 +63,7 @@ export class JWTService implements TokenService {
       id: userProfile[securityId],
       name: userProfile.name,
       roles: userProfile.roles,
-      email: userProfile.email,
+      email: userProfile.email
     };
     // console.error("Userinfo for token:"+JSON.stringify(userInfoForToken,null,3))
     // Generate a JSON Web Token

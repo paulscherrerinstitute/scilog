@@ -1,6 +1,4 @@
 import {inject} from '@loopback/core';
-import { repository } from '@loopback/repository';
-import { ACLRepository } from './acl.repository';
 import {MongoDataSource} from '../datasources';
 import {Paragraph, ParagraphRelations} from '../models';
 import {AutoAddRepository} from './autoadd.repository.base';
@@ -13,9 +11,7 @@ export class ParagraphRepository extends AutoAddRepository<
   > {
   constructor(
     @inject('datasources.mongo') dataSource: MongoDataSource,
-    @repository(ACLRepository)
-    public aclRepository: ACLRepository,
   ) {
-    super(Paragraph, dataSource, aclRepository);
+    super(Paragraph, dataSource);
   }
 }
