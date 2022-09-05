@@ -1,7 +1,7 @@
-import {TokenService} from '@loopback/authentication';
-import {TokenServiceBindings} from '@loopback/authentication-jwt';
+import { TokenService } from '@loopback/authentication';
+import { TokenServiceBindings } from '@loopback/authentication-jwt';
 import { AnyObject } from '@loopback/repository';
-import {SciLogDbApplication} from '../application';
+import { SciLogDbApplication } from '../application';
 import { MongoDataSource } from '../datasources';
 
 export interface WebsocketClient {
@@ -23,7 +23,7 @@ export async function startWebsocket(app: SciLogDbApplication) {
   jwtService = await app.get(TokenServiceBindings.TOKEN_SERVICE);
 
   // console.log(app.restServer)
-  let wss = new WebSocket.Server({server: app.restServer.httpServer?.server});
+  let wss = new WebSocket.Server({ server: app.restServer.httpServer?.server });
 
   // console.log(app.restServer)
   wss.on("connection", function connection(ws: any) {
@@ -38,15 +38,15 @@ export async function startWebsocket(app: SciLogDbApplication) {
             try {
               userProfileFromToken = await jwtService.verifyToken(msgContainer['message']['token']);
             } catch (error) {
-              ws.send(JSON.stringify({'error': 'Token invalid'}));
+              ws.send(JSON.stringify({ 'error': 'Token invalid' }));
             }
             if (userProfileFromToken != null) {
               let logbookID: string = msgContainer['message']['join'];
               let config: any = msgContainer['message']['config'];
               if (websocketMap.hasOwnProperty(logbookID)) {
-                websocketMap[logbookID].push({ws: ws, user: userProfileFromToken, config: config})
+                websocketMap[logbookID].push({ ws: ws, user: userProfileFromToken, config: config })
               } else {
-                websocketMap[logbookID] = [{ws: ws, user: userProfileFromToken, config: config}];//push({ws: ws, user: userProfileFromToken});
+                websocketMap[logbookID] = [{ ws: ws, user: userProfileFromToken, config: config }];//push({ws: ws, user: userProfileFromToken});
               }
             }
 
@@ -57,7 +57,7 @@ export async function startWebsocket(app: SciLogDbApplication) {
     });
 
     ws.isAlive = true
-    ws.on('pong', () => {heartbeat(ws)})
+    ws.on('pong', () => { heartbeat(ws) })
 
     // handle disconnection
     ws.on("close", function close(msg: any) {
@@ -85,7 +85,7 @@ export async function startWebsocket(app: SciLogDbApplication) {
     // console.log("alive")
   }
   const ping = (ws: any) => {
-    ws.send(JSON.stringify({'ping': 'ping'}));
+    ws.send(JSON.stringify({ 'ping': 'ping' }));
     // console.log('server: ping');
   }
 
@@ -97,13 +97,13 @@ export async function startWebsocket(app: SciLogDbApplication) {
       }
 
       ws.isAlive = false
-      ws.ping(() => {ping(ws)})
+      ws.ping(() => { ping(ws) })
     })
   }, 10000)
 
   var getId = (function () {
     let findParentLogbook = (db: any, parentId: string, sendSocketMessage: any) => {
-      const parentDoc = db.collection("Basesnippet").findOne({'_id': Mongo.ObjectId(parentId)});
+      const parentDoc = db.collection("Basesnippet").findOne({ '_id': Mongo.ObjectId(parentId) });
       return parentDoc.then((document: any) => {
         if (document.snippetType == 'logbook') {
           sendSocketMessage(document._id);
@@ -130,11 +130,11 @@ export async function startWebsocket(app: SciLogDbApplication) {
   })();
 
   const dataSourceSettings: AnyObject = (app.getSync('datasources.mongo') as MongoDataSource).settings;
-  Mongo.MongoClient.connect(dataSourceSettings.url, {useUnifiedTopology: dataSourceSettings.useUnifiedTopology})
+  Mongo.MongoClient.connect(dataSourceSettings.url, { useUnifiedTopology: dataSourceSettings.useUnifiedTopology })
     .then((client: any) => {
       const db = client.db(dataSourceSettings.database);
       const collection = db.collection("Basesnippet");
-      const changeStream = collection.watch();//[{'$match': {'fullDocument.ownerGroup': 'p17301'}}]
+      const changeStream = collection.watch();
       // console.log(collection);
       changeStream.on("change", function (change: any) {
         if (change.operationType != 'delete') {
@@ -144,14 +144,13 @@ export async function startWebsocket(app: SciLogDbApplication) {
               // console.log("change: ", change);
 
               // make sure all subscribers have the permission to read the changestream
-              let doc = await collection.findOne({'_id': Mongo.ObjectId(change.documentKey._id)});
-              doc["accessGroups"].push(doc["ownerGroup"]);
+              let doc = await collection.findOne({ '_id': Mongo.ObjectId(change.documentKey._id) });
               // console.log(websocketMap[id])
               if (typeof (websocketMap[id]) != 'undefined') {
                 websocketMap[id].forEach((client: any) => {
-                  if (doc["accessGroups"].some((r: string) => client.user.roles.includes(r))) {
+                  if (doc["readACL"].some((r: string) => client.user.roles.includes(r))) {
                     if (matches_filter_settings(doc, client.config))
-                      client.ws.send(JSON.stringify({'new-notification': change}));
+                      client.ws.send(JSON.stringify({ 'new-notification': change }));
                   }
                 })
               }
@@ -166,11 +165,11 @@ export async function startWebsocket(app: SciLogDbApplication) {
                   console.log("delete");
                   console.log("updated doc", doc);
                   if (doc?.versionable) {
-                    let history = await collection.findOne({'parentId': Mongo.ObjectId(doc.parentId), 'snippetType': 'history'});
+                    let history = await collection.findOne({ 'parentId': Mongo.ObjectId(doc.parentId), 'snippetType': 'history' });
                     console.log('history: ', history)
-                    collection.updateOne({'_id': Mongo.ObjectId(change.documentKey._id)}, {$set: {'parentId': Mongo.ObjectId(history._id)}});
+                    collection.updateOne({ '_id': Mongo.ObjectId(change.documentKey._id) }, { $set: { 'parentId': Mongo.ObjectId(history._id) } });
                   } else {
-                    collection.deleteOne({"_id": Mongo.ObjectId(change.documentKey._id)});
+                    collection.deleteOne({ "_id": Mongo.ObjectId(change.documentKey._id) });
                   }
                 }
               }

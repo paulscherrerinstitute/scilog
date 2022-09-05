@@ -119,8 +119,12 @@ export class BasesnippetController {
       if (snippets[0]?.parentId) {
         let parent = await this.basesnippetRepository.findById(snippets[0].parentId, filter, { currentUser: this.user });
         job = {
-          ownerGroup: parent.ownerGroup,
-          accessGroups: parent.accessGroups,
+          createACL: parent.createACL,
+          readACL: parent.readACL,
+          updateACL: parent.updateACL,
+          deleteACL: parent.deleteACL,
+          shareACL: parent.shareACL,
+          adminACL: parent.adminACL,
           parentId: parent.id,
           description: "export",
           params: filter
@@ -449,7 +453,7 @@ export class BasesnippetController {
     let historySnippet = await this.basesnippetRepository.findOne({ where: { snippetType: 'history', parentId: snippet.id } }, { currentUser: this.user });
 
     if (historySnippet == null) {
-      let historySnippetPayload: any = _.pick(snippet, ['isPrivate', 'ownerGroup', 'accessGroups']);
+      let historySnippetPayload: any = _.pick(snippet, ['isPrivate', 'createACL', 'readACL', 'updateACL', 'deleteACL', 'shareACL', 'adminACL']);
       historySnippetPayload.parentId = snippet.id;
       historySnippetPayload.snippetType = 'history';
       historySnippet = await this.basesnippetRepository.create(historySnippetPayload, { currentUser: this.user });

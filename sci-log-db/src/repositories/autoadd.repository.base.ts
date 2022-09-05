@@ -100,22 +100,14 @@ export class AutoAddRepository<
             } else {
                 currentUser = ctx.options.currentUser;
             }
-            // console.log("roles:", currentUser?.roles);
+            console.log("roles:", currentUser?.roles);
             // console.log("access case:", JSON.stringify(ctx, null, 3));
             let groups = [...ctx?.options?.currentUser?.roles]
             if (!groups.includes('admin')) {
                 var groupCondition = {
-                    or: [{
-                        ownerGroup: {
-                            inq: groups
-                        }
-                    },
-                    {
-                        accessGroups: {
-                            inq: groups
-                        }
+                    readACL: {
+                        inq: groups
                     }
-                    ]
                 };
                 if (!ctx.query.where) {
                     ctx.query.where = groupCondition;
@@ -125,7 +117,7 @@ export class AutoAddRepository<
                     };
                 }
             }
-            // console.log("query:",JSON.stringify(ctx.query,null,3));
+            console.log("query:", JSON.stringify(ctx.query, null, 3));
         })
         return modelClass;
     }
