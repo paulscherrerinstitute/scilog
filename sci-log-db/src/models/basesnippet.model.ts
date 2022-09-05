@@ -20,19 +20,41 @@ export class Basesnippet extends Entity {
   })
   id: string;
 
-  @property({
-    type: 'string',
-    description:
-      'Only members of the ownerGroup are allowed to see and work with this snippet',
+  @property.array(String, {
+    description: 'groups or users who can create this snippet',
     index: true,
   })
-  ownerGroup?: string;
+  createACL: string[];
 
   @property.array(String, {
-    description: 'groups whose members have read access to this snippet',
+    description: 'groups or users who can read this snippet',
     index: true,
   })
-  accessGroups?: string[];
+  readACL: string[];
+
+  @property.array(String, {
+    description: 'groups or users who can update this snippet',
+    index: true,
+  })
+  updateACL: string[];
+
+  @property.array(String, {
+    description: 'groups or users who can delete this snippet',
+    index: true,
+  })
+  deleteACL: string[];
+
+  @property.array(String, {
+    description: 'groups or users who can share this snippet',
+    index: true,
+  })
+  shareACL: string[];
+
+  @property.array(String, {
+    description: 'groups or users who can administrate this snippet',
+    index: true,
+  })
+  adminACL: string[];
 
   @property({
     type: 'string',

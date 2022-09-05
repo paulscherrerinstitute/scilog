@@ -188,13 +188,12 @@ export async function startWebsocket(app: SciLogDbApplication) {
             const doc = await collection.findOne({
               _id: Mongo.ObjectId(change.documentKey._id),
             });
-            doc['accessGroups'].push(doc['ownerGroup']);
             // console.log(websocketMap[id])
             if (typeof websocketMap[id] != 'undefined') {
               // eslint-disable-next-line  @typescript-eslint/no-explicit-any
               websocketMap[id].forEach((c: any) => {
                 if (
-                  doc['accessGroups'].some((r: string) =>
+                  doc['readACL'].some((r: string) =>
                     c.user.roles.includes(r),
                   )
                 ) {
