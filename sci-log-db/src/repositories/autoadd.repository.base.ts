@@ -100,7 +100,7 @@ export class AutoAddRepository<
             } else {
                 currentUser = ctx.options.currentUser;
             }
-            console.log("roles:", currentUser?.roles);
+            // console.log("roles:", currentUser?.roles);
             // console.log("access case:", JSON.stringify(ctx, null, 3));
             let groups = [...ctx?.options?.currentUser?.roles]
             if (!groups.includes('admin')) {
