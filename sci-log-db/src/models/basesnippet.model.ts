@@ -20,42 +20,6 @@ export class Basesnippet extends Entity {
   })
   id: string;
 
-  @property.array(String, {
-    description: 'groups or users who can create this snippet',
-    index: true,
-  })
-  createACL: string[];
-
-  @property.array(String, {
-    description: 'groups or users who can read this snippet',
-    index: true,
-  })
-  readACL: string[];
-
-  @property.array(String, {
-    description: 'groups or users who can update this snippet',
-    index: true,
-  })
-  updateACL: string[];
-
-  @property.array(String, {
-    description: 'groups or users who can delete this snippet',
-    index: true,
-  })
-  deleteACL: string[];
-
-  @property.array(String, {
-    description: 'groups or users who can share this snippet',
-    index: true,
-  })
-  shareACL: string[];
-
-  @property.array(String, {
-    description: 'groups or users who can administrate this snippet',
-    index: true,
-  })
-  adminACL: string[];
-
   @property({
     type: 'string',
     default: 'base',
@@ -120,7 +84,50 @@ export class Basesnippet extends Entity {
   })
   updatedBy: string;
 
-  @hasMany(() => Basesnippet, {keyTo: 'parentId'})
+  @property.array(String, {
+    description: 'groups or users who can create this snippet',
+    index: true,
+  })
+  createACL: string[];
+
+  @property.array(String, {
+    description: 'groups or users who can read this snippet',
+    index: true,
+  })
+  readACL: string[];
+
+  @property.array(String, {
+    description: 'groups or users who can update this snippet',
+    index: true,
+  })
+  updateACL: string[];
+
+  @property.array(String, {
+    description: 'groups or users who can delete this snippet',
+    index: true,
+  })
+  deleteACL: string[];
+
+  @property.array(String, {
+    description: 'groups or users who can share this snippet',
+    index: true,
+  })
+  shareACL: string[];
+
+  @property.array(String, {
+    description: 'groups or users who can administrate this snippet',
+    index: true,
+  })
+  adminACL: string[];
+
+  @property({
+    type: 'string',
+    description: 'ACL flags (UDSA) calculated for current user, taking her role into account',
+    index: false,
+  })
+  calculatedACLs: string;
+  
+  @hasMany(() => Basesnippet, { keyTo: 'parentId' })
   subsnippets?: Basesnippet[];
 
   @belongsTo(
