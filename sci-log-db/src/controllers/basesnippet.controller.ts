@@ -316,6 +316,7 @@ export class BasesnippetController {
     basesnippet: Basesnippet,
     @param.where(Basesnippet) where?: Where<Basesnippet>,
   ): Promise<Count> {
+    // TODO SE drop ACLs unless admin
     return this.basesnippetRepository.updateAll(basesnippet, where, { currentUser: this.user });
   }
 
@@ -374,6 +375,7 @@ export class BasesnippetController {
     })
     basesnippet: Basesnippet,
   ): Promise<void> {
+        // TODO SE drop ACLs unless admin
     if ((typeof basesnippet.deleted == 'undefined') || (basesnippet.deleted == false)) {
       let snippet = await this.basesnippetRepository.findById(id, {}, { currentUser: this.user });
       if (((typeof snippet?.expiresAt != 'undefined') && (snippet.expiresAt.getTime() < Date.now())) || (typeof snippet?.expiresAt == 'undefined')) {
@@ -398,6 +400,7 @@ export class BasesnippetController {
     @param.path.string('id') id: string,
     @requestBody() basesnippet: Basesnippet,
   ): Promise<void> {
+        // TODO SE drop ACLs unless admin
     await this.basesnippetRepository.replaceById(id, basesnippet, { currentUser: this.user });
   }
 

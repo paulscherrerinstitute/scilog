@@ -20,7 +20,7 @@ const userData = {
   email: 'test@loopback.io',
   firstName: 'Example',
   lastName: 'User',
-  roles: ['any-authenticated-user'],
+  roles: ['p12345','any-authenticated-user'],
 };
 
 export const oidcOptions = {
