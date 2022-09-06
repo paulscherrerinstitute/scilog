@@ -241,7 +241,8 @@ describe('UserController', () => {
         .expect(401);
 
       expect(res.body.error.message).to.equal(
-        'Error verifying token : jwt expired',
+        'Error verifying token : invalid signature',
+        //'Error verifying token : jwt expired',
       );
     });
   });

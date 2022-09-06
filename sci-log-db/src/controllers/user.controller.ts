@@ -82,9 +82,9 @@ export class UserController {
     })
     newUserRequest: NewUserRequest,
   ): Promise<User> {
+    // comment the following to allow roles to be defined from calling instance completely
     // All new users have the "any-authenticated-user" role by default
-    if (!newUserRequest.roles?.includes('any-authenticated-user'))
-      newUserRequest.roles?.push('any-authenticated-user');
+    // newUserRequest.roles?.push('any-authenticated-user');
 
     // ensure a valid email value and password value
     validateCredentials({
