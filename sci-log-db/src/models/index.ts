@@ -1,5 +1,6 @@
 export * from './basesnippet.model';
 export * from './image.model';
+export * from './location.model';
 export * from './logbook.model';
 export * from './paragraph.model';
 export * from './task.model';

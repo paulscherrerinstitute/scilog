@@ -82,9 +82,8 @@ export class UserController {
     })
     newUserRequest: NewUserRequest,
   ): Promise<User> {
-    // comment the following to allow roles to be defined from calling instance completely
     // All new users have the "any-authenticated-user" role by default
-    // newUserRequest.roles?.push('any-authenticated-user');
+    newUserRequest.roles?.push('any-authenticated-user');
 
     // ensure a valid email value and password value
     validateCredentials({principal: newUserRequest.email, password: newUserRequest.password });
@@ -106,7 +105,7 @@ export class UserController {
         .create({password});
 
       return savedUser;
-    } catch (error) {
+    } catch (error: any) {
       // MongoError 11000 duplicate key
       if (error.code === 11000 && error.errmsg.includes('index: uniqueEmail')) {
         throw new HttpErrors.Conflict('Email value is already taken');
@@ -149,7 +148,7 @@ export class UserController {
       }
       const updatedUser = await this.userRepository.updateById(userId, user);
       return updatedUser;
-    } catch (e) {
+    } catch (e: any) {
       return e;
     }
   }

@@ -114,9 +114,10 @@ export class Basesnippet extends Entity {
   @property({
     type: 'string',
     description: 'ACL flags (UDSA) calculated for current user, taking her role into account',
+    readonly: true,
     index: false,
   })
-  calculatedACLs: string;
+  calculatedACLs?: string;
   
   @hasMany(() => Basesnippet, { keyTo: 'parentId' })
   subsnippets?: Basesnippet[];
