@@ -171,7 +171,7 @@ export class BasesnippetController {
     security: OPERATION_SECURITY_SPEC,
     responses: {
       '200': {
-        description: 'Basesnippet model instance',
+        description: 'Find the index (i.e position) of a basesnippet within a query.',
         content: {
           'application/json': {
             type: 'any',
@@ -338,7 +338,7 @@ export class BasesnippetController {
     @param.filter(Basesnippet, { exclude: 'where' }) filter?: FilterExcludingWhere<Basesnippet>
   ): Promise<Basesnippet> {
     return this.basesnippetRepository.findById(id, filter, { currentUser: this.user }).then((sn) => {
-      sn.calculatedACLs=""
+      sn.calculatedACLs = ""
       if ((this.user.roles.filter((element: string) => sn.updateACL.includes(element))).length > 0) {
         sn.calculatedACLs += "U"
       }
