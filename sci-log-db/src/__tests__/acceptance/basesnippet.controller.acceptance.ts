@@ -42,12 +42,12 @@ describe('Base snippet controller services', function (this: Suite) {
       shareACL:[''],
       adminACL:['unx_sf-bernina-bs'],
     }
-    await client.post('/basesnippets')
+    await client.post('/locations')
       .set('Authorization', 'Bearer ' + token)
-      .send({snippetType: 'paragraph', title:'location', ...acls})
+      .send({snippetType: 'location', textcontent:'Abstract goes here...', ...acls})
       .expect(200)
       .then((result) =>
-        expect(result.body.title).to.be.eql("location"),
+        expect(result.body.snippetType).to.be.eql("location"),
       )
       .catch((err) => {
         throw err;

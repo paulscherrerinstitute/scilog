@@ -24,6 +24,13 @@ describe('UserController', () => {
     email: 'test@loopback.io',
     firstName: 'Example',
     lastName: 'User',
+    roles: [],
+  };
+
+  const userDataReturned = {
+    email: 'test@loopback.io',
+    firstName: 'Example',
+    lastName: 'User',
     roles: ['any-authenticated-user'],
   };
 
@@ -70,7 +77,7 @@ describe('UserController', () => {
     });
     expect(res.body).to.deepEqual({
       id: '5dd6acee242760334f6aef65',
-      ...userData,
+      ...userDataReturned,
     });
   });
 
