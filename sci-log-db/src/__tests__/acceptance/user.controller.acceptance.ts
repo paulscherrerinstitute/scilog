@@ -168,7 +168,7 @@ describe('UserController', () => {
         .send({principal: 'idontexist@example.com', password: userPassword})
         .expect(401);
 
-      expect(res.body.error.message).to.equal('Invalid principal or password.');
+      expect(res.body.error.message).to.equal('Invalid email or password.');
     });
 
     it('login returns an error when invalid password is used', async () => {
@@ -179,7 +179,7 @@ describe('UserController', () => {
         .send({principal: newUser.email, password: 'wrongpassword'})
         .expect(401);
 
-      expect(res.body.error.message).to.equal('Invalid principal or password.');
+      expect(res.body.error.message).to.equal('Invalid email or password.');
     });
 
     it('users/me returns the current user profile when a valid JWT token is provided', async () => {
@@ -241,7 +241,8 @@ describe('UserController', () => {
         .expect(401);
 
       expect(res.body.error.message).to.equal(
-        'Error verifying token : jwt expired',
+        'Error verifying token : invalid signature',
+        //'Error verifying token : jwt expired',
       );
     });
   });

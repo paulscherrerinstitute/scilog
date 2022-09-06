@@ -7,7 +7,7 @@ import { createAUser, setupApplication, userPassword } from './test-helper';
 
 
 describe('File controller services', function (this: Suite) {
-  this.timeout(5000);
+  this.timeout(1000);
   let app: SciLogDbApplication;
   let client: Client;
   let user: User;
@@ -77,7 +77,7 @@ describe('File controller services', function (this: Suite) {
     await client.post('/filesnippet/files')
       .set('Authorization', 'Bearer ' + token)
       .type('form')
-      .field('fields', '{"ownerGroup": "aOwner"}')
+      .field('fields', '{"readACL": ["aOwner"]}')
       .attach('file', __filename)
       .expect(200)
       .then()
@@ -90,7 +90,7 @@ describe('File controller services', function (this: Suite) {
     const postResponse = await client.post('/filesnippet/files')
       .set('Authorization', 'Bearer ' + token)
       .type('form')
-      .field('fields', '{"ownerGroup": "any-authenticated-user"}')
+      .field('fields', '{"readACL": ["any-authenticated-user"]}')
       .attach('file', __filename)
       .then()
       .catch((err) => {
@@ -113,7 +113,7 @@ describe('File controller services', function (this: Suite) {
     const postResponse = await client.post('/filesnippet/files')
       .set('Authorization', 'Bearer ' + token)
       .type('form')
-      .field('fields', '{"ownerGroup": "any-authenticated-user"}')
+      .field('fields', '{"readACL": ["any-authenticated-user"]}')
       .attach('file', __filename)
       .then()
       .catch((err) => {

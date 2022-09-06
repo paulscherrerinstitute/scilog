@@ -94,7 +94,7 @@ describe('authentication services', function (this: Suite) {
     const credentials = {principal: 'idontexist@example.com', password: 'p4ssw0rd'};
 
     const expectedError = new HttpErrors.Unauthorized(
-      'Invalid principal or password.',
+      'Invalid email or password.',
     );
 
     await expect(userService.verifyCredentials(credentials)).to.be.rejectedWith(
@@ -106,7 +106,7 @@ describe('authentication services', function (this: Suite) {
     const {email} = newUser;
     const credentials = {principal: email, password: 'invalidp4ssw0rd'};
     const expectedError = new HttpErrors.Unauthorized(
-      'Invalid principal or password.',
+      'Invalid email or password.',
     );
 
     await expect(userService.verifyCredentials(credentials)).to.be.rejectedWith(
