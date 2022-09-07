@@ -33,12 +33,8 @@ export class LogbookWidgetComponent implements OnInit {
     if (this.logbook?.thumbnail) {
       this.getImageFromService();
     }
-    if (this.userPreferences.userInfo?.roles.find(entry => {
-      return entry == this.logbook.ownerGroup
-    })) {
-      this.enableEdit = true;
-    }
 
+    this.enableEdit = this.userPreferences.userInfo.roles.filter(x => this.logbook.updateACL.includes(x)).length > 0;
   }
 
   ngAfterViewInit() {

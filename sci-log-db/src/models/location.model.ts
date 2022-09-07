@@ -1,5 +1,5 @@
-import {model, property} from '@loopback/repository';
-import {Basesnippet} from './basesnippet.model';
+import { model, property } from '@loopback/repository';
+import { Basesnippet } from './basesnippet.model';
 
 enum LinkType {
   LOCATION = 'location',
@@ -21,18 +21,24 @@ export interface Filecontainer {
   settings: {
     strict: true,
     scope: {
-      where: {snippetType: 'location'}
+      where: { snippetType: 'location' }
     },
-    mongodb: {collection: 'Basesnippet'}
+    mongodb: { collection: 'Basesnippet' }
   }
 })
 export class Location extends Basesnippet {
 
   @property({
     type: 'string',
-    description: 'Markup contents in markdown (MD) syntax of this location'
+    description: 'Name of the location, e.g. X12SA'
   })
-  textcontent?: string;
+  name: string;
+
+  @property({
+    type: 'string',
+    description: 'Location string, e.g. /PSI/SLS/X12SA'
+  })
+  location: string;
 
   @property.array(Object, {
     type: 'object',

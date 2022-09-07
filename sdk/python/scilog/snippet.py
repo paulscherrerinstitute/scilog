@@ -52,12 +52,9 @@ class Snippet:
     def to_dict(self, include_none=True):
         if include_none:
             return {key: getattr(self, key) for key in self._properties}
-        else:
-            return {
-                key: getattr(self, key)
-                for key in self._properties
-                if getattr(self, key) is not None
-            }
+        return {
+            key: getattr(self, key) for key in self._properties if getattr(self, key) is not None
+        }
 
     def import_dict(self, properties):
         for name, value in properties.items():
@@ -70,7 +67,10 @@ class Snippet:
         return new
 
     def __str__(self):
-        return typename(self)
+        return f"{self.__class__.__name__}: {self.to_dict()}"
+
+    def __repr__(self):
+        return f"{self.__class__.__name__}: {self.to_dict()}"
 
     @classmethod
     def from_http_response(cls, response):
@@ -110,15 +110,21 @@ class Basesnippet(Snippet):
 
 
 class Paragraph(Basesnippet):
-    def __init__(self, snippetType="paragraph"):
-        super().__init__(snippetType=snippetType)
+    def __init__(self):
+        super().__init__(snippetType="paragraph")
         self.init_properties(textcontent=str, isMessage=str)
 
 
 class Filesnippet(Basesnippet):
-    def __init__(self, snippetType="paragraph"):
-        super().__init__(snippetType=snippetType)
+    def __init__(self):
+        super().__init__(snippetType="filesnippet")
         self.init_properties(fileExtension=str, accessHash=str)
+
+
+class Location(Basesnippet):
+    def __init__(self):
+        super().__init__(snippetType="location")
+        self.init_properties(name=str, location=str)
 
 
 if __name__ == "__main__":

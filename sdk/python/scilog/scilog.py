@@ -9,7 +9,7 @@ from typing import Any, Tuple
 
 from .authmixin import HEADER_JSON, AuthError
 from .httpclient import HttpClient
-from .snippet import Basesnippet, Filesnippet, Paragraph, Snippet
+from .snippet import Basesnippet, Filesnippet, Location, Paragraph, Snippet
 
 ACLS = ["createACL", "readACL", "updateACL", "deleteACL", "shareACL", "adminACL"]
 
@@ -96,6 +96,16 @@ class SciLog:
         if payload.get("files"):
             payload = self.upload_files(payload)
         return Paragraph.from_http_response(
+            self.http_client.post_request(url, payload=payload, headers=HEADER_JSON)
+        )
+
+    @pinned_to_logbook(["parentId", *ACLS])
+    def post_location(self, **kwargs):
+        url = self.http_client.address + "/basesnippets"
+        payload = kwargs
+        if payload.get("files"):
+            payload = self.upload_files(payload)
+        return Location.from_http_response(
             self.http_client.post_request(url, payload=payload, headers=HEADER_JSON)
         )
 

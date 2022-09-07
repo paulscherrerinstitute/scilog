@@ -14,8 +14,12 @@ export interface Filecontainer {
 
 export interface Basesnippets {
     id?: string;
-    ownerGroup?: string;
-    accessGroups?: string[];
+    createACL?: string[];
+    readACL?: string[];
+    updateACL?: string[];
+    deleteACL?: string[];
+    shareACL?: string[];
+    adminACL?: string[];
     snippetType?: string;
     isPrivate?: boolean;
     createdAt?: string;
