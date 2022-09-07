@@ -9,7 +9,7 @@ from psi_webpage_icon_extractor import PSIWebpageIconExtractor
 
 
 def prepare_location_snippet(log):
-    snips = log.get_snippets(title="location", createACL=["admin"])
+    snips = log.get_snippets(snippetType="location", createACL=["admin"])
     if snips:
         print("location snippet exists already:", snips[0].id)
         assert len(snips) == 1
@@ -25,8 +25,7 @@ def prepare_location_snippet(log):
         "shareACL": ["admin"],
         "adminACL": ["admin"],
         "isPrivate": True,
-        "title": "location",
-        "snippetType": "paragraph",
+        "snippetType": "location",
         "files": [{"filepath": filepath}],
     }
     snip = log.post_snippet(**location_snippet)
@@ -46,8 +45,8 @@ def _collect_data(proposals):
     proposalsStorage = []
 
     for prop in proposals:
-        # if (not(prop["ownerGroup"] in ["p18539", "p18713","p18711", "p18763","p18915", "p19160","p19303","p19318","p19319","p19320","p19321","p19704","p19740", "p19741","p19742","p20230"])):
-        #     continue
+        if (not(prop["ownerGroup"] in ["p18539", "p18713","p18711", "p18763","p18915", "p19160","p19303","p19318","p19319","p19320","p19321","p19704","p19740", "p19741","p19742","p20230"])):
+            continue
         accessGroups.update(prop["accessGroups"])
 
         loc = prop["MeasurementPeriodList"][0]["instrument"]
@@ -115,7 +114,9 @@ def _update_locations(log, loc_id, locations):
 
         snip = log.post_snippet(**new_snip)
         locationStorage[loc] = snip
+        print("loc and locationStorage(loc):",loc, snip)
 
+    # print("locationStorage:",locationStorage)
     return locationStorage
 
 
@@ -123,8 +124,9 @@ def _update_proposals(log, locationStorage, proposalsStorage):
     for proposal in proposalsStorage:
         ownerGroup = proposal["ownerGroup"]
 
-        loc = proposal["location"]
-        loc = locationStorage[loc]
+        locStr = proposal["location"]
+        loc = locationStorage[locStr]
+        print("locStr,loc",locStr,loc)
 
         new_snip = {
             "createACL": [ownerGroup],
