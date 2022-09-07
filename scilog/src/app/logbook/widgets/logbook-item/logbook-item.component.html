@@ -18,46 +18,48 @@
   </mat-form-field> -->
   <div #snippetContainer class="logbook-content">
     <div *uiScroll="let snippet of logbookScrollService.datasource; let i = index">
-      <snippet [snippet]="snippet" [updatedAt]="snippet.updatedAt" [index]=i+1 [config]="config" (isLoading)="logbookScrollService.setItemStatus(snippet.id, $event)">
+      <snippet [snippet]="snippet" [updatedAt]="snippet.updatedAt" [index]=i+1 [config]="config"
+        (isLoading)="logbookScrollService.setItemStatus(snippet.id, $event)">
       </snippet>
     </div>
   </div>
 
-  <div *ngIf="!mobile && !isReadOnly" [ngClass]="isLightMode == true ? 'editor-container' : 'editor-container-no-border'">
+  <div *ngIf="!mobile && !isReadOnly"
+    [ngClass]="isLightMode == true ? 'editor-container' : 'editor-container-no-border'">
     <div #editor class="content-editor"
       [ngStyle]="{'padding-left':dashboardView === true ? '0px' : '78px', 'width': dashboardView === true ? '97%' : '92%'}"
       (resized)="onResized($event)">
       <div class='accessSettings'>
         <span [ngStyle]="{'flex':'1 1 auto'}"></span>
-        <span matTooltip="ownerGroup">
+        <span matTooltip="Write access">
           <span [ngStyle]="{'vertical-align':'middle'}">
             <mat-icon [inline]='true'>person</mat-icon>
           </span>
-          <span>{{ logbookInfo.logbookInfo.ownerGroup}}</span>
+          <span>{{ logbookInfo.logbookInfo.createACL}}</span>
         </span>
-        <span *ngIf='logbookInfo.logbookInfo.accessGroups.length>0' matTooltip='accessGroups'>
+        <span *ngIf='logbookInfo.logbookInfo.readACL.length>0' matTooltip='Read access'>
           <span> / </span>
           <span [ngStyle]="{'vertical-align':'middle'}">
             <mat-icon [inline]='true'>group</mat-icon>
           </span>
-          <span> {{ logbookInfo.logbookInfo.accessGroups}}</span>
+          <span> {{ logbookInfo.logbookInfo.readACL}}</span>
         </span>
       </div>
       <ckeditor #contentEditor [config]="editorConfig" [editor]="Editor" [data]="dataEditor"
         (ready)="onEditorReady($event)"></ckeditor>
-        <div class='tagsContainer'>
-          <span class='tagEditor'>
-            <tag-editor [ngStyle]="{'width': '100%'}" #tagEditor [tagIn]="tag" [configIndex]="configIndex"></tag-editor>
-          </span>
-            <span class="addButton">
-              <button mat-mini-fab (click)="addContent()">
-                <mat-icon matTooltip="Send">send</mat-icon>
-              </button>
-              <button mat-mini-fab (click)="addMessage()" *ngIf="messagesEnabled">
-                <mat-icon matTooltip="Send as message">message</mat-icon>
-              </button>
-          </span>
-        </div>
+      <div class='tagsContainer'>
+        <span class='tagEditor'>
+          <tag-editor [ngStyle]="{'width': '100%'}" #tagEditor [tagIn]="tag" [configIndex]="configIndex"></tag-editor>
+        </span>
+        <span class="addButton">
+          <button mat-mini-fab (click)="addContent()">
+            <mat-icon matTooltip="Send">send</mat-icon>
+          </button>
+          <button mat-mini-fab (click)="addMessage()" *ngIf="messagesEnabled">
+            <mat-icon matTooltip="Send as message">message</mat-icon>
+          </button>
+        </span>
+      </div>
 
     </div>
 

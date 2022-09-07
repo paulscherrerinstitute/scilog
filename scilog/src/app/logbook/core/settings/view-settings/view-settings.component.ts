@@ -33,17 +33,17 @@ export function existingNameValidator(views: Views[]): ValidatorFn {
   };
 }
 
-export function ownerGroupMemberValidator(groups: string[]): ValidatorFn {
+export function updateACLMemberValidator(groups: string[]): ValidatorFn {
   return (control: AbstractControl): { [key: string]: any } | null => {
     const forbidden = !groups.includes(control.value);
     return forbidden ? { forbiddenGroup: { value: control.value } } : null;
   };
 }
 
-export function accessGroupsMemberValidator(groups: string[], chips: string[]): ValidatorFn {
+export function readACLMemberValidator(groups: string[], chips: string[]): ValidatorFn {
   return (control: AbstractControl): { [key: string]: any } | null => {
     const groupEntriesForbidden = (chip: string) => !groups.includes(chip);
-    const forbidden = ((control.value!=null) && (control.value !== "")&& (!groups.includes(control.value))) || (chips.length > 0 && chips.some(groupEntriesForbidden));
+    const forbidden = ((control.value != null) && (control.value !== "") && (!groups.includes(control.value))) || (chips.length > 0 && chips.some(groupEntriesForbidden));
     console.log(typeof control.value)
     console.log(control.value)
     console.log(chips)
@@ -73,8 +73,8 @@ export class ViewSettingsComponent implements OnInit {
   removable = true;
   separatorKeysCodes: number[] = [ENTER, COMMA, SPACE];
   filteredAccessGroups: Observable<string[]>;
-  accessGroupsSelected: string[] = [];
-  accessGroupsAvail: string[] = [];
+  readACLAvailSelected: string[] = [];
+  readACLAvail: string[] = [];
   logbook: Logbooks;
   currentLocation: Basesnippets = {};
   showSaveMessage = false;
@@ -96,16 +96,16 @@ export class ViewSettingsComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    if (this.viewService.views.length > 0){
+    if (this.viewService.views.length > 0) {
       this.views = JSON.parse(JSON.stringify(this.viewService.views));
     }
     let indexToRemove = null;
     for (let index = 0; index < this.views.length; index++) {
-      if (this.views[index].name == this.views[index].ownerGroup + "_personal"){
+      if (this.views[index].name == this.userPreferences.userInfo.username + "_personal") {
         indexToRemove = index;
       }
     }
-    if (indexToRemove != null){
+    if (indexToRemove != null) {
       this.views.splice(indexToRemove, 1);
     }
 
@@ -116,8 +116,8 @@ export class ViewSettingsComponent implements OnInit {
       name: new FormControl('', [Validators.required]),
       description: new FormControl(''),
       location: new FormControl('', Validators.required),
-      ownerGroup: new FormControl('', Validators.required),
-      accessGroupsCtrl: new FormControl(''),
+      updateACL: new FormControl('', Validators.required),
+      readACLCtrl: new FormControl(''),
       enableAdvanced: new FormControl({ value: false, disabled: false }),
       shareWithLocation: new FormControl({ value: false, disabled: true }),
       shareWithLogbook: new FormControl(false),
@@ -126,15 +126,15 @@ export class ViewSettingsComponent implements OnInit {
   }
 
   async getData() {
-    
+
     let data = await this.logbookDataService.getLocations();
-    if (typeof data[0].subsnippets != "undefined"){
+    if (typeof data[0].subsnippets != "undefined") {
       this.availLocations = data[0].subsnippets;
       this.availLocations.forEach(loc => {
         if (loc.id == this.logbook.location) {
           this.currentLocation = loc;
           this.userPreferences.userInfo.roles.forEach(role => {
-            if (role == this.currentLocation.ownerGroup) {
+            if (this.currentLocation.updateACL.includes(role)) {
               this.viewFormGroup.get("shareWithLocation").setValue({ value: false, disabled: false });
             }
           })
@@ -147,15 +147,15 @@ export class ViewSettingsComponent implements OnInit {
 
   setDefaults() {
     this.viewFormGroup.get('name').setValue(this.userPreferences.userInfo.username);
-    this.viewFormGroup.get('ownerGroup').setValue(this.userPreferences.userInfo.username);
-    this.accessGroupsSelected = [];
+    this.viewFormGroup.get('updateACL').setValue(this.userPreferences.userInfo.username);
+    this.readACLAvailSelected = [];
     this.viewFormGroup.get('location').setValue(this.currentLocation.id);
-    this.accessGroupsAvail = this.userPreferences.userInfo?.roles;
-    this.filteredAccessGroups = this.viewFormGroup.get('accessGroupsCtrl').valueChanges.pipe(startWith(null), map((accessGroup: string | null) => accessGroup ? this._filter(accessGroup) : this.accessGroupsAvail.slice()));
-    
+    this.readACLAvail = this.userPreferences.userInfo?.roles;
+    this.filteredAccessGroups = this.viewFormGroup.get('readACLCtrl').valueChanges.pipe(startWith(null), map((accessGroup: string | null) => accessGroup ? this._filter(accessGroup) : this.readACLAvail.slice()));
+
     this.viewFormGroup.get('name').setValidators([Validators.required, existingNameValidator(this.views), forbiddenNameValidator(/_personal/i)])
-    this.viewFormGroup.get('accessGroupsCtrl').setValidators([accessGroupsMemberValidator(this.accessGroupsAvail, this.accessGroupsSelected)]);
-    this.viewFormGroup.get('ownerGroup').setValidators([Validators.required, ownerGroupMemberValidator(this.accessGroupsAvail)]);
+    this.viewFormGroup.get('readACLCtrl').setValidators([readACLMemberValidator(this.readACLAvail, this.readACLAvailSelected)]);
+    this.viewFormGroup.get('updateACL').setValidators([Validators.required, updateACLMemberValidator(this.readACLAvail)]);
     this.viewFormGroup.get('name').updateValueAndValidity();
   }
 
@@ -175,7 +175,7 @@ export class ViewSettingsComponent implements OnInit {
 
     // Add accessGroup
     if ((value || '').trim()) {
-      this.accessGroupsSelected.push(value.trim());
+      this.readACLAvailSelected.push(value.trim());
     }
 
     // Reset the input value
@@ -187,16 +187,16 @@ export class ViewSettingsComponent implements OnInit {
   }
 
   removeAccessGroup(accessGroup: string): void {
-    const index = this.accessGroupsSelected.indexOf(accessGroup);
+    const index = this.readACLAvailSelected.indexOf(accessGroup);
 
     if (index >= 0) {
-      this.accessGroupsSelected.splice(index, 1);
+      this.readACLAvailSelected.splice(index, 1);
     }
     this.viewFormGroup.get('accessGroupsCtrl').updateValueAndValidity();
   }
 
   selectedAccessGroup(event: MatAutocompleteSelectedEvent): void {
-    this.accessGroupsSelected.push(event.option.viewValue);
+    this.readACLAvailSelected.push(event.option.viewValue);
     this.accessGroupsInput.nativeElement.value = '';
     this.viewFormGroup.get('accessGroupsCtrl').setValue(null);
   }
@@ -204,26 +204,26 @@ export class ViewSettingsComponent implements OnInit {
   private _filter(value: string): string[] {
     const filterValue = value.toLowerCase();
 
-    return this.accessGroupsAvail.filter(accessGroup => accessGroup.toLowerCase().indexOf(filterValue) === 0);
+    return this.readACLAvail.filter(accessGroup => accessGroup.toLowerCase().indexOf(filterValue) === 0);
   }
 
   shareWithLogbookSlide() {
     console.log("change");
     console.log(this.viewFormGroup.get('shareWithLogbook'))
-    if (this.viewFormGroup.get('shareWithLogbook').value){
-      this.viewFormGroup.get('ownerGroup').setValue(this.logbook.ownerGroup);
+    if (this.viewFormGroup.get('shareWithLogbook').value) {
+      this.viewFormGroup.get('updateACL').setValue(this.logbook.updateACL);
     } else {
-      this.viewFormGroup.get('ownerGroup').setValue(this.userPreferences.userInfo.username);
+      this.viewFormGroup.get('updateACL').setValue(this.userPreferences.userInfo.username);
       this.viewFormGroup.get('accessGroupsCtrl').setValue('');
     }
 
   }
 
   shareWithLocationSlide($event) {
-    if (this.viewFormGroup.get('shareWithLocation').value){
+    if (this.viewFormGroup.get('shareWithLocation').value) {
       this.viewFormGroup.get('shareWithLogbook').setValue(true)
-      this.viewFormGroup.get('ownerGroup').setValue(this.currentLocation.ownerGroup);
-      this.viewFormGroup.get('accessGroupsCtrl').setValue(this.currentLocation.accessGroups);
+      this.viewFormGroup.get('updateACL').setValue(this.currentLocation.updateACL);
+      this.viewFormGroup.get('accessGroupsCtrl').setValue(this.currentLocation.readACL);
     } else {
       this.shareWithLogbookSlide();
     }
@@ -235,12 +235,16 @@ export class ViewSettingsComponent implements OnInit {
     let payload: Views = {
       name: this.viewFormGroup.get('name').value,
       location: this.viewFormGroup.get('location').value,
-      ownerGroup: this.viewFormGroup.get('ownerGroup').value,
-      accessGroups: this.accessGroupsSelected,
+      createACL: this.viewFormGroup.get('updateACL').value,
+      readACL: this.readACLAvailSelected,
+      updateACL: this.viewFormGroup.get('updateACL').value,
+      deleteACL: this.viewFormGroup.get('updateACL').value,
+      shareACL: this.viewFormGroup.get('updateACL').value,
+      adminACL: this.viewFormGroup.get('updateACL').value,
       snippetType: "view",
       configuration: this.viewService.view.configuration
     }
-    if (payload.ownerGroup == this.currentLocation.ownerGroup){
+    if (payload.updateACL == this.currentLocation.updateACL) {
       payload.parentId = this.currentLocation.id;
     } else {
       payload.parentId = this.logbook.id;

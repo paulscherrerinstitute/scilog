@@ -218,8 +218,7 @@ export class LogbookItemDataService extends RemoteDataService {
       await Promise.all(payload.files.map(async file => {
         if (file.file) {
           // first upload filesnippet then set file id for basesnippet
-          // let imgPayload: Images = _.pick(payload, ['ownerGroup', 'accessGroups', 'isPrivate']);
-          let filePayload: Filesnippet = _.pick(payload, ['ownerGroup', 'accessGroups', 'isPrivate']);
+          let filePayload: Filesnippet = _.pick(payload, ['createACL', 'readACL', 'updateACL', 'deleteACL', 'shareACL', 'adminACL', 'isPrivate']);
           filePayload.fileExtension = file.fileExtension.split("/")[1];
           let dataFile = await this.postFilesnippet(filePayload, file.file);
           console.log(filePayload)
@@ -310,7 +309,7 @@ export class LogbookDataService extends RemoteDataService {
     let params = new HttpParams();
     let httpFilter: Object = {};
     httpFilter["order"] = ["defaultOrder ASC"];
-    httpFilter["where"] = { "snippetType": "location", "title": "root", "ownerGroup": "admin" };
+    httpFilter["where"] = { "snippetType": "location", "title": "root", "createACL": ["admin"] };
     httpFilter["include"] = [{ "relation": "subsnippets" }];
     // console.log(JSON.stringify(httpFilter));
     params = params.set('filter', JSON.stringify(httpFilter));

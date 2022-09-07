@@ -13,13 +13,13 @@ export class SnippetInfoComponent implements OnInit {
   snippet: Basesnippets;
 
   infoFieldsGeneral = ['id', 'dashboardName'];
-  infoFieldsPermissions = ['ownerGroup', 'accessGroups'];
+  infoFieldsPermissions = ['createACL', 'readACL', 'updateACL', 'deleteACL', 'shareACL', 'adminACL'];
   infoFieldsType = ['snippetType'];
   infoFieldsCreated = ['createdBy', 'createdAt'];
   infoFieldsUpdated = ['updatedBy', 'updatedAt'];
 
   constructor(@Inject(MAT_DIALOG_DATA) public data: Basesnippets,
-  private dialogRef: MatDialogRef<SnippetInfoComponent>) { 
+    private dialogRef: MatDialogRef<SnippetInfoComponent>) {
     this.snippet = data;
   }
 
@@ -27,7 +27,7 @@ export class SnippetInfoComponent implements OnInit {
 
   }
 
-  closeInfo(){
+  closeInfo() {
     this.dialogRef.close();
   }
 

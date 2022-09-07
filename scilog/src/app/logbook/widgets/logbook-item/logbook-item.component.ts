@@ -214,14 +214,14 @@ export class LogbookItemComponent implements OnInit {
 
     this.updateViewSubscription();
 
-    this.subscriptions.push(this.scrollToElementService.$selectedItem.subscribe(async (element)=>{
-      if (element != null){
-        if (typeof element.id == 'string'){
+    this.subscriptions.push(this.scrollToElementService.$selectedItem.subscribe(async (element) => {
+      if (element != null) {
+        if (typeof element.id == 'string') {
           let index = await this.logbookItemDataService.getIndex(element.id, this.config);
           console.log("snippet:", element);
           console.log("index: ", index)
           console.log(this.config);
-          if (index>=0){
+          if (index >= 0) {
             this.goToSnippetIndex(index);
           }
         }
@@ -400,7 +400,7 @@ export class LogbookItemComponent implements OnInit {
                       this.forceScrollToEnd = false;
                       let count = await this.logbookItemDataService.getCount(this.config);
                       await this.logbookScrollService.goToSnippetIndex(count.count - 1, () => {
-                        this.logbookScrollService.datasource.adapter.relax(()=>{
+                        this.logbookScrollService.datasource.adapter.relax(() => {
                           setTimeout(() => {
                             this.snippetContainerRef.nativeElement.scrollTop = this.snippetContainerRef.nativeElement.scrollHeight;
                           }, 50);
@@ -440,8 +440,12 @@ export class LogbookItemComponent implements OnInit {
     // for now, I just take the last array entry
     let referenceEntry: ChangeStreamNotification = {};
     // if (this.childSnippets.toArray().length == 0) {
-    referenceEntry.ownerGroup = this.logbookInfo.logbookInfo.ownerGroup;
-    referenceEntry.accessGroups = this.logbookInfo.logbookInfo.accessGroups;
+    referenceEntry.createACL = this.logbookInfo.logbookInfo.createACL;
+    referenceEntry.readACL = this.logbookInfo.logbookInfo.readACL;
+    referenceEntry.updateACL = this.logbookInfo.logbookInfo.updateACL;
+    referenceEntry.deleteACL = this.logbookInfo.logbookInfo.deleteACL;
+    referenceEntry.shareACL = this.logbookInfo.logbookInfo.shareACL;
+    referenceEntry.adminACL = this.logbookInfo.logbookInfo.adminACL;
     referenceEntry.isPrivate = this.logbookInfo.logbookInfo.isPrivate;
     // } else {
     //   referenceEntry = this.childSnippets.toArray()[this.childSnippets.toArray().length - 1].snippet;
@@ -465,8 +469,12 @@ export class LogbookItemComponent implements OnInit {
     // I guess it should only take these variables if they are not defined in the msg...
     console.log("referenceEntry: ", referenceEntry)
     let payload: ChangeStreamNotification = {
-      ownerGroup: referenceEntry.ownerGroup,
-      accessGroups: referenceEntry.accessGroups,
+      createACL: referenceEntry.createACL,
+      readACL: referenceEntry.readACL,
+      updateACL: referenceEntry.updateACL,
+      deleteACL: referenceEntry.deleteACL,
+      shareACL: referenceEntry.shareACL,
+      adminACL: referenceEntry.adminACL,
       isPrivate: referenceEntry.isPrivate,
       tags: msg.tags,
       snippetType: "paragraph",
@@ -476,7 +484,8 @@ export class LogbookItemComponent implements OnInit {
     };
     if (msg.isMessage) {
       payload.isMessage = true;
-      payload.ownerGroup = this.userPreferences.userInfo.email;
+      payload.createACL = [this.userPreferences.userInfo.email];
+      payload.updateACL = [this.userPreferences.userInfo.email];
     }
     return payload;
   }
@@ -484,8 +493,12 @@ export class LogbookItemComponent implements OnInit {
   _preparePostPayload(referenceEntry: ChangeStreamNotification, msg: ChangeStreamNotification): ChangeStreamNotification {
     // I guess it should only take these variables if they are not defined in the msg...
     let payload: ChangeStreamNotification = {
-      ownerGroup: referenceEntry.ownerGroup,
-      accessGroups: referenceEntry.accessGroups,
+      createACL: referenceEntry.createACL,
+      readACL: referenceEntry.readACL,
+      updateACL: referenceEntry.updateACL,
+      deleteACL: referenceEntry.deleteACL,
+      shareACL: referenceEntry.shareACL,
+      adminACL: referenceEntry.adminACL,
       isPrivate: referenceEntry.isPrivate,
       tags: msg.tags,
       snippetType: "paragraph",
@@ -499,7 +512,8 @@ export class LogbookItemComponent implements OnInit {
     }
     if (msg.isMessage) {
       payload.isMessage = true;
-      payload.ownerGroup = this.userPreferences.userInfo.username;
+      payload.createACL = [this.userPreferences.userInfo.email];
+      payload.updateACL = [this.userPreferences.userInfo.email];
     }
     console.log('posting data');
     console.log(payload);
@@ -714,7 +728,7 @@ export class LogbookItemComponent implements OnInit {
 
   };
 
-  snippetIsLoading(status:boolean, id:string){
+  snippetIsLoading(status: boolean, id: string) {
     console.log(status, id);
     this.logbookScrollService.setItemStatus(id, status);
   }

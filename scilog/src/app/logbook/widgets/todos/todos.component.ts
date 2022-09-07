@@ -45,7 +45,7 @@ export class TodosComponent implements OnInit {
 
     this.subscriptions.push(this.views.currentWidgetConfigs.subscribe(config => {
       if (this.notificationSubscription == null) {
-        console.log(this.logbookInfo.logbookInfo); 
+        console.log(this.logbookInfo.logbookInfo);
         let configTasks = config[this.configIndex].config;
         configTasks.filter.snippetType = ["task"];
 
@@ -62,8 +62,12 @@ export class TodosComponent implements OnInit {
 
   addTasks() {
     let newTask: Tasks = {
-      ownerGroup: this.logbookInfo.logbookInfo.ownerGroup,
-      accessGroups: this.logbookInfo.logbookInfo.accessGroups,
+      createACL: this.logbookInfo.logbookInfo.createACL,
+      readACL: this.logbookInfo.logbookInfo.readACL,
+      updateACL: this.logbookInfo.logbookInfo.updateACL,
+      deleteACL: this.logbookInfo.logbookInfo.deleteACL,
+      shareACL: this.logbookInfo.logbookInfo.shareACL,
+      adminACL: this.logbookInfo.logbookInfo.adminACL,
       isPrivate: this.logbookInfo.logbookInfo.isPrivate,
       parentId: this.logbookInfo.logbookInfo.id,
       snippetType: "task",
@@ -95,7 +99,7 @@ export class TodosComponent implements OnInit {
     this.subscriptions.forEach(sub => {
       sub.unsubscribe();
     })
-    if (this.notificationSubscription != null){
+    if (this.notificationSubscription != null) {
       this.notificationSubscription.unsubscribe();
     }
   }

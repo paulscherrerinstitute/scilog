@@ -87,7 +87,12 @@ export class ViewsService {
       if (this.views.length == 0) {
         this.views.push({
           name: this.userPreferences.userInfo.username + "_personal",
-          ownerGroup: this.userPreferences.userInfo.username,
+          createACL: [this.userPreferences.userInfo.username],
+          readACL: [this.userPreferences.userInfo.username],
+          updateACL: [this.userPreferences.userInfo.username],
+          deleteACL: [this.userPreferences.userInfo.username],
+          shareACL: [this.userPreferences.userInfo.username],
+          adminACL: [this.userPreferences.userInfo.username],
           snippetType: 'view',
           parentId: this.currentLogbook.id,
           configuration: {
@@ -122,7 +127,7 @@ export class ViewsService {
     this.saveView();
   }
 
-  public updateAllWidgets(config: WidgetConfig[]){
+  public updateAllWidgets(config: WidgetConfig[]) {
     this.updateView(config);
     this.saveView();
   }
@@ -158,7 +163,12 @@ export class ViewsService {
         // create new personal view entry
         let payload: Views = {
           name: this.userPreferences.userInfo.username + "_personal",
-          ownerGroup: this.userPreferences.userInfo.username,
+          createACL: [this.userPreferences.userInfo.username],
+          readACL: [this.userPreferences.userInfo.username],
+          updateACL: [this.userPreferences.userInfo.username],
+          deleteACL: [this.userPreferences.userInfo.username],
+          shareACL: [this.userPreferences.userInfo.username],
+          adminACL: [this.userPreferences.userInfo.username],
           snippetType: 'view',
           parentId: this.currentLogbook.id,
           configuration: {
@@ -168,7 +178,7 @@ export class ViewsService {
         }
         console.log(JSON.stringify(payload))
         let view_db = await this.dataService.postView(payload);
-        if (view_db?.id){
+        if (view_db?.id) {
           this.views[this.personalViewIndex] = view_db;
         }
         console.log(view_db);
@@ -205,7 +215,7 @@ export class ViewsService {
 
 
   private updateWidgetConfigTemplate() {
-    this._currentView.configuration.widgetConfig.forEach((configs:WidgetConfig) => {
+    this._currentView.configuration.widgetConfig.forEach((configs: WidgetConfig) => {
       if (configs.config?.filter) {
         configs.config.filter.targetId = this.currentLogbook.id;
       }
@@ -217,7 +227,7 @@ export class ViewsService {
       this.personalViewIndex = null;
     } else {
       for (let index = 0; index < this.views.length; index++) {
-        if (this.views[index].name == this.views[index].ownerGroup + "_personal") {
+        if (this.views[index].name == this.userPreferences.userInfo.username + "_personal") {
           this.personalViewIndex = index;
         }
       }

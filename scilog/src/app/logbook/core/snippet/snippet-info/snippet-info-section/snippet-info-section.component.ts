@@ -20,7 +20,7 @@ export class SnippetInfoSectionComponent implements OnInit {
   @ViewChild('autosize') autosize: CdkTextareaAutosize;
 
   infoFieldsGeneral = ['id', 'dashboardName'];
-  infoFieldsPermissions = ['ownerGroup', 'accessGroups'];
+  infoFieldsPermissions = ['createACL', 'readACL', 'updateACL', 'deleteACL', 'shareACL', 'adminACL'];
   infoFieldsType = ['snippetType'];
   infoFieldsCreated = ['createdBy', 'createdAt'];
   infoFieldsUpdated = ['updatedBy', 'updatedAt'];
@@ -33,7 +33,7 @@ export class SnippetInfoSectionComponent implements OnInit {
   triggerResize() {
     // Wait for changes to be applied, then trigger textarea resize.
     this._ngZone.onStable.pipe(take(1))
-        .subscribe(() => this.autosize.resizeToFitContent(true));
+      .subscribe(() => this.autosize.resizeToFitContent(true));
   }
 
 }

@@ -2,7 +2,7 @@ import { Component, ElementRef, Inject, Input, OnInit, ViewChild } from '@angula
 import { AbstractControl, FormBuilder, FormControl, FormGroup, ValidatorFn, Validators } from '@angular/forms';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { Observable, Subscription } from 'rxjs';
-import { CompactType, DisplayGrid, GridsterConfig, GridsterItem,GridType } from 'angular-gridster2';
+import { CompactType, DisplayGrid, GridsterConfig, GridsterItem, GridType } from 'angular-gridster2';
 import { COMMA, ENTER, SPACE } from '@angular/cdk/keycodes';
 import { MatAutocompleteSelectedEvent, MatAutocomplete } from '@angular/material/autocomplete';
 import { MatChipInputEvent } from '@angular/material/chips';
@@ -12,7 +12,7 @@ import { Logbooks } from '@model/logbooks';
 import { LogbookDataService, LogbookItemDataService } from '@shared/remote-data.service';
 
 
-export function ownerGroupMemberValidator(groups: string[]): ValidatorFn {
+export function updateACLMemberValidator(groups: string[]): ValidatorFn {
   return (control: AbstractControl): { [key: string]: any } | null => {
     const forbidden = !groups.includes(control.value);
     return forbidden ? { forbiddenGroup: { value: control.value } } : null;
@@ -97,7 +97,7 @@ export class AddLogbookComponent implements OnInit {
   separatorKeysCodes: number[] = [ENTER, COMMA, SPACE];
   accessGroupsCtrl = new FormControl();
   filteredAccessGroups: Observable<string[]>;
-  filteredOwnerGroups: Observable<string[]>;
+  filteredUpdateACL: Observable<string[]>;
   accessGroupsSelected: string[] = [];
   accessGroupsAvail: string[] = [];
 
@@ -119,8 +119,9 @@ export class AddLogbookComponent implements OnInit {
       title: new FormControl('', Validators.required),
       description: new FormControl(''),
       location: new FormControl('', Validators.required),
-      ownerGroup: new FormControl('', Validators.required),
-      accessGroups: new FormControl(''),
+      updateACL: new FormControl('', Validators.required),
+      readACL: new FormControl(''),
+      createACL: new FormControl(''),
       isPrivate: new FormControl(false)
     });
     this.logbook = data;
@@ -133,13 +134,14 @@ export class AddLogbookComponent implements OnInit {
     this.setDefaults();
   }
 
-  setDefaults(){
+  setDefaults() {
     if (this.logbook) {
       this.optionsFormGroup.get('title').setValue(this.logbook.name);
       this.optionsFormGroup.get('description').setValue(this.logbook.description);
       this.optionsFormGroup.get('location').setValue(this.logbook.location);
-      this.optionsFormGroup.get('ownerGroup').setValue(this.logbook.ownerGroup);
-      this.optionsFormGroup.get('accessGroups').setValue(this.logbook.accessGroups);
+      this.optionsFormGroup.get('createACL').setValue(this.logbook.createACL);
+      this.optionsFormGroup.get('readACL').setValue(this.logbook.readACL);
+      this.optionsFormGroup.get('updateACL').setValue(this.logbook.updateACL);
       this.optionsFormGroup.get('isPrivate').setValue(this.logbook.isPrivate);
       this.imageUrl = this.logbook.thumbnail;
       if (this.imageUrl) {
@@ -150,19 +152,14 @@ export class AddLogbookComponent implements OnInit {
 
     this.accessGroupsAvail = this.userPreferences.userInfo?.roles;
     this.filteredAccessGroups = this.accessGroupsCtrl.valueChanges.pipe(startWith(null), map((accessGroup: string | null) => accessGroup ? this._filter(accessGroup) : this.accessGroupsAvail.slice()));
-    this.filteredOwnerGroups = this.optionsFormGroup.get('ownerGroup').valueChanges.pipe(startWith(null), map((accessGroup: string | null) => accessGroup ? this._filter(accessGroup) : this.accessGroupsAvail.slice()));
-    this.optionsFormGroup.get('ownerGroup').setValidators([ownerGroupMemberValidator(this.accessGroupsAvail)]);
-    // let ownerGroupIndex = Object.keys(this.data.filters).find(k => this.data.filters[k].name == 'ownerGroup');
-    // if (typeof ownerGroupIndex != 'undefined') {
-    //   this.optionsFormGroup.get('ownerGroup').setValue(this.data.filters[ownerGroupIndex].value);
-    // } 
-
+    this.filteredUpdateACL = this.optionsFormGroup.get('updateACL').valueChanges.pipe(startWith(null), map((accessGroup: string | null) => accessGroup ? this._filter(accessGroup) : this.accessGroupsAvail.slice()));
+    this.optionsFormGroup.get('updateACL').setValidators([updateACLMemberValidator(this.accessGroupsAvail)]);
 
   }
 
-  async getLocations(){
+  async getLocations() {
     let data = await this.logbookDataService.getLocations();
-    if (data.length > 0){
+    if (data.length > 0) {
       this.availLocations = data[0].subsnippets;
     }
   }
@@ -196,9 +193,9 @@ export class AddLogbookComponent implements OnInit {
     if (this.optionsFormGroup.invalid) {
       console.log("form invalid")
       for (const key in this.optionsFormGroup.controls) {
-          if (this.optionsFormGroup.get(key).invalid){
-            this.optionsFormGroup.get(key).setErrors({'required': true});
-          }
+        if (this.optionsFormGroup.get(key).invalid) {
+          this.optionsFormGroup.get(key).setErrors({ 'required': true });
+        }
       }
       return;
     }
@@ -211,8 +208,9 @@ export class AddLogbookComponent implements OnInit {
     this.logbook = {
       name: this.optionsFormGroup.get('title').value,
       location: this.optionsFormGroup.get('location').value,
-      ownerGroup: this.optionsFormGroup.get('ownerGroup').value,
-      accessGroups: this.accessGroupsSelected,
+      createACL: this.optionsFormGroup.get('createACL').value,
+      readACL: this.optionsFormGroup.get('readACL').value,
+      updateACL: this.optionsFormGroup.get('updateACL').value,
       isPrivate: this.optionsFormGroup.get('isPrivate').value,
       thumbnail: this.imageUrl,
       description: this.optionsFormGroup.get('description').value
