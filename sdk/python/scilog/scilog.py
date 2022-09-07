@@ -109,6 +109,7 @@ class SciLog:
                 **{key: val for key, val in payload.items() if key in ACLS},
             )
             file["fileId"] = filesnippet.id
+            file["accessHash"] = filesnippet.accessHash
             file.pop("filepath")
         return payload
 
@@ -193,7 +194,8 @@ class SciLog:
     def prepare_file_content(filepath: str, fsnippet: Filesnippet = None) -> Tuple:
         file_extension = filepath.split(".")[-1].lower()
         file_hash = str(uuid.uuid4())
-        file_id = fsnippet.id if fsnippet.id else None  #  str(uuid.uuid4())
+        file_id = fsnippet.id if fsnippet and fsnippet.id else None 
+        accessHash = fsnippet.accessHash if fsnippet and fsnippet.accessHash else None 
 
         if file_extension in SciLog.IMAGE_TYPES:
             textcontent = (
@@ -204,7 +206,7 @@ class SciLog:
                 "filepath": filepath,
                 "fileExtension": f"image/{file_extension}",
                 "fileId": file_id,
-                "accessHash": fsnippet.accessHash,
+                "accessHash": accessHash,
                 "style": {"width": "82.25%", "height": ""},
             }
 
@@ -215,7 +217,7 @@ class SciLog:
                 "filepath": filepath,
                 "fileExtension": f"file/{file_extension}",
                 "fileId": file_id,
-                "accessHash": fsnippet.accessHash,
+                "accessHash": accessHash,
             }
         return (file_info, textcontent)
 
