@@ -2,7 +2,7 @@ import { authenticate } from '@loopback/authentication';
 import { authorize } from '@loopback/authorization';
 import { inject } from '@loopback/core';
 import { Count, CountSchema, Filter, FilterExcludingWhere, repository, Where } from '@loopback/repository';
-import { del, get, getModelSchemaRef, HttpErrors, param, patch, post, put, Request, requestBody, Response, RestBindings } from '@loopback/rest';
+import { del, get, getModelSchemaRef, HttpErrors, param, patch, post, Request, requestBody, Response, RestBindings } from '@loopback/rest';
 import { SecurityBindings, UserProfile } from '@loopback/security';
 import formidable from 'formidable';
 import fs from 'fs';
@@ -310,22 +310,6 @@ export class FileController {
     file: Filesnippet,
   ): Promise<void> {
     await this.fileRepository.updateById(id, file, { currentUser: this.user });
-  }
-
-
-  @put('/filesnippet/{id}', {
-    security: OPERATION_SECURITY_SPEC,
-    responses: {
-      '204': {
-        description: 'File PUT success',
-      },
-    },
-  })
-  async replaceById(
-    @param.path.string('id') id: string,
-    @requestBody() file: Filesnippet,
-  ): Promise<void> {
-    await this.fileRepository.replaceById(id, file, { currentUser: this.user });
   }
 
   @del('/filesnippet/{id}', {

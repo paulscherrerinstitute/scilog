@@ -12,7 +12,6 @@ import {
   get,
   getModelSchemaRef,
   patch,
-  put,
   del,
   requestBody,
 } from '@loopback/rest';
@@ -160,21 +159,6 @@ export class LocationController {
     location: Location,
   ): Promise<void> {
     await this.locationRepository.updateById(id, location, { currentUser: this.user });
-  }
-
-  @put('/locations/{id}', {
-    security: OPERATION_SECURITY_SPEC,
-    responses: {
-      '204': {
-        description: 'Location PUT success',
-      },
-    },
-  })
-  async replaceById(
-    @param.path.string('id') id: string,
-    @requestBody() location: Location,
-  ): Promise<void> {
-    await this.locationRepository.replaceById(id, location, { currentUser: this.user });
   }
 
   @del('/locations/{id}', {
