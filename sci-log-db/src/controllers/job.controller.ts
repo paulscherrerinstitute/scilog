@@ -9,14 +9,10 @@ import {
   Where,
 } from '@loopback/repository';
 import {
-  del,
-  get,
-  getModelSchemaRef,
-  param,
-  patch,
-  post,
-  put,
-  requestBody,
+  del, get,
+  getModelSchemaRef, param,
+  patch, post,
+  requestBody
 } from '@loopback/rest';
 import {Job} from '../models/job.model';
 import {JobRepository} from '../repositories/job.repository';
@@ -158,21 +154,6 @@ export class JobController {
     job: Job,
   ): Promise<void> {
     await this.jobRepository.updateById(id, job, {currentUser: this.user});
-  }
-
-  @put('/jobs/{id}', {
-    security: OPERATION_SECURITY_SPEC,
-    responses: {
-      '204': {
-        description: 'Job PUT success',
-      },
-    },
-  })
-  async replaceById(
-    @param.path.string('id') id: string,
-    @requestBody() job: Job,
-  ): Promise<void> {
-    await this.jobRepository.replaceById(id, job, {currentUser: this.user});
   }
 
   @del('/jobs/{id}', {

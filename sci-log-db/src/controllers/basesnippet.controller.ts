@@ -16,7 +16,6 @@ import {
   param,
   patch,
   post,
-  put,
   requestBody,
   Response,
   RestBindings,
@@ -267,23 +266,6 @@ export class BasesnippetController {
     basesnippet: Basesnippet,
   ): Promise<void> {
     await this.basesnippetRepository.updateByIdWithHistory(id, basesnippet, {
-      currentUser: this.user,
-    });
-  }
-
-  @put('/basesnippets/{id}', {
-    security: OPERATION_SECURITY_SPEC,
-    responses: {
-      '204': {
-        description: 'Basesnippet PUT success',
-      },
-    },
-  })
-  async replaceById(
-    @param.path.string('id') id: string,
-    @requestBody() basesnippet: Basesnippet,
-  ): Promise<void> {
-    await this.basesnippetRepository.replaceById(id, basesnippet, {
       currentUser: this.user,
     });
   }

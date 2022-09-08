@@ -12,7 +12,6 @@ import {
   get,
   getModelSchemaRef,
   patch,
-  put,
   del,
   requestBody,
 } from '@loopback/rest';
@@ -140,20 +139,6 @@ export class ViewController {
     view: View,
   ): Promise<void> {
     await this.viewRepository.updateById(id, view);
-  }
-
-  @put('/views/{id}', {
-    responses: {
-      '204': {
-        description: 'View PUT success',
-      },
-    },
-  })
-  async replaceById(
-    @param.path.string('id') id: string,
-    @requestBody() view: View,
-  ): Promise<void> {
-    await this.viewRepository.replaceById(id, view);
   }
 
   @del('/views/{id}', {

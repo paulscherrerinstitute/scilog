@@ -1,24 +1,8 @@
 import {authenticate} from '@loopback/authentication';
 import {authorize} from '@loopback/authorization';
 import {inject} from '@loopback/core';
-import {
-  Count,
-  CountSchema,
-  Filter,
-  FilterExcludingWhere,
-  repository,
-  Where,
-} from '@loopback/repository';
-import {
-  del,
-  get,
-  getModelSchemaRef,
-  param,
-  patch,
-  post,
-  put,
-  requestBody,
-} from '@loopback/rest';
+import {Count, CountSchema, Filter, FilterExcludingWhere, repository, Where} from '@loopback/repository';
+import {del, get, getModelSchemaRef, param, patch, post, requestBody} from '@loopback/rest';
 import {SecurityBindings, UserProfile} from '@loopback/security';
 import {Logbook} from '../models';
 import {LogbookRepository} from '../repositories';
@@ -213,23 +197,6 @@ export class LogbookController {
     logbook: Logbook,
   ): Promise<void> {
     await this.logbookRepository.updateByIdWithHistory(id, logbook, {
-      currentUser: this.user,
-    });
-  }
-
-  @put('/logbooks/{id}', {
-    security: OPERATION_SECURITY_SPEC,
-    responses: {
-      '204': {
-        description: 'Logbook PUT success',
-      },
-    },
-  })
-  async replaceById(
-    @param.path.string('id') id: string,
-    @requestBody() logbook: Logbook,
-  ): Promise<void> {
-    await this.logbookRepository.replaceById(id, logbook, {
       currentUser: this.user,
     });
   }

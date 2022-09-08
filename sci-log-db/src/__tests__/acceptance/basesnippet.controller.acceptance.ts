@@ -52,7 +52,7 @@ describe('Base snippet controller services', function (this: Suite) {
 
     const postResponse = await client.post('/locations')
       .set('Authorization', 'Bearer ' + token)
-      .send({ snippetType: 'location', textcontent: 'Abstract goes here...', ...acls })
+      .send({ snippetType: 'location', name:'cSAXS', location: 'PSI/SLS/CSAXS', ...acls })
       .expect(200)
       .then()
       .catch((err) => {
