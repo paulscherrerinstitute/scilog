@@ -20,7 +20,13 @@ enum LinkType {
 export class Paragraph extends Basesnippet {
   @property({
     type: 'string',
-    description: 'Markup contents in markdown (MD) syntax of this paragraph',
+    default: 'paragraph',
+  })
+  snippetType: string;
+
+  @property({
+    type: 'string',
+    description: 'Markup contents in markdown (MD) syntax of this paragraph'
   })
   textcontent?: string;
 

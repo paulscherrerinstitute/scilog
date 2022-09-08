@@ -13,7 +13,13 @@ import {Basesnippet} from './basesnippet.model';
 export class Task extends Basesnippet {
   @property({
     type: 'string',
-    description: 'Description of the task',
+    default: 'task',
+  })
+  snippetType: string;
+
+  @property({
+    type: 'string',
+    description: 'Description of the task'
   })
   content: string;
 

@@ -13,7 +13,13 @@ import {Basesnippet} from './basesnippet.model';
 export class Job extends Basesnippet {
   @property({
     type: 'string',
-    description: 'Job description',
+    default: 'job',
+  })
+  snippetType: string;
+
+  @property({
+    type: 'string',
+    description: 'Job description'
   })
   description?: string;
 
