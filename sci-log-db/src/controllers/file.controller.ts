@@ -465,7 +465,6 @@ export class FileController {
           reject({error: error});
         })
         .on('finish', async () => {
-          console.log('done!');
           formData.fields['_fileId'] = id;
           formData.fields['contentType'] = formData.files.file.type;
           // eslint-disable-next-line  @typescript-eslint/no-floating-promises

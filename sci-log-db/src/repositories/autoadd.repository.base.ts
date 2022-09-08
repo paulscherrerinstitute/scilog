@@ -7,6 +7,7 @@ import {
   juggler,
   Model,
 } from '@loopback/repository';
+import { Basesnippet } from '../models/basesnippet.model';
 
 export class AutoAddRepository<
   T extends Entity,
@@ -46,6 +47,7 @@ export class AutoAddRepository<
     definePersistedModel(entityClass: typeof Model) {
         const modelClass = super.definePersistedModel(entityClass);
         modelClass.observe('before save', async ctx => {
+            // console.log("=============== before save:", entityClass.modelName, JSON.stringify(ctx, null, 3))
             let currentUser: any;
             if (!ctx?.options.hasOwnProperty('currentUser')) {
                 throw new Error("Unexpected user context: Current user cannot be retrieved.")
@@ -55,13 +57,37 @@ export class AutoAddRepository<
             // console.log(`going to save ${ctx.Model.modelName} ${ctx}`);
             // PATCH case
             if (ctx.data) {
-                // console.error("PATCH case")
+                // console.log("PATCH case")
                 ctx.data.updatedAt = new Date();
                 ctx.data.updatedBy = currentUser?.email ?? 'unknown@domain.org';
+                // remove all auto generated fields
+                delete ctx.data.createdAt
+                delete ctx.data.createdBy
+                delete ctx.data.expiresAt
+                // drop any potential ACLs unless admin
+                if (ctx.data.createACL !== undefined ||
+                    ctx.data.readACL !== undefined ||
+                    ctx.data.updateACL !== undefined ||
+                    ctx.data.deleteACL !== undefined ||
+                    ctx.data.shareACL !== undefined ||
+                    ctx.data.adminACL !== undefined) {
+                    // get instance data to check admin rights
+                    const instance=await this.findById(ctx.where.id, {}, { currentUser: currentUser }) as unknown as Basesnippet
+                    // console.log("Got instance since someoone tried to change ACLS:",instance)
+                    if (currentUser.roles.filter((element: string) => instance.adminACL.includes(element)).length = 0) {
+                        delete ctx.data.createACL
+                        delete ctx.data.readACL
+                        delete ctx.data.updateACL
+                        delete ctx.data.deleteACL
+                        delete ctx.data.shareACL
+                        delete ctx.data.adminACL
+                    }
+                }
+
             } else {
                 if (ctx.isNewInstance) {
                     // POST case
-                    // console.error("POST case")
+                    // console.log("POST case")
                     ctx.instance.defaultOrder = ctx.instance.defaultOrder ?? Date.now() * 1000;
                     // only admin may override createdAt/updateAt etc fields
                     if (currentUser.roles.includes('admin')) {
@@ -82,18 +108,19 @@ export class AutoAddRepository<
                         ctx.instance.expiresAt.setDate(ctx.instance.expiresAt.getDate() + 3);
                     }
                 } else {
-                    // PUT case
-                    // console.error("PUT case")
+                    // PUT case not supported
+                    // console.log("PUT case")
                     // TODO restore auto generated fields, which would otherwise be lost
                     // ctx.instance.unsetAttribute('id')
                 }
 
             }
-            //console.error("going to save:" + JSON.stringify(ctx, null, 3))
+            console.log("going to save:" + JSON.stringify(ctx, null, 3))
 
         });
 
         modelClass.observe('access', async ctx => {
+            // console.log("=========Access Observe:", ctx?.options)
             let currentUser: any;
             if (ctx?.options.hasOwnProperty('openAccess') && ctx.options.openAccess) {
                 return;
@@ -120,7 +147,7 @@ export class AutoAddRepository<
                     };
                 }
             }
-            console.log("query:", JSON.stringify(ctx.query, null, 3));
+            // console.log("query:", JSON.stringify(ctx.query, null, 3));
         })
         return modelClass;
     }

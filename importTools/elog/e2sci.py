@@ -113,6 +113,9 @@ for fn in fns:
     if default_pgroup == "any-authenticated-user":
         continue
 
+    # if data_in["MID"] > 10757 :
+    #      continue
+
     print ("This msg is selected")
     # remove ignored entries
     for i in ignored:
@@ -141,9 +144,13 @@ for fn in fns:
     data_out["updatedBy"] = author
 
     pgroup = data_in.pop("P-Group", default_pgroup)
-    data_out["ownerGroup"] = pgroup
 
-    data_out["accessGroups"] = []
+    data_out["createACL"] = [pgroup]
+    data_out["readACL"] = ["default"]
+    data_out["updateACL"] = ["default"]
+    data_out["deleteACL"] = ["default"]
+    data_out["shareACL"] = ["default"]
+    data_out["adminACL"] = ["default"]
 
     attchs = data_in.pop("attachments")
     # remove empty entries which seem sometimes to appear
