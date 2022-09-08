@@ -353,7 +353,7 @@ export class FileController {
           reject({ error: error });
         }).
         on('finish', async () => {
-          console.log('done!');
+          // console.log('done!');
           formData.fields['_fileId'] = id;
           formData.fields['contentType'] = formData.files.file.type;
           cb(formData, resolve, reject)

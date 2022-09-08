@@ -28,12 +28,10 @@ with open("./elog/scilog.json", "r") as stream:
     snippets = json.loads(content)
 
 for snippet in snippets:
-    pgroup=snippet["ownerGroup"]
-    if pgroup == "any-authenticated-user":
+    owner=snippet["createACL"]
+    if owner == "any-authenticated-user":
         continue
-    # if pgroup < "p19000" :
-    #    continue
-    logbooks = log.get_logbooks(ownerGroup=pgroup)
+    logbooks = log.get_logbooks(createACL=owner)
     assert len(logbooks) >= 1
     logbook = logbooks[0]
     log.select_logbook(logbook)
