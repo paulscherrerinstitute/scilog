@@ -30,6 +30,12 @@ export class Location extends Basesnippet {
 
   @property({
     type: 'string',
+    default: 'location',
+  })
+  snippetType: string;
+
+  @property({
+    type: 'string',
     description: 'Name of the location, e.g. X12SA'
   })
   name: string;

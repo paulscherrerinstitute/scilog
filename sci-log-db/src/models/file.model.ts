@@ -6,12 +6,18 @@ import { Image } from './image.model';
   settings: {
     strict: true,
     scope: {
-      where: { snippetType: 'image' }
+      where: { snippetType: 'filesnippet' }
     },
     mongodb: { collection: 'Basesnippet' }
   }
 })
 export class Filesnippet extends Basesnippet {
+
+  @property({
+    type: 'string',
+    default: 'filesnippet',
+  })
+  snippetType: string;
 
   @property({
     type: 'string',

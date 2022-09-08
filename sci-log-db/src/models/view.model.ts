@@ -1,8 +1,22 @@
 import {model, property} from '@loopback/repository';
 import {Basesnippet} from './basesnippet.model';
 
-@model()
+@model({
+  settings: {
+    strict: true,
+    scope: {
+      where: {snippetType: 'view'}
+    },
+    mongodb: {collection: 'Basesnippet'}
+  }
+})
 export class View extends Basesnippet {
+
+  @property({
+    type: 'string',
+    default: 'view',
+  })
+  snippetType: string;
 
   @property({
     type: 'string',
