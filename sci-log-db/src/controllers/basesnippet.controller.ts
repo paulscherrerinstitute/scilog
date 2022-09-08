@@ -337,23 +337,7 @@ export class BasesnippetController {
     @param.path.string('id') id: string,
     @param.filter(Basesnippet, { exclude: 'where' }) filter?: FilterExcludingWhere<Basesnippet>
   ): Promise<Basesnippet> {
-    return this.basesnippetRepository.findById(id, filter, { currentUser: this.user }).then((sn) => {
-      sn.calculatedACLs = ""
-      if ((this.user.roles.filter((element: string) => sn.updateACL.includes(element))).length > 0) {
-        sn.calculatedACLs += "U"
-      }
-      if ((this.user.roles.filter((element: string) => sn.deleteACL.includes(element))).length > 0) {
-        sn.calculatedACLs += "D"
-      }
-      if ((this.user.roles.filter((element: string) => sn.shareACL.includes(element))).length > 0) {
-        sn.calculatedACLs += "S"
-      }
-      if ((this.user.roles.filter((element: string) => sn.adminACL.includes(element))).length > 0) {
-        sn.calculatedACLs += "A"
-      }
-      return sn
-    }
-    );
+    return this.basesnippetRepository.findById(id, filter, { currentUser: this.user })
   }
 
   @patch('/basesnippets/{id}', {
