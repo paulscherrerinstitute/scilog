@@ -96,14 +96,19 @@ export class AddLogbookComponent implements OnInit {
   removable = true;
   separatorKeysCodes: number[] = [ENTER, COMMA, SPACE];
   accessGroupsCtrl = new FormControl();
+  updateGroupsCtrl = new FormControl();
   filteredAccessGroups: Observable<string[]>;
-  filteredUpdateACL: Observable<string[]>;
+  filteredUpdateGroups: Observable<string[]>;
   accessGroupsSelected: string[] = [];
-  accessGroupsAvail: string[] = [];
+  updateGroupsSelected: string[] = [];
+  availableGroups: string[] = [];
 
 
   @ViewChild('accessGroupsInput') accessGroupsInput: ElementRef<HTMLInputElement>;
-  @ViewChild('auto') matAutocomplete: MatAutocomplete;
+  @ViewChild('updateGroupsInput') updateGroupsInput: ElementRef<HTMLInputElement>;
+
+  @ViewChild('auto') matAutocompleteUpdateGroups: MatAutocomplete;
+  @ViewChild('autoComplAccess') matAutocompleteAccessGroups: MatAutocomplete;
 
 
   constructor(
@@ -119,7 +124,7 @@ export class AddLogbookComponent implements OnInit {
       title: new FormControl('', Validators.required),
       description: new FormControl(''),
       location: new FormControl('', Validators.required),
-      updateACL: new FormControl('', Validators.required),
+      updateACL: new FormControl(''),
       readACL: new FormControl(''),
       createACL: new FormControl(''),
       isPrivate: new FormControl(false)
@@ -150,10 +155,9 @@ export class AddLogbookComponent implements OnInit {
       console.log("editing existing logbook");
     }
 
-    this.accessGroupsAvail = this.userPreferences.userInfo?.roles;
-    this.filteredAccessGroups = this.accessGroupsCtrl.valueChanges.pipe(startWith(null), map((accessGroup: string | null) => accessGroup ? this._filter(accessGroup) : this.accessGroupsAvail.slice()));
-    this.filteredUpdateACL = this.optionsFormGroup.get('updateACL').valueChanges.pipe(startWith(null), map((accessGroup: string | null) => accessGroup ? this._filter(accessGroup) : this.accessGroupsAvail.slice()));
-    this.optionsFormGroup.get('updateACL').setValidators([updateACLMemberValidator(this.accessGroupsAvail)]);
+    this.availableGroups = this.userPreferences.userInfo?.roles;
+    this.filteredAccessGroups = this.accessGroupsCtrl.valueChanges.pipe(startWith(null), map((accessGroup: string | null) => accessGroup ? this._filter(accessGroup) : this.availableGroups.slice()));
+    this.filteredUpdateGroups = this.updateGroupsCtrl.valueChanges.pipe(startWith(null), map((accessGroup: string | null) => accessGroup ? this._filter(accessGroup) : this.availableGroups.slice()));
 
   }
 
@@ -278,11 +282,36 @@ export class AddLogbookComponent implements OnInit {
     this.accessGroupsCtrl.setValue(null);
   }
 
+  addUpdateGroup(event: MatChipInputEvent): void {
+    const input = event.input;
+    const value = event.value;
+
+    // Add accessGroup
+    if ((value || '').trim()) {
+      this.updateGroupsSelected.push(value.trim());
+    }
+
+    // Reset the input value
+    if (input) {
+      input.value = '';
+    }
+
+    this.updateGroupsCtrl.setValue(null);
+  }
+
   removeAccessGroup(accessGroup: string): void {
     const index = this.accessGroupsSelected.indexOf(accessGroup);
 
     if (index >= 0) {
       this.accessGroupsSelected.splice(index, 1);
+    }
+  }
+
+  removeUpdateACLGroup(updateACL: string): void {
+    const index = this.updateGroupsSelected.indexOf(updateACL);
+
+    if (index >= 0) {
+      this.updateGroupsSelected.splice(index, 1);
     }
   }
 
@@ -292,10 +321,16 @@ export class AddLogbookComponent implements OnInit {
     this.accessGroupsCtrl.setValue(null);
   }
 
+  selectedUpdateGroup(event: MatAutocompleteSelectedEvent): void {
+    this.updateGroupsSelected.push(event.option.viewValue);
+    this.updateGroupsInput.nativeElement.value = '';
+    this.updateGroupsCtrl.setValue(null);
+  }
+
   private _filter(value: string): string[] {
     const filterValue = value.toLowerCase();
 
-    return this.accessGroupsAvail.filter(accessGroup => accessGroup.toLowerCase().indexOf(filterValue) === 0);
+    return this.availableGroups.filter(accessGroup => accessGroup.toLowerCase().indexOf(filterValue) === 0);
   }
 
   onFileChanged($event) {

@@ -9,7 +9,7 @@ import { Basesnippets } from '@model/basesnippets';
 import { Logbooks } from '@model/logbooks';
 import { Views } from '@model/views';
 import { map, startWith } from 'rxjs/operators';
-import {accessGroupsMemberValidator, ownerGroupMemberValidator} from '../view-settings.component';
+import { readACLMemberValidator, updateACLMemberValidator } from '../view-settings.component';
 import { ViewDataService } from '@shared/remote-data.service';
 
 @Component({
@@ -63,8 +63,8 @@ export class ViewEditComponent implements OnInit {
       views: new FormControl('', [Validators.required]),
       description: new FormControl(''),
       location: new FormControl('', Validators.required),
-      ownerGroup: new FormControl('', Validators.required),
-      accessGroupsCtrl: new FormControl({value: '', disabled: true}),
+      updateACL: new FormControl('', Validators.required),
+      readACLCtrl: new FormControl({ value: '', disabled: true }),
       shareWithLocation: new FormControl({ value: false, disabled: true }),
       shareWithLogbook: new FormControl(false),
       applyCurrentView: new FormControl(false),
@@ -76,7 +76,7 @@ export class ViewEditComponent implements OnInit {
       if (loc.id == this.logbook.location) {
         this.currentLocation = loc;
         this.userPreferences.userInfo.roles.forEach(role => {
-          if (role == this.currentLocation.ownerGroup) {
+          if (this.currentLocation.updateACL.includes(role)) {
             this.editFormGroup.get("shareWithLocation").setValue({ value: false, disabled: false });
           }
         })
@@ -84,9 +84,9 @@ export class ViewEditComponent implements OnInit {
     })
     this.accessGroupsAvail = this.userPreferences.userInfo?.roles;
     this.filteredAccessGroups = this.editFormGroup.get('accessGroupsCtrl').valueChanges.pipe(startWith(null), map((accessGroup: string | null) => accessGroup ? this._filter(accessGroup) : this.accessGroupsAvail.slice()));
-    this.editFormGroup.get('accessGroupsCtrl').setValidators([accessGroupsMemberValidator(this.accessGroupsAvail, this.accessGroupsSelected)]);
-    this.editFormGroup.get('ownerGroup').setValidators([Validators.required, ownerGroupMemberValidator(this.accessGroupsAvail)]);
-    
+    this.editFormGroup.get('accessGroupsCtrl').setValidators([readACLMemberValidator(this.accessGroupsAvail, this.accessGroupsSelected)]);
+    this.editFormGroup.get('ownerGroup').setValidators([Validators.required, updateACLMemberValidator(this.accessGroupsAvail)]);
+
   }
 
   selectLocation(id: any) {
@@ -147,8 +147,8 @@ export class ViewEditComponent implements OnInit {
     })
     this.toggleEnableForms(true);
   }
-  toggleEnableForms(enable: boolean){
-    if (enable){
+  toggleEnableForms(enable: boolean) {
+    if (enable) {
       this.editFormGroup.get('name').enable();
       this.editFormGroup.get('description').enable();
       this.editFormGroup.get('location').enable();
@@ -164,18 +164,18 @@ export class ViewEditComponent implements OnInit {
 
   }
 
-  updateForm(){
-    if (this.selectedView != null){
+  updateForm() {
+    if (this.selectedView != null) {
       this.editFormGroup.get('name').setValue(this.selectedView.name);
       this.editFormGroup.get('description').setValue(this.selectedView.description);
       this.editFormGroup.get('location').setValue(this.selectedView.location);
       this.accessGroupsAvail = this.userPreferences.userInfo?.roles;
-      if (this.selectedView.accessGroups.length > 0){
-        this.editFormGroup.get('accessGroupsCtrl').setValue(this.selectedView.accessGroups);
+      if (this.selectedView.readACL.length > 0) {
+        this.editFormGroup.get('accessGroupsCtrl').setValue(this.selectedView.readACL);
       } else {
         this.editFormGroup.get('accessGroupsCtrl').setValue('');
       }
-      this.editFormGroup.get('ownerGroup').setValue(this.selectedView.ownerGroup);
+      this.editFormGroup.get('ownerGroup').setValue(this.selectedView.updateACL);
     }
   }
 
@@ -184,12 +184,12 @@ export class ViewEditComponent implements OnInit {
     let payload: Views = {
       name: this.editFormGroup.get('name').value,
       location: this.editFormGroup.get('location').value,
-      ownerGroup: this.editFormGroup.get('ownerGroup').value,
-      accessGroups: this.accessGroupsSelected,
+      updateACL: this.editFormGroup.get('updateACL').value,
+      readACL: this.accessGroupsSelected,
       snippetType: "view",
       configuration: this.currentView.configuration
     }
-    if (payload.ownerGroup == this.currentLocation.ownerGroup) {
+    if (payload.updateACL == this.currentLocation.updateACL) {
       payload.parentId = this.currentLocation.id;
     } else {
       payload.parentId = this.logbook.id;
