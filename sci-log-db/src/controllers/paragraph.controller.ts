@@ -12,7 +12,6 @@ import {
   get,
   getModelSchemaRef,
   patch,
-  put,
   del,
   requestBody,
 } from '@loopback/rest';
@@ -160,21 +159,6 @@ export class ParagraphController {
     paragraph: Paragraph,
   ): Promise<void> {
     await this.paragraphRepository.updateById(id, paragraph, { currentUser: this.user });
-  }
-
-  @put('/paragraphs/{id}', {
-    security: OPERATION_SECURITY_SPEC,
-    responses: {
-      '204': {
-        description: 'Paragraph PUT success',
-      },
-    },
-  })
-  async replaceById(
-    @param.path.string('id') id: string,
-    @requestBody() paragraph: Paragraph,
-  ): Promise<void> {
-    await this.paragraphRepository.replaceById(id, paragraph, { currentUser: this.user });
   }
 
   @del('/paragraphs/{id}', {

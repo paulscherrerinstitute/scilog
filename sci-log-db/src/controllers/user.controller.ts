@@ -18,7 +18,6 @@ import {
   HttpErrors,
   param,
   post,
-  put,
   requestBody,
 } from '@loopback/rest';
 import {SecurityBindings, securityId, UserProfile} from '@loopback/security';
@@ -112,44 +111,6 @@ export class UserController {
       } else {
         throw error;
       }
-    }
-  }
-
-  @put('/users/{userId}', {
-    security: OPERATION_SECURITY_SPEC,
-    responses: {
-      '200': {
-        description: 'User',
-        content: {
-          'application/json': {
-            schema: {
-              'x-ts-type': User,
-            },
-          },
-        },
-      },
-    },
-  })
-  @authenticate('jwt')
-  @authorize({
-    allowedRoles: ['admin', 'any-authenticated-user'],
-    voters: [basicAuthorization],
-  })
-  async set(
-    @inject(SecurityBindings.USER)
-    currentUserProfile: UserProfile,
-    @param.path.string('userId') userId: string,
-    @requestBody({description: 'update user'}) user: User,
-  ): Promise<void> {
-    try {
-      // Only admin can assign roles
-      if (!currentUserProfile.roles.includes('admin')) {
-        delete user.roles;
-      }
-      const updatedUser = await this.userRepository.updateById(userId, user);
-      return updatedUser;
-    } catch (e: any) {
-      return e;
     }
   }
 

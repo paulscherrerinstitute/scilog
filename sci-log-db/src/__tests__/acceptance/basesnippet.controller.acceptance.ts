@@ -52,7 +52,7 @@ describe('Base snippet controller services', function (this: Suite) {
 
     const postResponse = await client.post('/locations')
       .set('Authorization', 'Bearer ' + token)
-      .send({ snippetType: 'location', textcontent: 'Abstract goes here...', ...acls })
+      .send({ name:'cSAXS', location: 'PSI/SLS/CSAXS', ...acls })
       .expect(200)
       .then()
       .catch((err) => {
@@ -64,6 +64,7 @@ describe('Base snippet controller services', function (this: Suite) {
       .send({ ...logbook, location: `${postResponse.body.id}` })
       .expect(200)
       .then((result) => {
+        expect(postResponse.body.snippetType).to.be.eql("location")
         logbookId = result.body.id
         // console.log("Found logbook id:",logbookId)
         expect(result.body.snippetType).to.be.eql("logbook")

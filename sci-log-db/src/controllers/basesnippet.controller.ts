@@ -2,7 +2,7 @@ import { authenticate } from '@loopback/authentication';
 import { authorize } from '@loopback/authorization';
 import { inject } from '@loopback/core';
 import { Count, CountSchema, Filter, FilterExcludingWhere, repository, Where } from '@loopback/repository';
-import { del, get, getModelSchemaRef, HttpErrors, oas, param, patch, post, put, requestBody, Response, RestBindings } from '@loopback/rest';
+import { del, get, getModelSchemaRef, HttpErrors, oas, param, patch, post, requestBody, Response, RestBindings } from '@loopback/rest';
 import { SecurityBindings, UserProfile } from '@loopback/security';
 import _ from 'lodash';
 import { EXPORT_SERVICE } from '../keys';
@@ -337,23 +337,7 @@ export class BasesnippetController {
     @param.path.string('id') id: string,
     @param.filter(Basesnippet, { exclude: 'where' }) filter?: FilterExcludingWhere<Basesnippet>
   ): Promise<Basesnippet> {
-    return this.basesnippetRepository.findById(id, filter, { currentUser: this.user }).then((sn) => {
-      sn.calculatedACLs = ""
-      if ((this.user.roles.filter((element: string) => sn.updateACL.includes(element))).length > 0) {
-        sn.calculatedACLs += "U"
-      }
-      if ((this.user.roles.filter((element: string) => sn.deleteACL.includes(element))).length > 0) {
-        sn.calculatedACLs += "D"
-      }
-      if ((this.user.roles.filter((element: string) => sn.shareACL.includes(element))).length > 0) {
-        sn.calculatedACLs += "S"
-      }
-      if ((this.user.roles.filter((element: string) => sn.adminACL.includes(element))).length > 0) {
-        sn.calculatedACLs += "A"
-      }
-      return sn
-    }
-    );
+    return this.basesnippetRepository.findById(id, filter, { currentUser: this.user })
   }
 
   @patch('/basesnippets/{id}', {
@@ -386,22 +370,6 @@ export class BasesnippetController {
       }
     }
     await this.basesnippetRepository.updateById(id, basesnippet, { currentUser: this.user });
-  }
-
-  @put('/basesnippets/{id}', {
-    security: OPERATION_SECURITY_SPEC,
-    responses: {
-      '204': {
-        description: 'Basesnippet PUT success',
-      },
-    },
-  })
-  async replaceById(
-    @param.path.string('id') id: string,
-    @requestBody() basesnippet: Basesnippet,
-  ): Promise<void> {
-        // TODO SE drop ACLs unless admin
-    await this.basesnippetRepository.replaceById(id, basesnippet, { currentUser: this.user });
   }
 
   @del('/basesnippets/{id}', {

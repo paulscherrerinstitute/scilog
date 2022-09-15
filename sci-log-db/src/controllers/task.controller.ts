@@ -12,15 +12,7 @@ import {
 import {
   del, get,
   getModelSchemaRef, param,
-
-
   patch, post,
-
-
-
-
-  put,
-
   requestBody
 } from '@loopback/rest';
 import {SecurityBindings, UserProfile} from '@loopback/security';
@@ -168,21 +160,6 @@ export class TaskController {
     task: Task,
   ): Promise<void> {
     await this.taskRepository.updateById(id, task, {currentUser: this.user});
-  }
-
-  @put('/task/{id}', {
-    security: OPERATION_SECURITY_SPEC,
-    responses: {
-      '204': {
-        description: 'Task PUT success',
-      },
-    },
-  })
-  async replaceById(
-    @param.path.string('id') id: string,
-    @requestBody() task: Task,
-  ): Promise<void> {
-    await this.taskRepository.replaceById(id, task, {currentUser: this.user});
   }
 
   @del('/tasks/{id}', {

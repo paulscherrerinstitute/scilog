@@ -14,6 +14,12 @@ export class Task extends Basesnippet {
 
   @property({
     type: 'string',
+    default: 'task',
+  })
+  snippetType: string;
+
+  @property({
+    type: 'string',
     description: 'Description of the task'
   })
   content: string;

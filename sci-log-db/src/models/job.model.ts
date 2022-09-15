@@ -14,6 +14,12 @@ export class Job extends Basesnippet {
 
   @property({
     type: 'string',
+    default: 'job',
+  })
+  snippetType: string;
+
+  @property({
+    type: 'string',
     description: 'Job description'
   })
   description?: string;
