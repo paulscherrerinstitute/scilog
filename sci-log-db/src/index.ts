@@ -12,7 +12,6 @@ export async function main(options: ApplicationConfig = {}) {
   await app.startWebsocket();
   const url = app.restServer.url;
   console.log(`Server is running at ${url}`);
-  console.log(`Try ${url}/ping`);
 
   return app;
 }
@@ -24,7 +23,7 @@ if (require.main === module) {
     rest: {
       port,
       host: process.env.HOST,
-      basePath: process.env.BASE_PATH ?? "",
+      basePath: process.env.BASE_PATH ?? '',
       // The `gracePeriodForClose` provides a graceful close for http/https
       // servers with keep-alive clients. The default value is `Infinity`
       // (don't force-close). If you want to immediately destroy all sockets
@@ -38,8 +37,10 @@ if (require.main === module) {
       websocket: {port},
     },
     databaseSeeding: false,
-    oidcOptions: fs.existsSync(path.resolve(__dirname, '../oidc.json'))? require('../oidc.json'): undefined,
-  }
+    oidcOptions: fs.existsSync(path.resolve(__dirname, '../oidc.json'))
+      ? require('../oidc.json')
+      : undefined,
+  };
 
   main(config).catch(err => {
     console.error('Cannot start the application.', err);

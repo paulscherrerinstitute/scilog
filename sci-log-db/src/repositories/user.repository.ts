@@ -23,7 +23,6 @@ export class UserRepository extends DefaultCrudRepository<
   User,
   typeof User.prototype.id
 > {
-
   public readonly userCredentials: HasOneRepositoryFactory<
     UserCredentials,
     typeof User.prototype.id
@@ -32,9 +31,7 @@ export class UserRepository extends DefaultCrudRepository<
   constructor(
     @inject('datasources.mongo') dataSource: juggler.DataSource,
     @repository.getter('UserCredentialsRepository')
-    protected userCredentialsRepositoryGetter: Getter<
-      UserCredentialsRepository
-    >,
+    protected userCredentialsRepositoryGetter: Getter<UserCredentialsRepository>,
   ) {
     super(User, dataSource);
     this.userCredentials = this.createHasOneRepositoryFactoryFor(

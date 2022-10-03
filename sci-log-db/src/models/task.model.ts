@@ -5,23 +5,22 @@ import {Basesnippet} from './basesnippet.model';
   settings: {
     strict: true,
     scope: {
-      where: {snippetType: 'task'}
+      where: {snippetType: 'task'},
     },
-    mongodb: {collection: 'Basesnippet'}
-  }
+    mongodb: {collection: 'Basesnippet'},
+  },
 })
 export class Task extends Basesnippet {
-
   @property({
     type: 'string',
-    description: 'Description of the task'
+    description: 'Description of the task',
   })
   content: string;
 
   @property({
     type: 'boolean',
     default: false,
-    description: 'True if the task is done'
+    description: 'True if the task is done',
   })
   isDone: boolean;
 

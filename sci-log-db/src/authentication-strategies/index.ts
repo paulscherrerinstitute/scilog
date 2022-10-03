@@ -1,1 +1,1 @@
-export * from './oidc'
+export * from './oidc';

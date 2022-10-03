@@ -1,6 +1,9 @@
 import {
-  Application, CoreBindings, inject, lifeCycleObserver, // The decorator
-  LifeCycleObserver
+  Application,
+  CoreBindings,
+  inject,
+  lifeCycleObserver, // The decorator
+  LifeCycleObserver,
 } from '@loopback/core';
 import _ from 'lodash';
 import {PasswordHasherBindings} from '../keys';
@@ -15,8 +18,10 @@ import {PasswordHasher} from '../services/hash.password.bcryptjs';
 export class CreateFunctionalAccountsObserver implements LifeCycleObserver {
   constructor(
     @inject(CoreBindings.APPLICATION_INSTANCE) private app: Application,
-    @inject('repositories.UserRepository') private userRepository: UserRepository,
-    @inject(PasswordHasherBindings.PASSWORD_HASHER) public passwordHasher: PasswordHasher,
+    @inject('repositories.UserRepository')
+    private userRepository: UserRepository,
+    @inject(PasswordHasherBindings.PASSWORD_HASHER)
+    public passwordHasher: PasswordHasher,
   ) {}
 
   /**
@@ -33,45 +38,39 @@ export class CreateFunctionalAccountsObserver implements LifeCycleObserver {
   async start(): Promise<void> {
     // Add your logic for start
 
-    var fs = require('fs');
-    let path = '/home/node/app/functionalAccounts.json';
-    let pathLocal = './functionalAccounts.json';
-    var accounts = [];
+    const fs = require('fs');
+    const path = '/home/node/app/functionalAccounts.json';
+    const pathLocal = './functionalAccounts.json';
+    let accounts = [];
     if (fs.existsSync(path)) {
-      var contents = fs.readFileSync(path, 'utf8');
+      const contents = fs.readFileSync(path, 'utf8');
       // Define to JSON type
       accounts = JSON.parse(contents);
     } else if (fs.existsSync(pathLocal)) {
-      var contents = fs.readFileSync(pathLocal, 'utf8');
+      const contents = fs.readFileSync(pathLocal, 'utf8');
       // Define to JSON type
       accounts = JSON.parse(contents);
     }
 
+    // eslint-disable-next-line  @typescript-eslint/no-explicit-any
     accounts.forEach(async (account: any) => {
-      let accountExists = await this.userRepository.findOne({
-        where: {email: account.email}
+      const accountExists = await this.userRepository.findOne({
+        where: {email: account.email},
       });
       if (accountExists != null) {
-        return
+        return;
       }
-      const password = await this.passwordHasher.hashPassword(
-        account.password,
+      const password = await this.passwordHasher.hashPassword(account.password);
+
+      // create the new user
+      const savedUser = await this.userRepository.create(
+        _.omit(account, 'password'),
       );
 
-      try {
-        // create the new user
-        const savedUser = await this.userRepository.create(
-          _.omit(account, 'password'),
-        );
-
-        // set the password
-        await this.userRepository
-          .userCredentials(savedUser.id)
-          .create({password});
-      } catch (error) {
-        // MongoError 11000 duplicate key
-        throw error;
-      }
+      // set the password
+      await this.userRepository
+        .userCredentials(savedUser.id)
+        .create({password});
     });
   }
 

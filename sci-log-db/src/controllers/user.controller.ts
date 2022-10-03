@@ -6,7 +6,7 @@
 import {
   authenticate,
   TokenService,
-  UserService
+  UserService,
 } from '@loopback/authentication';
 import {TokenServiceBindings} from '@loopback/authentication-jwt';
 import {authorize} from '@loopback/authorization';
@@ -83,10 +83,14 @@ export class UserController {
     newUserRequest: NewUserRequest,
   ): Promise<User> {
     // All new users have the "any-authenticated-user" role by default
-    newUserRequest.roles?.push('any-authenticated-user');
+    if (!newUserRequest.roles?.includes('any-authenticated-user'))
+      newUserRequest.roles?.push('any-authenticated-user');
 
     // ensure a valid email value and password value
-    validateCredentials({principal: newUserRequest.email, password: newUserRequest.password });
+    validateCredentials({
+      principal: newUserRequest.email,
+      password: newUserRequest.password,
+    });
 
     // encrypt the password
     const password = await this.passwordHasher.hashPassword(

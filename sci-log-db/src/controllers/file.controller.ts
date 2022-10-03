@@ -1,24 +1,45 @@
-import { authenticate } from '@loopback/authentication';
-import { authorize } from '@loopback/authorization';
-import { inject } from '@loopback/core';
-import { Count, CountSchema, Filter, FilterExcludingWhere, repository, Where } from '@loopback/repository';
-import { del, get, getModelSchemaRef, HttpErrors, param, patch, post, put, Request, requestBody, Response, RestBindings } from '@loopback/rest';
-import { SecurityBindings, UserProfile } from '@loopback/security';
+import {authenticate} from '@loopback/authentication';
+import {authorize} from '@loopback/authorization';
+import {inject} from '@loopback/core';
+import {
+  Count,
+  CountSchema,
+  Filter,
+  FilterExcludingWhere,
+  repository,
+  Where,
+} from '@loopback/repository';
+import {
+  del,
+  get,
+  getModelSchemaRef,
+  HttpErrors,
+  param,
+  patch,
+  post,
+  put,
+  Request,
+  requestBody,
+  Response,
+  RestBindings,
+} from '@loopback/rest';
+import {SecurityBindings, UserProfile} from '@loopback/security';
 import formidable from 'formidable';
 import fs from 'fs';
 import _ from 'lodash';
-import { STORAGE_DIRECTORY } from '../keys';
-import { Filesnippet } from '../models/file.model';
-import { FileRepository } from '../repositories/file.repository';
-import { basicAuthorization } from '../services/basic.authorizor';
-import { OPERATION_SECURITY_SPEC } from '../utils/security-spec';
+import {STORAGE_DIRECTORY} from '../keys';
+import {Filesnippet} from '../models/file.model';
+import {FileRepository} from '../repositories/file.repository';
+import {basicAuthorization} from '../services/basic.authorizor';
+import {OPERATION_SECURITY_SPEC} from '../utils/security-spec';
 
 const Mongo = require('mongodb');
 const crypto = require('crypto');
 
 interface FormData {
-  fields: Filesnippet,
-  files: any
+  fields: Filesnippet;
+  // eslint-disable-next-line  @typescript-eslint/no-explicit-any
+  files: any;
 }
 
 const formDataSchema = {
@@ -27,35 +48,38 @@ const formDataSchema = {
     fields: getModelSchemaRef(Filesnippet),
     file: {
       type: 'string' as const,
-      format: 'binary'
+      format: 'binary',
     },
-  }
-}
+  },
+};
 
 class MissingFileError extends Error {
-  constructor(message: string = 'A file must be provided') {
-    super(message)
+  constructor(message = 'A file must be provided') {
+    super(message);
   }
-  statusCode = 422
-  name = 'ValidationError'
+  statusCode = 422;
+  name = 'ValidationError';
 }
 
 @authenticate('jwt')
-@authorize({ allowedRoles: ['any-authenticated-user'], voters: [basicAuthorization] })
+@authorize({
+  allowedRoles: ['any-authenticated-user'],
+  voters: [basicAuthorization],
+})
 export class FileController {
   constructor(
     @inject(SecurityBindings.USER) private user: UserProfile,
     @repository(FileRepository)
     public fileRepository: FileRepository,
-    @inject(STORAGE_DIRECTORY) private storageDirectory: string
-  ) { }
+    @inject(STORAGE_DIRECTORY) private storageDirectory: string,
+  ) {}
 
   @post('/filesnippet', {
     security: OPERATION_SECURITY_SPEC,
     responses: {
       '200': {
         description: 'Filesnippet model instance',
-        content: { 'application/json': { schema: getModelSchemaRef(Filesnippet) } },
+        content: {'application/json': {schema: getModelSchemaRef(Filesnippet)}},
       },
     },
   })
@@ -72,7 +96,7 @@ export class FileController {
     })
     file: Omit<Filesnippet, 'id'>,
   ): Promise<Filesnippet> {
-    return this.fileRepository.create(file, { currentUser: this.user });
+    return this.fileRepository.create(file, {currentUser: this.user});
   }
 
   @post('/filesnippet/files', {
@@ -95,16 +119,16 @@ export class FileController {
       required: true,
       content: {
         'multipart/form-data': {
-          schema:
-            formDataSchema,
-          'x-parser': 'stream'
-        }
-      }
+          schema: formDataSchema,
+          'x-parser': 'stream',
+        },
+      },
     })
-    request: Request
+    request: Request,
   ): Promise<Object> {
-    var form = new formidable.IncomingForm();
-    var formData: FormData = await new Promise(function (resolve, reject) {
+    const form = new formidable.IncomingForm();
+    const formData: FormData = await new Promise(function (resolve, reject) {
+      // eslint-disable-next-line  @typescript-eslint/no-explicit-any
       form.parse(request, (err: any, fields: any, files: any) => {
         if (err) {
           reject(err);
@@ -115,16 +139,19 @@ export class FileController {
           reject(error);
           return error;
         }
-        resolve({ fields: JSON.parse(fields?.fields || '{}'), files: files });
+        resolve({fields: JSON.parse(fields?.fields || '{}'), files: files});
       });
     });
-    return this.uploadToGridfs(formData, async (formData, resolve, reject) => {
-      formData.fields["accessHash"] = crypto.randomBytes(64).toString('hex');
-      return this.fileRepository.create(_.omit(formData.fields, ['id']), { currentUser: this.user }).then((file) => {
-        resolve(file);
-      }).catch((err: HttpErrors.HttpError) => {
-        reject(err);
-      });
+    return this.uploadToGridfs(formData, async (fm, resolve, reject) => {
+      fm.fields['accessHash'] = crypto.randomBytes(64).toString('hex');
+      return this.fileRepository
+        .create(_.omit(fm.fields, ['id']), {currentUser: this.user})
+        .then(file => {
+          resolve(file);
+        })
+        .catch((err: HttpErrors.HttpError) => {
+          reject(err);
+        });
     });
   }
 
@@ -133,14 +160,14 @@ export class FileController {
     responses: {
       '200': {
         description: 'Filesnippet model count',
-        content: { 'application/json': { schema: CountSchema } },
+        content: {'application/json': {schema: CountSchema}},
       },
     },
   })
   async count(
     @param.where(Filesnippet) where?: Where<Filesnippet>,
   ): Promise<Count> {
-    return this.fileRepository.count(where, { currentUser: this.user });
+    return this.fileRepository.count(where, {currentUser: this.user});
   }
 
   @get('/filesnippet', {
@@ -152,7 +179,7 @@ export class FileController {
           'application/json': {
             schema: {
               type: 'array',
-              items: getModelSchemaRef(Filesnippet, { includeRelations: true }),
+              items: getModelSchemaRef(Filesnippet, {includeRelations: true}),
             },
           },
         },
@@ -162,7 +189,7 @@ export class FileController {
   async find(
     @param.filter(Filesnippet) filter?: Filter<Filesnippet>,
   ): Promise<Filesnippet[]> {
-    return this.fileRepository.find(filter, { currentUser: this.user });
+    return this.fileRepository.find(filter, {currentUser: this.user});
   }
 
   @patch('/filesnippet', {
@@ -170,7 +197,7 @@ export class FileController {
     responses: {
       '200': {
         description: 'File PATCH success count',
-        content: { 'application/json': { schema: CountSchema } },
+        content: {'application/json': {schema: CountSchema}},
       },
     },
   })
@@ -178,14 +205,14 @@ export class FileController {
     @requestBody({
       content: {
         'application/json': {
-          schema: getModelSchemaRef(Filesnippet, { partial: true }),
+          schema: getModelSchemaRef(Filesnippet, {partial: true}),
         },
       },
     })
     file: Filesnippet,
     @param.where(Filesnippet) where?: Where<Filesnippet>,
   ): Promise<Count> {
-    return this.fileRepository.updateAll(file, where, { currentUser: this.user });
+    return this.fileRepository.updateAll(file, where, {currentUser: this.user});
   }
 
   @get('/filesnippet/{id}', {
@@ -195,7 +222,7 @@ export class FileController {
         description: 'Filesnippet model instance',
         content: {
           'application/json': {
-            schema: getModelSchemaRef(Filesnippet, { includeRelations: true }),
+            schema: getModelSchemaRef(Filesnippet, {includeRelations: true}),
           },
         },
       },
@@ -203,9 +230,10 @@ export class FileController {
   })
   async findById(
     @param.path.string('id') id: string,
-    @param.filter(Filesnippet, { exclude: 'where' }) filter?: FilterExcludingWhere<Filesnippet>
+    @param.filter(Filesnippet, {exclude: 'where'})
+    filter?: FilterExcludingWhere<Filesnippet>,
   ): Promise<Filesnippet> {
-    return this.fileRepository.findById(id, filter, { currentUser: this.user });
+    return this.fileRepository.findById(id, filter, {currentUser: this.user});
   }
 
   @get('/filesnippet/{id}/files', {
@@ -220,14 +248,19 @@ export class FileController {
   async downloadFile(
     @param.path.string('id') id: string,
     @inject(RestBindings.Http.RESPONSE) response: Response,
-    @param.filter(Filesnippet, { exclude: 'where' }) filter?: FilterExcludingWhere<Filesnippet>
+    @param.filter(Filesnippet, {exclude: 'where'})
+    filter?: FilterExcludingWhere<Filesnippet>,
   ) {
-    let data = await this.fileRepository.findById(id, filter, { currentUser: this.user })
+    const data = await this.fileRepository.findById(id, filter, {
+      currentUser: this.user,
+    });
     console.log(data);
     if (typeof data._fileId == 'undefined') {
       throw new HttpErrors.BadRequest(`Retrieving sandbox data is deprecated.`);
     }
-    let bucket = new Mongo.GridFSBucket(this.fileRepository.dataSource.connector?.db);
+    const bucket = new Mongo.GridFSBucket(
+      this.fileRepository.dataSource.connector?.db,
+    );
     response.set('Content-Type', data.contentType);
     bucket.openDownloadStream(data._fileId).pipe(response);
     return response;
@@ -254,20 +287,16 @@ export class FileController {
       required: true,
       content: {
         'multipart/form-data': {
-          schema:
-            formDataSchema,
-          'x-parser': 'stream'
-        }
-      }
+          schema: formDataSchema,
+          'x-parser': 'stream',
+        },
+      },
     })
-    request: Request
+    request: Request,
   ): Promise<void> {
-    var form = new formidable.IncomingForm();
-    interface FormData {
-      fields: any,
-      files: any
-    }
-    var formData: FormData = await new Promise(function (resolve, reject) {
+    const form = new formidable.IncomingForm();
+    const formData: FormData = await new Promise(function (resolve, reject) {
+      // eslint-disable-next-line  @typescript-eslint/no-explicit-any
       form.parse(request, (err: any, fields: any, files: any) => {
         if (err) {
           reject(err);
@@ -278,16 +307,21 @@ export class FileController {
           reject(error);
           return error;
         }
-        resolve({ fields: JSON.parse(fields?.fields), files: files });
+        resolve({fields: JSON.parse(fields?.fields), files: files});
       });
     });
-    return this.uploadToGridfs(formData, async (formData, resolve, reject) => {
-      return this.fileRepository.updateById(id, _.omit(formData.fields, ['id']), { currentUser: this.user }).then(() => {
-        resolve();
-      }).catch((err: HttpErrors.HttpError) => {
-        reject(err);
-      });
-    })
+    return this.uploadToGridfs(formData, async (fm, resolve, reject) => {
+      return this.fileRepository
+        .updateById(id, _.omit(fm.fields, ['id']), {
+          currentUser: this.user,
+        })
+        .then(() => {
+          resolve();
+        })
+        .catch((err: HttpErrors.HttpError) => {
+          reject(err);
+        });
+    });
   }
 
   @patch('/filesnippet/{id}', {
@@ -303,15 +337,14 @@ export class FileController {
     @requestBody({
       content: {
         'application/json': {
-          schema: getModelSchemaRef(Filesnippet, { partial: true }),
+          schema: getModelSchemaRef(Filesnippet, {partial: true}),
         },
       },
     })
     file: Filesnippet,
   ): Promise<void> {
-    await this.fileRepository.updateById(id, file, { currentUser: this.user });
+    await this.fileRepository.updateById(id, file, {currentUser: this.user});
   }
-
 
   @put('/filesnippet/{id}', {
     security: OPERATION_SECURITY_SPEC,
@@ -325,7 +358,7 @@ export class FileController {
     @param.path.string('id') id: string,
     @requestBody() file: Filesnippet,
   ): Promise<void> {
-    await this.fileRepository.replaceById(id, file, { currentUser: this.user });
+    await this.fileRepository.replaceById(id, file, {currentUser: this.user});
   }
 
   @del('/filesnippet/{id}', {
@@ -337,26 +370,41 @@ export class FileController {
     },
   })
   async deleteById(@param.path.string('id') id: string): Promise<void> {
-    await this.fileRepository.deleteById(id, { currentUser: this.user });
+    await this.fileRepository.deleteById(id, {currentUser: this.user});
   }
 
-  uploadToGridfs(formData: FormData, cb: (formData: FormData, resolve: (value?: any | PromiseLike<any>) => void, reject: (reason?: any) => void) => Promise<any>): Promise<any> {
+  uploadToGridfs(
+    formData: FormData,
+    cb: (
+      formData: FormData,
+      // eslint-disable-next-line  @typescript-eslint/no-explicit-any
+      resolve: (value?: any | PromiseLike<any>) => void,
+      // eslint-disable-next-line  @typescript-eslint/no-explicit-any
+      reject: (reason?: any) => void,
+      // eslint-disable-next-line  @typescript-eslint/no-explicit-any
+    ) => Promise<any>,
+    // eslint-disable-next-line  @typescript-eslint/no-explicit-any
+  ): Promise<any> {
     return new Promise((resolve, reject) => {
-      var bucket = new Mongo.GridFSBucket(this.fileRepository.dataSource.connector?.db);
-      let readStream = fs.createReadStream(formData.files.file.path);
-      let uploadStream = bucket.openUploadStream(formData.files.file.path);
+      const bucket = new Mongo.GridFSBucket(
+        this.fileRepository.dataSource.connector?.db,
+      );
+      const readStream = fs.createReadStream(formData.files.file.path);
+      const uploadStream = bucket.openUploadStream(formData.files.file.path);
       readStream.pipe(uploadStream);
-      let id = uploadStream.id;
-      uploadStream.
-        on('error', (error: any) => {
+      const id = uploadStream.id;
+      uploadStream
+        // eslint-disable-next-line  @typescript-eslint/no-explicit-any
+        .on('error', (error: any) => {
           console.log(error);
-          reject({ error: error });
-        }).
-        on('finish', async () => {
+          reject({error: error});
+        })
+        .on('finish', async () => {
           console.log('done!');
           formData.fields['_fileId'] = id;
           formData.fields['contentType'] = formData.files.file.type;
-          cb(formData, resolve, reject)
+          // eslint-disable-next-line  @typescript-eslint/no-floating-promises
+          cb(formData, resolve, reject);
         });
     });
   }

@@ -13,7 +13,6 @@ import {User} from '../models';
 import {Credentials, UserRepository} from '../repositories';
 import {PasswordHasher} from './hash.password.bcryptjs';
 
-
 export class MyUserService implements UserService<User, Credentials> {
   constructor(
     @repository(UserRepository) public userRepository: UserRepository,
@@ -68,7 +67,7 @@ export class MyUserService implements UserService<User, Credentials> {
       name: userName,
       id: user.id,
       roles: user.roles,
-      email: user.email
+      email: user.email,
     };
     // console.error("convertToUserProfile:",user,userProfile)
     return userProfile;

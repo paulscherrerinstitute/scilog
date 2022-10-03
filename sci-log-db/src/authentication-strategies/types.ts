@@ -9,25 +9,27 @@ import {UserProfile, securityId} from '@loopback/security';
 import {UserRepository} from '../repositories';
 
 type ProfileUser = {
-  email: string,
-  firstName: string,
-  lastName: string,
-  username: string | undefined,
-  roles: string[]
-} 
+  email: string;
+  firstName: string;
+  lastName: string;
+  username: string | undefined;
+  roles: string[];
+};
 
-type UserRolesProfile = Profile & {_json: {roles: string[]}}
+type UserRolesProfile = Profile & {_json: {roles: string[]}};
 
 export type VerifyFunction = (
   claimIss: string,
   profile: UserRolesProfile,
   idProfile: ProfileUser,
+  // eslint-disable-next-line  @typescript-eslint/no-explicit-any
   context: any,
   idToken: string,
   accessToken: string,
   refreshToken: string,
+  // eslint-disable-next-line  @typescript-eslint/no-explicit-any
   params: any,
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   done: (error: any, user?: any, info?: any) => void,
 ) => void;
 
@@ -46,10 +48,12 @@ export const verifyFunctionFactory = function (
     claimIss: string,
     profile: UserRolesProfile,
     idProfile: ProfileUser,
+    // eslint-disable-next-line  @typescript-eslint/no-explicit-any
     context: any,
     idToken: string,
     accessToken: string,
     refreshToken: string,
+    // eslint-disable-next-line  @typescript-eslint/no-explicit-any
     params: any,
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     done: (error: any, user?: any, info?: any) => void,
@@ -57,23 +61,31 @@ export const verifyFunctionFactory = function (
     // look up a linked user for the profile
     if (!profile.emails || !profile.emails.length) {
       throw new Error('email-id is required in returned profile to login');
-    } 
+    }
     const name = profile.name?.givenName
-    ? profile.name.givenName + ' ' + profile.name.familyName
-    : profile.displayName;
-    const [firstName, lastName] = (name || JSON.stringify(profile.name)).split(' ')
+      ? profile.name.givenName + ' ' + profile.name.familyName
+      : profile.displayName;
+    const [firstName, lastName] = (name || JSON.stringify(profile.name)).split(
+      ' ',
+    );
     const user = {
       email: profile.emails[0].value,
       firstName: firstName,
       lastName: lastName,
       username: profile.username,
-      roles: [...profile._json.roles ?? [], 'any-authenticated-user', profile.username as string]
-    }
-    findOrCreateUser(userRepo, user).then((user: User) => {
-      done(null, user);
-    }).catch((err: Error) => {
-      done(err);
-    });
+      roles: [
+        ...(profile._json.roles ?? []),
+        'any-authenticated-user',
+        profile.username as string,
+      ],
+    };
+    findOrCreateUser(userRepo, user)
+      .then((u: User) => {
+        done(null, u);
+      })
+      .catch((err: Error) => {
+        done(err);
+      });
   };
 };
 
@@ -87,21 +99,27 @@ export const mapProfile = function (user: User): UserProfile {
     name: `${user.firstName} ${user.lastName}`.trim(),
     id: user.id,
     roles: user.roles,
-    email: user.email
+    email: user.email,
   };
   return userProfile;
 };
 
-export const findOrCreateUser = async function (userRepo: UserRepository, user: ProfileUser): Promise<User> {
-  var foundUser = await userRepo.findOne({
-    where: { username: user.username },
+export const findOrCreateUser = async function (
+  userRepo: UserRepository,
+  user: ProfileUser,
+): Promise<User> {
+  let foundUser = await userRepo.findOne({
+    where: {username: user.username},
   });
   if (!foundUser) {
-    console.log("User not yet known, create it", JSON.stringify(user, null, 3))
+    console.log('User not yet known, create it', JSON.stringify(user, null, 3));
     foundUser = await userRepo.create(user);
   } else {
     // update roles for current user
-    await userRepo.updateById(foundUser.id, { 'roles': user.roles, 'username': user.username }); // username can be removed later
+    await userRepo.updateById(foundUser.id, {
+      roles: user.roles,
+      username: user.username,
+    }); // username can be removed later
   }
-  return foundUser
-}
+  return foundUser;
+};

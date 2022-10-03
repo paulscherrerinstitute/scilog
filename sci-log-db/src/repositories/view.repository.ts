@@ -8,9 +8,7 @@ export class ViewRepository extends DefaultCrudRepository<
   typeof View.prototype.id,
   ViewRelations
 > {
-  constructor(
-    @inject('datasources.mongo') dataSource: MongoDataSource,
-  ) {
+  constructor(@inject('datasources.mongo') dataSource: MongoDataSource) {
     super(View, dataSource);
   }
 }

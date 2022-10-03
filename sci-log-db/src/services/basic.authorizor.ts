@@ -3,7 +3,11 @@
 // This file is licensed under the MIT License.
 // License text available at https://opensource.org/licenses/MIT
 
-import {AuthorizationContext, AuthorizationDecision, AuthorizationMetadata} from '@loopback/authorization';
+import {
+  AuthorizationContext,
+  AuthorizationDecision,
+  AuthorizationMetadata,
+} from '@loopback/authorization';
 import {securityId, UserProfile} from '@loopback/security';
 import _ from 'lodash';
 

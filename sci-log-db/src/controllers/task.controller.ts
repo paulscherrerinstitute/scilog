@@ -7,21 +7,17 @@ import {
   Filter,
   FilterExcludingWhere,
   repository,
-  Where
+  Where,
 } from '@loopback/repository';
 import {
-  del, get,
-  getModelSchemaRef, param,
-
-
-  patch, post,
-
-
-
-
+  del,
+  get,
+  getModelSchemaRef,
+  param,
+  patch,
+  post,
   put,
-
-  requestBody
+  requestBody,
 } from '@loopback/rest';
 import {SecurityBindings, UserProfile} from '@loopback/security';
 import {Task} from '../models';
@@ -31,7 +27,10 @@ import {OPERATION_SECURITY_SPEC} from '../utils/security-spec';
 import {BasesnippetController} from './basesnippet.controller';
 
 @authenticate('jwt')
-@authorize({allowedRoles: ['any-authenticated-user'], voters: [basicAuthorization]})
+@authorize({
+  allowedRoles: ['any-authenticated-user'],
+  voters: [basicAuthorization],
+})
 export class TaskController {
   constructor(
     @inject(SecurityBindings.USER) private user: UserProfile,
@@ -41,7 +40,7 @@ export class TaskController {
     public basesnippetRepository: BasesnippetRepository,
     @inject('controllers.BasesnippetController')
     public basesnippetController: BasesnippetController,
-  ) { }
+  ) {}
 
   @post('/tasks', {
     security: OPERATION_SECURITY_SPEC,
@@ -77,9 +76,7 @@ export class TaskController {
       },
     },
   })
-  async count(
-    @param.where(Task) where?: Where<Task>,
-  ): Promise<Count> {
+  async count(@param.where(Task) where?: Where<Task>): Promise<Count> {
     return this.taskRepository.count(where, {currentUser: this.user});
   }
 
@@ -99,9 +96,7 @@ export class TaskController {
       },
     },
   })
-  async find(
-    @param.filter(Task) filter?: Filter<Task>,
-  ): Promise<Task[]> {
+  async find(@param.filter(Task) filter?: Filter<Task>): Promise<Task[]> {
     return this.taskRepository.find(filter, {currentUser: this.user});
   }
 
@@ -143,7 +138,7 @@ export class TaskController {
   })
   async findById(
     @param.path.string('id') id: string,
-    @param.filter(Task, {exclude: 'where'}) filter?: FilterExcludingWhere<Task>
+    @param.filter(Task, {exclude: 'where'}) filter?: FilterExcludingWhere<Task>,
   ): Promise<Task> {
     return this.taskRepository.findById(id, filter, {currentUser: this.user});
   }
@@ -200,14 +195,28 @@ export class TaskController {
     // Two steps:
     // 1. set snippet to 'deleted=true'
     // 2. inside websocket and after informing the clients, replace the parentId or delete the snippet
-    let snippet = await this.taskRepository.findById(id, {}, {currentUser: this.user});
+    const snippet = await this.taskRepository.findById(
+      id,
+      {},
+      {currentUser: this.user},
+    );
     if (snippet?.versionable) {
       if (snippet?.parentId) {
-        let parent = await this.basesnippetRepository.findById(snippet.parentId, {}, {currentUser: this.user});
-        let parentHistory = await this.basesnippetController.getHistorySnippet(parent);
+        const parent = await this.basesnippetRepository.findById(
+          snippet.parentId,
+          {},
+          {currentUser: this.user},
+        );
+        const parentHistory = await this.basesnippetController.getHistorySnippet(
+          parent,
+        );
         console.log(parentHistory);
       }
     }
-    await this.taskRepository.updateById(id, {deleted: true}, {currentUser: this.user});
+    await this.taskRepository.updateById(
+      id,
+      {deleted: true},
+      {currentUser: this.user},
+    );
   }
 }

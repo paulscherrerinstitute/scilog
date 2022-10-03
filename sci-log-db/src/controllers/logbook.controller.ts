@@ -1,8 +1,24 @@
 import {authenticate} from '@loopback/authentication';
 import {authorize} from '@loopback/authorization';
 import {inject} from '@loopback/core';
-import {Count, CountSchema, Filter, FilterExcludingWhere, repository, Where} from '@loopback/repository';
-import {del, get, getModelSchemaRef, param, patch, post, put, requestBody} from '@loopback/rest';
+import {
+  Count,
+  CountSchema,
+  Filter,
+  FilterExcludingWhere,
+  repository,
+  Where,
+} from '@loopback/repository';
+import {
+  del,
+  get,
+  getModelSchemaRef,
+  param,
+  patch,
+  post,
+  put,
+  requestBody,
+} from '@loopback/rest';
 import {SecurityBindings, UserProfile} from '@loopback/security';
 import {Logbook} from '../models';
 import {LogbookRepository} from '../repositories';
@@ -10,7 +26,10 @@ import {basicAuthorization} from '../services/basic.authorizor';
 import {OPERATION_SECURITY_SPEC} from '../utils/security-spec';
 
 @authenticate('jwt')
-@authorize({allowedRoles: ['any-authenticated-user'], voters: [basicAuthorization]})
+@authorize({
+  allowedRoles: ['any-authenticated-user'],
+  voters: [basicAuthorization],
+})
 export class LogbookController {
   constructor(
     @inject(SecurityBindings.USER) private user: UserProfile,
@@ -40,7 +59,7 @@ export class LogbookController {
     })
     logbook: Omit<Logbook, 'id'>,
   ): Promise<Logbook> {
-    return this.logbookRepository.create(logbook,{currentUser: this.user});
+    return this.logbookRepository.create(logbook, {currentUser: this.user});
   }
 
   @get('/logbooks/count', {
@@ -52,9 +71,7 @@ export class LogbookController {
       },
     },
   })
-  async count(
-    @param.where(Logbook) where?: Where<Logbook>,
-  ): Promise<Count> {
+  async count(@param.where(Logbook) where?: Where<Logbook>): Promise<Count> {
     return this.logbookRepository.count(where, {currentUser: this.user});
   }
 
@@ -100,7 +117,9 @@ export class LogbookController {
     logbook: Logbook,
     @param.where(Logbook) where?: Where<Logbook>,
   ): Promise<Count> {
-    return this.logbookRepository.updateAll(logbook, where, {currentUser: this.user});
+    return this.logbookRepository.updateAll(logbook, where, {
+      currentUser: this.user,
+    });
   }
 
   @get('/logbooks/{id}', {
@@ -118,9 +137,12 @@ export class LogbookController {
   })
   async findById(
     @param.path.string('id') id: string,
-    @param.filter(Logbook, {exclude: 'where'}) filter?: FilterExcludingWhere<Logbook>
+    @param.filter(Logbook, {exclude: 'where'})
+    filter?: FilterExcludingWhere<Logbook>,
   ): Promise<Logbook> {
-    return this.logbookRepository.findById(id, filter, {currentUser: this.user});
+    return this.logbookRepository.findById(id, filter, {
+      currentUser: this.user,
+    });
   }
 
   @patch('/logbooks/{id}', {
@@ -142,7 +164,9 @@ export class LogbookController {
     })
     logbook: Logbook,
   ): Promise<void> {
-    await this.logbookRepository.updateById(id, logbook, {currentUser: this.user});
+    await this.logbookRepository.updateById(id, logbook, {
+      currentUser: this.user,
+    });
   }
 
   @put('/logbooks/{id}', {
@@ -157,7 +181,9 @@ export class LogbookController {
     @param.path.string('id') id: string,
     @requestBody() logbook: Logbook,
   ): Promise<void> {
-    await this.logbookRepository.replaceById(id, logbook, {currentUser: this.user});
+    await this.logbookRepository.replaceById(id, logbook, {
+      currentUser: this.user,
+    });
   }
 
   @del('/logbooks/{id}', {

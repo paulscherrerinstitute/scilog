@@ -3,14 +3,14 @@
 // This file is licensed under the MIT License.
 // License text available at https://opensource.org/licenses/MIT
 
-import { Credentials } from '../repositories/user.repository';
+import {Credentials} from '../repositories/user.repository';
 import isemail from 'isemail';
-import { HttpErrors } from '@loopback/rest';
+import {HttpErrors} from '@loopback/rest';
 
 export function validateCredentials(credentials: Credentials) {
   // Validate Email: only if principal seems to be an email:
 
-  if (credentials.principal.includes("@")) {
+  if (credentials.principal.includes('@')) {
     if (!isemail.validate(credentials.principal)) {
       throw new HttpErrors.UnprocessableEntity('invalid email');
     }

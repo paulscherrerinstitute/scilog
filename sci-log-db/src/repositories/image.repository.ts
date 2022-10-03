@@ -7,11 +7,8 @@ export class ImageRepository extends AutoAddRepository<
   Image,
   typeof Image.prototype.id,
   ImageRelations
-  > {
-
-  constructor(
-    @inject('datasources.mongo') dataSource: MongoDataSource,
-  ) {
+> {
+  constructor(@inject('datasources.mongo') dataSource: MongoDataSource) {
     super(Image, dataSource);
   }
 }
