@@ -3,7 +3,7 @@
 // This file is licensed under the MIT License.
 // License text available at https://opensource.org/licenses/MIT
 
-import {TokenServiceConstants} from '@loopback/authentication-jwt';
+import {TokenServiceBindings} from '@loopback/authentication-jwt';
 import {securityId} from '@loopback/security';
 import {Client, expect} from '@loopback/testlab';
 import {HTTPError} from 'superagent';
@@ -168,7 +168,7 @@ describe('UserController', () => {
         .send({principal: 'idontexist@example.com', password: userPassword})
         .expect(401);
 
-      expect(res.body.error.message).to.equal('Invalid principal or password.');
+      expect(res.body.error.message).to.equal('Invalid email or password.');
     });
 
     it('login returns an error when invalid password is used', async () => {
@@ -179,7 +179,7 @@ describe('UserController', () => {
         .send({principal: newUser.email, password: 'wrongpassword'})
         .expect(401);
 
-      expect(res.body.error.message).to.equal('Invalid principal or password.');
+      expect(res.body.error.message).to.equal('Invalid email or password.');
     });
 
     it('users/me returns the current user profile when a valid JWT token is provided', async () => {
@@ -246,7 +246,7 @@ describe('UserController', () => {
     });
   });
 
-   async function clearDatabase() {
+  async function clearDatabase() {
     await userRepo.deleteAll();
   }
 
@@ -280,7 +280,7 @@ describe('UserController', () => {
   async function givenAnExpiredToken() {
     const newUser = await createAUser();
     const tokenService: JWTService = new JWTService(
-      TokenServiceConstants.TOKEN_SECRET_VALUE,
+      await app.get(TokenServiceBindings.TOKEN_SECRET),
       '-1',
     );
     const userProfile = {

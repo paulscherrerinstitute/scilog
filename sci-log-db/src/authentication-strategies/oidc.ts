@@ -1,3 +1,5 @@
+/* eslint-disable  @typescript-eslint/no-explicit-any */
+
 import {asAuthStrategy, AuthenticationStrategy} from '@loopback/authentication';
 import {StrategyAdapter} from '@loopback/authentication-passport';
 import {inject, injectable} from '@loopback/core';
@@ -11,9 +13,7 @@ import {UserRepository} from '../repositories';
 import {repository} from '@loopback/repository';
 const passport = require('passport');
 
-@injectable(
-  asAuthStrategy,
-)
+@injectable(asAuthStrategy)
 export class OIDCAuthentication implements AuthenticationStrategy {
   name = 'oidc';
   protected strategy: StrategyAdapter<User>;
@@ -23,8 +23,8 @@ export class OIDCAuthentication implements AuthenticationStrategy {
    */
   constructor(
     @inject('oidcOptions')
-    public oidcOptions: any,
-    @repository(UserRepository) 
+    private oidcOptions: any,
+    @repository(UserRepository)
     public userRepository: UserRepository,
   ) {
     const strategy: Strategy = new oidcStrategy(
@@ -36,7 +36,7 @@ export class OIDCAuthentication implements AuthenticationStrategy {
       this.name,
       mapProfile.bind(this),
     );
-    passport.use(strategy)
+    passport.use(strategy);
   }
 
   /**

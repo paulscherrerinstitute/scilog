@@ -4,9 +4,8 @@
 // License text available at https://opensource.org/licenses/MIT
 
 import {belongsTo, Entity, model, property} from '@loopback/repository';
-import {User} from './user.model'
+import {User} from './user.model';
 
-import { userInfo } from 'os';
 @model()
 export class UserCredentials extends Entity {
   @property({
@@ -22,11 +21,14 @@ export class UserCredentials extends Entity {
   })
   password: string;
 
-  @belongsTo(() => User,
-   {}, //relation metadata goes in here
-   {// property definition goes in here
-    mongodb: {dataType: 'ObjectId'}
-  })
+  @belongsTo(
+    () => User,
+    {}, //relation metadata goes in here
+    {
+      // property definition goes in here
+      mongodb: {dataType: 'ObjectId'},
+    },
+  )
   userId: string;
 
   constructor(data?: Partial<UserCredentials>) {

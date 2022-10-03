@@ -1,9 +1,8 @@
-import { belongsTo, Entity, Model, model, property } from '@loopback/repository';
-import { User } from './user.model';
+import {belongsTo, Entity, Model, model, property} from '@loopback/repository';
+import {User} from './user.model';
 
-@model({ settings: { strict: false } })
+@model({settings: {strict: false}})
 export class Collection extends Model {
-
   @property({
     type: 'string',
     required: true,
@@ -21,13 +20,12 @@ export class Collection extends Model {
   })
   description?: string;
 
-
   constructor(data?: Partial<Collection>) {
     super(data);
   }
 }
 
-@model({ settings: { strict: false } })
+@model({settings: {strict: false}})
 export class UserPreference extends Entity {
   @property({
     type: 'string',
@@ -37,11 +35,13 @@ export class UserPreference extends Entity {
   id?: string;
 
   // Each user preference belongs to a user, indentified by its id (userId)
-  @belongsTo(() => User,
+  @belongsTo(
+    () => User,
     {},
     {
-      mongodb: { dataType: 'ObjectId' }
-    })
+      mongodb: {dataType: 'ObjectId'},
+    },
+  )
   userId?: string;
 
   @property.array(Collection)
@@ -56,4 +56,5 @@ export interface UserPreferenceRelations {
   // describe navigational properties here
 }
 
-export type UserPreferenceWithRelations = UserPreference & UserPreferenceRelations;
+export type UserPreferenceWithRelations = UserPreference &
+  UserPreferenceRelations;

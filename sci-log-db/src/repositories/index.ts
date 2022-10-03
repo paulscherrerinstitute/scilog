@@ -7,4 +7,3 @@ export * from './user-credentials.repository';
 export * from './user-preference.repository';
 export * from './user.repository';
 export * from './view.repository';
-

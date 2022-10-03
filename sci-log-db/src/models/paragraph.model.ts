@@ -4,16 +4,16 @@ import {Basesnippet} from './basesnippet.model';
 enum LinkType {
   PARAGRAPH = 'paragraph',
   COMMENT = 'comment',
-  QUOTE = 'quote'
+  QUOTE = 'quote',
 }
 
 export interface Filecontainer {
-  className?: string,
-  childTag?: string,
+  className?: string;
+  childTag?: string;
   style?: {
-    width: string,
-    height: string
-  },
+    width: string;
+    height: string;
+  };
   fileId?: string;
 }
 
@@ -21,16 +21,15 @@ export interface Filecontainer {
   settings: {
     strict: true,
     scope: {
-      where: {snippetType: 'paragraph'}
+      where: {snippetType: 'paragraph'},
     },
-    mongodb: {collection: 'Basesnippet'}
-  }
+    mongodb: {collection: 'Basesnippet'},
+  },
 })
 export class Paragraph extends Basesnippet {
-
   @property({
     type: 'string',
-    description: 'Markup contents in markdown (MD) syntax of this paragraph'
+    description: 'Markup contents in markdown (MD) syntax of this paragraph',
   })
   textcontent?: string;
 
@@ -39,19 +38,20 @@ export class Paragraph extends Basesnippet {
     jsonSchema: {
       enum: Object.values(LinkType),
     },
-    description: 'Defines if this entry is considered a comment (to be displayed near the parent info) or an entry which refers to previous discussion entries in which case the entry is shown in chronological order and the parent entry is partially duplicated as a quote'
+    description:
+      'Defines if this entry is considered a comment (to be displayed near the parent info) or an entry which refers to previous discussion entries in which case the entry is shown in chronological order and the parent entry is partially duplicated as a quote',
   })
   linkType?: LinkType;
 
   @property({
     type: 'boolean',
-    description: 'Defines if this entry is considered a message.'
+    description: 'Defines if this entry is considered a message.',
   })
   isMessage?: boolean;
 
   @property.array(Object, {
     type: 'object',
-    description: 'Information about the embedded files.'
+    description: 'Information about the embedded files.',
   })
   files?: Filecontainer[];
 

@@ -1,13 +1,13 @@
-import { SciLogDbApplication } from '../..';
+import {SciLogDbApplication} from '../..';
 import {
   createRestAppClient,
   givenHttpServerConfig,
   Client,
 } from '@loopback/testlab';
-import { testdb } from '../testdb.datasource';
-import { PasswordHasherBindings } from '../../keys';
-import { User, UserRepository } from '@loopback/authentication-jwt';
-import { ApplicationConfig } from '@loopback/core';
+import {testdb} from '../testdb.datasource';
+import {PasswordHasherBindings} from '../../keys';
+import {User, UserRepository} from '@loopback/authentication-jwt';
+import {ApplicationConfig} from '@loopback/core';
 
 export interface AppWithClient {
   app: SciLogDbApplication;
@@ -24,14 +24,16 @@ const userData = {
 };
 
 export const oidcOptions = {
-  issuer: "issuer",
-  authorizationURL: "oidc-authorization-url",
-  tokenURL: "tokenURL",
-  clientID: "clientID",
-  successRedirect: 'success-redirect'
+  issuer: 'issuer',
+  authorizationURL: 'oidc-authorization-url',
+  tokenURL: 'tokenURL',
+  clientID: 'clientID',
+  successRedirect: 'success-redirect',
 };
 
-export async function setupApplication(options: ApplicationConfig = {}): Promise<AppWithClient> {
+export async function setupApplication(
+  options: ApplicationConfig = {},
+): Promise<AppWithClient> {
   const app = new SciLogDbApplication({
     rest: givenHttpServerConfig(),
     databaseSeeding: false,
@@ -41,8 +43,8 @@ export async function setupApplication(options: ApplicationConfig = {}): Promise
   app.dataSource(testdb);
   await app.start();
   const client = createRestAppClient(app);
-  return {app, client}
-};
+  return {app, client};
+}
 
 export async function createAUser(app: SciLogDbApplication): Promise<User> {
   const passwordHasher = await app.get(PasswordHasherBindings.PASSWORD_HASHER);

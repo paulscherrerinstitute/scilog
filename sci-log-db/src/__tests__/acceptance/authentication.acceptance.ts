@@ -18,7 +18,6 @@ import {PasswordHasher} from '../../services/hash.password.bcryptjs';
 import {validateCredentials} from '../../services/validator';
 import {setupApplication} from './test-helper';
 
-
 describe('authentication services', function (this: Suite) {
   this.timeout(5000);
   let app: SciLogDbApplication;
@@ -57,7 +56,7 @@ describe('authentication services', function (this: Suite) {
     expect(() => validateCredentials(credentials)).to.not.throw();
   });
 
-/*  The following test becomes obsolete, because there are no invalid principals
+  /*  The following test becomes obsolete, because there are no invalid principals
     any more: principal can be email or user account
  it('validateCredentials() fails with invalid principal', () => {
     const expectedError = new HttpErrors.UnprocessableEntity('invalid principal');
@@ -91,10 +90,13 @@ describe('authentication services', function (this: Suite) {
   });
 
   it('user service verifyCredentials() fails with user not found', async () => {
-    const credentials = {principal: 'idontexist@example.com', password: 'p4ssw0rd'};
+    const credentials = {
+      principal: 'idontexist@example.com',
+      password: 'p4ssw0rd',
+    };
 
     const expectedError = new HttpErrors.Unauthorized(
-      'Invalid principal or password.',
+      'Invalid email or password.',
     );
 
     await expect(userService.verifyCredentials(credentials)).to.be.rejectedWith(
@@ -106,7 +108,7 @@ describe('authentication services', function (this: Suite) {
     const {email} = newUser;
     const credentials = {principal: email, password: 'invalidp4ssw0rd'};
     const expectedError = new HttpErrors.Unauthorized(
-      'Invalid principal or password.',
+      'Invalid email or password.',
     );
 
     await expect(userService.verifyCredentials(credentials)).to.be.rejectedWith(

@@ -25,7 +25,7 @@ const CredentialsSchema = {
   properties: {
     principal: {
       type: 'string' as const,
-     /* format: 'email',*/
+      /* format: 'email',*/
     },
     password: {
       type: 'string' as const,

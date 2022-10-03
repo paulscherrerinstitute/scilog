@@ -22,7 +22,7 @@ import {ViewRepository} from '../repositories';
 export class ViewController {
   constructor(
     @repository(ViewRepository)
-    public viewRepository : ViewRepository,
+    public viewRepository: ViewRepository,
   ) {}
 
   @post('/views', {
@@ -57,9 +57,7 @@ export class ViewController {
       },
     },
   })
-  async count(
-    @param.where(View) where?: Where<View>,
-  ): Promise<Count> {
+  async count(@param.where(View) where?: Where<View>): Promise<Count> {
     return this.viewRepository.count(where);
   }
 
@@ -78,9 +76,7 @@ export class ViewController {
       },
     },
   })
-  async find(
-    @param.filter(View) filter?: Filter<View>,
-  ): Promise<View[]> {
+  async find(@param.filter(View) filter?: Filter<View>): Promise<View[]> {
     return this.viewRepository.find(filter);
   }
 
@@ -120,7 +116,7 @@ export class ViewController {
   })
   async findById(
     @param.path.string('id') id: string,
-    @param.filter(View, {exclude: 'where'}) filter?: FilterExcludingWhere<View>
+    @param.filter(View, {exclude: 'where'}) filter?: FilterExcludingWhere<View>,
   ): Promise<View> {
     return this.viewRepository.findById(id, filter);
   }

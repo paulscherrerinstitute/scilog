@@ -23,12 +23,14 @@ import {authorize} from '@loopback/authorization';
 import {basicAuthorization} from '../services/basic.authorizor';
 import {OPERATION_SECURITY_SPEC} from '../utils/security-spec';
 @authenticate('jwt')
-@authorize({allowedRoles: ['any-authenticated-user'], voters: [basicAuthorization]})
-
+@authorize({
+  allowedRoles: ['any-authenticated-user'],
+  voters: [basicAuthorization],
+})
 export class UserPreferenceController {
   constructor(
     @repository(UserPreferenceRepository)
-    public userPreferenceRepository : UserPreferenceRepository,
+    public userPreferenceRepository: UserPreferenceRepository,
   ) {}
 
   @post('/user-preferences', {
@@ -36,7 +38,9 @@ export class UserPreferenceController {
     responses: {
       '200': {
         description: 'UserPreference model instance',
-        content: {'application/json': {schema: getModelSchemaRef(UserPreference)}},
+        content: {
+          'application/json': {schema: getModelSchemaRef(UserPreference)},
+        },
       },
     },
   })
@@ -80,7 +84,9 @@ export class UserPreferenceController {
           'application/json': {
             schema: {
               type: 'array',
-              items: getModelSchemaRef(UserPreference, {includeRelations: true}),
+              items: getModelSchemaRef(UserPreference, {
+                includeRelations: true,
+              }),
             },
           },
         },
@@ -131,7 +137,8 @@ export class UserPreferenceController {
   })
   async findById(
     @param.path.string('id') id: string,
-    @param.filter(UserPreference, {exclude: 'where'}) filter?: FilterExcludingWhere<UserPreference>
+    @param.filter(UserPreference, {exclude: 'where'})
+    filter?: FilterExcludingWhere<UserPreference>,
   ): Promise<UserPreference> {
     return this.userPreferenceRepository.findById(id, filter);
   }

@@ -5,13 +5,12 @@ import {Basesnippet} from './basesnippet.model';
   settings: {
     strict: true,
     scope: {
-      where: {snippetType: 'image'}
+      where: {snippetType: 'image'},
     },
-    mongodb: {collection: 'Basesnippet'}
-  }
+    mongodb: {collection: 'Basesnippet'},
+  },
 })
 export class Image extends Basesnippet {
-
   @property({
     type: 'string',
     description: 'Name of uploaded file',
@@ -32,13 +31,13 @@ export class Image extends Basesnippet {
 
   @property({
     type: 'string',
-    description: 'width of image in percent'
+    description: 'width of image in percent',
   })
   width?: string;
 
   @property({
     type: 'string',
-    description: 'height of image in percent'
+    description: 'height of image in percent',
   })
   height?: string;
 
@@ -47,21 +46,24 @@ export class Image extends Basesnippet {
     jsonSchema: {
       pattern: '^(https?|wss?|ftp)://',
     },
-    description: 'URI from which image can be downloaded'
+    description: 'URI from which image can be downloaded',
   })
   url?: string;
 
   @property({
     type: 'string',
-    description: 'file extension'
+    description: 'file extension',
   })
   fileExtension?: string;
 
-  @belongsTo(() => Basesnippet,
+  @belongsTo(
+    () => Basesnippet,
     {}, //relation metadata goes in here
-    {// property definition goes in here
-      mongodb: {dataType: 'ObjectId'}
-    })
+    {
+      // property definition goes in here
+      mongodb: {dataType: 'ObjectId'},
+    },
+  )
   fileId?: string;
 
   constructor(data?: Partial<Image>) {

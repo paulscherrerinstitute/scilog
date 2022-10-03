@@ -5,25 +5,23 @@ import {Basesnippet} from './basesnippet.model';
   settings: {
     strict: true,
     scope: {
-      where: {snippetType: 'job'}
+      where: {snippetType: 'job'},
     },
-    mongodb: {collection: 'Basesnippet'}
-  }
+    mongodb: {collection: 'Basesnippet'},
+  },
 })
 export class Job extends Basesnippet {
-
   @property({
     type: 'string',
-    description: 'Job description'
+    description: 'Job description',
   })
   description?: string;
 
   @property({
     type: Object,
-    description: 'Job parameters'
+    description: 'Job parameters',
   })
   params?: Object;
-
 
   constructor(data?: Partial<Job>) {
     super(data);

@@ -39,4 +39,6 @@ export const STORAGE_DIRECTORY = BindingKey.create<string>('storage.directory');
 /**
  * Binding key for the export service
  */
-export const EXPORT_SERVICE = BindingKey.create<ExportService>('services.Export');
+export const EXPORT_SERVICE = BindingKey.create<ExportService>(
+  'services.Export',
+);

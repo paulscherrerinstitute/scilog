@@ -7,11 +7,8 @@ export class LogbookRepository extends AutoAddRepository<
   Logbook,
   typeof Logbook.prototype.id,
   LogbookRelations
-  > {
-
-  constructor(
-    @inject('datasources.mongo') dataSource: MongoDataSource,
-  ) {
+> {
+  constructor(@inject('datasources.mongo') dataSource: MongoDataSource) {
     super(Logbook, dataSource);
   }
 }

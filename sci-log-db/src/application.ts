@@ -3,20 +3,43 @@
 // This file is licensed under the MIT License.
 // License text available at https://opensource.org/licenses/MIT
 
-import {AuthenticationComponent, registerAuthenticationStrategy} from '@loopback/authentication';
-import {JWTAuthenticationComponent, TokenServiceBindings} from '@loopback/authentication-jwt';
+import {
+  AuthenticationComponent,
+  registerAuthenticationStrategy,
+} from '@loopback/authentication';
+import {
+  JWTAuthenticationComponent,
+  TokenServiceBindings,
+} from '@loopback/authentication-jwt';
 import {AuthorizationComponent} from '@loopback/authorization';
 import {BootMixin} from '@loopback/boot';
-import {ApplicationConfig, BindingKey, createBindingFromClass} from '@loopback/core';
-import {AnyObject, model, property, RepositoryMixin, SchemaMigrationOptions} from '@loopback/repository';
+import {
+  ApplicationConfig,
+  BindingKey,
+  createBindingFromClass,
+} from '@loopback/core';
+import {
+  AnyObject,
+  model,
+  property,
+  RepositoryMixin,
+  SchemaMigrationOptions,
+} from '@loopback/repository';
 import {RestApplication} from '@loopback/rest';
-import {RestExplorerBindings, RestExplorerComponent} from '@loopback/rest-explorer';
+import {
+  RestExplorerBindings,
+  RestExplorerComponent,
+} from '@loopback/rest-explorer';
 import {ServiceMixin} from '@loopback/service-proxy';
 import fs from 'fs';
 import _ from 'lodash';
 import multer from 'multer';
 import path from 'path';
-import {FILE_UPLOAD_SERVICE, PasswordHasherBindings, STORAGE_DIRECTORY} from './keys';
+import {
+  FILE_UPLOAD_SERVICE,
+  PasswordHasherBindings,
+  STORAGE_DIRECTORY,
+} from './keys';
 import {User} from './models';
 import {UserRepository} from './repositories';
 import {MySequence} from './sequence';
@@ -25,13 +48,11 @@ import {JWTService} from './services/jwt-service';
 import {SecuritySpecEnhancer} from './services/jwt-spec.enhancer';
 import {MyUserService} from './services/user-service';
 import {startWebsocket} from './utils/websocket';
-import * as crypto from "crypto";
+import * as crypto from 'crypto';
 
 import {toInterceptor} from '@loopback/rest';
 import passport from 'passport';
-import {
-  OIDCAuthentication
-} from './authentication-strategies';
+import {OIDCAuthentication} from './authentication-strategies';
 import {UserServiceBindings} from './keys';
 
 import YAML = require('yaml');
@@ -128,14 +149,20 @@ export class SciLogDbApplication extends BootMixin(
     this.bind(PasswordHasherBindings.ROUNDS).to(10);
     this.bind(PasswordHasherBindings.PASSWORD_HASHER).toClass(BcryptHasher);
     this.bind(TokenServiceBindings.TOKEN_SERVICE).toClass(JWTService);
-    this.bind(TokenServiceBindings.TOKEN_SECRET).to(process.env.JWT_SECRET as string ?? crypto.randomBytes(12).toString('hex'));
+    this.bind(TokenServiceBindings.TOKEN_SECRET).to(
+      (process.env.JWT_SECRET as string) ??
+        crypto.randomBytes(12).toString('hex'),
+    );
     this.bind(UserServiceBindings.USER_SERVICE).toClass(MyUserService);
 
     this.add(createBindingFromClass(SecuritySpecEnhancer));
 
     // Bind datasource config
-    this.configureDatasourceFromFile("../datasource.json", "datasources.config.mongo")
-    
+    this.configureDatasourceFromFile(
+      '../datasource.json',
+      'datasources.config.mongo',
+    );
+
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     passport.serializeUser(function (user: any, done) {
       done(null, user);
@@ -144,9 +171,9 @@ export class SciLogDbApplication extends BootMixin(
     passport.deserializeUser(function (user: any, done) {
       done(null, user);
     });
-  
+
     // LoopBack 4 style authentication strategies
-  
+
     // Express style middleware interceptors
     if (this.options.oidcOptions) {
       this.bind('oidcOptions').to(this.options.oidcOptions);
@@ -154,16 +181,21 @@ export class SciLogDbApplication extends BootMixin(
       this.add(createBindingFromClass(OIDCAuthentication));
       this.bind('passport-init-mw').to(toInterceptor(passport.initialize()));
       this.bind('passport-session-mw').to(toInterceptor(passport.session()));
-      this.bind('passport-oidc').to(toInterceptor(passport.authenticate('openidconnect')));
+      this.bind('passport-oidc').to(
+        toInterceptor(passport.authenticate('openidconnect')),
+      );
     }
   }
 
-  configureDatasourceFromFile(datasourceFile: string, datasourceConfigBindingKey: string): void {
+  configureDatasourceFromFile(
+    datasourceFile: string,
+    datasourceConfigBindingKey: string,
+  ): void {
     try {
       const mongoConfig: AnyObject = require(datasourceFile);
       this.bind(datasourceConfigBindingKey).to(mongoConfig);
     } catch {
-      console.debug("missing datasource config file, applying defaults");
+      console.debug('missing datasource config file, applying defaults');
     }
   }
 
@@ -175,7 +207,10 @@ export class SciLogDbApplication extends BootMixin(
     // Use `databaseSeeding` flag to control if products/users should be pre
     // populated into the database. Its value is default to `true`.
     if (this.options.databaseSeeding !== false) {
-      console.error("Warning: Database seeding enabled" + JSON.stringify(this.options, null, 3))
+      console.error(
+        'Warning: Database seeding enabled' +
+          JSON.stringify(this.options, null, 3),
+      );
       await this.migrateSchema();
     }
     return super.start();
@@ -230,7 +265,5 @@ export class SciLogDbApplication extends BootMixin(
     // TODO adjust to SciLog case Delete existing shopping carts
     // cconst cartRepo = await this.getRepository(ShoppingCartRepository);
     // await cartRepo.deleteAll();
-
-
   }
 }

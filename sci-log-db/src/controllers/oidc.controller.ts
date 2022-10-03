@@ -1,15 +1,19 @@
 import {
-    get,
-    RestBindings,
-    Response,
-    param,
-    RequestWithSession,
-  } from '@loopback/rest';
-import {authenticate, AuthenticationBindings, TokenService} from '@loopback/authentication';
+  get,
+  RestBindings,
+  Response,
+  param,
+  RequestWithSession,
+} from '@loopback/rest';
+import {
+  authenticate,
+  AuthenticationBindings,
+  TokenService,
+} from '@loopback/authentication';
 import {inject, intercept} from '@loopback/core';
-import { mapProfile } from '../authentication-strategies/types';
+import {mapProfile} from '../authentication-strategies/types';
 import {TokenServiceBindings, User} from '@loopback/authentication-jwt';
-  
+
 /**
  * Login controller for third party oauth provider
  *
@@ -46,8 +50,7 @@ export class OIDCController {
   }
 
   @intercept('passport-oidc')
-  @get('/auth/{provider}/callback',  
-  )
+  @get('/auth/{provider}/callback')
   /**
    * This method uses the passport strategies as express middleware
    *
@@ -58,11 +61,11 @@ export class OIDCController {
   async thirdPartyCallBack(
     @param.path.string('provider') provider: string,
     @inject(RestBindings.Http.REQUEST) request: RequestWithSession,
+    // eslint-disable-next-line  @typescript-eslint/no-explicit-any
     @inject('oidcOptions') oidcOptions: any,
     @inject(RestBindings.Http.RESPONSE) response: Response,
   ) {
-    if (!request.user)
-      throw new Error('user not found from request');
+    if (!request.user) throw new Error('user not found from request');
     const userProfile = mapProfile(request.user as User);
 
     // create a JSON Web Token based on the user profile
@@ -70,7 +73,5 @@ export class OIDCController {
 
     response.redirect(`${oidcOptions.successRedirect}?token=${token}`);
     return response;
-
   }
-
 }

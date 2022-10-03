@@ -1,49 +1,48 @@
-import { authenticate } from '@loopback/authentication';
-import { authorize } from '@loopback/authorization';
+import {authenticate} from '@loopback/authentication';
+import {authorize} from '@loopback/authorization';
 import {
   Count,
   CountSchema,
   Filter,
   FilterExcludingWhere,
   repository,
-  Where
+  Where,
 } from '@loopback/repository';
 import {
-  del, get,
-  getModelSchemaRef, param,
-
-
-  patch, post,
-
-
-
-
+  del,
+  get,
+  getModelSchemaRef,
+  param,
+  patch,
+  post,
   put,
-
-  requestBody
+  requestBody,
 } from '@loopback/rest';
-import { Job } from '../models/job.model';
-import { JobRepository } from '../repositories/job.repository';
-import { basicAuthorization } from '../services/basic.authorizor';
-import { OPERATION_SECURITY_SPEC } from '../utils/security-spec';
-import { SecurityBindings, UserProfile } from '@loopback/security';
+import {Job} from '../models/job.model';
+import {JobRepository} from '../repositories/job.repository';
+import {basicAuthorization} from '../services/basic.authorizor';
+import {OPERATION_SECURITY_SPEC} from '../utils/security-spec';
+import {SecurityBindings, UserProfile} from '@loopback/security';
 import {inject} from '@loopback/core';
 
 @authenticate('jwt')
-@authorize({ allowedRoles: ['any-authenticated-user'], voters: [basicAuthorization] })
+@authorize({
+  allowedRoles: ['any-authenticated-user'],
+  voters: [basicAuthorization],
+})
 export class JobController {
   constructor(
     @inject(SecurityBindings.USER) private user: UserProfile,
     @repository(JobRepository)
     public jobRepository: JobRepository,
-  ) { }
+  ) {}
 
   @post('/jobs', {
     security: OPERATION_SECURITY_SPEC,
     responses: {
       '200': {
         description: 'Job model instance',
-        content: { 'application/json': { schema: getModelSchemaRef(Job) } },
+        content: {'application/json': {schema: getModelSchemaRef(Job)}},
       },
     },
   })
@@ -60,7 +59,7 @@ export class JobController {
     })
     job: Omit<Job, 'id'>,
   ): Promise<Job> {
-    return this.jobRepository.create(job, { currentUser: this.user });
+    return this.jobRepository.create(job, {currentUser: this.user});
   }
 
   @get('/jobs/count', {
@@ -68,14 +67,12 @@ export class JobController {
     responses: {
       '200': {
         description: 'Job model count',
-        content: { 'application/json': { schema: CountSchema } },
+        content: {'application/json': {schema: CountSchema}},
       },
     },
   })
-  async count(
-    @param.where(Job) where?: Where<Job>,
-  ): Promise<Count> {
-    return this.jobRepository.count(where, { currentUser: this.user });
+  async count(@param.where(Job) where?: Where<Job>): Promise<Count> {
+    return this.jobRepository.count(where, {currentUser: this.user});
   }
 
   @get('/jobs', {
@@ -87,17 +84,15 @@ export class JobController {
           'application/json': {
             schema: {
               type: 'array',
-              items: getModelSchemaRef(Job, { includeRelations: true }),
+              items: getModelSchemaRef(Job, {includeRelations: true}),
             },
           },
         },
       },
     },
   })
-  async find(
-    @param.filter(Job) filter?: Filter<Job>,
-  ): Promise<Job[]> {
-    return this.jobRepository.find(filter, { currentUser: this.user });
+  async find(@param.filter(Job) filter?: Filter<Job>): Promise<Job[]> {
+    return this.jobRepository.find(filter, {currentUser: this.user});
   }
 
   @patch('/jobs', {
@@ -105,7 +100,7 @@ export class JobController {
     responses: {
       '200': {
         description: 'Job PATCH success count',
-        content: { 'application/json': { schema: CountSchema } },
+        content: {'application/json': {schema: CountSchema}},
       },
     },
   })
@@ -113,14 +108,14 @@ export class JobController {
     @requestBody({
       content: {
         'application/json': {
-          schema: getModelSchemaRef(Job, { partial: true }),
+          schema: getModelSchemaRef(Job, {partial: true}),
         },
       },
     })
     job: Job,
     @param.where(Job) where?: Where<Job>,
   ): Promise<Count> {
-    return this.jobRepository.updateAll(job, where, { currentUser: this.user });
+    return this.jobRepository.updateAll(job, where, {currentUser: this.user});
   }
 
   @get('/jobs/{id}', {
@@ -130,7 +125,7 @@ export class JobController {
         description: 'Job model instance',
         content: {
           'application/json': {
-            schema: getModelSchemaRef(Job, { includeRelations: true }),
+            schema: getModelSchemaRef(Job, {includeRelations: true}),
           },
         },
       },
@@ -138,9 +133,9 @@ export class JobController {
   })
   async findById(
     @param.path.string('id') id: string,
-    @param.filter(Job, { exclude: 'where' }) filter?: FilterExcludingWhere<Job>
+    @param.filter(Job, {exclude: 'where'}) filter?: FilterExcludingWhere<Job>,
   ): Promise<Job> {
-    return this.jobRepository.findById(id, filter, { currentUser: this.user });
+    return this.jobRepository.findById(id, filter, {currentUser: this.user});
   }
 
   @patch('/jobs/{id}', {
@@ -156,13 +151,13 @@ export class JobController {
     @requestBody({
       content: {
         'application/json': {
-          schema: getModelSchemaRef(Job, { partial: true }),
+          schema: getModelSchemaRef(Job, {partial: true}),
         },
       },
     })
     job: Job,
   ): Promise<void> {
-    await this.jobRepository.updateById(id, job, { currentUser: this.user });
+    await this.jobRepository.updateById(id, job, {currentUser: this.user});
   }
 
   @put('/jobs/{id}', {
@@ -177,7 +172,7 @@ export class JobController {
     @param.path.string('id') id: string,
     @requestBody() job: Job,
   ): Promise<void> {
-    await this.jobRepository.replaceById(id, job, { currentUser: this.user });
+    await this.jobRepository.replaceById(id, job, {currentUser: this.user});
   }
 
   @del('/jobs/{id}', {
@@ -189,6 +184,6 @@ export class JobController {
     },
   })
   async deleteById(@param.path.string('id') id: string): Promise<void> {
-    await this.jobRepository.deleteById(id, { currentUser: this.user });
+    await this.jobRepository.deleteById(id, {currentUser: this.user});
   }
 }
