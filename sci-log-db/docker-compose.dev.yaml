@@ -1,0 +1,23 @@
+services:
+  mongodb:
+    image: bitnami/mongodb:4.2
+    volumes:
+      - mongodb_data:/bitnami
+  backend:
+    build: .
+    depends_on:
+      - mongodb
+    ports:
+      - 3000:3000
+    volumes:
+      - .:/home/node/app
+      - ./functionalAccounts-example.json:/home/node/app:functionalAccounts.json
+      - /home/node/app/node_modules
+    environment:
+      - JWT_SECRET=jwt_secret
+      - DEBUG=loopback:*
+    command: /bin/sh -c "while true; do sleep 600; done"
+
+volumes:
+  mongodb_data:
+    driver: local
