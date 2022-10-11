@@ -35,7 +35,8 @@
     "stop": "pm2 stop ecosystem.config.js --env production",
     "logs": "pm2 logs",
     "delete-pm2": "pm2 delete 0",
-    "start-local": "npm run build && node ."
+    "start-local": "npm run build && node .",
+    "start:watch": "tsc-watch --target es2017 --outDir ./dist --onSuccess \"node .\""
   },
   "repository": {
     "type": "git"
@@ -77,13 +78,14 @@
     "@loopback/build": "^6.2.9",
     "@loopback/eslint-config": "^10.0.5",
     "@loopback/testlab": "^3.2.12",
-    "@types/formidable": "^2.0.5",
     "@types/express-session": "^1.17.4",
+    "@types/formidable": "^2.0.5",
     "@types/ldapjs": "^1.0.9",
     "@types/node": "^10.17.51",
     "@types/passport": "^1.0.7",
     "eslint": "^7.18.0",
     "source-map-support": "^0.5.19",
+    "tsc-watch": "^5.0.3",
     "typescript": "~4.1.3"
   }
 }
