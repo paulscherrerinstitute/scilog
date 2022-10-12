@@ -19,7 +19,7 @@ on:
 
 env:
   CONTAINER_REGISTRY: ghcr.io
-  IMAGE_NAME: ${{ env.CONTAINER_REGISTRY}}/${{ github.repository }}/be
+  IMAGE_NAME: ${{ github.repository }}/be
   CONTEXT: sci-log-db
 
 jobs:
@@ -48,11 +48,12 @@ jobs:
       - name: Extract tags
         id: tags
         run: |
-          tags=$IMAGE_NAME:"${{ github.sha }}"
+          prefix=$CONTAINER_REGISTRY/$IMAGE_NAME
+          tags=$prefix:"${{ github.sha }}"
           if [[ "${{ github.event_name }}" == "release" ]]; then
-            tags=$IMAGE_NAME:"${{ github.event.release.tag_name }}",$IMAGE_NAME:stable
+            tags=$prefix:"${{ github.event.release.tag_name }}",$prefix:stable
           fi
-          echo "::set-output name=tags::$(echo $tags,$IMAGE_NAME:latest)"
+          echo "::set-output name=tags::$(echo $tags,$prefix:latest)"
 
       - name: Build
         uses: docker/build-push-action@v3
