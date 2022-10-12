@@ -5,14 +5,17 @@ on:
     branches: [main]
     paths: 
       - sci-log-db/**
+      - .github/workflows/test-build-push.be.yaml
   push:
     branches: [main]
     paths: 
       - sci-log-db/**
+      - .github/workflows/test-build-push.be.yaml
   release:
     types: [published]
     paths: 
       - sci-log-db/**
+      - .github/workflows/test-build-push.be.yaml
 
 env:
   CONTAINER_REGISTRY: ghcr.io
