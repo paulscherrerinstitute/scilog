@@ -38,11 +38,12 @@ jobs:
           if [[ "${{ github.event_name }}" == "release" ]]; then
             tags=$prefix:"${{ github.event.release.tag_name }}",$prefix:stable
           fi
-          echo "::set-output name=tags::$(echo $tags,$prefix:latest)"
+          echo "tags=$tags,$prefix:latest" >> GITHUB_OUTPUT
 
       - name: Test
         if: github.event_name != 'push' 
         run: |
+          echo ${{ steps.tags.outputs.tags }}
           cd $CONTEXT
           docker-compose -f docker-compose.test.yaml up --build --no-deps
           docker-compose -f docker-compose.test.yaml down
