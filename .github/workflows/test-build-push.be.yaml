@@ -34,7 +34,7 @@ jobs:
         if: github.event_name != 'push' 
         run: |
           cd $CONTEXT
-          docker-compose up -d --build --no-deps -f docker-compose.test.yaml
+          docker-compose -f docker-compose.test.yaml up -d --build --no-deps
           docker-compose down
 
       - name: Login to GHCR
