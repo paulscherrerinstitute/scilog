@@ -30,21 +30,11 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v2
 
-      - name: Extract tags
-        id: tags
-        run: |
-          prefix=$CONTAINER_REGISTRY/$IMAGE_NAME
-          tags=$prefix:"${{ github.sha }}"
-          if [[ "${{ github.event_name }}" == "release" ]]; then
-            tags=$prefix:"${{ github.event.release.tag_name }}",$prefix:stable
-          fi
-          echo "tags=$tags,$prefix:latest" >> $GITHUB_OUTPUT
-
       - name: Test
         if: github.event_name != 'push' 
         run: |
           cd $CONTEXT
-          docker-compose -f docker-compose.test.yaml up --build --no-deps
+          docker-compose -f docker-compose.test.yaml up --build --no-deps --abort-on-container-exit
           docker-compose -f docker-compose.test.yaml down
 
       - name: Login to GHCR
@@ -54,6 +44,16 @@ jobs:
           registry: ${{ env.CONTAINER_REGISTRY }}
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Extract tags
+        id: tags
+        run: |
+          prefix=$CONTAINER_REGISTRY/$IMAGE_NAME
+          tags=$prefix:"${{ github.sha }}"
+          if [[ "${{ github.event_name }}" == "release" ]]; then
+            tags=$prefix:"${{ github.event.release.tag_name }}",$prefix:stable
+          fi
+          echo "tags=$tags,$prefix:latest" >> $GITHUB_OUTPUT
 
       - name: Build
         uses: docker/build-push-action@v3
