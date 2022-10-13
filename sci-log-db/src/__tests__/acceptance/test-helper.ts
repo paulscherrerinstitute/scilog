@@ -8,6 +8,10 @@ import {testdb} from '../testdb.datasource';
 import {PasswordHasherBindings} from '../../keys';
 import {User, UserRepository} from '@loopback/authentication-jwt';
 import {ApplicationConfig} from '@loopback/core';
+import _ from 'lodash';
+import {BasesnippetRepository, TaskRepository} from '../../repositories';
+import {FileRepository} from '../../repositories/file.repository';
+import {JobRepository} from '../../repositories/job.repository';
 
 export interface AppWithClient {
   app: SciLogDbApplication;
@@ -46,11 +50,17 @@ export async function setupApplication(
   return {app, client};
 }
 
-export async function createAUser(app: SciLogDbApplication): Promise<User> {
+export async function createAUser(
+  app: SciLogDbApplication,
+  additionalRoles: string[] = [],
+): Promise<User> {
   const passwordHasher = await app.get(PasswordHasherBindings.PASSWORD_HASHER);
   const encryptedPassword = await passwordHasher.hashPassword(userPassword);
   const userRepo: UserRepository = await app.get('repositories.UserRepository');
-  const newUser = await userRepo.create(userData);
+  const newUser = await userRepo.create({
+    ..._.omit(userData, 'roles'),
+    roles: userData.roles.concat(additionalRoles),
+  });
   newUser.id = newUser.id.toString();
 
   await userRepo.userCredentials(newUser.id).create({
@@ -58,4 +68,46 @@ export async function createAUser(app: SciLogDbApplication): Promise<User> {
   });
 
   return newUser;
+}
+
+async function createToken(client: Client, user: User) {
+  const loginResponse = await client
+    .post('/users/login')
+    .send({principal: user.email, password: userPassword});
+  return loginResponse.body.token;
+}
+
+export async function createUserToken(
+  app: SciLogDbApplication,
+  client: Client,
+  additionalRoles: string[] = [],
+) {
+  const user = await createAUser(app, additionalRoles);
+  const token = await createToken(client, user);
+  return token;
+}
+
+export async function clearDatabase(app: SciLogDbApplication) {
+  const basesnippetRepository: BasesnippetRepository = await app.get(
+    'repositories.BasesnippetRepository',
+  );
+  const userRepository: UserRepository = await app.get(
+    'repositories.UserRepository',
+  );
+  const fileRepository: FileRepository = await app.get(
+    'repositories.FileRepository',
+  );
+  const jobRepository: JobRepository = await app.get(
+    'repositories.JobRepository',
+  );
+  const taskRepository: TaskRepository = await app.get(
+    'repositories.TaskRepository',
+  );
+  await basesnippetRepository.deleteAll(null, {
+    currentUser: {roles: ['admin']},
+  });
+  await userRepository.deleteAll();
+  await fileRepository.deleteAll(null, {currentUser: {roles: ['admin']}});
+  await jobRepository.deleteAll({}, {currentUser: {roles: ['admin']}});
+  await taskRepository.deleteAll(null, {currentUser: {roles: ['admin']}});
 }
