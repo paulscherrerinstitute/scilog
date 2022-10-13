@@ -80,6 +80,55 @@ export class TaskController {
     return this.taskRepository.count(where, {currentUser: this.user});
   }
 
+  @get('/tasks/search={search}', {
+    security: OPERATION_SECURITY_SPEC,
+    responses: {
+      '200': {
+        description: 'Array of tasks model instances',
+        content: {
+          'application/json': {
+            schema: {
+              type: 'array',
+              items: getModelSchemaRef(Task, {includeRelations: true}),
+            },
+          },
+        },
+      },
+    },
+  })
+  async findWithSearch(
+    @param.path.string('search') search: string,
+    @param.filter(Task) filter?: Filter<Task>,
+  ): Promise<Task[]> {
+    const snippetsFiltered = await this.taskRepository.findWithSearch(
+      search,
+      this.user,
+      filter,
+    );
+    return snippetsFiltered;
+  }
+
+  @get('/tasks/index={id}', {
+    security: OPERATION_SECURITY_SPEC,
+    responses: {
+      '200': {
+        description: 'Tasks model instance',
+        content: {
+          'application/json': {
+            type: 'any',
+            schema: getModelSchemaRef(Task, {includeRelations: true}),
+          },
+        },
+      },
+    },
+  })
+  async findIndexInBuffer(
+    @param.path.string('id') id: string,
+    @param.filter(Task) filter?: Filter<Task>,
+  ): Promise<number> {
+    return this.taskRepository.findIndexInBuffer(id, this.user, filter);
+  }
+
   @get('/tasks', {
     security: OPERATION_SECURITY_SPEC,
     responses: {
@@ -162,7 +211,9 @@ export class TaskController {
     })
     task: Task,
   ): Promise<void> {
-    await this.taskRepository.updateById(id, task, {currentUser: this.user});
+    await this.taskRepository.updateByIdWithHistory(id, task, {
+      currentUser: this.user,
+    });
   }
 
   @put('/task/{id}', {
@@ -188,35 +239,21 @@ export class TaskController {
       },
     },
   })
-  // async deleteById(@param.path.string('id') id: string): Promise<void> {
-  //   await this.taskRepository.deleteById(id, { currentUser: this.user });
-  // }
   async deleteById(@param.path.string('id') id: string): Promise<void> {
-    // Two steps:
-    // 1. set snippet to 'deleted=true'
-    // 2. inside websocket and after informing the clients, replace the parentId or delete the snippet
-    const snippet = await this.taskRepository.findById(
-      id,
-      {},
-      {currentUser: this.user},
-    );
-    if (snippet?.versionable) {
-      if (snippet?.parentId) {
-        const parent = await this.basesnippetRepository.findById(
-          snippet.parentId,
-          {},
-          {currentUser: this.user},
-        );
-        const parentHistory = await this.basesnippetController.getHistorySnippet(
-          parent,
-        );
-        console.log(parentHistory);
-      }
-    }
-    await this.taskRepository.updateById(
-      id,
-      {deleted: true},
-      {currentUser: this.user},
-    );
+    await this.basesnippetRepository.deleteByIdWithHistory(id, {
+      currentUser: this.user,
+    });
+  }
+
+  @patch('/tasks/{id}/restore', {
+    security: OPERATION_SECURITY_SPEC,
+    responses: {
+      '204': {
+        description: 'Tasks RESTORE success',
+      },
+    },
+  })
+  async restoreDeletedId(@param.path.string('id') id: string): Promise<void> {
+    this.taskRepository.restoreDeletedId(id, this.user);
   }
 }
