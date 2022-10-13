@@ -34,7 +34,7 @@ jobs:
         if: github.event_name != 'push' 
         run: |
           cd $CONTEXT
-          docker-compose -f docker-compose.test.yaml up --build --no-deps --abort-on-container-exit
+          docker-compose -f docker-compose.test.yaml up --build --no-deps --abort-on-container-exit --exit-code-from scilog
           docker-compose -f docker-compose.test.yaml down
 
       - name: Login to GHCR
