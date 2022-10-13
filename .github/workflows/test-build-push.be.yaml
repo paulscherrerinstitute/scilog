@@ -59,5 +59,5 @@ jobs:
         uses: docker/build-push-action@v3
         with:
           context: ${{ env.CONTEXT }}/.
-          push: github.event_name != 'pull_request' 
+          push: ${{ github.event_name != 'pull_request' }}
           tags: ${{ steps.tags.outputs.tags }}
