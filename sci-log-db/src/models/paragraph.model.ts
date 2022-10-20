@@ -1,6 +1,6 @@
 import {model, property} from '@loopback/repository';
 import {Basesnippet} from './basesnippet.model';
-import { Filecontainer } from './location.model';
+import {Filecontainer} from './location.model';
 
 enum LinkType {
   PARAGRAPH = 'paragraph',
@@ -26,7 +26,7 @@ export class Paragraph extends Basesnippet {
 
   @property({
     type: 'string',
-    description: 'Markup contents in markdown (MD) syntax of this paragraph'
+    description: 'Markup contents in markdown (MD) syntax of this paragraph',
   })
   textcontent?: string;
 

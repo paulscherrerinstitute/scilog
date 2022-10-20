@@ -19,7 +19,11 @@ const ldap = require('ldapjs-promise');
 // the following is PSI specific
 
 function isRoleGroup(element: string) {
-  return (element.startsWith("CN=a-") || element.startsWith("CN=p") || element.startsWith("CN=unx"));
+  return (
+    element.startsWith('CN=a-') ||
+    element.startsWith('CN=p') ||
+    element.startsWith('CN=unx')
+  );
 }
 
 // TODO make these constant configurable
@@ -135,29 +139,32 @@ export class LDAPUserService implements UserService<User, Credentials> {
     }
 
     try {
-      const results = await client.searchReturnAll(searchSubject, searchOptions);
-      for (let entry of results.entries) {
-        var roleGroups = [...entry.memberOf].filter(isRoleGroup).map(
-          (value: string) => value.substring(3, value.indexOf(","))
-        )
-        roleGroups.push('any-authenticated-user')
+      const results = await client.searchReturnAll(
+        searchSubject,
+        searchOptions,
+      );
+      for (const entry of results.entries) {
+        const roleGroups = [...entry.memberOf]
+          .filter(isRoleGroup)
+          .map((value: string) => value.substring(3, value.indexOf(',')));
+        roleGroups.push('any-authenticated-user');
         // add linked pgroup to eaccounts
         if (/^e[0-9]{5}$/.test(principal)) {
-          roleGroups.push("p" + principal.substring(1))
+          roleGroups.push('p' + principal.substring(1));
         }
         // add user itself to allow for single user ownership
         // always take login account name, not email
-        roleGroups.push(entry.cn)
+        roleGroups.push(entry.cn);
         u = {
           email: entry.userPrincipalName || entry.mail, // eaccount only have mail field
           firstName: entry.givenName,
           lastName: entry.sn,
           username: entry.cn,
           roles: roleGroups,
-        }
-      };
-      var foundUser = await repo.findOne({
-        where: { username: u.username },
+        };
+      }
+      let foundUser = await repo.findOne({
+        where: {username: u.username},
       });
       if (!foundUser) {
         console.log(

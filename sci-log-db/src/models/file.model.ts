@@ -6,7 +6,7 @@ import {Image} from './image.model';
   settings: {
     strict: true,
     scope: {
-      where: { snippetType: 'filesnippet' }
+      where: {snippetType: 'filesnippet'},
     },
     mongodb: {collection: 'Basesnippet'},
   },
@@ -20,7 +20,7 @@ export class Filesnippet extends Basesnippet {
 
   @property({
     type: 'string',
-    description: 'Optional name of file as presented to user in GUI'
+    description: 'Optional name of file as presented to user in GUI',
   })
   name?: string;
 

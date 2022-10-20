@@ -139,7 +139,8 @@ export class BasesnippetController {
     security: OPERATION_SECURITY_SPEC,
     responses: {
       '200': {
-        description: 'Find the index (i.e position) of a basesnippet within a query.',
+        description:
+          'Find the index (i.e position) of a basesnippet within a query.',
         content: {
           'application/json': {
             type: 'any',
@@ -227,7 +228,9 @@ export class BasesnippetController {
     @param.filter(Basesnippet, {exclude: 'where'})
     filter?: FilterExcludingWhere<Basesnippet>,
   ): Promise<Basesnippet> {
-    return this.basesnippetRepository.findById(id, filter, { currentUser: this.user })
+    return this.basesnippetRepository.findById(id, filter, {
+      currentUser: this.user,
+    });
   }
 
   @patch('/basesnippets/{id}', {

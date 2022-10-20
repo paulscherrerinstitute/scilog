@@ -193,9 +193,7 @@ export async function startWebsocket(app: SciLogDbApplication) {
               // eslint-disable-next-line  @typescript-eslint/no-explicit-any
               websocketMap[id].forEach((c: any) => {
                 if (
-                  doc['readACL'].some((r: string) =>
-                    c.user.roles.includes(r),
-                  )
+                  doc['readACL'].some((r: string) => c.user.roles.includes(r))
                 ) {
                   if (matchesFilterSettings(doc, c.config))
                     c.ws.send(JSON.stringify({'new-notification': change}));

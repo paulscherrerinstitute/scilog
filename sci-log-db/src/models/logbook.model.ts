@@ -11,7 +11,6 @@ import {Basesnippet} from './basesnippet.model';
   },
 })
 export class Logbook extends Basesnippet {
-
   @property({
     type: 'string',
     default: 'logbook',

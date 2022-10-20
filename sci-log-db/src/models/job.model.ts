@@ -19,7 +19,7 @@ export class Job extends Basesnippet {
 
   @property({
     type: 'string',
-    description: 'Job description'
+    description: 'Job description',
   })
   description?: string;
 

@@ -5,10 +5,10 @@ import {Basesnippet} from './basesnippet.model';
   settings: {
     strict: true,
     scope: {
-      where: {snippetType: 'view'}
+      where: {snippetType: 'view'},
     },
-    mongodb: {collection: 'Basesnippet'}
-  }
+    mongodb: {collection: 'Basesnippet'},
+  },
 })
 export class View extends Basesnippet {
   @property({

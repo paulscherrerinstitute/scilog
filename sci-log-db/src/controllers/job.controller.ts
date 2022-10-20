@@ -9,10 +9,13 @@ import {
   Where,
 } from '@loopback/repository';
 import {
-  del, get,
-  getModelSchemaRef, param,
-  patch, post,
-  requestBody
+  del,
+  get,
+  getModelSchemaRef,
+  param,
+  patch,
+  post,
+  requestBody,
 } from '@loopback/rest';
 import {Job} from '../models/job.model';
 import {JobRepository} from '../repositories/job.repository';

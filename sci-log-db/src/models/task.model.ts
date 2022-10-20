@@ -19,7 +19,7 @@ export class Task extends Basesnippet {
 
   @property({
     type: 'string',
-    description: 'Description of the task'
+    description: 'Description of the task',
   })
   content: string;
 
