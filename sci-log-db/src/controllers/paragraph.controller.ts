@@ -78,6 +78,55 @@ export class ParagraphController {
     return this.paragraphRepository.count(where, {currentUser: this.user});
   }
 
+  @get('/paragraphs/search={search}', {
+    security: OPERATION_SECURITY_SPEC,
+    responses: {
+      '200': {
+        description: 'Array of paragraphs model instances',
+        content: {
+          'application/json': {
+            schema: {
+              type: 'array',
+              items: getModelSchemaRef(Paragraph, {includeRelations: true}),
+            },
+          },
+        },
+      },
+    },
+  })
+  async findWithSearch(
+    @param.path.string('search') search: string,
+    @param.filter(Paragraph) filter?: Filter<Paragraph>,
+  ): Promise<Paragraph[]> {
+    const snippetsFiltered = await this.paragraphRepository.findWithSearch(
+      search,
+      this.user,
+      filter,
+    );
+    return snippetsFiltered;
+  }
+
+  @get('/paragraphs/index={id}', {
+    security: OPERATION_SECURITY_SPEC,
+    responses: {
+      '200': {
+        description: 'Paragraphs model instance',
+        content: {
+          'application/json': {
+            type: 'any',
+            schema: getModelSchemaRef(Paragraph, {includeRelations: true}),
+          },
+        },
+      },
+    },
+  })
+  async findIndexInBuffer(
+    @param.path.string('id') id: string,
+    @param.filter(Paragraph) filter?: Filter<Paragraph>,
+  ): Promise<number> {
+    return this.paragraphRepository.findIndexInBuffer(id, this.user, filter);
+  }
+
   @get('/paragraphs', {
     security: OPERATION_SECURITY_SPEC,
     responses: {
@@ -167,7 +216,7 @@ export class ParagraphController {
     })
     paragraph: Paragraph,
   ): Promise<void> {
-    await this.paragraphRepository.updateById(id, paragraph, {
+    await this.paragraphRepository.updateByIdWithHistory(id, paragraph, {
       currentUser: this.user,
     });
   }
@@ -198,6 +247,20 @@ export class ParagraphController {
     },
   })
   async deleteById(@param.path.string('id') id: string): Promise<void> {
-    await this.paragraphRepository.deleteById(id, {currentUser: this.user});
+    await this.paragraphRepository.deleteByIdWithHistory(id, {
+      currentUser: this.user,
+    });
+  }
+
+  @patch('/paragraphs/{id}/restore', {
+    security: OPERATION_SECURITY_SPEC,
+    responses: {
+      '204': {
+        description: 'Paragraphs RESTORE success',
+      },
+    },
+  })
+  async restoreDeletedId(@param.path.string('id') id: string): Promise<void> {
+    this.paragraphRepository.restoreDeletedId(id, this.user);
   }
 }
