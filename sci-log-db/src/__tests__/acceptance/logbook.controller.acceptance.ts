@@ -1,18 +1,18 @@
 import {Client, expect} from '@loopback/testlab';
-import {Suite} from 'mocha';
 import _ from 'lodash';
+import {Suite} from 'mocha';
 import {SciLogDbApplication} from '../..';
 import {clearDatabase, createUserToken, setupApplication} from './test-helper';
 
-describe('File controller services', function (this: Suite) {
+describe('Logbook', function (this: Suite) {
   this.timeout(5000);
   let app: SciLogDbApplication;
   let client: Client;
   let token: string;
-  let fileSnippetId: string;
-  const fileSnippet = {
+  let logbookSnippetId: string;
+  const logbookSnippet = {
     ownerGroup: 'aOwner',
-    accessGroups: ['filesnippetAcceptance'],
+    accessGroups: ['logbookAcceptance'],
     isPrivate: true,
     defaultOrder: 0,
     expiresAt: '2055-10-10T14:04:19.522Z',
@@ -20,12 +20,13 @@ describe('File controller services', function (this: Suite) {
     dashboardName: 'string',
     versionable: true,
     name: 'aSearchableName',
+    location: 'aLocation',
   };
 
   before('setupApplication', async () => {
     ({app, client} = await setupApplication());
     await clearDatabase(app);
-    token = await createUserToken(app, client, ['filesnippetAcceptance']);
+    token = await createUserToken(app, client, ['logbookAcceptance']);
   });
 
   after(async () => {
@@ -33,22 +34,22 @@ describe('File controller services', function (this: Suite) {
     if (app != null) await app.stop();
   });
 
-  it('post a file without token should return 401', async () => {
-    await client.post('/filesnippet').send(fileSnippet).expect(401);
+  it('post a logbook without token should return 401', async () => {
+    await client.post('/logbooks').send(logbookSnippet).expect(401);
   });
 
-  it('post a file with authentication should return 200 and contain file', async () => {
+  it('post a logbook with authentication should return 200 and contain logbookSnippet', async () => {
     await client
-      .post('/filesnippet')
+      .post('/logbooks')
       .set('Authorization', 'Bearer ' + token)
       .set('Content-Type', 'application/json')
-      .send(fileSnippet)
+      .send(logbookSnippet)
       .expect(200)
       .then(
         result => (
-          expect(result.body).to.containEql(fileSnippet),
-          expect(result.body.snippetType).to.be.eql('image'),
-          (fileSnippetId = result.body.id)
+          expect(result.body).to.containEql(logbookSnippet),
+          expect(result.body.snippetType).to.be.eql('logbook'),
+          (logbookSnippetId = result.body.id)
         ),
       )
       .catch(err => {
@@ -58,14 +59,14 @@ describe('File controller services', function (this: Suite) {
 
   it('count snippet without token should return 401', async () => {
     await client
-      .get('/filesnippet/count')
+      .get('/logbooks/count')
       .set('Content-Type', 'application/json')
       .expect(401);
   });
 
   it('count snippet with token should return body.count=1', async () => {
     await client
-      .get('/filesnippet/count')
+      .get('/logbooks/count')
       .set('Authorization', 'Bearer ' + token)
       .set('Content-Type', 'application/json')
       .expect(200)
@@ -77,21 +78,21 @@ describe('File controller services', function (this: Suite) {
 
   it('get snippets without token should return 401', async () => {
     await client
-      .get('/filesnippet')
+      .get('/logbooks')
       .set('Content-Type', 'application/json')
       .expect(401);
   });
 
-  it('get snippet with token should be of length one and contain file', async () => {
+  it('get snippet with token should be of length one and contain logbook', async () => {
     await client
-      .get('/filesnippet')
+      .get('/logbooks')
       .set('Authorization', 'Bearer ' + token)
       .set('Content-Type', 'application/json')
       .expect(200)
       .then(
         result => (
           expect(result.body.length).to.be.eql(1),
-          expect(result.body[0]).to.containEql(fileSnippet)
+          expect(result.body[0]).to.containEql(logbookSnippet)
         ),
       )
       .catch(err => {
@@ -101,18 +102,18 @@ describe('File controller services', function (this: Suite) {
 
   it('get snippets with ID without token should return 401', async () => {
     await client
-      .get(`/filesnippet/${fileSnippetId}`)
+      .get(`/logbooks/${logbookSnippetId}`)
       .set('Content-Type', 'application/json')
       .expect(401);
   });
 
-  it('get snippet with ID with token should return 200 and contain file', async () => {
+  it('get snippet with ID with token should return 200 and contain logbook', async () => {
     await client
-      .get(`/filesnippet/${fileSnippetId}`)
+      .get(`/logbooks/${logbookSnippetId}`)
       .set('Authorization', 'Bearer ' + token)
       .set('Content-Type', 'application/json')
       .expect(200)
-      .then(result => expect(result.body).to.containEql(fileSnippet))
+      .then(result => expect(result.body).to.containEql(logbookSnippet))
       .catch(err => {
         throw err;
       });
@@ -120,7 +121,7 @@ describe('File controller services', function (this: Suite) {
 
   it('patch snippet without token should return 401', async () => {
     await client
-      .patch('/filesnippet/')
+      .patch('/logbooks/')
       .set('Content-Type', 'application/json')
       .send({dashboardName: 'aNewName'})
       .expect(401);
@@ -128,7 +129,7 @@ describe('File controller services', function (this: Suite) {
 
   it('patch snippet with toke should return 200 and body.count=1', async () => {
     await client
-      .patch('/filesnippet')
+      .patch('/logbooks')
       .set('Authorization', 'Bearer ' + token)
       .set('Content-Type', 'application/json')
       .send({dashboardName: 'aNewName'})
@@ -141,35 +142,35 @@ describe('File controller services', function (this: Suite) {
 
   it('put snippet without token should return 401', async () => {
     await client
-      .put(`/filesnippet/${fileSnippetId}`)
-      .send(fileSnippet)
+      .put(`/logbooks/${logbookSnippetId}`)
+      .send(logbookSnippet)
       .set('Content-Type', 'application/json')
       .expect(401);
   });
 
   it('put snippet with token should return 204', async () => {
-    const filePut = {
-      ..._.omit(fileSnippet, 'dashboardName'),
+    const logbookSnippetPut = {
+      ..._.omit(logbookSnippet, 'dashboardName'),
       dashboardName: 'dashboardNamePut',
     };
     await client
-      .put(`/filesnippet/${fileSnippetId}`)
+      .put(`/logbooks/${logbookSnippetId}`)
       .set('Authorization', 'Bearer ' + token)
       .set('Content-Type', 'application/json')
-      .send(filePut)
+      .send(logbookSnippetPut)
       .expect(204);
   });
 
   it('Get index without token should return 401', async () => {
     await client
-      .get(`/filesnippet/index=${fileSnippetId}`)
+      .get(`/logbooks/index=${logbookSnippetId}`)
       .set('Content-Type', 'application/json')
       .expect(401);
   });
 
   it('Get index with token should return 200 and body=0', async () => {
     await client
-      .get(`/filesnippet/index=${fileSnippetId}`)
+      .get(`/logbooks/index=${logbookSnippetId}`)
       .set('Authorization', 'Bearer ' + token)
       .set('Content-Type', 'application/json')
       .expect(200)
@@ -179,16 +180,9 @@ describe('File controller services', function (this: Suite) {
       });
   });
 
-  it('Search without token should return 401', async () => {
-    await client
-      .get(`/filesnippet/search=descript`)
-      .set('Content-Type', 'application/json')
-      .expect(401);
-  });
-
   it('Search index with token should return 200 and matching body.name', async () => {
     await client
-      .get(`/filesnippet/search=searchablename`)
+      .get(`/logbooks/search=searchablename`)
       .set('Authorization', 'Bearer ' + token)
       .set('Content-Type', 'application/json')
       .expect(200)
@@ -207,9 +201,7 @@ describe('File controller services', function (this: Suite) {
     const includeTags = {fields: {tags: true}, include: ['subsnippets']};
     await client
       .get(
-        `/filesnippet/search=aSearchabletag?filter=${JSON.stringify(
-          includeTags,
-        )}`,
+        `/logbooks/search=aSearchabletag?filter=${JSON.stringify(includeTags)}`,
       )
       .set('Authorization', 'Bearer ' + token)
       .set('Content-Type', 'application/json')
@@ -227,8 +219,8 @@ describe('File controller services', function (this: Suite) {
 
   it('patch snippet by id without token should return 401', async () => {
     await client
-      .patch(`/filesnippet/${fileSnippetId}`)
-      .send(fileSnippet)
+      .patch(`/logbooks/${logbookSnippetId}`)
+      .send(logbookSnippet)
       .set('Content-Type', 'application/json')
       .expect(401);
   });
@@ -238,12 +230,13 @@ describe('File controller services', function (this: Suite) {
   // to prevent the search to return too many snippets, the fields used in the subsequent search are updated
   it('patch snippet by id with token should return 204', async () => {
     await client
-      .patch(`/filesnippet/${fileSnippetId}`)
+      .patch(`/logbooks/${logbookSnippetId}`)
       .set('Authorization', 'Bearer ' + token)
       .set('Content-Type', 'application/json')
       .send({
         tags: ['aSearchExcludedTag'],
         name: 'aSearchExcludedName',
+        textcontent: 'aSearchExcludedTextContent',
       })
       .expect(204);
   });
@@ -252,9 +245,7 @@ describe('File controller services', function (this: Suite) {
     const includeTags = {fields: {tags: true}, include: ['subsnippets']};
     await client
       .get(
-        `/filesnippet/search=aSearchabletag?filter=${JSON.stringify(
-          includeTags,
-        )}`,
+        `/logbooks/search=aSearchabletag?filter=${JSON.stringify(includeTags)}`,
       )
       .set('Authorization', 'Bearer ' + token)
       .set('Content-Type', 'application/json')
@@ -262,7 +253,7 @@ describe('File controller services', function (this: Suite) {
       .then(
         result => (
           expect(result.body.length).to.be.eql(1),
-          expect(result.body[0].snippetType).to.be.eql('image'),
+          expect(result.body[0].snippetType).to.be.eql('logbook'),
           expect(result.body[0].tags).to.be.eql(['aSearchableTag'])
         ),
       )
@@ -273,14 +264,14 @@ describe('File controller services', function (this: Suite) {
 
   it('delete snippet by id without token should return 401', async () => {
     await client
-      .delete(`/filesnippet/${fileSnippetId}`)
+      .delete(`/logbooks/${logbookSnippetId}`)
       .set('Content-Type', 'application/json')
       .expect(401);
   });
 
   it('delete snippet by id with token should return 204', async () => {
     await client
-      .delete(`/filesnippet/${fileSnippetId}`)
+      .delete(`/logbooks/${logbookSnippetId}`)
       .set('Authorization', 'Bearer ' + token)
       .set('Content-Type', 'application/json')
       .expect(204);
@@ -288,124 +279,16 @@ describe('File controller services', function (this: Suite) {
 
   it('restore snippet by id without token should return 401', async () => {
     await client
-      .patch(`/filesnippet/${fileSnippetId}/restore`)
+      .patch(`/logbooks/${logbookSnippetId}/restore`)
       .set('Content-Type', 'application/json')
       .expect(401);
   });
 
   it('restore snippet by id with token should return 204', async () => {
     await client
-      .patch(`/filesnippet/${fileSnippetId}/restore`)
+      .patch(`/logbooks/${logbookSnippetId}/restore`)
       .set('Authorization', 'Bearer ' + token)
       .set('Content-Type', 'application/json')
       .expect(204);
-  });
-
-  it('tries to post a file with incompatible fields', async () => {
-    await client
-      .post('/filesnippet/files')
-      .set('Authorization', 'Bearer ' + token)
-      .type('form')
-      .field('fields', '{"something": "a"}')
-      .attach('file', __filename)
-      .expect(422)
-      .then(result =>
-        expect(result.body.error.details.messages).to.be.eql({
-          something: ['is not defined in the model'],
-        }),
-      )
-      .catch(err => {
-        throw err;
-      });
-  });
-
-  it('tries to post without a file', async () => {
-    await client
-      .post('/filesnippet/files')
-      .set('Authorization', 'Bearer ' + token)
-      .set('Content-Type', 'multipart/form-data')
-      .expect(422)
-      .then(result =>
-        expect(result.body.error.message).to.be.eql('A file must be provided'),
-      )
-      .catch(err => {
-        throw err;
-      });
-  });
-
-  it('tries to post a file with empty fields', async () => {
-    await client
-      .post('/filesnippet/files')
-      .set('Authorization', 'Bearer ' + token)
-      .type('form')
-      .attach('file', __filename)
-      .expect(200)
-      .then()
-      .catch(err => {
-        throw err;
-      });
-  });
-
-  it('tries to post a file with allowed field', async () => {
-    await client
-      .post('/filesnippet/files')
-      .set('Authorization', 'Bearer ' + token)
-      .type('form')
-      .field('fields', '{"ownerGroup": "aOwner"}')
-      .attach('file', __filename)
-      .expect(200)
-      .then()
-      .catch(err => {
-        throw err;
-      });
-  });
-
-  it('tries to get a file with matching pgroup after posting', async () => {
-    const postResponse = await client
-      .post('/filesnippet/files')
-      .set('Authorization', 'Bearer ' + token)
-      .type('form')
-      .field('fields', '{"ownerGroup": "any-authenticated-user"}')
-      .attach('file', __filename)
-      .then()
-      .catch(err => {
-        throw err;
-      });
-
-    await client
-      .get(`/filesnippet/${postResponse.body.id}/files`)
-      .set('Authorization', 'Bearer ' + token)
-      .expect(200)
-      .then(result => {
-        expect(result.text).to.startWith('"use strict"');
-        expect(result.type).to.eql('application/javascript');
-      })
-      .catch(err => {
-        throw err;
-      });
-  });
-
-  it('patches a file after having created it', async () => {
-    const postResponse = await client
-      .post('/filesnippet/files')
-      .set('Authorization', 'Bearer ' + token)
-      .type('form')
-      .field('fields', '{"ownerGroup": "any-authenticated-user"}')
-      .attach('file', __filename)
-      .then()
-      .catch(err => {
-        throw err;
-      });
-
-    await client
-      .patch(`/filesnippet/${postResponse.body.id}/files`)
-      .set('Authorization', 'Bearer ' + token)
-      .field('fields', '{"description": "something"}')
-      .attach('file', __filename)
-      .expect(204)
-      .then()
-      .catch(err => {
-        throw err;
-      });
   });
 });
