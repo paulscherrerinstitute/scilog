@@ -146,7 +146,7 @@ export class FileController {
       fm.fields['accessHash'] = crypto.randomBytes(64).toString('hex');
       return this.fileRepository
         .create(_.omit(fm.fields, ['id']), {currentUser: this.user})
-        .then(file => {
+        .then((file: Filesnippet) => {
           resolve(file);
         })
         .catch((err: HttpErrors.HttpError) => {
@@ -168,6 +168,55 @@ export class FileController {
     @param.where(Filesnippet) where?: Where<Filesnippet>,
   ): Promise<Count> {
     return this.fileRepository.count(where, {currentUser: this.user});
+  }
+
+  @get('/filesnippet/index={id}', {
+    security: OPERATION_SECURITY_SPEC,
+    responses: {
+      '200': {
+        description: 'Filesnippet model instance',
+        content: {
+          'application/json': {
+            schema: getModelSchemaRef(Filesnippet, {includeRelations: true}),
+          },
+        },
+      },
+    },
+  })
+  async findIndexInBuffer(
+    @param.path.string('id') id: string,
+    @param.filter(Filesnippet, {exclude: 'where'})
+    filter?: FilterExcludingWhere<Filesnippet>,
+  ): Promise<Filesnippet> {
+    return this.fileRepository.findIndexInBuffer(id, this.user, filter);
+  }
+
+  @get('/filesnippet/search={search}', {
+    security: OPERATION_SECURITY_SPEC,
+    responses: {
+      '200': {
+        description: 'Array of Filesnippet model instances',
+        content: {
+          'application/json': {
+            schema: {
+              type: 'array',
+              items: getModelSchemaRef(Filesnippet, {includeRelations: true}),
+            },
+          },
+        },
+      },
+    },
+  })
+  async findWithSearch(
+    @param.path.string('search') search: string,
+    @param.filter(Filesnippet) filter?: Filter<Filesnippet>,
+  ): Promise<Filesnippet[]> {
+    const snippetsFiltered = await this.fileRepository.findWithSearch(
+      search,
+      this.user,
+      filter,
+    );
+    return snippetsFiltered;
   }
 
   @get('/filesnippet', {
@@ -343,7 +392,9 @@ export class FileController {
     })
     file: Filesnippet,
   ): Promise<void> {
-    await this.fileRepository.updateById(id, file, {currentUser: this.user});
+    await this.fileRepository.updateByIdWithHistory(id, file, {
+      currentUser: this.user,
+    });
   }
 
   @put('/filesnippet/{id}', {
@@ -370,7 +421,21 @@ export class FileController {
     },
   })
   async deleteById(@param.path.string('id') id: string): Promise<void> {
-    await this.fileRepository.deleteById(id, {currentUser: this.user});
+    await this.fileRepository.deleteByIdWithHistory(id, {
+      currentUser: this.user,
+    });
+  }
+
+  @patch('/filesnippet/{id}/restore', {
+    security: OPERATION_SECURITY_SPEC,
+    responses: {
+      '204': {
+        description: 'Filesnippet RESTORE success',
+      },
+    },
+  })
+  async restoreDeletedId(@param.path.string('id') id: string): Promise<void> {
+    this.fileRepository.restoreDeletedId(id, this.user);
   }
 
   uploadToGridfs(

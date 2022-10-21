@@ -74,6 +74,54 @@ export class LogbookController {
   async count(@param.where(Logbook) where?: Where<Logbook>): Promise<Count> {
     return this.logbookRepository.count(where, {currentUser: this.user});
   }
+  @get('/logbooks/search={search}', {
+    security: OPERATION_SECURITY_SPEC,
+    responses: {
+      '200': {
+        description: 'Array of logbooks model instances',
+        content: {
+          'application/json': {
+            schema: {
+              type: 'array',
+              items: getModelSchemaRef(Logbook, {includeRelations: true}),
+            },
+          },
+        },
+      },
+    },
+  })
+  async findWithSearch(
+    @param.path.string('search') search: string,
+    @param.filter(Logbook) filter?: Filter<Logbook>,
+  ): Promise<Logbook[]> {
+    const snippetsFiltered = await this.logbookRepository.findWithSearch(
+      search,
+      this.user,
+      filter,
+    );
+    return snippetsFiltered;
+  }
+
+  @get('/logbooks/index={id}', {
+    security: OPERATION_SECURITY_SPEC,
+    responses: {
+      '200': {
+        description: 'Logbooks model instance',
+        content: {
+          'application/json': {
+            type: 'any',
+            schema: getModelSchemaRef(Logbook, {includeRelations: true}),
+          },
+        },
+      },
+    },
+  })
+  async findIndexInBuffer(
+    @param.path.string('id') id: string,
+    @param.filter(Logbook) filter?: Filter<Logbook>,
+  ): Promise<number> {
+    return this.logbookRepository.findIndexInBuffer(id, this.user, filter);
+  }
 
   @get('/logbooks', {
     security: OPERATION_SECURITY_SPEC,
@@ -164,7 +212,7 @@ export class LogbookController {
     })
     logbook: Logbook,
   ): Promise<void> {
-    await this.logbookRepository.updateById(id, logbook, {
+    await this.logbookRepository.updateByIdWithHistory(id, logbook, {
       currentUser: this.user,
     });
   }
@@ -195,6 +243,20 @@ export class LogbookController {
     },
   })
   async deleteById(@param.path.string('id') id: string): Promise<void> {
-    await this.logbookRepository.deleteById(id, {currentUser: this.user});
+    await this.logbookRepository.deleteByIdWithHistory(id, {
+      currentUser: this.user,
+    });
+  }
+
+  @patch('/logbooks/{id}/restore', {
+    security: OPERATION_SECURITY_SPEC,
+    responses: {
+      '204': {
+        description: 'Logbooks RESTORE success',
+      },
+    },
+  })
+  async restoreDeletedId(@param.path.string('id') id: string): Promise<void> {
+    this.logbookRepository.restoreDeletedId(id, this.user);
   }
 }
