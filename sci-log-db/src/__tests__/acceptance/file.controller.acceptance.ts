@@ -1,6 +1,5 @@
 import {Client, expect} from '@loopback/testlab';
 import {Suite} from 'mocha';
-import _ from 'lodash';
 import {SciLogDbApplication} from '../..';
 import {clearDatabase, createUserToken, setupApplication} from './test-helper';
 
@@ -11,8 +10,8 @@ describe('File controller services', function (this: Suite) {
   let token: string;
   let fileSnippetId: string;
   const fileSnippet = {
-    ownerGroup: 'aOwner',
-    accessGroups: ['filesnippetAcceptance'],
+    ownerGroup: 'filesnippetAcceptance',
+    accessGroups: [],
     isPrivate: true,
     defaultOrder: 0,
     expiresAt: '2055-10-10T14:04:19.522Z',
@@ -47,7 +46,7 @@ describe('File controller services', function (this: Suite) {
       .then(
         result => (
           expect(result.body).to.containEql(fileSnippet),
-          expect(result.body.snippetType).to.be.eql('image'),
+          expect(result.body.snippetType).to.be.eql('filesnippet'),
           (fileSnippetId = result.body.id)
         ),
       )
@@ -137,27 +136,6 @@ describe('File controller services', function (this: Suite) {
       .catch(err => {
         throw err;
       });
-  });
-
-  it('put snippet without token should return 401', async () => {
-    await client
-      .put(`/filesnippet/${fileSnippetId}`)
-      .send(fileSnippet)
-      .set('Content-Type', 'application/json')
-      .expect(401);
-  });
-
-  it('put snippet with token should return 204', async () => {
-    const filePut = {
-      ..._.omit(fileSnippet, 'dashboardName'),
-      dashboardName: 'dashboardNamePut',
-    };
-    await client
-      .put(`/filesnippet/${fileSnippetId}`)
-      .set('Authorization', 'Bearer ' + token)
-      .set('Content-Type', 'application/json')
-      .send(filePut)
-      .expect(204);
   });
 
   it('Get index without token should return 401', async () => {
@@ -262,7 +240,7 @@ describe('File controller services', function (this: Suite) {
       .then(
         result => (
           expect(result.body.length).to.be.eql(1),
-          expect(result.body[0].snippetType).to.be.eql('image'),
+          expect(result.body[0].snippetType).to.be.eql('filesnippet'),
           expect(result.body[0].tags).to.be.eql(['aSearchableTag'])
         ),
       )

@@ -1,8 +1,12 @@
 import {Client, expect} from '@loopback/testlab';
-import _ from 'lodash';
 import {Suite} from 'mocha';
 import {SciLogDbApplication} from '../..';
-import {clearDatabase, createUserToken, setupApplication} from './test-helper';
+import {
+  clearDatabase,
+  createAdminUser,
+  createUserToken,
+  setupApplication,
+} from './test-helper';
 import {Basesnippet} from '../../models';
 
 describe('Basesnippet', function (this: Suite) {
@@ -12,8 +16,7 @@ describe('Basesnippet', function (this: Suite) {
   let token: string;
   let baseSnippetId: string;
   const baseSnippet = {
-    ownerGroup: 'aOwner',
-    accessGroups: ['basesnippetAcceptance'],
+    ownerGroup: 'basesnippetAcceptance',
     isPrivate: true,
     defaultOrder: 0,
     expiresAt: '2055-10-10T14:04:19.522Z',
@@ -28,6 +31,7 @@ describe('Basesnippet', function (this: Suite) {
   before('setupApplication', async () => {
     ({app, client} = await setupApplication());
     await clearDatabase(app);
+    await createAdminUser(app);
     token = await createUserToken(app, client, ['basesnippetAcceptance']);
   });
 
@@ -140,27 +144,6 @@ describe('Basesnippet', function (this: Suite) {
       .catch(err => {
         throw err;
       });
-  });
-
-  it('put snippet without token should return 401', async () => {
-    await client
-      .put(`/basesnippets/${baseSnippetId}`)
-      .send(baseSnippet)
-      .set('Content-Type', 'application/json')
-      .expect(401);
-  });
-
-  it('put snippet with token should return 204', async () => {
-    const baseSnippetPut = {
-      ..._.omit(baseSnippet, 'dashboardName'),
-      dashboardName: 'dashboardNamePut',
-    };
-    await client
-      .put(`/basesnippets/${baseSnippetId}`)
-      .set('Authorization', 'Bearer ' + token)
-      .set('Content-Type', 'application/json')
-      .send(baseSnippetPut)
-      .expect(204);
   });
 
   it('Get index without token should return 401', async () => {

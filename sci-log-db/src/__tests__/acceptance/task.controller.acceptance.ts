@@ -1,5 +1,4 @@
 import {Client, expect} from '@loopback/testlab';
-import _ from 'lodash';
 import {Suite} from 'mocha';
 import {SciLogDbApplication} from '../..';
 import {clearDatabase, createUserToken, setupApplication} from './test-helper';
@@ -11,8 +10,8 @@ describe('TaskRepositorySnippet', function (this: Suite) {
   let token: string;
   let taskSnippetId: string;
   const taskSnippet = {
-    ownerGroup: 'aOwner',
-    accessGroups: ['taskAcceptance'],
+    ownerGroup: 'taskAcceptance',
+    accessGroups: [],
     isPrivate: true,
     defaultOrder: 0,
     expiresAt: '2055-10-10T14:04:19.522Z',
@@ -136,27 +135,6 @@ describe('TaskRepositorySnippet', function (this: Suite) {
       .catch(err => {
         throw err;
       });
-  });
-
-  it('put snippet without token should return 401', async () => {
-    await client
-      .put(`/task/${taskSnippetId}`)
-      .send(taskSnippet)
-      .set('Content-Type', 'application/json')
-      .expect(401);
-  });
-
-  it('put snippet with token should return 204', async () => {
-    const taskSnippetPut = {
-      ..._.omit(taskSnippet, 'dashboardName'),
-      dashboardName: 'dashboardNamePut',
-    };
-    await client
-      .put(`/task/${taskSnippetId}`)
-      .set('Authorization', 'Bearer ' + token)
-      .set('Content-Type', 'application/json')
-      .send(taskSnippetPut)
-      .expect(204);
   });
 
   it('Get index without token should return 401', async () => {

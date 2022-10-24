@@ -1,5 +1,4 @@
 import {Client, expect} from '@loopback/testlab';
-import _ from 'lodash';
 import {Suite} from 'mocha';
 import {SciLogDbApplication} from '../..';
 import {clearDatabase, createUserToken, setupApplication} from './test-helper';
@@ -11,8 +10,8 @@ describe('Logbook', function (this: Suite) {
   let token: string;
   let logbookSnippetId: string;
   const logbookSnippet = {
-    ownerGroup: 'aOwner',
-    accessGroups: ['logbookAcceptance'],
+    ownerGroup: 'logbookAcceptance',
+    accessGroups: [],
     isPrivate: true,
     defaultOrder: 0,
     expiresAt: '2055-10-10T14:04:19.522Z',
@@ -138,27 +137,6 @@ describe('Logbook', function (this: Suite) {
       .catch(err => {
         throw err;
       });
-  });
-
-  it('put snippet without token should return 401', async () => {
-    await client
-      .put(`/logbooks/${logbookSnippetId}`)
-      .send(logbookSnippet)
-      .set('Content-Type', 'application/json')
-      .expect(401);
-  });
-
-  it('put snippet with token should return 204', async () => {
-    const logbookSnippetPut = {
-      ..._.omit(logbookSnippet, 'dashboardName'),
-      dashboardName: 'dashboardNamePut',
-    };
-    await client
-      .put(`/logbooks/${logbookSnippetId}`)
-      .set('Authorization', 'Bearer ' + token)
-      .set('Content-Type', 'application/json')
-      .send(logbookSnippetPut)
-      .expect(204);
   });
 
   it('Get index without token should return 401', async () => {

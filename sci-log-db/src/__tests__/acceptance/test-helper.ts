@@ -53,13 +53,14 @@ export async function setupApplication(
 export async function createAUser(
   app: SciLogDbApplication,
   additionalRoles: string[] = [],
+  user = userData,
 ): Promise<User> {
   const passwordHasher = await app.get(PasswordHasherBindings.PASSWORD_HASHER);
   const encryptedPassword = await passwordHasher.hashPassword(userPassword);
   const userRepo: UserRepository = await app.get('repositories.UserRepository');
   const newUser = await userRepo.create({
-    ..._.omit(userData, 'roles'),
-    roles: userData.roles.concat(additionalRoles),
+    ..._.omit(user, 'roles'),
+    roles: user.roles.concat(additionalRoles),
   });
   newUser.id = newUser.id.toString();
 
@@ -85,6 +86,16 @@ export async function createUserToken(
   const user = await createAUser(app, additionalRoles);
   const token = await createToken(client, user);
   return token;
+}
+
+export async function createAdminUser(app: SciLogDbApplication) {
+  const adminUser = {
+    email: 'admin@loopback.io',
+    firstName: 'Exampleadmin',
+    lastName: 'UserAdmin',
+    roles: ['admin'],
+  };
+  await createAUser(app, [], adminUser);
 }
 
 export async function clearDatabase(app: SciLogDbApplication) {
