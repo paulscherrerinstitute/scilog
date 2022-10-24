@@ -14,7 +14,7 @@ describe('Controllers utils unit tests', function (this: Suite) {
       deprecated: ['deleted'],
     });
     expect(
-      withDeprecated.definitions.Basesnippet.properties?.deleted,
+      Object.values(withDeprecated.definitions)[0].properties?.deleted,
     ).to.containEql({deprecated: true});
     expect(Basesnippet.definition.properties.deleted).not.to.containEql({
       deprecated: true,
@@ -24,12 +24,10 @@ describe('Controllers utils unit tests', function (this: Suite) {
   it('Should create a model and set ownerGroup and accessGroups to deprecated', () => {
     const withDeprecated = getModelSchemaRef(Basesnippet);
     expect(
-      withDeprecated.definitions.BasesnippetGroupsCompatible.properties
-        ?.ownerGroup,
+      Object.values(withDeprecated.definitions)[0].properties?.ownerGroup,
     ).to.containEql({deprecated: true});
     expect(
-      withDeprecated.definitions.BasesnippetGroupsCompatible.properties
-        ?.accessGroups,
+      Object.values(withDeprecated.definitions)[0].properties?.accessGroups,
     ).to.containEql({deprecated: true});
     expect(Basesnippet.definition.properties.ownerGroup).not.have.keys([
       'ownerGroup',
