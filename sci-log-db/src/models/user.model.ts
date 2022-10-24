@@ -58,6 +58,11 @@ export class User extends Entity {
   })
   roles?: string[];
 
+  @property({
+    type: 'string',
+  })
+  location?: string;
+
   constructor(data?: Partial<User>) {
     super(data);
   }
