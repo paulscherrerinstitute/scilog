@@ -11,6 +11,7 @@ import {
 } from '@loopback/repository';
 import {Logbook} from '../models';
 import {Basesnippet} from '../models/basesnippet.model';
+import {BasesnippetRepository} from './basesnippet.repository';
 
 export class AutoAddRepository<
   T extends Entity,
@@ -24,6 +25,16 @@ export class AutoAddRepository<
 
   @repository('UserRepository')
   readonly userRepository: UserRepository;
+  @repository.getter('BasesnippetRepository')
+  readonly baseSnippetRepositoryGetter: Getter<BasesnippetRepository>;
+
+  private async baseSnippetRepository(): Promise<BasesnippetRepository> {
+    const basesnippetRepository =
+      this.constructor.name === 'BasesnippetRepository'
+        ? this
+        : await this.baseSnippetRepositoryGetter();
+    return basesnippetRepository as BasesnippetRepository;
+  }
 
   constructor(
     entityClass: typeof Entity & {
@@ -51,17 +62,11 @@ export class AutoAddRepository<
   }
 
   private async aclDefault(
-    data: (Basesnippet | Logbook) & {ownerGroup?: string},
+    data: (Basesnippet | Logbook) & {
+      ownerGroup?: string;
+      unsetAttribute: Function;
+    },
   ) {
-    if (data.snippetType === 'location') return;
-    const aclObj = {} as {
-      createACL: string[];
-      readACL: string[];
-      updateACL: string[];
-      deleteACL: string[];
-      shareACL: string[];
-      adminACL: string[];
-    };
     const acls = [
       'createACL',
       'readACL',
@@ -71,51 +76,74 @@ export class AutoAddRepository<
       'shareACL',
       'adminACL',
     ];
-    const parentId = (data as Logbook).location ?? data.parentId;
-    if (parentId && acls.some(acl => data[acl as keyof Basesnippet])) {
-      const parentAcl = ((await this.findById(
-        parentId as ID,
-        {},
-        {currentUser: ['admin']},
-      )) as unknown) as Basesnippet | Logbook;
+    if (!acls.some(acl => data[acl as keyof Basesnippet])) {
+      const parentId =
+        data.snippetType !== 'location'
+          ? (data as Logbook).location ?? data.parentId
+          : false;
+      let parentACL = {} as Basesnippet;
+      if (parentId) {
+        const baseSnippetRepository = await this.baseSnippetRepository();
+        try {
+          parentACL = ((await baseSnippetRepository.findById(
+            (parentId as unknown) as ID,
+            {},
+            {currentUser: {roles: ['admin']}},
+          )) as unknown) as Basesnippet | Logbook;
+        } catch {
+          console.warn(
+            `Cannot find snippet with ID from parentId or location: ${parentId}`,
+          );
+        }
+      }
       const ownerGroup = data.ownerGroup;
-      aclObj.createACL = data.createACL ?? parentAcl.createACL ?? [ownerGroup]; // potentially remove it
-      aclObj.readACL = (
+      data.createACL = data.createACL ?? parentACL.createACL ?? [ownerGroup]; // potentially remove it
+      data.readACL = (
         data.readACL ??
-        parentAcl.readACL ??
-        (await this.readACLfromLocation(data, parentAcl))
+        parentACL.readACL ??
+        (await this.readACLfromLocation(data))
       ).concat(ownerGroup ?? []); // ownergroup + location (beamline account as function of location )
-      aclObj.updateACL = data.updateACL ?? parentAcl.updateACL ?? [ownerGroup]; // ownergroup
-      aclObj.deleteACL = data.deleteACL ?? parentAcl.deleteACL ?? [ownerGroup]; // admin
-      aclObj.shareACL = data.shareACL ?? parentAcl.shareACL ?? [ownerGroup]; // ownerGroup
-      aclObj.adminACL =
-        data.adminACL ?? parentAcl.adminACL ?? (await this.adminACLfromUsers());
+      data.updateACL = data.updateACL ?? parentACL.updateACL ?? [ownerGroup]; // ownergroup
+      data.deleteACL = data.deleteACL ?? parentACL.deleteACL ?? [ownerGroup]; // admin
+      data.shareACL = data.shareACL ?? parentACL.shareACL ?? [ownerGroup]; // ownerGroup
+      data.adminACL =
+        data.adminACL ?? parentACL.adminACL ?? (await this.adminACLfromUsers());
     }
-    return aclObj;
+    data.unsetAttribute('ownerGroup');
+    data.unsetAttribute('accessGroups');
   }
 
   private async readACLfromLocation(
     data: (Basesnippet | Logbook) & {ownerGroup?: string | undefined},
-    parentAcl: Basesnippet,
   ) {
-    if (parentAcl.snippetType === 'location')
+    if (!data.readACL && data.snippetType === 'location')
       return (
         await this.userRepository.find({
           where: {
-            location: (parentAcl as Logbook).location,
+            location: (data as Logbook).location,
           },
-          fields: ['username'],
+          fields: ['email'],
         })
-      ).map(u => u.username) as string[];
+      ).map(u => u.email) as string[];
+    else return [];
   }
 
   private async adminACLfromUsers() {
     return (
       await this.userRepository.find({
         where: {roles: 'admin'},
-        fields: ['username'],
+        fields: ['email'],
       })
-    ).map(u => u.username);
+    ).map(u => u.email);
+  }
+
+  private async addOwnerGroupAccessGroups(data: {
+    ownerGroup: string;
+    accessGroups: string[];
+    readACL: string[];
+  }) {
+    data.ownerGroup = data.readACL?.[0];
+    data.accessGroups = [];
   }
 
   //   if (filter?.aclId)
@@ -247,8 +275,7 @@ export class AutoAddRepository<
               ctx.instance.expiresAt.getDate() + 3,
             );
           }
-          const aclDefault = await this.aclDefault(ctx.instance);
-          ctx.instance = {...ctx.instance, ...aclDefault};
+          await this.aclDefault(ctx.instance);
         } else {
           // PUT case not supported
           // console.log("PUT case")
@@ -334,6 +361,11 @@ export class AutoAddRepository<
         calculatedACLs += 'A';
       }
       ctx.data['calculatedACLs'] = calculatedACLs;
+      await this.addOwnerGroupAccessGroups(ctx.data);
+    });
+
+    modelClass.observe('after save', async ctx => {
+      await this.addOwnerGroupAccessGroups(ctx.data ?? ctx.instance);
     });
 
     return modelClass;
