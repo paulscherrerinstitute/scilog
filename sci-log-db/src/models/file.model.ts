@@ -4,7 +4,7 @@ import {Image} from './image.model';
 
 @model({
   settings: {
-    strict: true,
+    strict: false,
     scope: {
       where: {snippetType: 'filesnippet'},
     },

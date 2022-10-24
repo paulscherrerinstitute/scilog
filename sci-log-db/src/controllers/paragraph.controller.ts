@@ -6,15 +6,7 @@ import {
   repository,
   Where,
 } from '@loopback/repository';
-import {
-  post,
-  param,
-  get,
-  getModelSchemaRef,
-  patch,
-  del,
-  requestBody,
-} from '@loopback/rest';
+import {post, param, get, patch, del, requestBody} from '@loopback/rest';
 import {Paragraph} from '../models';
 import {ParagraphRepository} from '../repositories';
 
@@ -24,6 +16,7 @@ import {basicAuthorization} from '../services/basic.authorizor';
 import {OPERATION_SECURITY_SPEC} from '../utils/security-spec';
 import {SecurityBindings, UserProfile} from '@loopback/security';
 import {inject} from '@loopback/core';
+import {getModelSchemaRef} from '../utils/misc';
 
 @authenticate('jwt')
 @authorize({

@@ -9,19 +9,12 @@ import {
   repository,
   Where,
 } from '@loopback/repository';
-import {
-  del,
-  get,
-  getModelSchemaRef,
-  param,
-  patch,
-  post,
-  requestBody,
-} from '@loopback/rest';
+import {del, get, param, patch, post, requestBody} from '@loopback/rest';
 import {SecurityBindings, UserProfile} from '@loopback/security';
 import {Logbook} from '../models';
 import {LogbookRepository} from '../repositories';
 import {basicAuthorization} from '../services/basic.authorizor';
+import {getModelSchemaRef} from '../utils/misc';
 import {OPERATION_SECURITY_SPEC} from '../utils/security-spec';
 
 @authenticate('jwt')

@@ -8,21 +8,14 @@ import {
   repository,
   Where,
 } from '@loopback/repository';
-import {
-  del,
-  get,
-  getModelSchemaRef,
-  param,
-  patch,
-  post,
-  requestBody,
-} from '@loopback/rest';
+import {del, get, param, patch, post, requestBody} from '@loopback/rest';
 import {Job} from '../models/job.model';
 import {JobRepository} from '../repositories/job.repository';
 import {basicAuthorization} from '../services/basic.authorizor';
 import {OPERATION_SECURITY_SPEC} from '../utils/security-spec';
 import {SecurityBindings, UserProfile} from '@loopback/security';
 import {inject} from '@loopback/core';
+import {getModelSchemaRef} from '../utils/misc';
 
 @authenticate('jwt')
 @authorize({

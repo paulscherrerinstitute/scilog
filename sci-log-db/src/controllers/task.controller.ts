@@ -9,19 +9,12 @@ import {
   repository,
   Where,
 } from '@loopback/repository';
-import {
-  del,
-  get,
-  getModelSchemaRef,
-  param,
-  patch,
-  post,
-  requestBody,
-} from '@loopback/rest';
+import {del, get, param, patch, post, requestBody} from '@loopback/rest';
 import {SecurityBindings, UserProfile} from '@loopback/security';
 import {Task} from '../models';
 import {BasesnippetRepository, TaskRepository} from '../repositories';
 import {basicAuthorization} from '../services/basic.authorizor';
+import {getModelSchemaRef} from '../utils/misc';
 import {OPERATION_SECURITY_SPEC} from '../utils/security-spec';
 import {BasesnippetController} from './basesnippet.controller';
 

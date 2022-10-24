@@ -12,8 +12,8 @@ import {
 import {
   del,
   get,
-  getModelSchemaRef,
   HttpErrors,
+  modelToJsonSchema,
   param,
   patch,
   post,
@@ -30,10 +30,21 @@ import {STORAGE_DIRECTORY} from '../keys';
 import {Filesnippet} from '../models/file.model';
 import {FileRepository} from '../repositories/file.repository';
 import {basicAuthorization} from '../services/basic.authorizor';
+import {
+  addOwnerGroupAccessGroups,
+  getModelSchemaRefWithStrict,
+  validateFieldsVSModel,
+} from '../utils/misc';
 import {OPERATION_SECURITY_SPEC} from '../utils/security-spec';
 
 const Mongo = require('mongodb');
 const crypto = require('crypto');
+
+const ownerGroupAccessGroupsFilesnippetModel = modelToJsonSchema(
+  addOwnerGroupAccessGroups(Filesnippet, true),
+);
+
+const getModelSchemaRef = getModelSchemaRefWithStrict;
 
 interface FormData {
   fields: Filesnippet;
@@ -138,7 +149,13 @@ export class FileController {
           reject(error);
           return error;
         }
-        resolve({fields: JSON.parse(fields?.fields || '{}'), files: files});
+        const parsedFields = JSON.parse(fields?.fields || '{}');
+        validateFieldsVSModel(
+          parsedFields,
+          ownerGroupAccessGroupsFilesnippetModel,
+          reject,
+        );
+        resolve({fields: parsedFields, files: files});
       });
     });
     return this.uploadToGridfs(formData, async (fm, resolve, reject) => {
@@ -355,7 +372,13 @@ export class FileController {
           reject(error);
           return error;
         }
-        resolve({fields: JSON.parse(fields?.fields), files: files});
+        const parsedFields = JSON.parse(fields?.fields || '{}');
+        validateFieldsVSModel(
+          parsedFields,
+          ownerGroupAccessGroupsFilesnippetModel,
+          reject,
+        );
+        resolve({fields: parsedFields, files: files});
       });
     });
     return this.uploadToGridfs(formData, async (fm, resolve, reject) => {

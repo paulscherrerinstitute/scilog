@@ -3,7 +3,7 @@ import {Basesnippet} from './basesnippet.model';
 
 @model({
   settings: {
-    strict: true,
+    strict: false,
     scope: {
       where: {snippetType: 'logbook'},
     },

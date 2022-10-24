@@ -10,7 +10,7 @@ enum LinkType {
 
 @model({
   settings: {
-    strict: true,
+    strict: false,
     scope: {
       where: {snippetType: 'paragraph'},
     },
