@@ -125,3 +125,12 @@ export function getModelSchemaRefWithStrict<T extends Entity>(
     strict: true,
   });
 }
+
+// eslint-disable-next-line  @typescript-eslint/no-explicit-any
+export function defaultSequentially(...args: any[]) {
+  return args.reduce(
+    (previousValue, currentValue) =>
+      previousValue ? previousValue : currentValue,
+    undefined,
+  );
+}

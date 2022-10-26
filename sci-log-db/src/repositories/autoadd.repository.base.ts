@@ -1,16 +1,20 @@
 import {UserRepository} from '@loopback/authentication-jwt';
 import {Getter} from '@loopback/core';
 import {
+  AndClause,
   BelongsToAccessor,
+  Condition,
   DefaultCrudRepository,
   Entity,
   HasManyRepositoryFactory,
   juggler,
   Model,
   repository,
+  Where,
 } from '@loopback/repository';
 import {Logbook} from '../models';
 import {Basesnippet} from '../models/basesnippet.model';
+import {defaultSequentially} from '../utils/misc';
 import {BasesnippetRepository} from './basesnippet.repository';
 
 export class AutoAddRepository<
@@ -22,6 +26,16 @@ export class AutoAddRepository<
   public readonly parent: BelongsToAccessor<Entity, any>;
 
   public readonly subsnippets: HasManyRepositoryFactory<T, string>;
+
+  private readonly acls = [
+    'createACL',
+    'readACL',
+    'shareACL',
+    'updateACL',
+    'deleteACL',
+    'shareACL',
+    'adminACL',
+  ];
 
   @repository('UserRepository')
   readonly userRepository: UserRepository;
@@ -61,71 +75,119 @@ export class AutoAddRepository<
     this.registerInclusionResolver('parent', this.parent.inclusionResolver);
   }
 
-  private async aclDefault(
+  private async aclDefaultOnCreation(
     data: (Basesnippet | Logbook) & {
       ownerGroup?: string;
       unsetAttribute: Function;
     },
   ) {
-    const acls = [
-      'createACL',
-      'readACL',
-      'shareACL',
-      'updateACL',
-      'deleteACL',
-      'shareACL',
-      'adminACL',
-    ];
-    if (!acls.some(acl => data[acl as keyof Basesnippet])) {
-      const parentId =
-        data.snippetType !== 'location'
-          ? (data as Logbook).location ?? data.parentId
-          : false;
-      let parentACL = {} as Basesnippet;
-      if (parentId) {
-        const baseSnippetRepository = await this.baseSnippetRepository();
-        try {
-          parentACL = ((await baseSnippetRepository.findById(
-            (parentId as unknown) as ID,
-            {},
-            {currentUser: {roles: ['admin']}},
-          )) as unknown) as Basesnippet | Logbook;
-        } catch {
-          console.warn(
-            `Cannot find snippet with ID from parentId or location: ${parentId}`,
-          );
-        }
-      }
-      const ownerGroup = data.ownerGroup;
-      data.createACL = data.createACL ?? parentACL.createACL ?? [ownerGroup]; // potentially remove it
-      data.readACL = (
-        data.readACL ??
-        parentACL.readACL ??
-        (await this.readACLfromLocation(data))
-      ).concat(ownerGroup ?? []); // ownergroup + location (beamline account as function of location )
-      data.updateACL = data.updateACL ?? parentACL.updateACL ?? [ownerGroup]; // ownergroup
-      data.deleteACL = data.deleteACL ?? parentACL.deleteACL ?? [ownerGroup]; // admin
-      data.shareACL = data.shareACL ?? parentACL.shareACL ?? [ownerGroup]; // ownerGroup
-      data.adminACL =
-        data.adminACL ?? parentACL.adminACL ?? (await this.adminACLfromUsers());
+    if (this.acls.some(acl => !data[acl as keyof Basesnippet])) {
+      const parent = await this.getParent(data);
+      const ownerGroup = data.ownerGroup ? [data.ownerGroup] : [];
+      const acls = this.acls;
+      const aclObj = {} as {
+        [K in typeof acls[number]]: string[];
+      };
+      aclObj.createACL = defaultSequentially(
+        data.createACL,
+        parent.createACL,
+        ownerGroup,
+      ); // potentially remove it
+      aclObj.readACL = defaultSequentially(
+        data.readACL,
+        parent.readACL,
+        await this.readACLfromLocation(data),
+      );
+      // ownergroup + location (beamline account as function of location )
+      aclObj.updateACL = defaultSequentially(
+        data.updateACL,
+        parent.updateACL,
+        ownerGroup,
+      ); // ownergroup
+      aclObj.deleteACL = defaultSequentially(
+        data.deleteACL,
+        parent.deleteACL,
+        ownerGroup,
+      ); // admin
+      aclObj.shareACL = defaultSequentially(
+        data.shareACL,
+        parent.shareACL,
+        ownerGroup,
+      ); // ownerGroup
+      aclObj.adminACL = defaultSequentially(
+        data.adminACL,
+        parent.adminACL,
+        await this.adminACLfromUsers(),
+      );
+      Object.keys(aclObj).map(k => {
+        if (aclObj[k].length > 0)
+          (data[k as keyof Basesnippet] as string[]) = aclObj[k];
+      });
     }
     data.unsetAttribute('ownerGroup');
     data.unsetAttribute('accessGroups');
   }
 
+  private aclDefaultOnUpdate(
+    data: (Basesnippet | Logbook) & {
+      ownerGroup?: string;
+      unsetAttribute: Function;
+      accessGroups?: string[];
+    },
+  ) {
+    if (data.ownerGroup) {
+      const ownerGroup = data.ownerGroup;
+      data.updateACL = data.updateACL ?? [ownerGroup]; // ownergroup
+      data.deleteACL = data.deleteACL ?? [ownerGroup]; // admin
+      data.shareACL = data.shareACL ?? [ownerGroup]; // ownerGroup
+      data.readACL = data.readACL ?? [ownerGroup];
+    }
+    delete data.ownerGroup;
+    delete data.accessGroups;
+  }
+
+  private async getParent(
+    data: (Basesnippet | Logbook) & {
+      ownerGroup?: string | undefined;
+      unsetAttribute: Function;
+    },
+  ) {
+    const parentId =
+      data.snippetType !== 'location'
+        ? (data as Logbook).location ?? data.parentId
+        : false;
+    let parentACL = {} as Basesnippet;
+    if (parentId) {
+      const baseSnippetRepository = await this.baseSnippetRepository();
+      try {
+        parentACL = ((await baseSnippetRepository.findById(
+          (parentId as unknown) as ID,
+          {},
+          {currentUser: {roles: ['admin']}},
+        )) as unknown) as Basesnippet | Logbook;
+      } catch {
+        console.warn(
+          `Cannot find snippet with ID from parentId or location: ${parentId}`,
+        );
+      }
+    }
+    return parentACL;
+  }
+
   private async readACLfromLocation(
     data: (Basesnippet | Logbook) & {ownerGroup?: string | undefined},
   ) {
+    let acl: string[] = [];
     if (!data.readACL && data.snippetType === 'location')
-      return (
+      acl = (
         await this.userRepository.find({
           where: {
             location: (data as Logbook).location,
           },
           fields: ['email'],
         })
-      ).map(u => u.email) as string[];
-    else return [];
+      ).map(u => u.email);
+    return [...new Set((data.ownerGroup ? [data.ownerGroup] : []).concat(acl))];
   }
 
   private async adminACLfromUsers() {
@@ -137,58 +199,14 @@ export class AutoAddRepository<
     ).map(u => u.email);
   }
 
-  private async addOwnerGroupAccessGroups(data: {
+  private addOwnerGroupAccessGroups(data: {
     ownerGroup: string;
     accessGroups: string[];
     readACL: string[];
   }) {
-    data.ownerGroup = data.readACL?.[0];
+    data.ownerGroup = data.readACL?.[0] ?? '';
     data.accessGroups = [];
   }
-
-  //   if (filter?.aclId)
-  //     await this.updateAllAclFromDefault(filter, aclObj as ACL);
-  //   else if (data.ownerGroup) {
-  //     if (!data.aclId)
-  //       data.aclId = await this.createAclFromDefault(aclObj as ACL);
-  //     else await this.replaceAclFromDefault(data.aclId, aclObj as ACL);
-  //     data.unsetAttribute('ownerGroup');
-  //     data.unsetAttribute('accessGroups');
-  //   }
-  // }
-
-  // private async replaceAclFromDefault(aclId: string, aclObj: ACL) {
-  //   await this.aclRepository.replaceById(aclId, aclObj);
-  // }
-
-  // private async createAclFromDefault(aclObj: ACL) {
-  //   const acl = await this.aclRepository.create(aclObj);
-  //   return acl.id;
-  // }
-
-  // private async updateAllAclFromDefault(
-  //   filter: Condition<Basesnippet>,
-  //   aclObj: ACL,
-  // ) {
-  //   const aclFilter = {id: filter.aclId} as Condition<ACL>;
-  //   if (filter.id) {
-  //     const aclId = ((await this.find(
-  //       // eslint-disable-next-line  @typescript-eslint/no-explicit-any
-  //       {where: filter} as any,
-  //     )) as unknown) as Basesnippet;
-  //     aclFilter.id = aclId.aclId;
-  //   }
-  //   const updateCondition = aclObj.admin
-  //     ? aclObj
-  //     : ({
-  //         // $addToSet: {read: {$each: aclObj.read}},
-  //         $set: _.omit(aclObj, 'read'),
-  //         read: {$concatSets: [aclObj, '$create']},
-  //         // eslint-disable-next-line  @typescript-eslint/no-explicit-any
-  //       } as any);
-
-  //   await this.aclRepository.updateAll(updateCondition, aclFilter);
-  // }
 
   definePersistedModel(entityClass: typeof Model) {
     const modelClass = super.definePersistedModel(entityClass);
@@ -215,34 +233,46 @@ export class AutoAddRepository<
         delete ctx.data.createdBy;
         delete ctx.data.expiresAt;
         // drop any potential ACLs unless admin
-        if (
-          ctx.data.createACL !== undefined ||
-          ctx.data.readACL !== undefined ||
-          ctx.data.updateACL !== undefined ||
-          ctx.data.deleteACL !== undefined ||
-          ctx.data.shareACL !== undefined ||
-          ctx.data.adminACL !== undefined
-        ) {
-          // get instance data to check admin rights
-          const instance = ((await this.findById(
-            ctx.where.id,
-            {},
-            {currentUser: currentUser},
-          )) as unknown) as Basesnippet;
-          // console.log("Got instance since someoone tried to change ACLS:",instance)
-          if (
-            currentUser.roles.filter((element: string) =>
-              instance.adminACL.includes(element),
-            ).length === 0
-          ) {
-            delete ctx.data.createACL;
-            delete ctx.data.readACL;
-            delete ctx.data.updateACL;
-            delete ctx.data.deleteACL;
-            delete ctx.data.shareACL;
-            delete ctx.data.adminACL;
-          }
+        this.aclDefaultOnUpdate(ctx.data);
+        if (this.acls.some(acl => ctx.data[acl])) {
+          const adminCondition = {
+            adminACL: {
+              inq: [
+                ...ctx?.options?.currentUser?.roles,
+                ctx?.options?.currentUser?.email,
+              ],
+            },
+          };
+          ctx.where = this.addACLToFilter(ctx.where, adminCondition);
         }
+        // if (
+        //   ctx.data.createACL !== undefined ||
+        //   ctx.data.readACL !== undefined ||
+        //   ctx.data.updateACL !== undefined ||
+        //   ctx.data.deleteACL !== undefined ||
+        //   ctx.data.shareACL !== undefined ||
+        //   ctx.data.adminACL !== undefined
+        // ) {
+        //   // get instance data to check admin rights
+        //   const instance = ((await this.findById(
+        //     ctx.where.id,
+        //     {},
+        //     {currentUser: currentUser},
+        //   )) as unknown) as Basesnippet;
+        //   // console.log("Got instance since someoone tried to change ACLS:",instance)
+        //   if (
+        //     currentUser.roles.filter((element: string) =>
+        //       instance.adminACL.includes(element),
+        //     ).length === 0
+        //   ) {
+        //     delete ctx.data.createACL;
+        //     delete ctx.data.readACL;
+        //     delete ctx.data.updateACL;
+        //     delete ctx.data.deleteACL;
+        //     delete ctx.data.shareACL;
+        //     delete ctx.data.adminACL;
+        //   }
+        // }
       } else {
         if (ctx.isNewInstance) {
           // POST case
@@ -275,7 +305,7 @@ export class AutoAddRepository<
               ctx.instance.expiresAt.getDate() + 3,
             );
           }
-          await this.aclDefault(ctx.instance);
+          await this.aclDefaultOnCreation(ctx.instance);
         } else {
           // PUT case not supported
           // console.log("PUT case")
@@ -300,20 +330,18 @@ export class AutoAddRepository<
       }
       // console.log("roles:", currentUser?.roles);
       // console.log("access case:", JSON.stringify(ctx, null, 3));
-      const groups = [...ctx?.options?.currentUser?.roles];
+      const groups = [
+        ...ctx?.options?.currentUser?.roles,
+        ctx?.options?.currentUser?.email,
+      ];
       if (!groups.includes('admin')) {
         const groupCondition = {
           readACL: {
             inq: groups,
           },
         };
-        if (!ctx.query.where) {
-          ctx.query.where = groupCondition;
-        } else {
-          ctx.query.where = {
-            and: [ctx.query.where, groupCondition],
-          };
-        }
+        ctx.query.where = this.addACLToFilter(ctx.query.where, groupCondition);
+        console.log();
       }
       // console.log("query:", JSON.stringify(ctx.query, null, 3));
     });
@@ -361,13 +389,32 @@ export class AutoAddRepository<
         calculatedACLs += 'A';
       }
       ctx.data['calculatedACLs'] = calculatedACLs;
-      await this.addOwnerGroupAccessGroups(ctx.data);
+      this.addOwnerGroupAccessGroups(ctx.data);
     });
 
     modelClass.observe('after save', async ctx => {
-      await this.addOwnerGroupAccessGroups(ctx.data ?? ctx.instance);
+      this.addOwnerGroupAccessGroups(ctx.data ?? ctx.instance);
     });
 
     return modelClass;
+  }
+
+  private addACLToFilter(
+    where: Where<Basesnippet>,
+    additionalCondition: Condition<Basesnippet>,
+  ) {
+    let outWhere: Where<Basesnippet>;
+    if (!where || Object.keys(where).length === 0) {
+      outWhere = additionalCondition;
+    } else if (!(where as AndClause<Basesnippet>).and) {
+      outWhere = {
+        and: [where, additionalCondition],
+      };
+    } else {
+      outWhere = {
+        and: (where as AndClause<Basesnippet>).and.concat(additionalCondition),
+      };
+    }
+    return outWhere;
   }
 }

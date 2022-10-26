@@ -88,14 +88,24 @@ export async function createUserToken(
   return token;
 }
 
+export async function createAdminToken(
+  app: SciLogDbApplication,
+  client: Client,
+) {
+  const user = await createAdminUser(app);
+  const token = await createToken(client, user);
+  return token;
+}
 export async function createAdminUser(app: SciLogDbApplication) {
   const adminUser = {
     email: 'admin@loopback.io',
     firstName: 'Exampleadmin',
     lastName: 'UserAdmin',
-    roles: ['admin'],
+    roles: ['admin', 'any-authenticated-user'],
+    location: 'anExistingLocation',
   };
-  await createAUser(app, [], adminUser);
+  const user = await createAUser(app, [], adminUser);
+  return user;
 }
 
 export async function clearDatabase(app: SciLogDbApplication) {

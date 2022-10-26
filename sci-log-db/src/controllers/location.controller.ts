@@ -68,6 +68,55 @@ export class LocationController {
     return this.locationRepository.count(where, {currentUser: this.user});
   }
 
+  @get('/locations/search={search}', {
+    security: OPERATION_SECURITY_SPEC,
+    responses: {
+      '200': {
+        description: 'Array of locations model instances',
+        content: {
+          'application/json': {
+            schema: {
+              type: 'array',
+              items: getModelSchemaRef(Location, {includeRelations: true}),
+            },
+          },
+        },
+      },
+    },
+  })
+  async findWithSearch(
+    @param.path.string('search') search: string,
+    @param.filter(Location) filter?: Filter<Location>,
+  ): Promise<Location[]> {
+    const snippetsFiltered = await this.locationRepository.findWithSearch(
+      search,
+      this.user,
+      filter,
+    );
+    return snippetsFiltered;
+  }
+
+  @get('/locations/index={id}', {
+    security: OPERATION_SECURITY_SPEC,
+    responses: {
+      '200': {
+        description: 'Locations model instance',
+        content: {
+          'application/json': {
+            type: 'any',
+            schema: getModelSchemaRef(Location, {includeRelations: true}),
+          },
+        },
+      },
+    },
+  })
+  async findIndexInBuffer(
+    @param.path.string('id') id: string,
+    @param.filter(Location) filter?: Filter<Location>,
+  ): Promise<number> {
+    return this.locationRepository.findIndexInBuffer(id, this.user, filter);
+  }
+
   @get('/locations', {
     security: OPERATION_SECURITY_SPEC,
     responses: {
@@ -157,7 +206,7 @@ export class LocationController {
     })
     location: Location,
   ): Promise<void> {
-    await this.locationRepository.updateById(id, location, {
+    await this.locationRepository.updateByIdWithHistory(id, location, {
       currentUser: this.user,
     });
   }
@@ -171,6 +220,20 @@ export class LocationController {
     },
   })
   async deleteById(@param.path.string('id') id: string): Promise<void> {
-    await this.locationRepository.deleteById(id, {currentUser: this.user});
+    await this.locationRepository.deleteByIdWithHistory(id, {
+      currentUser: this.user,
+    });
+  }
+
+  @patch('/locations/{id}/restore', {
+    security: OPERATION_SECURITY_SPEC,
+    responses: {
+      '204': {
+        description: 'Locations RESTORE success',
+      },
+    },
+  })
+  async restoreDeletedId(@param.path.string('id') id: string): Promise<void> {
+    this.locationRepository.restoreDeletedId(id, this.user);
   }
 }

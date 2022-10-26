@@ -3,10 +3,11 @@ import {Suite} from 'mocha';
 import {SciLogDbApplication} from '../..';
 import {
   clearDatabase,
-  createAdminUser,
+  createAdminToken,
   createUserToken,
   setupApplication,
 } from './test-helper';
+import _ from 'lodash';
 import {Basesnippet} from '../../models';
 
 describe('Basesnippet', function (this: Suite) {
@@ -14,7 +15,9 @@ describe('Basesnippet', function (this: Suite) {
   let app: SciLogDbApplication;
   let client: Client;
   let token: string;
+  let adminToken: string;
   let baseSnippetId: string;
+  let nonVisibleSnippetId: string;
   const baseSnippet = {
     ownerGroup: 'basesnippetAcceptance',
     isPrivate: true,
@@ -31,7 +34,7 @@ describe('Basesnippet', function (this: Suite) {
   before('setupApplication', async () => {
     ({app, client} = await setupApplication());
     await clearDatabase(app);
-    await createAdminUser(app);
+    adminToken = await createAdminToken(app, client);
     token = await createUserToken(app, client, ['basesnippetAcceptance']);
   });
 
@@ -55,6 +58,11 @@ describe('Basesnippet', function (this: Suite) {
         result => (
           expect(result.body).to.containEql(baseSnippet),
           expect(result.body.snippetType).to.be.eql('base'),
+          expect(result.body.readACL).to.be.eql(['basesnippetAcceptance']),
+          expect(result.body.createACL).to.be.eql(['basesnippetAcceptance']),
+          expect(result.body.updateACL).to.be.eql(['basesnippetAcceptance']),
+          expect(result.body.deleteACL).to.be.eql(['basesnippetAcceptance']),
+          expect(result.body.adminACL).to.be.eql(['admin@loopback.io']),
           (baseSnippetId = result.body.id)
         ),
       )
@@ -363,5 +371,149 @@ describe('Basesnippet', function (this: Suite) {
       .catch(err => {
         throw err;
       });
+  });
+
+  it('patch snippet ownergroup with token should return 200 and body.count=0', async () => {
+    await client
+      .patch('/basesnippets/')
+      .set('Authorization', 'Bearer ' + token)
+      .set('Content-Type', 'application/json')
+      .send({ownerGroup: 'aNewName'})
+      .expect(200)
+      .then(result => expect(result.body.count).to.be.eql(0))
+      .catch(err => {
+        throw err;
+      });
+  });
+
+  it('patch snippet by id with ownergroup and token should return 404', async () => {
+    await client
+      .patch(`/basesnippets/${baseSnippetId}`)
+      .set('Authorization', 'Bearer ' + token)
+      .set('Content-Type', 'application/json')
+      .send({ownerGroup: 'aNewName'})
+      .expect(404);
+  });
+
+  it('post a basesnippet with authentication and without ownerGroup should return 200 and contain baseSnippet', async () => {
+    await client
+      .post('/basesnippets')
+      .set('Authorization', 'Bearer ' + token)
+      .set('Content-Type', 'application/json')
+      .send(_.omit(baseSnippet, 'ownerGroup'))
+      .expect(200)
+      .then(
+        result => (
+          expect(result.body).to.containEql(_.omit(baseSnippet, 'ownerGroup')),
+          expect(result.body.snippetType).to.be.eql('base'),
+          expect(result.body.readACL).to.be.eql(undefined),
+          expect(result.body.createACL).to.be.eql(undefined),
+          expect(result.body.updateACL).to.be.eql(undefined),
+          expect(result.body.deleteACL).to.be.eql(undefined),
+          expect(result.body.shareACL).to.be.eql(undefined),
+          expect(result.body.adminACL).to.be.eql(['admin@loopback.io'])
+        ),
+      )
+      .catch(err => {
+        throw err;
+      });
+  });
+
+  it('post a basesnippet with authentication and parentId from existing snippet should return 200 and have parent ACLS', async () => {
+    await client
+      .post('/basesnippets')
+      .set('Authorization', 'Bearer ' + token)
+      .set('Content-Type', 'application/json')
+      .send({..._.omit(baseSnippet, 'ownerGroup'), parentId: baseSnippetId})
+      .expect(200)
+      .then(
+        result => (
+          expect(result.body).to.containEql(_.omit(baseSnippet, 'ownerGroup')),
+          expect(result.body.snippetType).to.be.eql('base'),
+          expect(result.body.readACL).to.be.eql(['basesnippetAcceptance']),
+          expect(result.body.createACL).to.be.eql(['basesnippetAcceptance']),
+          expect(result.body.updateACL).to.be.eql(['basesnippetAcceptance']),
+          expect(result.body.deleteACL).to.be.eql(['basesnippetAcceptance']),
+          expect(result.body.shareACL).to.be.eql(['basesnippetAcceptance']),
+          expect(result.body.adminACL).to.be.eql(['admin@loopback.io'])
+        ),
+      )
+      .catch(err => {
+        throw err;
+      });
+  });
+
+  it('patch snippet by id with ownergroup and admin token should return 204', async () => {
+    await client
+      .patch(`/basesnippets/${baseSnippetId}`)
+      .set('Authorization', 'Bearer ' + adminToken)
+      .set('Content-Type', 'application/json')
+      .send({createACL: ['aNewCreateACL']})
+      .expect(204);
+  });
+
+  it('post a basesnippet with authentication and parentId from existing snippet should return 200 and have parent ACLS with priority on ownergroup', async () => {
+    await client
+      .post('/basesnippets')
+      .set('Authorization', 'Bearer ' + token)
+      .set('Content-Type', 'application/json')
+      .send({...baseSnippet, parentId: baseSnippetId})
+      .expect(200)
+      .then(
+        result => (
+          expect(result.body).to.containEql(baseSnippet),
+          expect(result.body.snippetType).to.be.eql('base'),
+          expect(result.body.readACL).to.be.eql(['basesnippetAcceptance']),
+          expect(result.body.createACL).to.be.eql(['aNewCreateACL']),
+          expect(result.body.updateACL).to.be.eql(['basesnippetAcceptance']),
+          expect(result.body.deleteACL).to.be.eql(['basesnippetAcceptance']),
+          expect(result.body.shareACL).to.be.eql(['basesnippetAcceptance']),
+          expect(result.body.adminACL).to.be.eql(['admin@loopback.io'])
+        ),
+      )
+      .catch(err => {
+        throw err;
+      });
+  });
+
+  it('post a basesnippet with authentication and parentId from existing snippet setting explict ACLS should return 200 and have set ACLS with priority on ownergroup and parentACLs', async () => {
+    await client
+      .post('/basesnippets')
+      .set('Authorization', 'Bearer ' + token)
+      .set('Content-Type', 'application/json')
+      .send({
+        ...baseSnippet,
+        parentId: baseSnippetId,
+        readACL: ['aReadACL'],
+        updateACL: ['anUpdateACL'],
+      })
+      .expect(200)
+      .then(
+        result => (
+          expect(result.body).to.containEql({
+            ..._.omit(baseSnippet, 'ownerGroup'),
+            ownerGroup: 'aReadACL',
+          }),
+          expect(result.body.snippetType).to.be.eql('base'),
+          expect(result.body.readACL).to.be.eql(['aReadACL']),
+          expect(result.body.createACL).to.be.eql(['aNewCreateACL']),
+          expect(result.body.updateACL).to.be.eql(['anUpdateACL']),
+          expect(result.body.deleteACL).to.be.eql(['basesnippetAcceptance']),
+          expect(result.body.shareACL).to.be.eql(['basesnippetAcceptance']),
+          expect(result.body.adminACL).to.be.eql(['admin@loopback.io']),
+          (nonVisibleSnippetId = result.body.id)
+        ),
+      )
+      .catch(err => {
+        throw err;
+      });
+  });
+
+  it('get snippet with ID with token having changed readACL should return 404', async () => {
+    await client
+      .get(`/basesnippets/${nonVisibleSnippetId}`)
+      .set('Authorization', 'Bearer ' + token)
+      .set('Content-Type', 'application/json')
+      .expect(404);
   });
 });
