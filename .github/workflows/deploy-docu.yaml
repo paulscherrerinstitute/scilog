@@ -14,6 +14,7 @@ jobs:
 
       - name: Build
         run: |
+          cd documentation
           npm install
           npx honkit build . docs
 
@@ -23,6 +24,6 @@ jobs:
           target_branch: gh-pages
           keep_history: true
           allow_empty_commit: true
-          build_dir: docs
+          build_dir: documentation/docs
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
