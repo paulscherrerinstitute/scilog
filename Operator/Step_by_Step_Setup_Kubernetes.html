@@ -1,0 +1,570 @@
+
+<!DOCTYPE HTML>
+<html lang="" >
+    <head>
+        <meta charset="UTF-8">
+        <title>Deploy with Kubernetes · SciLog Documentation</title>
+        <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+        <meta name="description" content="">
+        <meta name="generator" content="HonKit 4.0.4">
+        
+        
+        
+    
+    <link rel="stylesheet" href="../gitbook/style.css">
+
+    
+            
+                
+                <link rel="stylesheet" href="../gitbook/gitbook-plugin-chapter-fold/chapter-fold.css">
+                
+            
+                
+                <link rel="stylesheet" href="../gitbook/@honkit/honkit-plugin-highlight/website.css">
+                
+            
+                
+                <link rel="stylesheet" href="../gitbook/gitbook-plugin-search/search.css">
+                
+            
+                
+                <link rel="stylesheet" href="../gitbook/gitbook-plugin-fontsettings/website.css">
+                
+            
+        
+
+    
+
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+
+        
+    
+    
+    <meta name="HandheldFriendly" content="true"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <link rel="apple-touch-icon-precomposed" sizes="152x152" href="../gitbook/images/apple-touch-icon-precomposed-152.png">
+    <link rel="shortcut icon" href="../gitbook/images/favicon.ico" type="image/x-icon">
+
+    
+    <link rel="next" href="../Development/" />
+    
+    
+    <link rel="prev" href="Step_by_Step_Setup_Docker.html" />
+    
+
+    </head>
+    <body>
+        
+<div class="book honkit-cloak">
+    <div class="book-summary">
+        
+            
+<div id="book-search-input" role="search">
+    <input type="text" placeholder="Type to search" />
+</div>
+
+            
+                <nav role="navigation">
+                
+
+
+<ul class="summary">
+    
+    
+
+    
+
+    
+        
+        
+    
+        <li class="chapter " data-level="1.1" data-path="../">
+            
+                <a href="../">
+            
+                    
+                    SciLog Overview and Concepts
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.2" data-path="../Users/">
+            
+                <a href="../Users/">
+            
+                    
+                    User Guide
+            
+                </a>
+            
+
+            
+            <ul class="articles">
+                
+    
+        <li class="chapter " data-level="1.2.1" data-path="../Users/Login.html">
+            
+                <a href="../Users/Login.html">
+            
+                    
+                    Login
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.2.2" data-path="../Users/Dashboard.html">
+            
+                <a href="../Users/Dashboard.html">
+            
+                    
+                    Overview Dashboard
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.2.3" data-path="../Users/Logbook.html">
+            
+                <a href="../Users/Logbook.html">
+            
+                    
+                    Logbook
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.2.4" data-path="../Users/Sharing.html">
+            
+                <a href="../Users/Sharing.html">
+            
+                    
+                    Sharing
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.2.5" data-path="../Users/SmartphoneUsage">
+            
+                <span>
+            
+                    
+                    Smartphone
+            
+                </a>
+            
+
+            
+        </li>
+    
+
+            </ul>
+            
+        </li>
+    
+        <li class="chapter " data-level="1.3" data-path="../Ingestor/">
+            
+                <a href="../Ingestor/">
+            
+                    
+                    Ingestor Guide
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.4" data-path="./">
+            
+                <a href="./">
+            
+                    
+                    Operator Guide
+            
+                </a>
+            
+
+            
+            <ul class="articles">
+                
+    
+        <li class="chapter " data-level="1.4.1" data-path="Step_by_Step_Setup.html">
+            
+                <a href="Step_by_Step_Setup.html">
+            
+                    
+                    Step by Step instruction
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.4.2" data-path="Step_by_Step_Setup_Docker.html">
+            
+                <a href="Step_by_Step_Setup_Docker.html">
+            
+                    
+                    Deploy with Docker Compose
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter active" data-level="1.4.3" data-path="Step_by_Step_Setup_Kubernetes.html">
+            
+                <a href="Step_by_Step_Setup_Kubernetes.html">
+            
+                    
+                    Deploy with Kubernetes
+            
+                </a>
+            
+
+            
+        </li>
+    
+
+            </ul>
+            
+        </li>
+    
+        <li class="chapter " data-level="1.5" data-path="../Development/">
+            
+                <a href="../Development/">
+            
+                    
+                    Developers Guide
+            
+                </a>
+            
+
+            
+            <ul class="articles">
+                
+    
+        <li class="chapter " data-level="1.5.1" data-path="../Development/Data_Model.html">
+            
+                <a href="../Development/Data_Model.html">
+            
+                    
+                    An Introduction to the Data Model
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.5.2" data-path="../Development/LocalDevelopment.html">
+            
+                <a href="../Development/LocalDevelopment.html">
+            
+                    
+                    Local Development
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.5.3" data-path="../Development/Environment.html">
+            
+                <a href="../Development/Environment.html">
+            
+                    
+                    Configuration files
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.5.4" data-path="../Development/Login.html">
+            
+                <a href="../Development/Login.html">
+            
+                    
+                    Login and Accounts
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.5.5" data-path="../Development/RunningTests.html">
+            
+                <a href="../Development/RunningTests.html">
+            
+                    
+                    Testing
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.5.6" data-path="../Development/Contributing.html">
+            
+                <a href="../Development/Contributing.html">
+            
+                    
+                    Contributing
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.5.7" data-path="../Development/Documentation.html">
+            
+                <a href="../Development/Documentation.html">
+            
+                    
+                    Adding Documentation
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.5.8" data-path="../Development/GitHubFlow.html">
+            
+                <a href="../Development/GitHubFlow.html">
+            
+                    
+                    GitHub Flow
+            
+                </a>
+            
+
+            
+        </li>
+    
+
+            </ul>
+            
+        </li>
+    
+        <li class="chapter " data-level="1.6" >
+            
+                <a target="_blank" href="https://scicatproject.github.io/api/">
+            
+                    
+                    API Documentation
+            
+                </a>
+            
+
+            
+        </li>
+    
+
+    
+
+    <li class="divider"></li>
+
+    <li>
+        <a href="https://github.com/honkit/honkit" target="blank" class="gitbook-link">
+            Published with HonKit
+        </a>
+    </li>
+</ul>
+
+
+                </nav>
+            
+        
+    </div>
+
+    <div class="book-body">
+        
+            <div class="body-inner">
+                
+                    
+
+<div class="book-header" role="navigation">
+    
+
+    <!-- Title -->
+    <h1>
+        <i class="fa fa-circle-o-notch fa-spin"></i>
+        <a href=".." >Deploy with Kubernetes</a>
+    </h1>
+</div>
+
+
+
+
+                    <div class="page-wrapper" tabindex="-1" role="main">
+                        <div class="page-inner">
+                            
+<div id="book-search-results">
+    <div class="search-noresults">
+    
+                                <section class="normal markdown-section">
+                                
+                                <h1 id="setup-scicat-with-kubernetes">Setup SciCat with Kubernetes</h1>
+<p>The procedure is described in the <a href="https://github.com/SciCatProject/localdeploy" target="_blank">localdeploy repository</a>
+It uses a minikube based Kubernetes system as the main deployment platform. It should run both on Linux and Mac Systems and is a convenient way to get a full &quot;production like&quot; system running on your laptop.</p>
+
+                                
+                                </section>
+                            
+    </div>
+    <div class="search-results">
+        <div class="has-results">
+            
+            <h1 class="search-results-title"><span class='search-results-count'></span> results matching "<span class='search-query'></span>"</h1>
+            <ul class="search-results-list"></ul>
+            
+        </div>
+        <div class="no-results">
+            
+            <h1 class="search-results-title">No results matching "<span class='search-query'></span>"</h1>
+            
+        </div>
+    </div>
+</div>
+
+                        </div>
+                    </div>
+                
+            </div>
+
+            
+                
+                <a href="Step_by_Step_Setup_Docker.html" class="navigation navigation-prev " aria-label="Previous page: Deploy with Docker Compose">
+                    <i class="fa fa-angle-left"></i>
+                </a>
+                
+                
+                <a href="../Development/" class="navigation navigation-next " aria-label="Next page: Developers Guide">
+                    <i class="fa fa-angle-right"></i>
+                </a>
+                
+            
+        
+    </div>
+
+    <script>
+        var gitbook = gitbook || [];
+        gitbook.push(function() {
+            gitbook.page.hasChanged({"page":{"title":"Deploy with Kubernetes","level":"1.4.3","depth":2,"next":{"title":"Developers Guide","level":"1.5","depth":1,"path":"Development/README.md","ref":"Development/README.md","articles":[{"title":"An Introduction to the Data Model","level":"1.5.1","depth":2,"path":"Development/Data_Model.md","ref":"Development/Data_Model.md","articles":[]},{"title":"Local Development","level":"1.5.2","depth":2,"path":"Development/LocalDevelopment.md","ref":"Development/LocalDevelopment.md","articles":[]},{"title":"Configuration files","level":"1.5.3","depth":2,"path":"Development/Environment.md","ref":"Development/Environment.md","articles":[]},{"title":"Login and Accounts","level":"1.5.4","depth":2,"path":"Development/Login.md","ref":"Development/Login.md","articles":[]},{"title":"Testing","level":"1.5.5","depth":2,"path":"Development/RunningTests.md","ref":"Development/RunningTests.md","articles":[]},{"title":"Contributing","level":"1.5.6","depth":2,"path":"Development/Contributing.md","ref":"Development/Contributing.md","articles":[]},{"title":"Adding Documentation","level":"1.5.7","depth":2,"path":"Development/Documentation.md","ref":"Development/Documentation.md","articles":[]},{"title":"GitHub Flow","level":"1.5.8","depth":2,"path":"Development/GitHubFlow.md","ref":"Development/GitHubFlow.md","articles":[]}]},"previous":{"title":"Deploy with Docker Compose","level":"1.4.2","depth":2,"path":"Operator/Step_by_Step_Setup_Docker.md","ref":"Operator/Step_by_Step_Setup_Docker.md","articles":[]},"dir":"ltr"},"config":{"plugins":["chapter-fold"],"styles":{"website":"styles/website.css","pdf":"styles/pdf.css","epub":"styles/epub.css","mobi":"styles/mobi.css","ebook":"styles/ebook.css","print":"styles/print.css"},"pluginsConfig":{"chapter-fold":{},"highlight":{},"search":{},"lunr":{"maxIndexSize":1000000,"ignoreSpecialCharacters":false},"fontsettings":{"theme":"white","family":"sans","size":2},"theme-default":{"styles":{"website":"styles/website.css","pdf":"styles/pdf.css","epub":"styles/epub.css","mobi":"styles/mobi.css","ebook":"styles/ebook.css","print":"styles/print.css"},"showLevel":false}},"theme":"default","pdf":{"pageNumbers":true,"fontSize":12,"fontFamily":"Arial","paperSize":"a4","chapterMark":"pagebreak","pageBreaksBefore":"/","margin":{"right":62,"left":62,"top":56,"bottom":56},"embedFonts":false},"structure":{"langs":"LANGS.md","readme":"README.md","glossary":"GLOSSARY.md","summary":"SUMMARY.md"},"variables":{},"title":"SciLog Documentation","gitbook":"*"},"file":{"path":"Operator/Step_by_Step_Setup_Kubernetes.md","mtime":"2022-10-26T14:51:05.242Z","type":"markdown"},"gitbook":{"version":"4.0.4","time":"2022-10-26T14:51:19.182Z"},"basePath":"..","book":{"language":""}});
+        });
+    </script>
+</div>
+
+        
+    <noscript>
+        <style>
+            .honkit-cloak {
+                display: block !important;
+            }
+        </style>
+    </noscript>
+    <script>
+        // Restore sidebar state as critical path for prevent layout shift
+        function __init__getSidebarState(defaultValue){
+            var baseKey = "";
+            var key = baseKey + ":sidebar";
+            try {
+                var value = localStorage[key];
+                if (value === undefined) {
+                    return defaultValue;
+                }
+                var parsed = JSON.parse(value);
+                return parsed == null ? defaultValue : parsed;
+            } catch (e) {
+                return defaultValue;
+            }
+        }
+        function __init__restoreLastSidebarState() {
+            var isMobile = window.matchMedia("(max-width: 600px)").matches;
+            if (isMobile) {
+                // Init last state if not mobile
+                return;
+            }
+            var sidebarState = __init__getSidebarState(true);
+            var book = document.querySelector(".book");
+            // Show sidebar if it enabled
+            if (sidebarState && book) {
+                book.classList.add("without-animation", "with-summary");
+            }
+        }
+
+        try {
+            __init__restoreLastSidebarState();
+        } finally {
+            var book = document.querySelector(".book");
+            book.classList.remove("honkit-cloak");
+        }
+    </script>
+    <script src="../gitbook/gitbook.js"></script>
+    <script src="../gitbook/theme.js"></script>
+    
+        
+        <script src="../gitbook/gitbook-plugin-chapter-fold/chapter-fold.js"></script>
+        
+    
+        
+        <script src="../gitbook/gitbook-plugin-search/search-engine.js"></script>
+        
+    
+        
+        <script src="../gitbook/gitbook-plugin-search/search.js"></script>
+        
+    
+        
+        <script src="../gitbook/gitbook-plugin-lunr/lunr.min.js"></script>
+        
+    
+        
+        <script src="../gitbook/gitbook-plugin-lunr/search-lunr.js"></script>
+        
+    
+        
+        <script src="../gitbook/gitbook-plugin-fontsettings/fontsettings.js"></script>
+        
+    
+
+    </body>
+</html>
+
