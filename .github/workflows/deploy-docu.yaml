@@ -19,7 +19,7 @@ jobs:
           npx honkit build . docs
 
       - name: Deploy
-        uses: crazy-max/ghaction-github-pages@v2
+        uses: crazy-max/ghaction-github-pages@v3
         with:
           target_branch: gh-pages
           keep_history: true
