@@ -7,6 +7,7 @@ import {
   createAdminUser,
   createUserToken,
   setupApplication,
+  userData,
 } from './test-helper';
 import _ from 'lodash';
 
@@ -309,6 +310,58 @@ describe('Location', function (this: Suite) {
           ])
         ),
       )
+      .catch(err => {
+        throw err;
+      });
+  });
+
+  it('tries to create location and linked logbook', async () => {
+    const acls = {
+      createACL: ['unx_sf-bernina-bs'],
+      readACL: ['p12345', 'unx_sf-bernina-bs'],
+      updateACL: ['p12345', 'unx_sf-bernina-bs'],
+      deleteACL: ['unx_sf-bernina-bs'],
+      shareACL: [userData.email, 'p12345'],
+      adminACL: [userData.email, 'unx_sf-bernina-bs'],
+    };
+    const logbook = {
+      snippetType: 'logbook',
+      isPrivate: false,
+      name: 'My logbook',
+      description: 'Logbook description goes here',
+      ...acls,
+    };
+
+    const postResponse = await client
+      .post('/locations')
+      .set('Authorization', 'Bearer ' + token)
+      .send({name: 'cSAXS', location: 'PSI/SLS/CSAXS', ...acls})
+      .expect(200)
+      .then()
+      .catch(err => {
+        throw err;
+      });
+    let logbookId;
+    await client
+      .post('/logbooks')
+      .set('Authorization', 'Bearer ' + token)
+      .send({...logbook, location: `${postResponse.body.id}`})
+      .expect(200)
+      .then(result => {
+        expect(postResponse.body.snippetType).to.be.eql('location');
+        logbookId = result.body.id;
+        // console.log("Found logbook id:",logbookId)
+        expect(result.body.snippetType).to.be.eql('logbook');
+      })
+      .catch(err => {
+        throw err;
+      });
+
+    await client
+      .get(`/basesnippets/${logbookId}`)
+      .set('Authorization', 'Bearer ' + token)
+      .expect(200)
+      .then()
       .catch(err => {
         throw err;
       });

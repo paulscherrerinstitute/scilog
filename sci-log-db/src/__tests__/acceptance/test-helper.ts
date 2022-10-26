@@ -20,7 +20,7 @@ export interface AppWithClient {
 
 export const userPassword = 'p4ssw0rd';
 
-const userData = {
+export const userData = {
   email: 'test@loopback.io',
   firstName: 'Example',
   lastName: 'User',
