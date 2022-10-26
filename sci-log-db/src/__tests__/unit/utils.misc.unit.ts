@@ -6,7 +6,6 @@ import {
   getModelSchemaRefWithDeprecated,
   getModelSchemaRef,
   validateFieldsVSModel,
-  defaultSequentially,
 } from '../../utils/misc';
 
 describe('Utils unit tests', function (this: Suite) {
@@ -64,18 +63,5 @@ describe('Utils unit tests', function (this: Suite) {
     expect(error.details.messages).to.be.eql({
       something: ['is not defined in the model'],
     });
-  });
-
-  it('Should default based on list', () => {
-    expect(defaultSequentially(1, 2, 3)).to.be.eql(1);
-    expect(defaultSequentially(1, undefined, 3)).to.be.eql(1);
-    expect(defaultSequentially(1, undefined, undefined)).to.be.eql(1);
-    expect(defaultSequentially(1, false, undefined)).to.be.eql(1);
-    expect(defaultSequentially(undefined, 2, undefined)).to.be.eql(2);
-    expect(defaultSequentially(undefined, 2, 3)).to.be.eql(2);
-    expect(defaultSequentially(undefined, undefined, 3)).to.be.eql(3);
-    expect(defaultSequentially(undefined, false, 3)).to.be.eql(3);
-    expect(defaultSequentially(false, undefined, 3)).to.be.eql(3);
-    expect(defaultSequentially(false, '', 3)).to.be.eql(3);
   });
 });

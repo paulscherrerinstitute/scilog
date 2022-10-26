@@ -63,6 +63,11 @@ export class User extends Entity {
   })
   location?: string;
 
+  @property({
+    type: 'string',
+  })
+  unxAccount?: string;
+
   constructor(data?: Partial<User>) {
     super(data);
   }

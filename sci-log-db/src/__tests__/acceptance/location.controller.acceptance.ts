@@ -303,7 +303,10 @@ describe('Location', function (this: Suite) {
             locationSnippet.ownerGroup,
             adminUser.email,
           ]),
-          (locationSnippetId = result.body.id)
+          expect(result.body.deleteACL).to.be.eql([
+            locationSnippet.ownerGroup,
+            adminUser.unxAccount,
+          ])
         ),
       )
       .catch(err => {

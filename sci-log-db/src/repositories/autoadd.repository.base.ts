@@ -14,7 +14,6 @@ import {
 } from '@loopback/repository';
 import {Logbook} from '../models';
 import {Basesnippet} from '../models/basesnippet.model';
-import {defaultSequentially} from '../utils/misc';
 import {BasesnippetRepository} from './basesnippet.repository';
 
 export class AutoAddRepository<
@@ -81,48 +80,22 @@ export class AutoAddRepository<
       unsetAttribute: Function;
     },
   ) {
-    if (this.acls.some(acl => !data[acl as keyof Basesnippet])) {
+    const emptyAcls = this.acls.filter(acl => !data[acl as keyof Basesnippet]);
+    if (emptyAcls) {
       const parent = await this.getParent(data);
       const ownerGroup = data.ownerGroup ? [data.ownerGroup] : [];
-      const acls = this.acls;
-      const aclObj = {} as {
-        [K in typeof acls[number]]: string[];
-      };
-      aclObj.createACL = defaultSequentially(
-        data.createACL,
-        parent.createACL,
-        ownerGroup,
-      ); // potentially remove it
-      aclObj.readACL = defaultSequentially(
-        data.readACL,
-        parent.readACL,
-        await this.readACLfromLocation(data),
+      await Promise.all(
+        emptyAcls.map(async k => {
+          const aclValue = (parent[k as keyof Basesnippet] ??
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            ((this as any)[k]
+              ? // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                await (this as any)[k](data)
+              : ownerGroup)) as string[];
+          if (aclValue.length > 0)
+            (data[k as keyof Basesnippet] as string[]) = aclValue;
+        }),
       );
-      // ownergroup + location (beamline account as function of location )
-      aclObj.updateACL = defaultSequentially(
-        data.updateACL,
-        parent.updateACL,
-        ownerGroup,
-      ); // ownergroup
-      aclObj.deleteACL = defaultSequentially(
-        data.deleteACL,
-        parent.deleteACL,
-        ownerGroup,
-      ); // admin
-      aclObj.shareACL = defaultSequentially(
-        data.shareACL,
-        parent.shareACL,
-        ownerGroup,
-      ); // ownerGroup
-      aclObj.adminACL = defaultSequentially(
-        data.adminACL,
-        parent.adminACL,
-        await this.adminACLfromUsers(),
-      );
-      Object.keys(aclObj).map(k => {
-        if (aclObj[k].length > 0)
-          (data[k as keyof Basesnippet] as string[]) = aclObj[k];
-      });
     }
     data.unsetAttribute('ownerGroup');
     data.unsetAttribute('accessGroups');
@@ -174,23 +147,39 @@ export class AutoAddRepository<
     return parentACL;
   }
 
-  private async readACLfromLocation(
+  private async readACL(
     data: (Basesnippet | Logbook) & {ownerGroup?: string | undefined},
   ) {
+    const result = await this.readOrDeleteACL(data, 'readACL', 'email');
+    return result;
+  }
+
+  private async deleteACL(
+    data: (Basesnippet | Logbook) & {ownerGroup?: string | undefined},
+  ) {
+    const result = await this.readOrDeleteACL(data, 'deleteACL', 'unxAccount');
+    return result;
+  }
+
+  private async readOrDeleteACL(
+    data: (Basesnippet | Logbook) & {ownerGroup?: string | undefined},
+    type: string,
+    field: string,
+  ) {
     let acl: string[] = [];
-    if (!data.readACL && data.snippetType === 'location')
+    if (!data[type as keyof Basesnippet] && data.snippetType === 'location')
       acl = (
         await this.userRepository.find({
           where: {
             location: (data as Logbook).location,
           },
-          fields: ['email'],
+          fields: [field],
         })
-      ).map(u => u.email);
+      ).map(u => u[field]);
     return [...new Set((data.ownerGroup ? [data.ownerGroup] : []).concat(acl))];
   }
 
-  private async adminACLfromUsers() {
+  private async adminACL() {
     return (
       await this.userRepository.find({
         where: {roles: 'admin'},

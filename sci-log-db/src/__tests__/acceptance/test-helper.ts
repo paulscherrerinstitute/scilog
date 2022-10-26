@@ -103,6 +103,7 @@ export async function createAdminUser(app: SciLogDbApplication) {
     lastName: 'UserAdmin',
     roles: ['admin', 'any-authenticated-user'],
     location: 'anExistingLocation',
+    unxAccount: 'aUnxAccount',
   };
   const user = await createAUser(app, [], adminUser);
   return user;
