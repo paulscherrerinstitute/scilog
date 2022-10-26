@@ -9,7 +9,7 @@ from typing import Any, Tuple
 
 from .authmixin import HEADER_JSON, AuthError
 from .httpclient import HttpClient
-from .snippet import Basesnippet, Filesnippet, Paragraph, Snippet
+from .snippet import Basesnippet, Filesnippet, Location, Paragraph, Snippet
 
 ACLS = ["createACL", "readACL", "updateACL", "deleteACL", "shareACL", "adminACL"]
 
@@ -99,6 +99,16 @@ class SciLog:
             self.http_client.post_request(url, payload=payload, headers=HEADER_JSON)
         )
 
+    @pinned_to_logbook(["parentId", *ACLS])
+    def post_location(self, **kwargs):
+        url = self.http_client.address + "/basesnippets"
+        payload = kwargs
+        if payload.get("files"):
+            payload = self.upload_files(payload)
+        return Location.from_http_response(
+            self.http_client.post_request(url, payload=payload, headers=HEADER_JSON)
+        )
+
     def upload_files(self, payload):
         for file in payload.get("files"):
             if "fileId" in file and file["fileId"] is not None:
@@ -145,14 +155,11 @@ class SciLog:
     @pinned_to_logbook(ACLS)
     def post_file(self, filepath: str, **kwargs) -> Filesnippet:
         """Upload a file
-
         Args:
             filepath (str): Path to the file that ought to be uploaded
-
         Raises:
             FileNotFoundError: Raised if the file specified in filepath does not exist
             ValueError: Raised if the filepath is not pointing to a file
-
         Returns:
             Filesnippet: Filesnippet containing the metadata of the newly created entry
         """
@@ -166,11 +173,9 @@ class SciLog:
     @pinned_to_logbook(ACLS)
     def append_files_to_snippet(self, snippet: Paragraph, filepaths: list, **kwargs) -> Paragraph:
         """Append files or images to an already existing snippet. Files and images will be appended following the order given in 'filepaths'.
-
         Args:
             snippet (Paragraph): Snippet to which the files should be appended
             filepaths (list): List of file paths pointing to the files that should be uploaded
-
         Returns:
             Paragraph: Updated snippet
         """
@@ -223,10 +228,8 @@ class SciLog:
 
     def patch_snippet(self, snippet: Paragraph, **kwargs) -> Paragraph:
         """Update (patch) snippet with given snippet.
-
         Args:
             snippet (Basesnippet): Snippet containing the newly updated fields
-
         Returns:
             Basesnippet: Updated snippet
         """
