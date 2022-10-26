@@ -3,13 +3,13 @@
 import os
 
 from dotenv import load_dotenv
-from scilog import SciCat, SciLog
+from scilog import Location, SciCat, SciLog
 
 from psi_webpage_icon_extractor import PSIWebpageIconExtractor
 
 
 def prepare_location_snippet(log):
-    snips = log.get_snippets(snippetType="location", createACL=["admin"])
+    snips = log.get_snippets(snippetType="location", name="root", createACL=["admin"])
     if snips:
         print("location snippet exists already:", snips[0].id)
         assert len(snips) == 1
@@ -26,9 +26,11 @@ def prepare_location_snippet(log):
         "adminACL": ["admin"],
         "isPrivate": True,
         "snippetType": "location",
+        "name": "root",
+        "location": "root",
         "files": [{"filepath": filepath}],
     }
-    snip = log.post_snippet(**location_snippet)
+    snip = log.post_location(**location_snippet)
     loc_id = snip.id
     return loc_id
 
@@ -45,8 +47,28 @@ def _collect_data(proposals):
     proposalsStorage = []
 
     for prop in proposals:
-        if (not(prop["ownerGroup"] in ["p18539", "p18713","p18711", "p18763","p18915", "p19160","p19303","p19318","p19319","p19320","p19321","p19704","p19740", "p19741","p19742","p20230"])):
-            continue
+        # if not (
+        #     prop["ownerGroup"]
+        #     in [
+        #         "p18539",
+        #         "p18713",
+        #         "p18711",
+        #         "p18763",
+        #         "p18915",
+        #         "p19160",
+        #         "p19303",
+        #         "p19318",
+        #         "p19319",
+        #         "p19320",
+        #         "p19321",
+        #         "p19704",
+        #         "p19740",
+        #         "p19741",
+        #         "p19742",
+        #         "p20230",
+        #     ]
+        # ):
+        #     continue
         accessGroups.update(prop["accessGroups"])
 
         loc = prop["MeasurementPeriodList"][0]["instrument"]
@@ -65,7 +87,7 @@ def _collect_data(proposals):
 
 
 def _update_locations(log, loc_id, locations):
-    locationStorage = dict()
+    locationStorage = {}
 
     locations_snippet = log.get_snippets(id=loc_id)[0]
 
@@ -96,25 +118,21 @@ def _update_locations(log, loc_id, locations):
         if not files:
             files = locations_snippet.files
 
-        new_snip = {
-            "createACL": ["any-authenticated-user"],
-            "readACL": ["any-authenticated-user"],
-            "updateACL": [group],
-            "deleteACL": ["admin"],
-            "shareACL": ["admin"],
-            "adminACL": ["admin"],
-            "isPrivate": True,
-            "title": loc.split("/")[-1],
-            "location": loc,
-            # "contact": group + "@psi.ch",
-            "snippetType": "image",
-            "parentId": loc_id,
-            "files": files,
-        }
+        new_location = Location()
+        new_location.createACL = ["any-authenticated-user"]
+        new_location.readACL = ["any-authenticated-user"]
+        new_location.updateACL = [group]
+        new_location.deleteACL = ["admin"]
+        new_location.shareACL = ["admin"]
+        new_location.adminACL = ["admin"]
+        new_location.isPrivate = True
+        new_location.location = loc
+        new_location.name = loc.split("/")[-1]
+        new_location.files = files
 
-        snip = log.post_snippet(**new_snip)
+        snip = log.post_location(**new_location.to_dict(include_none=False))
         locationStorage[loc] = snip
-        print("loc and locationStorage(loc):",loc, snip)
+        print("loc and locationStorage(loc):", loc, snip)
 
     # print("locationStorage:",locationStorage)
     return locationStorage
@@ -126,7 +144,7 @@ def _update_proposals(log, locationStorage, proposalsStorage):
 
         locStr = proposal["location"]
         loc = locationStorage[locStr]
-        print("locStr,loc",locStr,loc)
+        print("locStr,loc", locStr, loc)
 
         new_snip = {
             "createACL": [ownerGroup],
