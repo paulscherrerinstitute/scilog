@@ -57,4 +57,6 @@ The documentaion is split into the following chapters:
 
 ## Talks and Posters
 
-* [Poster at NOBUGS conference 2022](scilog_poster.pdf)
+<div>
+<a href="scilog_poster.pdf" download>Poster at NOBUGS conference 2022</a>
+</div>
