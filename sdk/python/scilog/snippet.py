@@ -87,8 +87,8 @@ class Snippet:
 
 
 class Basesnippet(Snippet):
-    _deprecated = {'ownerGroup': str}
-    _deprecated_by = {'ownerGroup': 'ACLS'}
+    _deprecated = {'ownerGroup': str, 'accessGroups': list}
+    _deprecated_by = {'ownerGroup': 'ACLS', 'accessGroups': 'ACLS'}
 
     def __init__(self, snippetType="basesnippet"):
         super().__init__(snippetType=snippetType)
