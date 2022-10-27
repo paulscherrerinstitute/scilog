@@ -1,4 +1,5 @@
 import functools
+import logging
 from typing import get_type_hints
 
 from .utils import typename
@@ -15,6 +16,10 @@ def typechecked(func):
                 raise TypeError(
                     f"{func} expected to receive input of type {dtype.__name__} but received {arg_type.__name__}"
                 )
+            if len(func.__closure__) > 0:
+                property_name = func.__closure__[0].cell_contents.strip('_')
+                if obj._deprecated[property_name]:
+                    logging.warning(f"{property_name} is deprecated by {obj._deprecated_by[property_name]}")
         return func(obj, *args, **kwargs)
 
     return typechecked_call
@@ -49,11 +54,12 @@ class Snippet:
             setattr(cls, name, property_maker(name, dtype))
             self._properties.append(name)
 
-    def to_dict(self, include_none=True):
+    def to_dict(self, include_none=True, include_deprecated=True):
+        properties = self._properties if include_deprecated else list(set(self._properties).difference(self._deprecated.keys()))
         if include_none:
-            return {key: getattr(self, key) for key in self._properties}
+            return {key: getattr(self, key) for key in properties}
         return {
-            key: getattr(self, key) for key in self._properties if getattr(self, key) is not None
+            key: getattr(self, key) for key in properties if getattr(self, key) is not None
         }
 
     def import_dict(self, properties):
@@ -81,6 +87,9 @@ class Snippet:
 
 
 class Basesnippet(Snippet):
+    _deprecated = {'ownerGroup': str}
+    _deprecated_by = {'ownerGroup': 'ACLS'}
+
     def __init__(self, snippetType="basesnippet"):
         super().__init__(snippetType=snippetType)
         self.init_properties(
@@ -106,6 +115,7 @@ class Basesnippet(Snippet):
             linkType=str,
             versionable=bool,
             deleted=bool,
+            **self._deprecated
         )
 
 
