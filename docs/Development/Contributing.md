@@ -2,11 +2,11 @@
 
 There are 3 core ways to get involved with the SciLog project:
 
-1. Documentation - Fixing errors, covering weaker areas, adding examples
-2. Github Issues - This should be the first area to focus on for those that want to amend the code. 
+1. Github Issues - This should be the first area to focus on for those that want to amend the code. 
+2. Documentation - Fixing errors, covering missing areas, adding examples
 3. Testing
 
-For information about the development method we follow, please check [Development Methodology.](./Development_Methods.md)
+For information about the development method we follow, please check [GitHub Flow Methodology](GitHubFlow.md) .
 
 ## Issues
 

@@ -1,6 +1,5 @@
-# Setup SciCat with Kubernetes
+# Setup SciLog with Kubernetes
 
-The procedure is described in the [localdeploy repository](https://github.com/SciCatProject/localdeploy)
-It uses a minikube based Kubernetes system as the main deployment platform. It should run both on Linux and Mac Systems and is a convenient way to get a full "production like" system running on your laptop.
+Please use the [CI repositories](https://github.com/paulscherrerinstitute/scilog-ci/) for deploying to Kubernetes
 
-
+TODO: describe how to adjust to your Kubernetes environment

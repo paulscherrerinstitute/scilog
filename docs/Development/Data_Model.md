@@ -15,10 +15,10 @@ Many other models are derived from this model. Derived models define the type vi
 
 
 ## Location
-Describes a location of an activity like a measurement and is usually a description of a beammline or instrument together with some thumbnail image .
+Describes a location of a measurement and is usually a description of a beamline or instrument together with some thumbnail image .
 
 ## Logbook
-Each logboook is defined as snippet type *logbook* . A logbook always is linked to a location. Different accounts get different access rights depending on the logbook ACLs, which are partly derived from the location information.
+Each logboook is defined with snippet type *logbook* . A logbook is always linked to a location. Different accounts get different access rights depending on the logbook ACLs, which are partly derived from the location information.
 
 The data model and its API endpoints are described in [Logbook controller](https://scilog.development.psi.ch/api/v1/explorer/#/LogbookController/LogbookController.find)
 
