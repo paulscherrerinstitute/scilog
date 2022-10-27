@@ -452,7 +452,7 @@ describe('Basesnippet', function (this: Suite) {
       .expect(204);
   });
 
-  it('post a basesnippet with authentication and parentId from existing snippet should return 200 and have parent ACLS with priority on ownergroup', async () => {
+  it('post a basesnippet with authentication and parentId from existing snippet should return 200 and have ownergroup with priority on parent ACLS', async () => {
     await client
       .post('/basesnippets')
       .set('Authorization', 'Bearer ' + token)
@@ -464,7 +464,7 @@ describe('Basesnippet', function (this: Suite) {
           expect(result.body).to.containEql(baseSnippet),
           expect(result.body.snippetType).to.be.eql('base'),
           expect(result.body.readACL).to.be.eql(['basesnippetAcceptance']),
-          expect(result.body.createACL).to.be.eql(['aNewCreateACL']),
+          expect(result.body.createACL).to.be.eql(['basesnippetAcceptance']),
           expect(result.body.updateACL).to.be.eql(['basesnippetAcceptance']),
           expect(result.body.deleteACL).to.be.eql(['basesnippetAcceptance']),
           expect(result.body.shareACL).to.be.eql(['basesnippetAcceptance']),
@@ -496,7 +496,7 @@ describe('Basesnippet', function (this: Suite) {
           }),
           expect(result.body.snippetType).to.be.eql('base'),
           expect(result.body.readACL).to.be.eql(['aReadACL']),
-          expect(result.body.createACL).to.be.eql(['aNewCreateACL']),
+          expect(result.body.createACL).to.be.eql(['basesnippetAcceptance']),
           expect(result.body.updateACL).to.be.eql(['anUpdateACL']),
           expect(result.body.deleteACL).to.be.eql(['basesnippetAcceptance']),
           expect(result.body.shareACL).to.be.eql(['basesnippetAcceptance']),

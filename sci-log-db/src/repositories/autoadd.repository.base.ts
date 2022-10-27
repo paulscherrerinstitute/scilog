@@ -14,6 +14,7 @@ import {
 } from '@loopback/repository';
 import {Logbook} from '../models';
 import {Basesnippet} from '../models/basesnippet.model';
+import {defaultSequentially} from '../utils/misc';
 import {BasesnippetRepository} from './basesnippet.repository';
 
 export class AutoAddRepository<
@@ -86,12 +87,15 @@ export class AutoAddRepository<
       const ownerGroup = data.ownerGroup ? [data.ownerGroup] : [];
       await Promise.all(
         emptyAcls.map(async k => {
-          const aclValue = (parent[k as keyof Basesnippet] ??
+          const aclValue = defaultSequentially(
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            ((this as any)[k]
+            (this as any)[k]
               ? // eslint-disable-next-line @typescript-eslint/no-explicit-any
                 await (this as any)[k](data)
-              : ownerGroup)) as string[];
+              : ownerGroup,
+            parent[k as keyof Basesnippet],
+            [],
+          ) as string[];
           if (aclValue.length > 0)
             (data[k as keyof Basesnippet] as string[]) = aclValue;
         }),

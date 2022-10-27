@@ -6,6 +6,7 @@ import {
   getModelSchemaRefWithDeprecated,
   getModelSchemaRef,
   validateFieldsVSModel,
+  defaultSequentially,
 } from '../../utils/misc';
 
 describe('Utils unit tests', function (this: Suite) {
@@ -63,5 +64,30 @@ describe('Utils unit tests', function (this: Suite) {
     expect(error.details.messages).to.be.eql({
       something: ['is not defined in the model'],
     });
+  });
+
+  it('Should default to the first non undefined or non empty list or non empty object value or last element', () => {
+    expect(defaultSequentially(1, 2, 3)).to.be.eql(1);
+    expect(defaultSequentially(1, undefined, 3)).to.be.eql(1);
+    expect(defaultSequentially(1, 2, undefined)).to.be.eql(1);
+    expect(defaultSequentially(1, false, 3)).to.be.eql(1);
+    expect(defaultSequentially(1, 2, false)).to.be.eql(1);
+    expect(defaultSequentially(1, [], 3)).to.be.eql(1);
+    expect(defaultSequentially(1, 2, [])).to.be.eql(1);
+    expect(defaultSequentially(1, {}, 3)).to.be.eql(1);
+    expect(defaultSequentially(1, 2, {})).to.be.eql(1);
+    expect(defaultSequentially({}, 2, {})).to.be.eql(2);
+    expect(defaultSequentially([], 2, {})).to.be.eql(2);
+    expect(defaultSequentially({}, [], 3)).to.be.eql(3);
+    expect(defaultSequentially({}, [], undefined, false, null, 5)).to.be.eql(5);
+    expect(defaultSequentially({}, [], undefined, false, [])).to.be.eql([]);
+    expect(defaultSequentially({}, [], undefined, false, {})).to.be.eql({});
+    expect(defaultSequentially({}, [], undefined, false, undefined)).to.be.eql(
+      undefined,
+    );
+    expect(defaultSequentially({}, [], undefined, false, false)).to.be.eql(
+      false,
+    );
+    expect(defaultSequentially({}, [], undefined, false, null)).to.be.eql(null);
   });
 });
