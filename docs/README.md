@@ -1,4 +1,4 @@
-![scilog_logo.png](https://paulscherrerinstitute.github.io/scilog/scilog_logo.png)
+![scilog_logo.png](scilog_logo.png)
 
 # SciLog Electronic Logbook Overview
 ![Build Status](https://github.com/paulscherrerinstitute/scilog/actions/workflows/deploy-docu.yaml/badge.svg)
@@ -57,4 +57,4 @@ The documentaion is split into the following chapters:
 
 ## Talks and Posters
 
-* TODO add Poster and Klaus talk
+* [Poster at NOBUGS conference 2022](scilog_poster.pdf)
