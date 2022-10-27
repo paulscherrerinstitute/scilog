@@ -171,9 +171,9 @@
             
         </li>
     
-        <li class="chapter " data-level="1.2.5" data-path="SmartphoneUsage">
+        <li class="chapter " data-level="1.2.5" data-path="SmartphoneUsage.html">
             
-                <span>
+                <a href="SmartphoneUsage.html">
             
                     
                     Smartphone
@@ -199,6 +199,51 @@
                 </a>
             
 
+            
+            <ul class="articles">
+                
+    
+        <li class="chapter " data-level="1.3.1" data-path="../Ingestor/RestAPI.html">
+            
+                <a href="../Ingestor/RestAPI.html">
+            
+                    
+                    REST API Examples
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.3.2" data-path="../Ingestor/PythonSDK.html">
+            
+                <a href="../Ingestor/PythonSDK.html">
+            
+                    
+                    Python SDK Usage
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.3.3" data-path="../Ingestor/MigrateElogData.html">
+            
+                <a href="../Ingestor/MigrateElogData.html">
+            
+                    
+                    Import of elog data
+            
+                </a>
+            
+
+            
+        </li>
+    
+
+            </ul>
             
         </li>
     
@@ -385,10 +430,10 @@
     
         <li class="chapter " data-level="1.6" >
             
-                <a target="_blank" href="https://scicatproject.github.io/api/">
+                <a target="_blank" href="https://scilog.psi.ch/api/v1/explorer">
             
                     
-                    API Documentation
+                    Example of API Documentation
             
                 </a>
             
@@ -443,10 +488,11 @@
                                 
                                 <h1 id="login">Login</h1>
 <p>To get access to the data, for which you have read access, you first have to login. </p>
-<p><img src="img/login.png" alt="Login to SciLog"></p>
-<p>There are two types of account associated with SciLog: <em>Functional</em> and <em>User</em>. A <em>functional</em> account will primarily be used by instrument responsibles or beamline managers for automated tasks and ingests. Also the general &quot;admin&quot; user is  a functional account. Functional accounts and their passwords are stored within SciLog itself and are defined at boot tome of the application.</p>
-<p>In all other cases you login with ayour personal <em>User</em> account. <em>User</em> accounts are tied into the login system that is used by your institution, for example: Active Directory or an OIDC identity provider. You are able to log in to the system using the same credentials you use on that account. This process is called <em>authentication</em> in IT tech terminology.</p>
-<p>When you login as a user, your user management system will assign groups (think of themn as <em>roles</em>) to the logged in user. These roles are the basis of authorization decisons, i.e. they define which part of the logbooks and snippet data are visible to the logged user. The logic that defines, what parts of the data you can see, is called &quot;authorization&quot; in IT terminology</p>
+<p>TODO add screenshot <img src="img/login.png" alt="Login to SciLog"></p>
+<p>There are two types of account associated with SciLog: <em>User</em> and <em>Functional</em> . </p>
+<p>In most cases you login with your personal <em>User</em> account. <em>User</em> accounts are tied into the login system that is used by your institution, for example: Active Directory or an OIDC identity provider. You are able to log into the system using the same credentials you use on that account. This process is called <em>authentication</em> in IT tech terminology.</p>
+<p>A <em>functional</em> account will primarily be used by instrument responsibles or beamline managers for automated tasks and ingests. Also the general &quot;admin&quot; user is  a functional account. Functional accounts and their passwords are stored within SciLog itself and are defined at boot time of the application.</p>
+<p>When you login, your user management system will assign groups (think of them as <em>roles</em>) to the logged in user. These roles are the basis of authorization decisons, i.e. they define which part of the logbooks and snippet data are visible to the authenticated user. The logic that defines, what parts of the data you can see, is called &quot;authorization&quot; in IT terminology.</p>
 
                                 
                                 </section>
@@ -490,7 +536,7 @@
     <script>
         var gitbook = gitbook || [];
         gitbook.push(function() {
-            gitbook.page.hasChanged({"page":{"title":"Login","level":"1.2.1","depth":2,"next":{"title":"Overview Dashboard","level":"1.2.2","depth":2,"path":"Users/Dashboard.md","ref":"Users/Dashboard.md","articles":[]},"previous":{"title":"User Guide","level":"1.2","depth":1,"path":"Users/README.md","ref":"Users/README.md","articles":[{"title":"Login","level":"1.2.1","depth":2,"path":"Users/Login.md","ref":"Users/Login.md","articles":[]},{"title":"Overview Dashboard","level":"1.2.2","depth":2,"path":"Users/Dashboard.md","ref":"Users/Dashboard.md","articles":[]},{"title":"Logbook","level":"1.2.3","depth":2,"path":"Users/Logbook.md","ref":"Users/Logbook.md","articles":[]},{"title":"Sharing","level":"1.2.4","depth":2,"path":"Users/Sharing.md","ref":"Users/Sharing.md","articles":[]},{"title":"Smartphone","level":"1.2.5","depth":2,"path":"Users/SmartphoneUsage","ref":"Users/SmartphoneUsage","articles":[]}]},"dir":"ltr"},"config":{"plugins":["chapter-fold"],"styles":{"website":"styles/website.css","pdf":"styles/pdf.css","epub":"styles/epub.css","mobi":"styles/mobi.css","ebook":"styles/ebook.css","print":"styles/print.css"},"pluginsConfig":{"chapter-fold":{},"highlight":{},"search":{},"lunr":{"maxIndexSize":1000000,"ignoreSpecialCharacters":false},"fontsettings":{"theme":"white","family":"sans","size":2},"theme-default":{"styles":{"website":"styles/website.css","pdf":"styles/pdf.css","epub":"styles/epub.css","mobi":"styles/mobi.css","ebook":"styles/ebook.css","print":"styles/print.css"},"showLevel":false}},"theme":"default","pdf":{"pageNumbers":true,"fontSize":12,"fontFamily":"Arial","paperSize":"a4","chapterMark":"pagebreak","pageBreaksBefore":"/","margin":{"right":62,"left":62,"top":56,"bottom":56},"embedFonts":false},"structure":{"langs":"LANGS.md","readme":"README.md","glossary":"GLOSSARY.md","summary":"SUMMARY.md"},"variables":{},"title":"SciLog Documentation","gitbook":"*"},"file":{"path":"Users/Login.md","mtime":"2022-10-27T11:03:20.639Z","type":"markdown"},"gitbook":{"version":"4.0.4","time":"2022-10-27T11:03:33.917Z"},"basePath":"..","book":{"language":""}});
+            gitbook.page.hasChanged({"page":{"title":"Login","level":"1.2.1","depth":2,"next":{"title":"Overview Dashboard","level":"1.2.2","depth":2,"path":"Users/Dashboard.md","ref":"Users/Dashboard.md","articles":[]},"previous":{"title":"User Guide","level":"1.2","depth":1,"path":"Users/README.md","ref":"Users/README.md","articles":[{"title":"Login","level":"1.2.1","depth":2,"path":"Users/Login.md","ref":"Users/Login.md","articles":[]},{"title":"Overview Dashboard","level":"1.2.2","depth":2,"path":"Users/Dashboard.md","ref":"Users/Dashboard.md","articles":[]},{"title":"Logbook","level":"1.2.3","depth":2,"path":"Users/Logbook.md","ref":"Users/Logbook.md","articles":[]},{"title":"Sharing","level":"1.2.4","depth":2,"path":"Users/Sharing.md","ref":"Users/Sharing.md","articles":[]},{"title":"Smartphone","level":"1.2.5","depth":2,"path":"Users/SmartphoneUsage.md","ref":"Users/SmartphoneUsage.md","articles":[]}]},"dir":"ltr"},"config":{"plugins":["chapter-fold"],"styles":{"website":"styles/website.css","pdf":"styles/pdf.css","epub":"styles/epub.css","mobi":"styles/mobi.css","ebook":"styles/ebook.css","print":"styles/print.css"},"pluginsConfig":{"chapter-fold":{},"highlight":{},"search":{},"lunr":{"maxIndexSize":1000000,"ignoreSpecialCharacters":false},"fontsettings":{"theme":"white","family":"sans","size":2},"theme-default":{"styles":{"website":"styles/website.css","pdf":"styles/pdf.css","epub":"styles/epub.css","mobi":"styles/mobi.css","ebook":"styles/ebook.css","print":"styles/print.css"},"showLevel":false}},"theme":"default","pdf":{"pageNumbers":true,"fontSize":12,"fontFamily":"Arial","paperSize":"a4","chapterMark":"pagebreak","pageBreaksBefore":"/","margin":{"right":62,"left":62,"top":56,"bottom":56},"embedFonts":false},"structure":{"langs":"LANGS.md","readme":"README.md","glossary":"GLOSSARY.md","summary":"SUMMARY.md"},"variables":{},"title":"SciLog Documentation","gitbook":"*"},"file":{"path":"Users/Login.md","mtime":"2022-10-27T11:47:45.778Z","type":"markdown"},"gitbook":{"version":"4.0.4","time":"2022-10-27T11:47:58.193Z"},"basePath":"..","book":{"language":""}});
         });
     </script>
 </div>
