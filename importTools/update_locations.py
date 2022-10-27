@@ -9,28 +9,24 @@ from psi_webpage_icon_extractor import PSIWebpageIconExtractor
 
 
 def prepare_location_snippet(log):
-    snips = log.get_snippets(snippetType="location", name="root", createACL=["admin"])
+    snips = log.get_snippets(snippetType="location", name="root", ownerGroup="admin")
     if snips:
-        print("location snippet exists already:", snips[0].id)
+        print("location snippet exists already:",snips[0].id)
         assert len(snips) == 1
         loc_id = snips[0].id
         return loc_id
 
     filepath = os.environ["SCILOG_DEFAULT_LOGBOOK_ICON"]
     location_snippet = {
-        "createACL": ["admin"],
-        "readACL": ["any-authenticated-user"],
-        "updateACL": ["admin"],
-        "deleteACL": ["admin"],
-        "shareACL": ["admin"],
-        "adminACL": ["admin"],
+        "ownerGroup": "admin",
+        "accessGroups": ["any-authenticated-user"],
         "isPrivate": True,
         "snippetType": "location",
         "name": "root",
         "location": "root",
         "files": [{"filepath": filepath}],
     }
-    snip = log.post_location(**location_snippet)
+    snip = log.post_snippet(**location_snippet)
     loc_id = snip.id
     return loc_id
 
@@ -47,29 +43,10 @@ def _collect_data(proposals):
     proposalsStorage = []
 
     for prop in proposals:
-        # if not (
-        #     prop["ownerGroup"]
-        #     in [
-        #         "p18539",
-        #         "p18713",
-        #         "p18711",
-        #         "p18763",
-        #         "p18915",
-        #         "p19160",
-        #         "p19303",
-        #         "p19318",
-        #         "p19319",
-        #         "p19320",
-        #         "p19321",
-        #         "p19704",
-        #         "p19740",
-        #         "p19741",
-        #         "p19742",
-        #         "p20230",
-        #     ]
-        # ):
+        # if (not(prop["ownerGroup"] in ["p18539", "p18713","p18711", "p18763","p18915", "p19160","p19303","p19318","p19319","p19320","p19321","p19704","p19740", "p19741","p19742","p20230"])):
         #     continue
-        accessGroups.update(prop["accessGroups"])
+        for ag in prop["accessGroups"]:
+            accessGroups.add(ag)
 
         loc = prop["MeasurementPeriodList"][0]["instrument"]
         locations.add(loc)
@@ -84,7 +61,6 @@ def _collect_data(proposals):
         )
 
     return accessGroups, locations, proposalsStorage
-
 
 def _update_locations(log, loc_id, locations):
     locationStorage = {}
@@ -111,7 +87,7 @@ def _update_locations(log, loc_id, locations):
                 "https://www.psi.ch/", f"en/{loc[5:].lower()}", loc[5:].split("/")[-1]
             )
             filepath = os.path.abspath(img.filepath)
-            files = [{"filepath": filepath}]
+            files = [{"filepath": filepath}] 
         except IndexError as exc:
             print(exc)
 
@@ -119,12 +95,7 @@ def _update_locations(log, loc_id, locations):
             files = locations_snippet.files
 
         new_location = Location()
-        new_location.createACL = ["any-authenticated-user"]
-        new_location.readACL = ["any-authenticated-user"]
-        new_location.updateACL = [group]
-        new_location.deleteACL = ["admin"]
-        new_location.shareACL = ["admin"]
-        new_location.adminACL = ["admin"]
+        new_location.ownerGroup = group
         new_location.isPrivate = True
         new_location.location = loc
         new_location.name = loc.split("/")[-1]
@@ -132,9 +103,7 @@ def _update_locations(log, loc_id, locations):
 
         snip = log.post_location(**new_location.to_dict(include_none=False))
         locationStorage[loc] = snip
-        print("loc and locationStorage(loc):", loc, snip)
 
-    # print("locationStorage:",locationStorage)
     return locationStorage
 
 
@@ -144,15 +113,10 @@ def _update_proposals(log, locationStorage, proposalsStorage):
 
         locStr = proposal["location"]
         loc = locationStorage[locStr]
-        print("locStr,loc", locStr, loc)
-
+        
         new_snip = {
-            "createACL": [ownerGroup],
-            "readACL": [ownerGroup],
-            "updateACL": [ownerGroup],
-            "deleteACL": [*loc.updateACL],
-            "shareACL": [*loc.updateACL, ownerGroup],
-            "adminACL": [*loc.updateACL],
+            "ownerGroup": ownerGroup,
+            "accessGroups": [loc.ownerGroup],
             "isPrivate": False,
             "name": proposal["title"],
             "location": loc.id,
@@ -167,7 +131,7 @@ def _update_proposals(log, locationStorage, proposalsStorage):
         if not new_snip["description"]:
             new_snip["description"] = "No proposal found."
 
-        snips = log.get_snippets(snippetType="logbook", createACL=[ownerGroup])
+        snips = log.get_snippets(snippetType="logbook", ownerGroup=ownerGroup)
 
         if snips:
             print(f"Logbook exists already for ownerGroup {ownerGroup}")
