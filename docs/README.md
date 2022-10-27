@@ -1,7 +1,7 @@
-[scilog_logo.png](https://paulscherrerinstitute.github.io/scilog/scilog_logo.png)
+![scilog_logo.png](https://paulscherrerinstitute.github.io/scilog/scilog_logo.png)
 
 # SciLog Electronic Logbook Overview
-[Build Status](https://github.com/paulscherrerinstitute/scilog/actions/workflows/deploy-docu.yaml/badge.svg)
+![Build Status](https://github.com/paulscherrerinstitute/scilog/actions/workflows/deploy-docu.yaml/badge.svg)
 
 ## Why SciLog ?
 
