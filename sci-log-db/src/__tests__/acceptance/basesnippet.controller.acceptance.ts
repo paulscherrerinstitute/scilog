@@ -516,4 +516,35 @@ describe('Basesnippet', function (this: Suite) {
       .set('Content-Type', 'application/json')
       .expect(404);
   });
+
+  it('post a basesnippet with authentication and accessGroups should return 200 and have corresponding ACLs', async () => {
+    await client
+      .post('/basesnippets')
+      .set('Authorization', 'Bearer ' + token)
+      .set('Content-Type', 'application/json')
+      .send({...baseSnippet, accessGroups: ['anAccessGroup']})
+      .expect(200)
+      .then(
+        result => (
+          expect(result.body).to.containEql({
+            ..._.omit(baseSnippet, 'accessGroups'),
+            accessGroups: ['basesnippetAcceptance', 'anAccessGroup'],
+          }),
+          expect(result.body.snippetType).to.be.eql('base'),
+          expect(result.body.readACL).to.be.eql([
+            'basesnippetAcceptance',
+            'anAccessGroup',
+          ]),
+          expect(result.body.createACL).to.be.eql(['basesnippetAcceptance']),
+          expect(result.body.updateACL).to.be.eql(['basesnippetAcceptance']),
+          expect(result.body.deleteACL).to.be.eql(['basesnippetAcceptance']),
+          expect(result.body.shareACL).to.be.eql(['basesnippetAcceptance']),
+          expect(result.body.adminACL).to.be.eql(['admin@loopback.io']),
+          (nonVisibleSnippetId = result.body.id)
+        ),
+      )
+      .catch(err => {
+        throw err;
+      });
+  });
 });

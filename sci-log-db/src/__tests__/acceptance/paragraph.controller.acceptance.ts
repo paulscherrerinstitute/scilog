@@ -11,7 +11,6 @@ describe('Paragraph', function (this: Suite) {
   let paragraphSnippetId: string;
   const paragraphSnippet = {
     ownerGroup: 'paragraphAcceptance',
-    accessGroups: [],
     isPrivate: true,
     defaultOrder: 0,
     expiresAt: '2055-10-10T14:04:19.522Z',

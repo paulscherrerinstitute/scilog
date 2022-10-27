@@ -11,7 +11,6 @@ describe('Logbook', function (this: Suite) {
   let logbookSnippetId: string;
   const logbookSnippet = {
     ownerGroup: 'logbookAcceptance',
-    accessGroups: [],
     isPrivate: true,
     defaultOrder: 0,
     expiresAt: '2055-10-10T14:04:19.522Z',

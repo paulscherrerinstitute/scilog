@@ -148,10 +148,13 @@ export class AutoAddRepository<
   }
 
   private async readACL(
-    data: (Basesnippet | Logbook) & {ownerGroup?: string | undefined},
+    data: (Basesnippet | Logbook) & {
+      ownerGroup?: string | undefined;
+      accessGroups?: string[];
+    },
   ) {
     const result = await this.readOrDeleteACL(data, 'readACL', 'email');
-    return result;
+    return [...new Set(result.concat(data.accessGroups ?? []))];
   }
 
   private async deleteACL(
@@ -194,7 +197,7 @@ export class AutoAddRepository<
     readACL: string[];
   }) {
     data.ownerGroup = data.readACL?.[0] ?? '';
-    data.accessGroups = [];
+    data.accessGroups = data.readACL ?? [];
   }
 
   definePersistedModel(entityClass: typeof Model) {
@@ -234,34 +237,6 @@ export class AutoAddRepository<
           };
           ctx.where = this.addACLToFilter(ctx.where, adminCondition);
         }
-        // if (
-        //   ctx.data.createACL !== undefined ||
-        //   ctx.data.readACL !== undefined ||
-        //   ctx.data.updateACL !== undefined ||
-        //   ctx.data.deleteACL !== undefined ||
-        //   ctx.data.shareACL !== undefined ||
-        //   ctx.data.adminACL !== undefined
-        // ) {
-        //   // get instance data to check admin rights
-        //   const instance = ((await this.findById(
-        //     ctx.where.id,
-        //     {},
-        //     {currentUser: currentUser},
-        //   )) as unknown) as Basesnippet;
-        //   // console.log("Got instance since someoone tried to change ACLS:",instance)
-        //   if (
-        //     currentUser.roles.filter((element: string) =>
-        //       instance.adminACL.includes(element),
-        //     ).length === 0
-        //   ) {
-        //     delete ctx.data.createACL;
-        //     delete ctx.data.readACL;
-        //     delete ctx.data.updateACL;
-        //     delete ctx.data.deleteACL;
-        //     delete ctx.data.shareACL;
-        //     delete ctx.data.adminACL;
-        //   }
-        // }
       } else {
         if (ctx.isNewInstance) {
           // POST case

@@ -20,7 +20,6 @@ describe('Location', function (this: Suite) {
   let locationSnippetId: string;
   const locationSnippet = {
     ownerGroup: 'locationAcceptance',
-    accessGroups: [],
     isPrivate: true,
     defaultOrder: 0,
     expiresAt: '2055-10-10T14:04:19.522Z',

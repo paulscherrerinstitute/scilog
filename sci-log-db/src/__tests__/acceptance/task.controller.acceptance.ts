@@ -11,7 +11,6 @@ describe('TaskRepositorySnippet', function (this: Suite) {
   let taskSnippetId: string;
   const taskSnippet = {
     ownerGroup: 'taskAcceptance',
-    accessGroups: [],
     isPrivate: true,
     defaultOrder: 0,
     expiresAt: '2055-10-10T14:04:19.522Z',

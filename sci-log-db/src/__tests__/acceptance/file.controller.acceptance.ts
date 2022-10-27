@@ -11,7 +11,6 @@ describe('File controller services', function (this: Suite) {
   let fileSnippetId: string;
   const fileSnippet = {
     ownerGroup: 'filesnippetAcceptance',
-    accessGroups: [],
     isPrivate: true,
     defaultOrder: 0,
     expiresAt: '2055-10-10T14:04:19.522Z',
