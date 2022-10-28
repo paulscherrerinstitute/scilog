@@ -200,8 +200,8 @@ export class AutoAddRepository<
     accessGroups: string[];
     readACL: string[];
   }) {
-    data.ownerGroup = data.readACL?.[0] ?? '';
-    data.accessGroups = data.readACL ?? [];
+    data.ownerGroup = data.ownerGroup ?? data.readACL?.[0] ?? '';
+    data.accessGroups = data.accessGroups ?? data.readACL ?? [];
   }
 
   definePersistedModel(entityClass: typeof Model) {
