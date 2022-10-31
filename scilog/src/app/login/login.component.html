@@ -1,50 +1,49 @@
 <div class="background-image"></div>
 <div class="login-form-flex">
-    <mat-card class='mat-card'>
-      
-      <mat-card-title>
-          <img src="assets/scilog_logo.png" alt="SciLog" width="120" height="120">
-      </mat-card-title>
-      <mat-card-content class="content-container">
-        <div *ngIf="oAuth2Endpoint">
-          <button
-            class="oauth-login-button"
-            mat-raised-button
-            type="submit"
-            (click)="redirectOIDC(oAuth2Endpoint.authURL)"
-          >
-            <img
-              class="oauth-login-image"
-              *ngIf="oAuth2Endpoint.displayImage"
-              [src]="oAuth2Endpoint.displayImage"
-            />
-            Login with {{ oAuth2Endpoint.displayText }}
-          </button>
-          <br />
-        </div>
+  <mat-card class='mat-card'>
+
+    <mat-card-title>
+      <img src="assets/scilog_logo.png" alt="SciLog" width="120" height="120">
+    </mat-card-title>
+    <mat-card-content class="content-container">
+      <div *ngIf="oAuth2Endpoint">
+        <button class="oauth-login-button" mat-raised-button type="submit"
+          matTooltip=" {{ oAuth2Endpoint.toolTipText }}"
+          (click)=" redirectOIDC(oAuth2Endpoint.authURL)">
+          <img class="oauth-login-image" *ngIf="oAuth2Endpoint.displayImage" [src]="oAuth2Endpoint.displayImage" />
+          {{ oAuth2Endpoint.displayText }}
+        </button>
         <br />
+      </div>
+      <br />
+      <mat-expansion-panel hideToggle>
+        <mat-expansion-panel-header>
+          <mat-panel-description matTooltip="...like beamline manager, instrument responsible or admin">
+            Login with functional accounts
+          </mat-panel-description>
+        </mat-expansion-panel-header>
         <form [formGroup]="form" (keyup.enter)="login()">
-        <mat-form-field appearance="outline" class="mat-form-field">
-          <mat-label>User name</mat-label>
-          <input matInput [type]="'text'" formControlName="email">
-        </mat-form-field>
-        <br/>
-        <mat-form-field appearance="outline" class="mat-form-field">
+          <mat-form-field appearance="outline" class="mat-form-field">
+            <mat-label>User name</mat-label>
+            <input matInput [type]="'text'" formControlName="email">
+          </mat-form-field>
+          <br />
+          <mat-form-field appearance="outline" class="mat-form-field">
             <mat-label>Enter your password</mat-label>
             <input matInput [type]="hide ? 'password' : 'text'" formControlName="password">
-            <button mat-icon-button matSuffix (mousedown)="hide = !hide" [attr.aria-label]="'Hide password'" [attr.aria-pressed]="hide">
-            <mat-icon>{{hide ? 'visibility_off' : 'visibility'}}</mat-icon>
+            <button mat-icon-button matSuffix (mousedown)="hide = !hide" [attr.aria-label]="'Hide password'"
+              [attr.aria-pressed]="hide">
+              <mat-icon>{{hide ? 'visibility_off' : 'visibility'}}</mat-icon>
             </button>
           </mat-form-field>
           <div class="errorText">
             {{ loginMessage }}
           </div>
         </form>
-      </mat-card-content>
-      <mat-card-actions class="mat-card-actions">
-          <button mat-raised-button color="primary" (click)="login()">Login</button>          
-      </mat-card-actions>
-    </mat-card>
-  </div>
-
-
+        <mat-card-actions class="mat-card-actions">
+          <button mat-raised-button color="primary" (click)="login()">Login</button>
+        </mat-card-actions>
+      </mat-expansion-panel>
+    </mat-card-content>
+  </mat-card>
+</div>

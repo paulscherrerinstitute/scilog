@@ -1,0 +1,8 @@
+{
+    "lbBaseURL": "http://localhost:3000/",
+    "oAuth2Endpoint": {
+        "authURL": "auth/thirdparty/keycloak",
+        "displayText": "Normal User Login",
+        "toolTipText": "...like any normal user connected to your identity management system. Note that you may be redirected to an identity provider"
+    }
+}
