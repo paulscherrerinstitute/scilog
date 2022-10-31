@@ -1,154 +1,148 @@
 # Step by Step manual to Setup SciCat without Containers
 
-
-
-TODO That chapter needs a complete rewrite
-
-## Setup Backend 
+## Setup Backend
 
 ### Mongo
 
-The first part is to setup a Mongo DB, if not yet existing. You will need at least version 3.4 . In the simplest case a simple
+The first part is to setup a Mongo DB, if not yet existing. You will need at least version 4.2 . In the simplest case a simple
 ```
 yum install mongodb-server
 ```
 (on RedHat systems) or similar will suffice.
 
-A production ready setup however may require to setup a replicated DB server. Follow the Mongo DB Manuals in this case. E.g. at PSI we operate a 3 fold relicated Mongo DB server.
+A production ready setup however may require to setup a replicated DB server. Follow the Mongo DB Manuals in this case. E.g. at PSI we operate a 3 fold relicated Mongo DB server. A convenient option is to use the [Percona distribution(https://www.percona.com)
 
+The needed database will be created automatically when the API server starts.
 
 ### API Server
 
 #### Prerequisites
 
-First you need to have node/npm installed
+First you need to have node/npm installed, follow instructions at https://nodejs.org/en/download/
 
 ```
-npm version X or higher
-Node version Yor higher
+npm version 6 or higher
+Node version 14 or higher
 ```
-The needed database will be created automatically when the API server starts. 
 
 #### Get code
 ```
-git clone https://github.com/SciCatProject/catamel.git
-cd catamel
-git checkout master # (or develop)
+git clone https://github.com/paulscherrerinstitute/scilog.git
+cd scilog
+git checkout main
+```
+
+#### Start Backend
+```
+# adjust configuration if needed (functionalAccounts.json), see section below
+cd sci-log-db
 npm install
-```
-
-Please note: the master branch is often quite behind the development, therefore to get all new features you may want to use the develop branch instead.
-
-#### Setup configuration
- 
-There are 5 configuration files that need to be adjusted to your situation. There are example configuration files for each of the 4 configuration files inside the server directory
-
-1. `functionalAccounts.json` : defines the functional accounts, such as admin, ingestor etc
-2. `datasources.json` : defines the connection to the Mongo DB -sample datasources.json
-3. `providers.json` : defines the authentication source for user accounts, e.g. how to link to your local LDAP/AD server
-4. `config.local.js` : defines the API server details, API root address, your local site name and policy settings for , the PID prefix for your datasets, the type of message broker to use, the connection to an email send server etc
-5. `component-config.json`: defines the Express framework components, in particular if the *explorer* is enabled and optionally definition of the RabbitMQ topology, if used.
-
-Adjusting these settings to your infrastructure should be straight forward. In case you do not understand a setting just leave it at its default.
-
-##### Email Notifications
-
-When jobs have been submitted successfully, the `node-mailer` package can send an email to the user that initiated.
-The details are loaded into `server/config.local.js` and the following block provides an example:
-
-```
-smtpSettings: {
-      host: 'HOSTPATH',
-      port: 587,
-      secure: false,
-      auth: {user: DOMAIN\\USER', pass: 'PWD'}
-    },
-    smtpMessage: {
-      from: 'gac-dacats@psi.ch',
-      to: undefined,
-      subject: '[SciCat]',
-      text: undefined // can also set html key and this will override this
-    }
-```
-
-#### Start metadata server
-```
+npm run test
 npm run start
 ```
 
-#### Test functionality
+After that the API server is running on http://localhost:3000 . You can check that it is working by navigating to the [API explorer](http://localhost:3000/explorer)
 
+#### Start Frontend
+In a separate terminal type the following commands
 ```
-npm run test
-```
-
-You can in addition test the API server using the "explorer", e.g if you run the instance locally point your browser to https://localhost:3000/explorer (note the explorer might be disabled for production environments, check the `component-config.json` file)
-
-![API Explorer](img/explorer.png)
-
-You can use this web interface to test all the available API end points. If you test endpoints, which are protected by authentication, then you first need to login , get an accessToken and fill it into the accessToken field on top of the explorer web page
-
-## Setup GUI frontend
-These instructions will get you a copy of the project up and running on your local machine for development and testing purposes. See deployment for notes on how to deploy the project on a live system.
-
-### Prerequisites
-
-What things you need to install the software and how to install them
-
-```
-Angular v8 or higher
-npm version 6 or higher
-node version 10 or higher
-```
-
-### Installing
-
-Use git to clone the repository
-```
-git clone https://github.com/SciCatProject/catanie
-cd catanie
-```
-First install the required modules
-```
+# you may want to adjust the configuration before (scilog/src/assets/config.json), see below
+cd scilog
 npm install
-```
-Then build with the Angular CLI
-```
-npx ng build
+npm run test
+npm run start
 ```
 
-You can deploy a test server with the following command:
+After that the frontend can be reached at http://localhost:4200
+
+### Setup configuration
+
+There are the following configuration files that need to be adjusted to your situation.
+
+#### Backend
+
+1. `sci-log-db/functionalAccounts.json` : defines the functional accounts, such as admin, beamline accounts etc
+2. `sci-log-db/datasource.json` : defines the connection to the Mongo DB , default settings are in the code
+3. `oidc.json` : TODO
 
 ```
-npx ng serve 
+# Example functionalAccounts.json with admin and one beamline account
+[{
+        "username": "scilog-admin",
+        "firstName": "Admin",
+        "lastName": "Scilog",
+        "password": "...",
+        "email": "scilog-admin@gmail.com",
+        "roles": [
+            "admin",
+            "any-authenticated-user"
+        ]
+    },
+    {
+        "username": "swissfelaramis-alvra",
+        "firstName": "Aramis",
+        "lastName": "Alvra",
+        "password": "...",
+        "email": "swissfelaramis-alvra@gmail.com",
+        "roles": [
+            "swissfelaramis-alvra",
+            "any-authenticated-user"
+        ]
+        "location": "/PSI/SWISSFEL/ARAMIS-ALVRA
+    },
+
+]
+
+
+# Example datasource.json for connection to replica set cluster ()
+{
+    "name": "mongo",
+    "connector": "mongodb",
+    "url":"mongodb://scilogMaster:your-PWo@my-cluster-name-rs0.mongo.svc.cluster.local/scilog-development?replicaSet=rs0&authSource=scilog-development",
+    "host": "",
+    "port": "",
+    "user": "",
+    "password": "",
+    "database": "scilog-development",
+    "useNewUrlParser": true,
+    "useUnifiedTopology": true
+}
+
+
+### Example OIDC configuration oidc.json
+{
+    "session": false,
+    "provider": "oidc",
+    "authScheme": "openid connect",
+    "module": "passport-openidconnect",
+    "failureFlash": true,
+    "issuer": "https://kc.development.psi.ch/auth/realms/awi",
+    "authorizationURL": "https://kc.development.psi.ch/auth/realms/awi/protocol/openid-connect/auth",
+    "tokenURL": "https://kc.development.psi.ch/auth/realms/awi/protocol/openid-connect/token",
+    "userInfoURL": "https://kc.development.psi.ch/auth/realms/awi/protocol/openid-connect/userinfo",
+    "clientID": "scilog",
+    "clientSecret": "yourSecretHere",
+    "callbackURL": "http://localhost:3000/auth/keycloak/callback/",
+    "scope": ["email", "profile", "openid"],
+    "successRedirect": "http://localhost:4200/login",
+    "skipUserProfile": false
+}
+```
+#### Frontend
+
+1. `scilog/src/assets/config.json` : defines the API server endpoint and OIDC connection details
+
+```
+# Example config.json file
+{
+    "lbBaseURL": "http://localhost:3000/",
+    "oAuth2Endpoint": {
+        "authURL": "auth/thirdparty/keycloak",
+        "displayText": "keycloak IDP"
+    }
+}
 ```
 
 
-## Running the unit tests
 
-To run the unit tests, type:
-```
-npm test
-```
-
-
-### End to end tests
-
-To run the end to end tests, type:
-
-```
-npm run e2e
-```
-
-### Configuration
-
-You can fine tune the features that you want to use in the GUI by setting the flags inside the `src/environments` folder. In this folder you find several example configuraion files used by the Sites. Please adjust to your needs. The `angular.json` file contains a section "configurations" which defines a set of prepared configurations, that you can choose from. This defines which files will be picked up at build time. The build system defaults to the `environment.ts`, but if you e.g. do `ng build --env=development` then `environment.development.ts` will be used instead. Here is an [example configuration file](https://github.com/SciCatProject/catanie/blob/develop/src/environments/environment.development.ts)
-
-The most important configuration setting is the connection to the API server
-```
-lbBaseURL: "https://your-loopbak-api-server",
-```
-
-Many of the other settings are boolean flags, which allow you to switch on/off features of the GUI
-Again, if in doubt, just leave the setting as defined in the available example environment files or leave them empty.
 
