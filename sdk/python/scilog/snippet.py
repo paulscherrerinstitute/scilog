@@ -18,7 +18,7 @@ def typechecked(func):
                 )
             if len(func.__closure__) > 0:
                 property_name = func.__closure__[0].cell_contents.strip('_')
-                if obj._deprecated[property_name]:
+                if obj._deprecated.get(property_name):
                     warnings.warn(f"{property_name} is deprecated by {obj._deprecated_by[property_name]}")
         return func(obj, *args, **kwargs)
 

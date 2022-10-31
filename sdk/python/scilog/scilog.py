@@ -101,7 +101,7 @@ class SciLog:
 
     @pinned_to_logbook(["parentId", *ACLS])
     def post_location(self, **kwargs):
-        url = self.http_client.address + "/locations"
+        url = self.http_client.address + "/basesnippets"
         payload = kwargs
         if payload.get("files"):
             payload = self.upload_files(payload)
@@ -117,7 +117,7 @@ class SciLog:
             filesnippet = self._post_filesnippet(
                 file["filepath"],
                 **{key: val for key, val in payload.items() if key 
-                in ACLS + [k for k, v in self.logbook._deprecated_by if v == "ACLS"]},
+                in ACLS + [k for k, v in Filesnippet._deprecated_by.items() if v == "ACLS"]},
             )
             file["fileId"] = filesnippet.id
             file["accessHash"] = filesnippet.accessHash
