@@ -66,7 +66,7 @@ export class User extends Entity {
   @property({
     type: 'string',
   })
-  unxAccount?: string;
+  unxGroup?: string;
 
   constructor(data?: Partial<User>) {
     super(data);

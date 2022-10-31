@@ -1,7 +1,14 @@
 import {Client, expect} from '@loopback/testlab';
 import {Suite} from 'mocha';
 import {SciLogDbApplication} from '../..';
-import {clearDatabase, createUserToken, setupApplication} from './test-helper';
+import {
+  adminUser,
+  clearDatabase,
+  createAdminToken,
+  createUserToken,
+  setupApplication,
+} from './test-helper';
+import _ from 'lodash';
 
 describe('Logbook', function (this: Suite) {
   this.timeout(5000);
@@ -24,6 +31,7 @@ describe('Logbook', function (this: Suite) {
   before('setupApplication', async () => {
     ({app, client} = await setupApplication());
     await clearDatabase(app);
+    await createAdminToken(app, client);
     token = await createUserToken(app, client, ['logbookAcceptance']);
   });
 
@@ -267,5 +275,73 @@ describe('Logbook', function (this: Suite) {
       .set('Authorization', 'Bearer ' + token)
       .set('Content-Type', 'application/json')
       .expect(204);
+  });
+
+  it('post a logbook with authentication and should create default ACLS from parent', async () => {
+    const locationSnippet = {
+      isPrivate: true,
+      defaultOrder: 0,
+      expiresAt: '2055-10-10T14:04:19.522Z',
+      tags: ['aSearchableTag'],
+      dashboardName: 'string',
+      versionable: true,
+      name: 'aSearchableName',
+      location: 'anExistingLocation',
+    };
+
+    const locationResponse = await client
+      .post('/locations')
+      .set('Authorization', 'Bearer ' + token)
+      .set('Content-Type', 'application/json')
+      .send(locationSnippet);
+
+    await client
+      .post('/logbooks')
+      .set('Authorization', 'Bearer ' + token)
+      .set('Content-Type', 'application/json')
+      .send({
+        ..._.omit(logbookSnippet, 'location'),
+        accessGroups: ['anAccessGroups'],
+        location: locationResponse.body.id,
+      })
+      .expect(200)
+      .then(
+        result => (
+          expect(result.body).to.containEql({
+            ..._.omit(logbookSnippet, 'location'),
+            location: locationResponse.body.id,
+          }),
+          expect(result.body.snippetType).to.be.eql('logbook'),
+          expect(result.body.readACL).to.be.eql([
+            'logbookAcceptance',
+            'anAccessGroups',
+            adminUser.email,
+            adminUser.unxGroup,
+          ]),
+          expect(result.body.createACL).to.be.eql([
+            'logbookAcceptance',
+            adminUser.email,
+            adminUser.unxGroup,
+          ]),
+          expect(result.body.updateACL).to.be.eql([
+            'logbookAcceptance',
+            adminUser.email,
+            adminUser.unxGroup,
+          ]),
+          expect(result.body.deleteACL).to.be.eql([
+            'admin',
+            'logbookAcceptance',
+            adminUser.unxGroup,
+          ]),
+          expect(result.body.shareACL).to.be.eql([
+            adminUser.email,
+            adminUser.unxGroup,
+          ]),
+          expect(result.body.adminACL).to.be.eql(['admin', adminUser.unxGroup])
+        ),
+      )
+      .catch(err => {
+        throw err;
+      });
   });
 });

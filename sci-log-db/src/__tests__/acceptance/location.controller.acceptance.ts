@@ -20,6 +20,12 @@ describe('Location', function (this: Suite) {
   let locationSnippetId: string;
   const locationSnippet = {
     ownerGroup: 'locationAcceptance',
+    createACL: ['locationAcceptance'],
+    readACL: ['locationAcceptance'],
+    updateACL: ['locationAcceptance'],
+    deleteACL: ['locationAcceptance'],
+    adminACL: ['admin'],
+    shareACL: ['locationAcceptance'],
     isPrivate: true,
     defaultOrder: 0,
     expiresAt: '2055-10-10T14:04:19.522Z',
@@ -289,23 +295,41 @@ describe('Location', function (this: Suite) {
       .set('Authorization', 'Bearer ' + token)
       .set('Content-Type', 'application/json')
       .send({
-        ..._.omit(locationSnippet, 'location'),
+        ..._.omit(locationSnippet, [
+          'ownerGroup',
+          'createACL',
+          'deleteACL',
+          'readACL',
+          'updateACL',
+          'shareACL',
+          'adminACL',
+          'location',
+        ]),
         location: 'anExistingLocation',
       })
       .expect(200)
       .then(
         result => (
           expect(result.body).to.containEql({
-            ..._.omit(locationSnippet, 'location'),
-            location: 'anExistingLocation',
+            ..._.omit(locationSnippet, [
+              'ownerGroup',
+              'createACL',
+              'deleteACL',
+              'readACL',
+              'updateACL',
+              'shareACL',
+              'adminACL',
+              'location',
+            ]),
           }),
-          expect(result.body.readACL).to.be.eql([
-            locationSnippet.ownerGroup,
+          expect(result.body.readACL).to.be.eql(['any-authenticated-user']),
+          expect(result.body.deleteACL).to.be.eql(['admin']),
+          expect(result.body.adminACL).to.be.eql(['admin']),
+          expect(result.body.shareACL).to.be.eql(undefined),
+          expect(result.body.createACL).to.be.eql(undefined),
+          expect(result.body.updateACL).to.be.eql([
+            adminUser.unxGroup,
             adminUser.email,
-          ]),
-          expect(result.body.deleteACL).to.be.eql([
-            locationSnippet.ownerGroup,
-            adminUser.unxAccount,
           ])
         ),
       )

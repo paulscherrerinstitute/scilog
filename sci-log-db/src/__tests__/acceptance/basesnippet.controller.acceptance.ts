@@ -20,6 +20,12 @@ describe('Basesnippet', function (this: Suite) {
   let nonVisibleSnippetId: string;
   const baseSnippet = {
     ownerGroup: 'basesnippetAcceptance',
+    createACL: ['basesnippetAcceptance'],
+    readACL: ['basesnippetAcceptance'],
+    updateACL: ['basesnippetAcceptance'],
+    deleteACL: ['basesnippetAcceptance'],
+    adminACL: ['admin'],
+    shareACL: ['basesnippetAcceptance'],
     isPrivate: true,
     defaultOrder: 0,
     expiresAt: '2055-10-10T14:04:19.522Z',
@@ -62,7 +68,7 @@ describe('Basesnippet', function (this: Suite) {
           expect(result.body.createACL).to.be.eql(['basesnippetAcceptance']),
           expect(result.body.updateACL).to.be.eql(['basesnippetAcceptance']),
           expect(result.body.deleteACL).to.be.eql(['basesnippetAcceptance']),
-          expect(result.body.adminACL).to.be.eql(['admin@loopback.io']),
+          expect(result.body.adminACL).to.be.eql(['admin']),
           (baseSnippetId = result.body.id)
         ),
       )
@@ -395,36 +401,23 @@ describe('Basesnippet', function (this: Suite) {
       .expect(404);
   });
 
-  it('post a basesnippet with authentication and without ownerGroup should return 200 and contain baseSnippet', async () => {
-    await client
-      .post('/basesnippets')
-      .set('Authorization', 'Bearer ' + token)
-      .set('Content-Type', 'application/json')
-      .send(_.omit(baseSnippet, 'ownerGroup'))
-      .expect(200)
-      .then(
-        result => (
-          expect(result.body).to.containEql(_.omit(baseSnippet, 'ownerGroup')),
-          expect(result.body.snippetType).to.be.eql('base'),
-          expect(result.body.readACL).to.be.eql(undefined),
-          expect(result.body.createACL).to.be.eql(undefined),
-          expect(result.body.updateACL).to.be.eql(undefined),
-          expect(result.body.deleteACL).to.be.eql(undefined),
-          expect(result.body.shareACL).to.be.eql(undefined),
-          expect(result.body.adminACL).to.be.eql(['admin@loopback.io'])
-        ),
-      )
-      .catch(err => {
-        throw err;
-      });
-  });
-
   it('post a basesnippet with authentication and parentId from existing snippet should return 200 and have parent ACLS', async () => {
     await client
       .post('/basesnippets')
       .set('Authorization', 'Bearer ' + token)
       .set('Content-Type', 'application/json')
-      .send({..._.omit(baseSnippet, 'ownerGroup'), parentId: baseSnippetId})
+      .send({
+        ..._.omit(baseSnippet, [
+          'ownerGroup',
+          'createACL',
+          'deleteACL',
+          'readACL',
+          'updateACL',
+          'shareACL',
+          'adminACL',
+        ]),
+        parentId: baseSnippetId,
+      })
       .expect(200)
       .then(
         result => (
@@ -435,7 +428,7 @@ describe('Basesnippet', function (this: Suite) {
           expect(result.body.updateACL).to.be.eql(['basesnippetAcceptance']),
           expect(result.body.deleteACL).to.be.eql(['basesnippetAcceptance']),
           expect(result.body.shareACL).to.be.eql(['basesnippetAcceptance']),
-          expect(result.body.adminACL).to.be.eql(['admin@loopback.io'])
+          expect(result.body.adminACL).to.be.eql(['admin'])
         ),
       )
       .catch(err => {
@@ -468,7 +461,7 @@ describe('Basesnippet', function (this: Suite) {
           expect(result.body.updateACL).to.be.eql(['basesnippetAcceptance']),
           expect(result.body.deleteACL).to.be.eql(['basesnippetAcceptance']),
           expect(result.body.shareACL).to.be.eql(['basesnippetAcceptance']),
-          expect(result.body.adminACL).to.be.eql(['admin@loopback.io'])
+          expect(result.body.adminACL).to.be.eql(['admin'])
         ),
       )
       .catch(err => {
@@ -491,7 +484,7 @@ describe('Basesnippet', function (this: Suite) {
       .then(
         result => (
           expect(result.body).to.containEql({
-            ..._.omit(baseSnippet, 'ownerGroup'),
+            ..._.omit(baseSnippet, ['ownerGroup', 'readACL', 'updateACL']),
             ownerGroup: 'aReadACL',
           }),
           expect(result.body.snippetType).to.be.eql('base'),
@@ -500,7 +493,7 @@ describe('Basesnippet', function (this: Suite) {
           expect(result.body.updateACL).to.be.eql(['anUpdateACL']),
           expect(result.body.deleteACL).to.be.eql(['basesnippetAcceptance']),
           expect(result.body.shareACL).to.be.eql(['basesnippetAcceptance']),
-          expect(result.body.adminACL).to.be.eql(['admin@loopback.io']),
+          expect(result.body.adminACL).to.be.eql(['admin']),
           (nonVisibleSnippetId = result.body.id)
         ),
       )
@@ -515,37 +508,6 @@ describe('Basesnippet', function (this: Suite) {
       .set('Authorization', 'Bearer ' + token)
       .set('Content-Type', 'application/json')
       .expect(404);
-  });
-
-  it('post a basesnippet with authentication and accessGroups should return 200 and have corresponding ACLs', async () => {
-    await client
-      .post('/basesnippets')
-      .set('Authorization', 'Bearer ' + token)
-      .set('Content-Type', 'application/json')
-      .send({...baseSnippet, accessGroups: ['anAccessGroup']})
-      .expect(200)
-      .then(
-        result => (
-          expect(result.body).to.containEql({
-            ..._.omit(baseSnippet, 'accessGroups'),
-            accessGroups: ['basesnippetAcceptance', 'anAccessGroup'],
-          }),
-          expect(result.body.snippetType).to.be.eql('base'),
-          expect(result.body.readACL).to.be.eql([
-            'basesnippetAcceptance',
-            'anAccessGroup',
-          ]),
-          expect(result.body.createACL).to.be.eql(['basesnippetAcceptance']),
-          expect(result.body.updateACL).to.be.eql(['basesnippetAcceptance']),
-          expect(result.body.deleteACL).to.be.eql(['basesnippetAcceptance']),
-          expect(result.body.shareACL).to.be.eql(['basesnippetAcceptance']),
-          expect(result.body.adminACL).to.be.eql(['admin@loopback.io']),
-          (nonVisibleSnippetId = result.body.id)
-        ),
-      )
-      .catch(err => {
-        throw err;
-      });
   });
 
   it('get snippet with token and ownerGroup filter should be greater than one', async () => {

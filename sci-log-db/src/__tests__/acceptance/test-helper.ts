@@ -27,6 +27,15 @@ export const userData = {
   roles: ['p12345', 'any-authenticated-user'],
 };
 
+export const adminUser = {
+  email: 'admin@loopback.io',
+  firstName: 'Exampleadmin',
+  lastName: 'UserAdmin',
+  roles: ['admin', 'any-authenticated-user'],
+  location: 'anExistingLocation',
+  unxGroup: 'aUnxGroup',
+};
+
 export const oidcOptions = {
   issuer: 'issuer',
   authorizationURL: 'oidc-authorization-url',
@@ -97,14 +106,6 @@ export async function createAdminToken(
   return token;
 }
 export async function createAdminUser(app: SciLogDbApplication) {
-  const adminUser = {
-    email: 'admin@loopback.io',
-    firstName: 'Exampleadmin',
-    lastName: 'UserAdmin',
-    roles: ['admin', 'any-authenticated-user'],
-    location: 'anExistingLocation',
-    unxAccount: 'aUnxAccount',
-  };
   const user = await createAUser(app, [], adminUser);
   return user;
 }

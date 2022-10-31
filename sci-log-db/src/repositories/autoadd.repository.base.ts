@@ -12,10 +12,11 @@ import {
   repository,
   Where,
 } from '@loopback/repository';
-import {Logbook} from '../models';
+import {Location, Logbook} from '../models';
 import {Basesnippet} from '../models/basesnippet.model';
 import {defaultSequentially} from '../utils/misc';
 import {BasesnippetRepository} from './basesnippet.repository';
+import _ from 'lodash';
 
 export class AutoAddRepository<
   T extends Entity,
@@ -84,25 +85,47 @@ export class AutoAddRepository<
     const emptyAcls = this.acls.filter(acl => !data[acl as keyof Basesnippet]);
     if (emptyAcls) {
       const parent = await this.getParent(data);
-      const ownerGroup = data.ownerGroup ? [data.ownerGroup] : [];
-      await Promise.all(
-        emptyAcls.map(async k => {
-          const aclValue = defaultSequentially(
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            (this as any)[k]
-              ? // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                await (this as any)[k](data)
-              : ownerGroup,
-            parent[k as keyof Basesnippet],
-            [],
-          ) as string[];
-          if (aclValue.length > 0)
-            (data[k as keyof Basesnippet] as string[]) = aclValue;
-        }),
-      );
+      if (data.snippetType === 'location')
+        await this.addToACLIfNotEmpty(
+          emptyAcls,
+          data,
+          this.defaultLocationACL.bind(this),
+        );
+      else if (data.snippetType === 'logbook') {
+        const users = await this.getUnxGroupsEmail(
+          (parent as Location).location ?? '',
+        );
+        await this.addToACLIfNotEmpty(
+          emptyAcls,
+          data,
+          _.partial(this.defaultLogbookACL.bind(this), users),
+        );
+      } else
+        await this.addToACLIfNotEmpty(
+          emptyAcls,
+          data,
+          _.partial(this.defaultAllButLocationLogbookACL.bind(this), parent),
+        );
     }
     data.unsetAttribute('ownerGroup');
     data.unsetAttribute('accessGroups');
+  }
+
+  private async addToACLIfNotEmpty(
+    emptyAcls: string[],
+    data: (Basesnippet | Logbook) & {ownerGroup?: string | undefined},
+    callableFunction: Function,
+  ) {
+    await Promise.all(
+      emptyAcls.map(async k => {
+        const aclValue = defaultSequentially(
+          await callableFunction(k, data),
+          [],
+        ) as string[];
+        if (aclValue.length > 0)
+          (data[k as keyof Basesnippet] as string[]) = aclValue;
+      }),
+    );
   }
 
   private aclDefaultOnUpdate(
@@ -151,48 +174,134 @@ export class AutoAddRepository<
     return parentACL;
   }
 
-  private async readACL(
-    data: (Basesnippet | Logbook) & {
+  private async defaultLocationACL(aclType: string, data: Location) {
+    if (aclType === 'readACL') return ['any-authenticated-user'];
+    if (aclType === 'updateACL') {
+      const users = await this.getUnxGroupsEmail(data.location);
+      return [...new Set([...(users.unxGroup ?? []), ...(users.email ?? [])])];
+    }
+    if (aclType === 'deleteACL') return ['admin'];
+    if (aclType === 'adminACL') return ['admin'];
+  }
+
+  private defaultAllButLocationLogbookACL(
+    parent: Basesnippet,
+    aclType: string,
+  ) {
+    if (aclType === 'shareACL')
+      return [...new Set((parent.shareACL ?? []).concat(parent.readACL ?? []))];
+    return parent[aclType as keyof Basesnippet];
+  }
+
+  private defaultLogbookACL(
+    users: {unxGroup: string[]; email: string[]},
+    aclType: string,
+    data: {
+      snippetType: string;
       ownerGroup?: string | undefined;
       accessGroups?: string[];
     },
   ) {
-    const result = await this.readOrDeleteACL(data, 'readACL', 'email');
-    return [...new Set(result.concat(data.accessGroups ?? []))];
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const results = (this as any)[aclType](data, users);
+    return results;
   }
 
-  private async deleteACL(
-    data: (Basesnippet | Logbook) & {ownerGroup?: string | undefined},
+  private readACL(
+    data: {
+      ownerGroup?: string | undefined;
+      accessGroups?: string[];
+    },
+    users: {unxGroup: string[]; email: string[]},
   ) {
-    const result = await this.readOrDeleteACL(data, 'deleteACL', 'unxAccount');
-    return result;
+    return [
+      ...new Set([
+        ...(data.ownerGroup ? [data.ownerGroup] : []),
+        ...(data.accessGroups ?? []),
+        ...(users.email ?? []),
+        ...(users.unxGroup ?? []),
+      ]),
+    ];
   }
 
-  private async readOrDeleteACL(
-    data: (Basesnippet | Logbook) & {ownerGroup?: string | undefined},
-    type: string,
-    field: string,
+  private deleteACL(
+    data: {
+      ownerGroup?: string | undefined;
+    },
+    users: {unxGroup: string[]; email: string[]},
   ) {
-    let acl: string[] = [];
-    if (!data[type as keyof Basesnippet] && data.snippetType === 'location')
-      acl = (
-        await this.userRepository.find({
-          where: {
-            location: (data as Logbook).location,
-          },
-          fields: [field],
-        })
-      ).map(u => u[field]);
-    return [...new Set((data.ownerGroup ? [data.ownerGroup] : []).concat(acl))];
+    return [
+      ...new Set([
+        'admin',
+        ...(data.ownerGroup ? [data.ownerGroup] : []),
+        ...(users.unxGroup ?? []),
+      ]),
+    ];
   }
 
-  private async adminACL() {
-    return (
-      await this.userRepository.find({
-        where: {roles: 'admin'},
-        fields: ['email'],
-      })
-    ).map(u => u.email);
+  private createACL(
+    data: {
+      ownerGroup?: string | undefined;
+    },
+    users: {unxGroup: string[]; email: string[]},
+  ) {
+    return [
+      ...new Set([
+        ...(data.ownerGroup ? [data.ownerGroup] : []),
+        ...(users.email ?? []),
+        ...(users.unxGroup ?? []),
+      ]),
+    ];
+  }
+
+  private updateACL(
+    data: {
+      ownerGroup?: string | undefined;
+    },
+    users: {unxGroup: string[]; email: string[]},
+  ) {
+    return [
+      ...new Set([
+        ...(data.ownerGroup ? [data.ownerGroup] : []),
+        ...(users.email ?? []),
+        ...(users.unxGroup ?? []),
+      ]),
+    ];
+  }
+
+  private shareACL(
+    data: {
+      ownerGroup?: string | undefined;
+    },
+    users: {unxGroup: string[]; email: string[]},
+  ) {
+    return [...new Set([...(users.email ?? []), ...(users.unxGroup ?? [])])];
+  }
+
+  private adminACL(
+    data: {
+      ownerGroup?: string | undefined;
+    },
+    users: {unxGroup: string[]; email: string[]},
+  ) {
+    return [...new Set(['admin', ...(users.unxGroup ?? [])])];
+  }
+
+  private async getUnxGroupsEmail(location: string) {
+    const acl = await this.userRepository.find({
+      where: {
+        location: location,
+      },
+      fields: ['unxGroup', 'email'],
+    });
+    return acl.reduce(
+      (previousValue, currentValue) => (
+        previousValue.unxGroup.push(currentValue.unxGroup),
+        previousValue.email.push(currentValue.email),
+        previousValue
+      ),
+      {unxGroup: [] as string[], email: [] as string[]},
+    );
   }
 
   private addOwnerGroupAccessGroups(data: {
