@@ -3,7 +3,7 @@
 <html lang="" >
     <head>
         <meta charset="UTF-8">
-        <title>Import of elog data · SciLog Documentation</title>
+        <title>Import of elog data · HonKit</title>
         <meta http-equiv="X-UA-Compatible" content="IE=edge" />
         <meta name="description" content="">
         <meta name="generator" content="HonKit 4.0.4">
@@ -14,10 +14,6 @@
     <link rel="stylesheet" href="../gitbook/style.css">
 
     
-            
-                
-                <link rel="stylesheet" href="../gitbook/gitbook-plugin-chapter-fold/chapter-fold.css">
-                
             
                 
                 <link rel="stylesheet" href="../gitbook/@honkit/honkit-plugin-highlight/website.css">
@@ -487,7 +483,51 @@
                                 <section class="normal markdown-section">
                                 
                                 <h1 id="migration-of-data-from-elog-to-scilog">Migration of data from elog to SciLog</h1>
-
+<p>You may have data residing in the <a href="https://elog.psi.ch/elog/" target="_blank">electronic logbook system from Stefan Ritt</a> .
+In case you want to migrate this data to SciLog, here is a description of the steps needed. 
+Please note that the concrete steps will likely need adjustments to your specific elog notebooks, 
+e.g. depending on the structure of the fields that have been used in elog.</p>
+<p>The whole process is a 3 step procedure: the example scripts are assuming that you have a working Python environment, e.g. setup via conda.</p>
+<pre><code># get the python SDK to talk to elog logbooks
+conda install -c paulscherrerinstitute elog
+# get the python SDK to talk to SciLog logbooks
+TODO pip  install scilog/sdk/python
+TODO, add requirments.txt
+</code></pre><h2 id="step-1-dump-data-from-elog">Step 1: Dump data from elog</h2>
+<pre><code>cd importTools/elog
+# create dump file of all entries in elogbook including images
+./elogdump.py URL-TO-ELOG-BOOK 
+# extract author information form dump files
+./collect_authors.py
+# and map authors to email address in 
+./convert_authors.py
+</code></pre><h2 id="step-2-convert-to-scilog-syntax">Step 2: Convert to scilog syntax</h2>
+<pre><code># this step creates the file scilog.json
+./e2sci.py
+</code></pre><h2 id="step-3-import-dumped-data-to-scilog">Step 3: Import dumped data to SciLog</h2>
+<pre><code>cd ..
+# select the proper env file one for the right destination
+source import.env 
+# initialize locations and logbooks from proposal data inside SciLog
+# this step is highly site specific. 
+# In the example this information is fetched from the proposal data stored inside the data catalog
+# which itself is derived from the data inside the digital user office.
+# For your site you may want to add this information manually instead
+./update_locations.py
+# now fill the logbooks with data dumped from elog
+./importToScilog.py
+</code></pre><p>Here is an example import. env files:</p>
+<pre><code># for tests on local system
+export SCICAT_URL=https://dacat.psi.ch/api/v3
+export SCICAT_LOGIN=Users/login
+export SCICAT_USERNAME=proposalIngestor
+export SCICAT_PWD=....
+export SCILOG_URL=http://localhost:3000
+export SCILOG_LOGIN=users/login
+export SCILOG_USERNAME=scilog-admin@psi.ch
+export SCILOG_PWD=....
+export SCILOG_DEFAULT_LOGBOOK_ICON=../sci-log-db/src/scilog_config_PSI/default_logbook_icon.jpg
+</code></pre>
                                 
                                 </section>
                             
@@ -530,7 +570,7 @@
     <script>
         var gitbook = gitbook || [];
         gitbook.push(function() {
-            gitbook.page.hasChanged({"page":{"title":"Import of elog data","level":"1.3.3","depth":2,"next":{"title":"Operator Guide","level":"1.4","depth":1,"path":"Operator/README.md","ref":"Operator/README.md","articles":[{"title":"Configuration files","level":"1.4.1","depth":2,"path":"Operator/Environment.md","ref":"Operator/Environment.md","articles":[]},{"title":"Login and Accounts","level":"1.4.2","depth":2,"path":"Operator/Login.md","ref":"Operator/Login.md","articles":[]},{"title":"Step by Step instruction","level":"1.4.3","depth":2,"path":"Operator/Step_by_Step_Setup.md","ref":"Operator/Step_by_Step_Setup.md","articles":[]},{"title":"Deploy with Docker Compose","level":"1.4.4","depth":2,"path":"Operator/Step_by_Step_Setup_Docker.md","ref":"Operator/Step_by_Step_Setup_Docker.md","articles":[]},{"title":"Deploy with Kubernetes","level":"1.4.5","depth":2,"path":"Operator/Step_by_Step_Setup_Kubernetes.md","ref":"Operator/Step_by_Step_Setup_Kubernetes.md","articles":[]}]},"previous":{"title":"Python SDK Usage","level":"1.3.2","depth":2,"path":"Ingestor/PythonSDK.md","ref":"Ingestor/PythonSDK.md","articles":[]},"dir":"ltr"},"config":{"plugins":["chapter-fold"],"styles":{"website":"styles/website.css","pdf":"styles/pdf.css","epub":"styles/epub.css","mobi":"styles/mobi.css","ebook":"styles/ebook.css","print":"styles/print.css"},"pluginsConfig":{"chapter-fold":{},"highlight":{},"search":{},"lunr":{"maxIndexSize":1000000,"ignoreSpecialCharacters":false},"fontsettings":{"theme":"white","family":"sans","size":2},"theme-default":{"styles":{"website":"styles/website.css","pdf":"styles/pdf.css","epub":"styles/epub.css","mobi":"styles/mobi.css","ebook":"styles/ebook.css","print":"styles/print.css"},"showLevel":false}},"theme":"default","pdf":{"pageNumbers":true,"fontSize":12,"fontFamily":"Arial","paperSize":"a4","chapterMark":"pagebreak","pageBreaksBefore":"/","margin":{"right":62,"left":62,"top":56,"bottom":56},"embedFonts":false},"structure":{"langs":"LANGS.md","readme":"README.md","glossary":"GLOSSARY.md","summary":"SUMMARY.md"},"variables":{},"title":"SciLog Documentation","gitbook":"*"},"file":{"path":"Ingestor/MigrateElogData.md","mtime":"2022-10-27T13:52:14.394Z","type":"markdown"},"gitbook":{"version":"4.0.4","time":"2022-10-27T13:52:33.158Z"},"basePath":"..","book":{"language":""}});
+            gitbook.page.hasChanged({"page":{"title":"Import of elog data","level":"1.3.3","depth":2,"next":{"title":"Operator Guide","level":"1.4","depth":1,"path":"Operator/README.md","ref":"Operator/README.md","articles":[{"title":"Configuration files","level":"1.4.1","depth":2,"path":"Operator/Environment.md","ref":"Operator/Environment.md","articles":[]},{"title":"Login and Accounts","level":"1.4.2","depth":2,"path":"Operator/Login.md","ref":"Operator/Login.md","articles":[]},{"title":"Step by Step instruction","level":"1.4.3","depth":2,"path":"Operator/Step_by_Step_Setup.md","ref":"Operator/Step_by_Step_Setup.md","articles":[]},{"title":"Deploy with Docker Compose","level":"1.4.4","depth":2,"path":"Operator/Step_by_Step_Setup_Docker.md","ref":"Operator/Step_by_Step_Setup_Docker.md","articles":[]},{"title":"Deploy with Kubernetes","level":"1.4.5","depth":2,"path":"Operator/Step_by_Step_Setup_Kubernetes.md","ref":"Operator/Step_by_Step_Setup_Kubernetes.md","articles":[]}]},"previous":{"title":"Python SDK Usage","level":"1.3.2","depth":2,"path":"Ingestor/PythonSDK.md","ref":"Ingestor/PythonSDK.md","articles":[]},"dir":"ltr"},"config":{"gitbook":"*","theme":"default","variables":{},"plugins":[],"pluginsConfig":{"highlight":{},"search":{},"lunr":{"maxIndexSize":1000000,"ignoreSpecialCharacters":false},"fontsettings":{"theme":"white","family":"sans","size":2},"theme-default":{"styles":{"website":"styles/website.css","pdf":"styles/pdf.css","epub":"styles/epub.css","mobi":"styles/mobi.css","ebook":"styles/ebook.css","print":"styles/print.css"},"showLevel":false}},"structure":{"langs":"LANGS.md","readme":"README.md","glossary":"GLOSSARY.md","summary":"SUMMARY.md"},"pdf":{"pageNumbers":true,"fontSize":12,"fontFamily":"Arial","paperSize":"a4","chapterMark":"pagebreak","pageBreaksBefore":"/","margin":{"right":62,"left":62,"top":56,"bottom":56},"embedFonts":false},"styles":{"website":"styles/website.css","pdf":"styles/pdf.css","epub":"styles/epub.css","mobi":"styles/mobi.css","ebook":"styles/ebook.css","print":"styles/print.css"}},"file":{"path":"Ingestor/MigrateElogData.md","mtime":"2022-10-31T09:52:09.226Z","type":"markdown"},"gitbook":{"version":"4.0.4","time":"2022-10-31T09:52:21.661Z"},"basePath":"..","book":{"language":""}});
         });
     </script>
 </div>
@@ -582,10 +622,6 @@
     </script>
     <script src="../gitbook/gitbook.js"></script>
     <script src="../gitbook/theme.js"></script>
-    
-        
-        <script src="../gitbook/gitbook-plugin-chapter-fold/chapter-fold.js"></script>
-        
     
         
         <script src="../gitbook/gitbook-plugin-search/search-engine.js"></script>
