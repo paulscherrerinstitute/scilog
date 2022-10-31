@@ -296,6 +296,7 @@ export class AutoAddRepository<
           'Unexpected user context: Current user cannot be retrieved.',
         );
       }
+      this.groupsToAclFilter(ctx.query.where);
       // console.log("roles:", currentUser?.roles);
       // console.log("access case:", JSON.stringify(ctx, null, 3));
       const groups = [
@@ -366,6 +367,33 @@ export class AutoAddRepository<
 
     return modelClass;
   }
+
+  // eslint-disable-next-line  @typescript-eslint/no-explicit-any
+  private groupsToAclFilter(object: any) {
+    if (!object) return;
+    if (object.ownerGroup && object.accessGroups) {
+      object.and = [
+        {readACL: object.ownerGroup},
+        {readACL: object.accessGroups},
+      ];
+      delete object.ownerGroup;
+      delete object.accessGroups;
+    } else if (object.ownerGroup) {
+      object.readACL = object.ownerGroup;
+      delete object.ownerGroup;
+    } else if (object.accessGroups) {
+      object.readACL = object.accessGroups;
+      delete object.accessGroups;
+    }
+
+    for (const objKey of Object.keys(object)) {
+      if (typeof object[objKey] === 'object') {
+        this.groupsToAclFilter(object[objKey]);
+      }
+    }
+  }
+
+  private groupsToACL(where: Where<Basesnippet>) {}
 
   private addACLToFilter(
     where: Where<Basesnippet>,

@@ -547,4 +547,92 @@ describe('Basesnippet', function (this: Suite) {
         throw err;
       });
   });
+
+  it('get snippet with token and ownerGroup filter should be greater than one', async () => {
+    const ownerGroupFilter = {where: {ownerGroup: baseSnippet.ownerGroup}};
+    await client
+      .get(`/basesnippets?filter=${JSON.stringify(ownerGroupFilter)}`)
+      .set('Authorization', 'Bearer ' + token)
+      .set('Content-Type', 'application/json')
+      .expect(200)
+      .then(result => expect(result.body.length).to.be.greaterThan(1))
+      .catch(err => {
+        throw err;
+      });
+  });
+
+  it('get snippet with token and ownerGroup and accessGroups filter should be greater than one', async () => {
+    const filter = {
+      where: {
+        ownerGroup: baseSnippet.ownerGroup,
+        accessGroups: baseSnippet.ownerGroup,
+      },
+    };
+    await client
+      .get(`/basesnippets?filter=${JSON.stringify(filter)}`)
+      .set('Authorization', 'Bearer ' + token)
+      .set('Content-Type', 'application/json')
+      .expect(200)
+      .then(result => expect(result.body.length).to.be.greaterThan(1))
+      .catch(err => {
+        throw err;
+      });
+  });
+
+  it('get snippet with token and accessGroups filter should be greater than one', async () => {
+    const filter = {where: {accessGroups: baseSnippet.ownerGroup}};
+    await client
+      .get(`/basesnippets?filter=${JSON.stringify(filter)}`)
+      .set('Authorization', 'Bearer ' + token)
+      .set('Content-Type', 'application/json')
+      .expect(200)
+      .then(result => expect(result.body.length).to.be.greaterThan(1))
+      .catch(err => {
+        throw err;
+      });
+  });
+
+  it('get snippet with token and non existing ownerGroup filter should be zero', async () => {
+    const filter = {where: {ownerGroup: 'aNonExtingOwnerGroup'}};
+    await client
+      .get(`/basesnippets?filter=${JSON.stringify(filter)}`)
+      .set('Authorization', 'Bearer ' + token)
+      .set('Content-Type', 'application/json')
+      .expect(200)
+      .then(result => expect(result.body.length).to.be.eql(0))
+      .catch(err => {
+        throw err;
+      });
+  });
+
+  it('get snippet with token and non existing accessGroups filter should be zero', async () => {
+    const filter = {where: {accessGroups: 'aNonExtingAccessGroup'}};
+    await client
+      .get(`/basesnippets?filter=${JSON.stringify(filter)}`)
+      .set('Authorization', 'Bearer ' + token)
+      .set('Content-Type', 'application/json')
+      .expect(200)
+      .then(result => expect(result.body.length).to.be.eql(0))
+      .catch(err => {
+        throw err;
+      });
+  });
+
+  it('get snippet with token and ownerGroup and non existing accessGroups filter should be greater than one', async () => {
+    const filter = {
+      where: {
+        ownerGroup: baseSnippet.ownerGroup,
+        accessGroups: 'aNonExtingAccessGroup',
+      },
+    };
+    await client
+      .get(`/basesnippets?filter=${JSON.stringify(filter)}`)
+      .set('Authorization', 'Bearer ' + token)
+      .set('Content-Type', 'application/json')
+      .expect(200)
+      .then(result => expect(result.body.length).to.be.eql(0))
+      .catch(err => {
+        throw err;
+      });
+  });
 });
