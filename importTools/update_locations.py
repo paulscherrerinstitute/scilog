@@ -18,8 +18,6 @@ def prepare_location_snippet(log):
 
     filepath = os.environ["SCILOG_DEFAULT_LOGBOOK_ICON"]
     location_snippet = {
-        "ownerGroup": "admin",
-        "accessGroups": ["any-authenticated-user"],
         "isPrivate": True,
         "snippetType": "location",
         "name": "root",
@@ -115,8 +113,6 @@ def _update_proposals(log, locationStorage, proposalsStorage):
         loc = locationStorage[locStr]
         
         new_snip = {
-            "ownerGroup": ownerGroup,
-            "accessGroups": [loc.ownerGroup],
             "isPrivate": False,
             "name": proposal["title"],
             "location": loc.id,
@@ -155,8 +151,7 @@ class ClientSettingsFromEnv:
 
 
 if __name__ == "__main__":
-    # load_dotenv("./SCICAT.env")
-    # load_dotenv("./SCILOG.env")
+    load_dotenv()
     scicat = ClientSettingsFromEnv("SCICAT")
 
     scilog = ClientSettingsFromEnv("SCILOG")
