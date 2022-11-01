@@ -93,7 +93,6 @@ def _update_locations(log, loc_id, locations):
             files = locations_snippet.files
 
         new_location = Location()
-        new_location.ownerGroup = group
         new_location.isPrivate = True
         new_location.location = loc
         new_location.name = loc.split("/")[-1]
@@ -113,6 +112,7 @@ def _update_proposals(log, locationStorage, proposalsStorage):
         loc = locationStorage[locStr]
         
         new_snip = {
+            "ownerGroup": ownerGroup,
             "isPrivate": False,
             "name": proposal["title"],
             "location": loc.id,
