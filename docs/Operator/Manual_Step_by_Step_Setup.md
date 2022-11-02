@@ -4,7 +4,7 @@
 
 ### Mongo
 
-The first part is to setup a Mongo DB, if not yet existing. You will need at least version 4.2 . In the simplest case a simple
+The first part is to setup a Mongo DB, if not yet existing. You will need at least version 4.4 . In the simplest case a simple
 ```
 yum install mongodb-server
 ```
