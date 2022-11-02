@@ -60,6 +60,7 @@ class SciLog:
 
     @staticmethod
     def _replace_json_placeholder(snippet: dict, field: str, data: Any) -> dict:
+        if not snippet.get(field): return snippet
         if isinstance(snippet[field], list):
             if "default" in snippet[field]:
                 data = set(data) | set(group for group in snippet[field] if group)
@@ -101,7 +102,7 @@ class SciLog:
 
     @pinned_to_logbook(["parentId", *ACLS])
     def post_location(self, **kwargs):
-        url = self.http_client.address + "/basesnippets"
+        url = self.http_client.address + "/basesnippet"
         payload = kwargs
         if payload.get("files"):
             payload = self.upload_files(payload)
