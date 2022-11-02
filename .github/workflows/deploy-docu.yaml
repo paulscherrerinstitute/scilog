@@ -1,0 +1,29 @@
+name: Build and deploy docu
+
+on:
+  push:
+    branches:
+      - feature/addDocumentation
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Build
+        run: |
+          cd docs
+          npm install
+          npx honkit build . docs
+
+      - name: Deploy
+        uses: crazy-max/ghaction-github-pages@v3
+        with:
+          target_branch: gh-pages
+          keep_history: true
+          allow_empty_commit: true
+          build_dir: docs/docs
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
