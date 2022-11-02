@@ -144,14 +144,8 @@ for fn in fns:
     data_out["updatedBy"] = author
 
     pgroup = data_in.pop("P-Group", default_pgroup)
-
-    data_out["createACL"] = [pgroup]
-    data_out["readACL"] = ["default"]
-    data_out["updateACL"] = ["default"]
-    data_out["deleteACL"] = ["default"]
-    data_out["shareACL"] = ["default"]
-    data_out["adminACL"] = ["default"]
-
+    data_out["ownerGroup"] = pgroup
+    
     attchs = data_in.pop("attachments")
     # remove empty entries which seem sometimes to appear
     while '' in attchs:

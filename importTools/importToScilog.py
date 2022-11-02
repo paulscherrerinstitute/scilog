@@ -9,7 +9,9 @@ clargs = parser.parse_args()
 # pgroup = clargs.pgroup
 url = clargs.url
 
+import os
 
+from dotenv import load_dotenv
 import urllib3
 
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
@@ -28,10 +30,10 @@ with open("./elog/scilog.json", "r") as stream:
     snippets = json.loads(content)
 
 for snippet in snippets:
-    owner=snippet["createACL"]
+    owner=snippet["ownerGroup"]
     if owner == "any-authenticated-user":
         continue
-    logbooks = log.get_logbooks(createACL=owner)
+    logbooks = log.get_logbooks(ownerGroup=owner)
     assert len(logbooks) >= 1
     logbook = logbooks[0]
     log.select_logbook(logbook)
