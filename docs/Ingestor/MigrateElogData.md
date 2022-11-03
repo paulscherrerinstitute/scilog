@@ -11,14 +11,14 @@ The whole process is a 3 step procedure: the example scripts are assuming that y
 # get the python SDK to talk to elog logbooks
 conda install -c paulscherrerinstitute elog
 # get the python SDK to talk to SciLog logbooks
-TODO pip  install scilog/sdk/python
-TODO, add requirments.txt
+cd importTools
+pip install -r requirements.txt --no-cache-dir
 ```
 
 ## Step 1: Dump data from elog
 
 ```
-cd importTools/elog
+cd elog
 # create dump file of all entries in elogbook including images
 ./elogdump.py URL-TO-ELOG-BOOK 
 # extract author information form dump files
