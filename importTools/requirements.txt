@@ -3,5 +3,5 @@ charset-normalizer==2.1.0
 idna==3.3
 python-dotenv==0.20.0
 requests==2.28.1
-scilog @ git+https://github.com/paulscherrerinstitute/scilog.git@c04d241a3edbb1e3fef9646f49f83546297ad690#subdirectory=sdk/python
+scilog @ git+https://github.com/paulscherrerinstitute/scilog.git@de7e7892bc8f3ed4b630d67cb0a68880b4f418cc#subdirectory=sdk/python
 urllib3==1.26.11
