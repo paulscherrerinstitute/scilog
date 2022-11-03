@@ -102,7 +102,7 @@ class SciLog:
 
     @pinned_to_logbook(["parentId", *ACLS])
     def post_location(self, **kwargs):
-        url = self.http_client.address + "/basesnippet"
+        url = self.http_client.address + "/basesnippets"
         payload = kwargs
         if payload.get("files"):
             payload = self.upload_files(payload)
