@@ -153,7 +153,7 @@ class ClientSettingsFromEnv:
 
 
 if __name__ == "__main__":
-    load_dotenv('.env.qa')
+    load_dotenv()
     scicat = ClientSettingsFromEnv("SCICAT")
 
     scilog = ClientSettingsFromEnv("SCILOG")
