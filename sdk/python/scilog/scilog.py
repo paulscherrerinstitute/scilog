@@ -14,19 +14,21 @@ from .snippet import Basesnippet, Filesnippet, Location, Paragraph, Snippet
 ACLS = ["createACL", "readACL", "updateACL", "deleteACL", "shareACL", "adminACL"]
 
 
-def pinned_to_logbook(logbook_keys):
+def pinned_to_logbook(logbook_keys, include_none=False):
     def pinned_to_logbook_inner(func):
         @functools.wraps(func)
         def pinned_to_logbook_call(log, *args, **kwargs):
             if not isinstance(log.logbook, Basesnippet):
                 warnings.warn("No logbook selected.")
             else:
+                logbook = log.logbook.to_dict(include_none=include_none)
                 for key in logbook_keys:
                     if key not in kwargs:
                         if key == "parentId":
                             kwargs[key] = log.logbook.id
                         else:
-                            kwargs[key] = getattr(log.logbook, key)
+                            if logbook.get(key): 
+                                kwargs[key] = logbook[key]
             return func(log, *args, **kwargs)
 
         return pinned_to_logbook_call
