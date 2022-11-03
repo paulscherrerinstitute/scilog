@@ -257,20 +257,7 @@
             <ul class="articles">
                 
     
-        <li class="chapter " data-level="1.4.1" data-path="Environment.html">
-            
-                <a href="Environment.html">
-            
-                    
-                    Configuration files
-            
-                </a>
-            
-
-            
-        </li>
-    
-        <li class="chapter " data-level="1.4.2" data-path="Login.html">
+        <li class="chapter " data-level="1.4.1" data-path="Login.html">
             
                 <a href="Login.html">
             
@@ -283,7 +270,7 @@
             
         </li>
     
-        <li class="chapter active" data-level="1.4.3" data-path="Step_by_Step_Setup.html">
+        <li class="chapter active" data-level="1.4.2" data-path="Step_by_Step_Setup.html">
             
                 <a href="Step_by_Step_Setup.html">
             
@@ -296,7 +283,7 @@
             
         </li>
     
-        <li class="chapter " data-level="1.4.4" data-path="Step_by_Step_Setup_Docker.html">
+        <li class="chapter " data-level="1.4.3" data-path="Step_by_Step_Setup_Docker.html">
             
                 <a href="Step_by_Step_Setup_Docker.html">
             
@@ -309,7 +296,7 @@
             
         </li>
     
-        <li class="chapter " data-level="1.4.5" data-path="Step_by_Step_Setup_Kubernetes.html">
+        <li class="chapter " data-level="1.4.4" data-path="Step_by_Step_Setup_Kubernetes.html">
             
                 <a href="Step_by_Step_Setup_Kubernetes.html">
             
@@ -482,10 +469,120 @@
     
                                 <section class="normal markdown-section">
                                 
-                                <h1 id="step-by-step-instruction">Step by Step instruction</h1>
-<p>Description how to install components manually with no containerization</p>
-<p>TODO</p>
+                                <h1 id="step-by-step-manual-to-setup-scicat-without-containers">Step by Step manual to Setup SciCat without Containers</h1>
+<h2 id="setup-backend">Setup Backend</h2>
+<h3 id="mongo">Mongo</h3>
+<p>The first part is to setup a Mongo DB, if not yet existing. You will need at least version 4.4 . In the simplest case a simple</p>
+<pre><code>yum install mongodb-server
+</code></pre><p>(on RedHat systems) or similar will suffice.</p>
+<p>A production ready setup however may require to setup a replicated DB server. Follow the Mongo DB Manuals in this case. E.g. at PSI we operate a 3 fold relicated Mongo DB server. A convenient option is to use the [Percona distribution(<a href="https://www.percona.com" target="_blank">https://www.percona.com</a>)</p>
+<p>The needed database will be created automatically when the API server starts.</p>
+<h3 id="api-server">API Server</h3>
+<h4 id="prerequisites">Prerequisites</h4>
+<p>First you need to have node/npm installed, follow instructions at <a href="https://nodejs.org/en/download/" target="_blank">https://nodejs.org/en/download/</a></p>
+<pre><code>npm version 6 or higher
+Node version 14 or higher
+</code></pre><h4 id="get-code">Get code</h4>
+<pre><code>git clone https://github.com/paulscherrerinstitute/scilog.git
+cd scilog
+git checkout main
+</code></pre><h4 id="start-backend">Start Backend</h4>
+<pre><code># adjust configuration if needed (functionalAccounts.json), see section below
+cd sci-log-db
+npm install
+npm run test
+npm run start
+</code></pre><p>After that the API server is running on <a href="http://localhost:3000" target="_blank">http://localhost:3000</a> . You can check that it is working by navigating to the <a href="http://localhost:3000/explorer" target="_blank">API explorer</a></p>
+<h4 id="start-frontend">Start Frontend</h4>
+<p>In a separate terminal type the following commands</p>
+<pre><code># you may want to adjust the configuration before (scilog/src/assets/config.json), see below
+cd scilog
+npm install
+npm run test
+npm run start
+</code></pre><p>After that the frontend can be reached at <a href="http://localhost:4200" target="_blank">http://localhost:4200</a></p>
+<h3 id="setup-configuration">Setup configuration</h3>
+<p>There are the following configuration files that need to be adjusted to your situation.</p>
+<h4 id="backend">Backend</h4>
+<ol>
+<li><code>sci-log-db/functionalAccounts.json</code> : defines the functional accounts, such as admin, beamline accounts etc</li>
+<li><code>sci-log-db/datasource.json</code> : defines the connection to the Mongo DB , default settings are in the code</li>
+<li><code>oidc.json</code> : TODO</li>
+</ol>
+<pre><code># Example functionalAccounts.json with admin and one beamline account
+[{
+        &quot;username&quot;: &quot;scilog-admin&quot;,
+        &quot;firstName&quot;: &quot;Admin&quot;,
+        &quot;lastName&quot;: &quot;Scilog&quot;,
+        &quot;password&quot;: &quot;...&quot;,
+        &quot;email&quot;: &quot;scilog-admin@gmail.com&quot;,
+        &quot;roles&quot;: [
+            &quot;admin&quot;,
+            &quot;any-authenticated-user&quot;
+        ]
+    },
+    {
+        &quot;username&quot;: &quot;swissfelaramis-alvra&quot;,
+        &quot;firstName&quot;: &quot;Aramis&quot;,
+        &quot;lastName&quot;: &quot;Alvra&quot;,
+        &quot;password&quot;: &quot;...&quot;,
+        &quot;email&quot;: &quot;swissfelaramis-alvra@gmail.com&quot;,
+        &quot;roles&quot;: [
+            &quot;swissfelaramis-alvra&quot;,
+            &quot;any-authenticated-user&quot;
+        ]
+        &quot;location&quot;: &quot;/PSI/SWISSFEL/ARAMIS-ALVRA
+    },
 
+]
+
+
+# Example datasource.json for connection to replica set cluster ()
+{
+    &quot;name&quot;: &quot;mongo&quot;,
+    &quot;connector&quot;: &quot;mongodb&quot;,
+    &quot;url&quot;:&quot;mongodb://scilogMaster:your-PWo@my-cluster-name-rs0.mongo.svc.cluster.local/scilog-development?replicaSet=rs0&amp;authSource=scilog-development&quot;,
+    &quot;host&quot;: &quot;&quot;,
+    &quot;port&quot;: &quot;&quot;,
+    &quot;user&quot;: &quot;&quot;,
+    &quot;password&quot;: &quot;&quot;,
+    &quot;database&quot;: &quot;scilog-development&quot;,
+    &quot;useNewUrlParser&quot;: true,
+    &quot;useUnifiedTopology&quot;: true
+}
+
+
+### Example OIDC configuration oidc.json
+{
+    &quot;session&quot;: false,
+    &quot;provider&quot;: &quot;oidc&quot;,
+    &quot;authScheme&quot;: &quot;openid connect&quot;,
+    &quot;module&quot;: &quot;passport-openidconnect&quot;,
+    &quot;failureFlash&quot;: true,
+    &quot;issuer&quot;: &quot;https://kc.development.psi.ch/auth/realms/awi&quot;,
+    &quot;authorizationURL&quot;: &quot;https://kc.development.psi.ch/auth/realms/awi/protocol/openid-connect/auth&quot;,
+    &quot;tokenURL&quot;: &quot;https://kc.development.psi.ch/auth/realms/awi/protocol/openid-connect/token&quot;,
+    &quot;userInfoURL&quot;: &quot;https://kc.development.psi.ch/auth/realms/awi/protocol/openid-connect/userinfo&quot;,
+    &quot;clientID&quot;: &quot;scilog&quot;,
+    &quot;clientSecret&quot;: &quot;yourSecretHere&quot;,
+    &quot;callbackURL&quot;: &quot;http://localhost:3000/auth/keycloak/callback/&quot;,
+    &quot;scope&quot;: [&quot;email&quot;, &quot;profile&quot;, &quot;openid&quot;],
+    &quot;successRedirect&quot;: &quot;http://localhost:4200/login&quot;,
+    &quot;skipUserProfile&quot;: false
+}
+</code></pre><h4 id="frontend">Frontend</h4>
+<ol>
+<li><code>scilog/src/assets/config.json</code> : defines the API server endpoint and OIDC connection details</li>
+</ol>
+<pre><code># Example config.json file
+{
+    &quot;lbBaseURL&quot;: &quot;http://localhost:3000/&quot;,
+    &quot;oAuth2Endpoint&quot;: {
+        &quot;authURL&quot;: &quot;auth/thirdparty/keycloak&quot;,
+        &quot;displayText&quot;: &quot;keycloak IDP&quot;
+    }
+}
+</code></pre>
                                 
                                 </section>
                             
@@ -528,7 +625,7 @@
     <script>
         var gitbook = gitbook || [];
         gitbook.push(function() {
-            gitbook.page.hasChanged({"page":{"title":"Step by Step instruction","level":"1.4.3","depth":2,"next":{"title":"Deploy with Docker Compose","level":"1.4.4","depth":2,"path":"Operator/Step_by_Step_Setup_Docker.md","ref":"Operator/Step_by_Step_Setup_Docker.md","articles":[]},"previous":{"title":"Login and Accounts","level":"1.4.2","depth":2,"path":"Operator/Login.md","ref":"Operator/Login.md","articles":[]},"dir":"ltr"},"config":{"gitbook":"*","theme":"default","variables":{},"plugins":[],"pluginsConfig":{"highlight":{},"search":{},"lunr":{"maxIndexSize":1000000,"ignoreSpecialCharacters":false},"fontsettings":{"theme":"white","family":"sans","size":2},"theme-default":{"styles":{"website":"styles/website.css","pdf":"styles/pdf.css","epub":"styles/epub.css","mobi":"styles/mobi.css","ebook":"styles/ebook.css","print":"styles/print.css"},"showLevel":false}},"structure":{"langs":"LANGS.md","readme":"README.md","glossary":"GLOSSARY.md","summary":"SUMMARY.md"},"pdf":{"pageNumbers":true,"fontSize":12,"fontFamily":"Arial","paperSize":"a4","chapterMark":"pagebreak","pageBreaksBefore":"/","margin":{"right":62,"left":62,"top":56,"bottom":56},"embedFonts":false},"styles":{"website":"styles/website.css","pdf":"styles/pdf.css","epub":"styles/epub.css","mobi":"styles/mobi.css","ebook":"styles/ebook.css","print":"styles/print.css"}},"file":{"path":"Operator/Step_by_Step_Setup.md","mtime":"2022-11-02T08:44:28.626Z","type":"markdown"},"gitbook":{"version":"4.0.4","time":"2022-11-02T08:44:49.826Z"},"basePath":"..","book":{"language":""}});
+            gitbook.page.hasChanged({"page":{"title":"Step by Step instruction","level":"1.4.2","depth":2,"next":{"title":"Deploy with Docker Compose","level":"1.4.3","depth":2,"path":"Operator/Step_by_Step_Setup_Docker.md","ref":"Operator/Step_by_Step_Setup_Docker.md","articles":[]},"previous":{"title":"Login and Accounts","level":"1.4.1","depth":2,"path":"Operator/Login.md","ref":"Operator/Login.md","articles":[]},"dir":"ltr"},"config":{"gitbook":"*","theme":"default","variables":{},"plugins":[],"pluginsConfig":{"highlight":{},"search":{},"lunr":{"maxIndexSize":1000000,"ignoreSpecialCharacters":false},"fontsettings":{"theme":"white","family":"sans","size":2},"theme-default":{"styles":{"website":"styles/website.css","pdf":"styles/pdf.css","epub":"styles/epub.css","mobi":"styles/mobi.css","ebook":"styles/ebook.css","print":"styles/print.css"},"showLevel":false}},"structure":{"langs":"LANGS.md","readme":"README.md","glossary":"GLOSSARY.md","summary":"SUMMARY.md"},"pdf":{"pageNumbers":true,"fontSize":12,"fontFamily":"Arial","paperSize":"a4","chapterMark":"pagebreak","pageBreaksBefore":"/","margin":{"right":62,"left":62,"top":56,"bottom":56},"embedFonts":false},"styles":{"website":"styles/website.css","pdf":"styles/pdf.css","epub":"styles/epub.css","mobi":"styles/mobi.css","ebook":"styles/ebook.css","print":"styles/print.css"}},"file":{"path":"Operator/Step_by_Step_Setup.md","mtime":"2022-11-03T10:52:45.525Z","type":"markdown"},"gitbook":{"version":"4.0.4","time":"2022-11-03T10:52:57.193Z"},"basePath":"..","book":{"language":""}});
         });
     </script>
 </div>
