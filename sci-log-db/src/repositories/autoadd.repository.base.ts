@@ -187,20 +187,21 @@ export class AutoAddRepository<
   private defaultAllButLocationLogbookACL(
     parent: Basesnippet,
     aclType: string,
+    data: {accessGroups?: string[]},
   ) {
     if (aclType === 'shareACL')
       return [...new Set((parent.shareACL ?? []).concat(parent.readACL ?? []))];
+    if (aclType === 'readACL')
+      return [
+        ...new Set((parent.readACL ?? []).concat(data.accessGroups ?? [])),
+      ];
     return parent[aclType as keyof Basesnippet];
   }
 
   private defaultLogbookACL(
     users: {unxGroup: string[]; email: string[]},
     aclType: string,
-    data: {
-      snippetType: string;
-      ownerGroup?: string | undefined;
-      accessGroups?: string[];
-    },
+    data: Basesnippet,
   ) {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const results = (this as any)[aclType](data, users);
@@ -269,21 +270,11 @@ export class AutoAddRepository<
     ];
   }
 
-  private shareACL(
-    data: {
-      ownerGroup?: string | undefined;
-    },
-    users: {unxGroup: string[]; email: string[]},
-  ) {
+  private shareACL(data: {}, users: {unxGroup: string[]; email: string[]}) {
     return [...new Set([...(users.email ?? []), ...(users.unxGroup ?? [])])];
   }
 
-  private adminACL(
-    data: {
-      ownerGroup?: string | undefined;
-    },
-    users: {unxGroup: string[]; email: string[]},
-  ) {
+  private adminACL(data: {}, users: {unxGroup: string[]; email: string[]}) {
     return [...new Set(['admin', ...(users.unxGroup ?? [])])];
   }
 

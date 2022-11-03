@@ -391,4 +391,21 @@ describe('File controller services', function (this: Suite) {
         throw err;
       });
   });
+
+  it('tries to post a file with accessGroups should add to readACL', async () => {
+    await client
+      .post('/filesnippet/files')
+      .set('Authorization', 'Bearer ' + token)
+      .type('form')
+      .field('fields', '{"accessGroups": ["anAccessGroup"]}')
+      .attach('file', __filename)
+      .expect(200)
+      .then(result => {
+        expect(result.body.accessGroups).to.be.eql(['anAccessGroup']);
+        expect(result.body.readACL).to.be.eql(['anAccessGroup']);
+      })
+      .catch(err => {
+        throw err;
+      });
+  });
 });
