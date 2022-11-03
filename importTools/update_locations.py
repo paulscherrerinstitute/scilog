@@ -22,6 +22,7 @@ def prepare_location_snippet(log):
         "snippetType": "location",
         "name": "root",
         "location": "root",
+        "accessGroups": ["any-authenticated-user"],
         "files": [{"filepath": filepath}],
     }
     snip = log.post_snippet(**location_snippet)
@@ -93,6 +94,7 @@ def _update_locations(log, loc_id, locations):
             files = locations_snippet.files
 
         new_location = Location()
+        new_location.accessGroups = ["any-authenticated-user"]
         new_location.isPrivate = True
         new_location.location = loc
         new_location.name = loc.split("/")[-1]
@@ -151,7 +153,7 @@ class ClientSettingsFromEnv:
 
 
 if __name__ == "__main__":
-    load_dotenv()
+    load_dotenv('.env.qa')
     scicat = ClientSettingsFromEnv("SCICAT")
 
     scilog = ClientSettingsFromEnv("SCILOG")
