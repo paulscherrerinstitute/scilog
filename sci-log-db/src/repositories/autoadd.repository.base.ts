@@ -493,8 +493,6 @@ export class AutoAddRepository<
     }
   }
 
-  private groupsToACL(where: Where<Basesnippet>) {}
-
   private addACLToFilter(
     where: Where<Basesnippet>,
     additionalCondition: Condition<Basesnippet>,

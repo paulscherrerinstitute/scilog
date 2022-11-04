@@ -178,6 +178,10 @@ export async function startWebsocket(app: SciLogDbApplication) {
     // console.log(collection);
     // eslint-disable-next-line  @typescript-eslint/no-explicit-any
     changeStream.on('change', function (change: any) {
+      if (change.fullDocument) {
+        change.fullDocument.ownerGroup = change.fullDocument.readACL?.[0] ?? '';
+        change.fullDocument.accessGroups = change.fullDocument.readACL ?? [];
+      }
       if (change.operationType !== 'delete') {
         getId.parentId(db, change.documentKey._id, async (id: string) => {
           if (id != null) {
