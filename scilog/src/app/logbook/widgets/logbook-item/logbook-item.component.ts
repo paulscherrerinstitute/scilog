@@ -336,7 +336,7 @@ export class LogbookItemComponent implements OnInit {
 
         break;
       case "insert":
-        if ((notification.content.snippetType == "paragraph") || (notification.content.snippetType == "image")) {
+        if ((notification.content.snippetType == "paragraph") || (notification.content.snippetType == "image") || (notification.content.snippetType == "filesnippet")) {
           // first check if the incoming message satisfies the current filters
           let snippetsFiltered = this.applyFilters([notification.content]);
           console.log("SnippetsFiltered:", snippetsFiltered);

@@ -97,7 +97,7 @@ export class LogbookItemDataService extends RemoteDataService {
     }
 
     let whereFilter: Object[] = [];
-    whereFilter.push({ "or": [{ "snippetType": "paragraph" }, { "snippetType": "image" }] });
+    whereFilter.push({ "or": [{ "snippetType": "paragraph" }, { "snippetType": "image" }, { "snippetType": "filesnippet" }] });
 
     let parentIds: string[] = [];
     if ((config.filter?.targetId) && (config.filter.targetId.length > 1)) {
