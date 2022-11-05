@@ -1,6 +1,7 @@
 import { Component, EventEmitter, Input, OnInit, Output, ViewChild, ElementRef } from '@angular/core';
 import { ChangeStreamNotification } from '../../changestreamnotification.model';
 import { LogbookItemDataService } from '@shared/remote-data.service';
+import { AppConfigService } from 'src/app/app-config.service';
 
 declare const Zone: any;
 
@@ -35,7 +36,10 @@ export class SnippetContentComponent implements OnInit {
 
   @ViewChild('contentDiv') contentRef: ElementRef;
 
-  constructor(private logbookItemDataService: LogbookItemDataService) {
+  constructor(
+    private logbookItemDataService: LogbookItemDataService,     
+    private appConfigService: AppConfigService,
+    ) {
     console.log(this)
   }
 
@@ -135,7 +139,7 @@ export class SnippetContentComponent implements OnInit {
             fig.firstElementChild.setAttribute('height', calc_height + "px")
           }
           let imageId = this.snippet.files[fileIndex].accessHash ?? this.snippet.files[fileIndex].fileId
-          fig.firstChild['src'] = "http://localhost:3000/images/" + imageId;
+          fig.firstChild['src'] = (this.appConfigService.getConfig().lbBaseURL ?? "http://localhost:3000/") + "images/" + imageId;
           this.setFileLoaded(fileIndex);
         }
       }
