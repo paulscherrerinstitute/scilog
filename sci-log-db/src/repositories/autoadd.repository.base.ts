@@ -419,45 +419,39 @@ export class AutoAddRepository<
       // console.log("========= Loaded Observe:", ctx?.options, ctx?.data)
       // TODO check if data field is single document or array
       // eslint-disable-next-line  @typescript-eslint/no-explicit-any
-      let currentUser: any;
-      // eslint-disable-next-line  no-prototype-builtins
-      if (!ctx?.options.hasOwnProperty('currentUser')) {
-        throw new Error(
-          'Unexpected user context: Current user cannot be retrieved.',
-        );
-      } else {
-        currentUser = ctx.options.currentUser;
+      if (ctx?.options?.currentUser) {
+        const currentUser = ctx.options.currentUser;
+        let calculatedACLs = '';
+        if (
+          currentUser.roles.filter((element: string) =>
+            ctx.data.updateACL?.includes(element),
+          ).length > 0
+        ) {
+          calculatedACLs += 'U';
+        }
+        if (
+          currentUser.roles.filter((element: string) =>
+            ctx.data.deleteACL?.includes(element),
+          ).length > 0
+        ) {
+          calculatedACLs += 'D';
+        }
+        if (
+          currentUser.roles.filter((element: string) =>
+            ctx.data.shareACL?.includes(element),
+          ).length > 0
+        ) {
+          calculatedACLs += 'S';
+        }
+        if (
+          currentUser.roles.filter((element: string) =>
+            ctx.data.adminACL?.includes(element),
+          ).length > 0
+        ) {
+          calculatedACLs += 'A';
+        }
+        ctx.data['calculatedACLs'] = calculatedACLs;
       }
-      let calculatedACLs = '';
-      if (
-        currentUser.roles.filter((element: string) =>
-          ctx.data.updateACL?.includes(element),
-        ).length > 0
-      ) {
-        calculatedACLs += 'U';
-      }
-      if (
-        currentUser.roles.filter((element: string) =>
-          ctx.data.deleteACL?.includes(element),
-        ).length > 0
-      ) {
-        calculatedACLs += 'D';
-      }
-      if (
-        currentUser.roles.filter((element: string) =>
-          ctx.data.shareACL?.includes(element),
-        ).length > 0
-      ) {
-        calculatedACLs += 'S';
-      }
-      if (
-        currentUser.roles.filter((element: string) =>
-          ctx.data.adminACL?.includes(element),
-        ).length > 0
-      ) {
-        calculatedACLs += 'A';
-      }
-      ctx.data['calculatedACLs'] = calculatedACLs;
       this.addOwnerGroupAccessGroups(ctx.data);
     });
 
