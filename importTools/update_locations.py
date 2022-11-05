@@ -99,6 +99,7 @@ def _update_locations(log, loc_id, locations):
         new_location.location = loc
         new_location.name = loc.split("/")[-1]
         new_location.files = files
+        new_location.parentId = loc_id
 
         snip = log.post_location(**new_location.to_dict(include_none=False))
         locationStorage[loc] = snip
