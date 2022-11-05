@@ -310,7 +310,7 @@ export class LogbookDataService extends RemoteDataService {
     let params = new HttpParams();
     let httpFilter: Object = {};
     httpFilter["order"] = ["defaultOrder ASC"];
-    httpFilter["where"] = { "snippetType": "location", "title": "root", "ownerGroup": "admin" };
+    httpFilter["where"] = { "snippetType": "location", "location": "root" };
     httpFilter["include"] = [{ "relation": "subsnippets" }];
     // console.log(JSON.stringify(httpFilter));
     params = params.set('filter', JSON.stringify(httpFilter));
