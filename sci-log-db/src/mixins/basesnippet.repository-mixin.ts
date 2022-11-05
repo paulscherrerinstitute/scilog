@@ -57,11 +57,11 @@ function UpdateAndDeleteRepositoryMixin<
         ) {
           throw new HttpErrors.Forbidden('Cannot modify expired data snippet.');
         }
+        await this.updateById(id, basesnippet, options);
         if (snippet?.versionable) {
           await this.addToHistory(snippet, options?.currentUser);
         }
-      }
-        await this.updateById(id, basesnippet, options);
+      } else await this.updateById(id, basesnippet, options);
     }
 
     private async addToHistory(snippet: M, user: UserProfile): Promise<void> {
@@ -108,6 +108,7 @@ function UpdateAndDeleteRepositoryMixin<
       // Two steps:
       // 1. set snippet to 'deleted=true'
       // 2. inside websocket and after informing the clients, replace the parentId or delete the snippet
+      await this.updateById(id as ID, {deleted: true}, options);
       const snippet = await this.findById(id, {}, options);
       if (snippet?.versionable) {
         if (snippet?.parentId) {
@@ -124,7 +125,6 @@ function UpdateAndDeleteRepositoryMixin<
           console.log('deleteById:parentHistory:', parentHistory);
         }
       }
-      await this.updateById(id as ID, {deleted: true}, options);
     }
 
     async restoreDeletedId(id: ID, user: UserProfile): Promise<void> {
