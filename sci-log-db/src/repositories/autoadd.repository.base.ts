@@ -329,7 +329,7 @@ export class AutoAddRepository<
         delete ctx.data.createdBy;
         delete ctx.data.expiresAt;
         // drop any potential ACLs unless admin
-        this.aclDefaultOnUpdate(ctx.data);
+        // this.aclDefaultOnUpdate(ctx.data);
         if (this.acls.some(acl => ctx.data[acl])) {
           const adminCondition = {
             adminACL: {
