@@ -127,7 +127,7 @@ class Paragraph(Basesnippet):
 
 class Filesnippet(Basesnippet):
     def __init__(self):
-        super().__init__(snippetType="filesnippet")
+        super().__init__(snippetType="image")
         self.init_properties(fileExtension=str, accessHash=str)
 
 
