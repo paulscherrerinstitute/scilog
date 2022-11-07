@@ -44,7 +44,7 @@ export class RemoteDataService {
     if (header == null) {
       header = new HttpHeaders().append('accept', 'application/json');
     }
-    return this.httpClient.post(this.serverSettings.getServerAddress() + "files", formData, { headers: header });
+    return this.httpClient.post(this.serverSettings.getServerAddress() + "filesnippet/files", formData, { headers: header });
   }
 
   protected getSnippets<T>(snippetPath: string, options: Object) {

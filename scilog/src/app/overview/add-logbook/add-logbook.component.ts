@@ -32,7 +32,7 @@ export class AddLogbookComponent implements OnInit {
 
   // general form settings and variables
   optionsFormGroup: FormGroup;
-  imageUrl: string = '';
+  fileId: string = '';
 
 
 
@@ -141,8 +141,8 @@ export class AddLogbookComponent implements OnInit {
       this.optionsFormGroup.get('ownerGroup').setValue(this.logbook.ownerGroup);
       this.optionsFormGroup.get('accessGroups').setValue(this.logbook.accessGroups);
       this.optionsFormGroup.get('isPrivate').setValue(this.logbook.isPrivate);
-      this.imageUrl = this.logbook.thumbnail;
-      if (this.imageUrl) {
+      this.fileId = this.logbook.thumbnail;
+      if (this.fileId) {
         this.getImageFromService();
       }
       console.log("editing existing logbook");
@@ -180,7 +180,7 @@ export class AddLogbookComponent implements OnInit {
 
   async getImageFromService() {
     this.imageLoaded = false;
-    let data = await this.logbookItemDataService.getFile(this.imageUrl);
+    let data = await this.logbookItemDataService.getImage(this.fileId);
     this.createImageFromBlob(data);
     this.showThumbnail();
     this.uploadThumbnailFile = null;
@@ -214,9 +214,22 @@ export class AddLogbookComponent implements OnInit {
       ownerGroup: this.optionsFormGroup.get('ownerGroup').value,
       accessGroups: this.accessGroupsSelected,
       isPrivate: this.optionsFormGroup.get('isPrivate').value,
-      thumbnail: this.imageUrl,
       description: this.optionsFormGroup.get('description').value
     }
+
+    let fileData: {id: string};
+    // now that we have the id, let's upload the image
+    if (this.uploadThumbnailFile != null) {
+      // upload selected file
+      let formData = new FormData();
+      let filenameStorage: string = this.logbook.id + "." + this.uploadThumbnailFile.name.split('.').pop();
+      if (this.logbook.ownerGroup)
+        formData.append('fields', JSON.stringify({accessGroups: [this.logbook.ownerGroup]}))
+      formData.append('file', this.uploadThumbnailFile);
+      fileData = await this.logbookDataService.uploadLogbookThumbnail(formData);
+    }
+
+    this.logbook.thumbnail = fileData?.id ?? this.fileId;
 
     if (logbookId != null) {
       // update logbook
@@ -226,15 +239,6 @@ export class AddLogbookComponent implements OnInit {
       // create new logbook
       let data = await this.logbookDataService.postLogbook(this.logbook);
       this.logbook.id = data.id;
-    }
-
-    // now that we have the id, let's upload the image
-    if (this.uploadThumbnailFile != null) {
-      // upload selected file
-      let formData = new FormData();
-      let filenameStorage: string = this.logbook.id + "." + this.uploadThumbnailFile.name.split('.').pop();
-      formData.append('file', this.uploadThumbnailFile);
-      await this.logbookDataService.uploadLogbookThumbnail(formData);
     }
 
     this.dialogRef.close(this.logbook);
@@ -248,8 +252,8 @@ export class AddLogbookComponent implements OnInit {
         console.log(this.selectedLocation);
         if (!this.customImageLoaded) {
           console.log(this.selectedLocation)
-          if (this.selectedLocation?.file) {
-            this.imageUrl = this.selectedLocation.file;
+          if (this.selectedLocation?.files[0]) {
+            this.fileId = this.selectedLocation?.files[0].fileId;
             this.getImageFromService();
           } else {
             // make sure to delete the image from previous selections
@@ -305,7 +309,7 @@ export class AddLogbookComponent implements OnInit {
     // If the user really decides to add the logbook, the upload of the image will be triggered
     this.uploadThumbnailFile = $event.target.files[0];
     console.log(this.uploadThumbnailFile)
-    this.imageUrl = "files/" + this.uploadThumbnailFile.name;
+    this.fileId = this.uploadThumbnailFile.name;
     this.createImageFromBlob(this.uploadThumbnailFile);
     this.showThumbnail();
     this.customImageLoaded = true;
