@@ -68,7 +68,7 @@ export class OverviewComponent implements OnInit {
       }
       this.config = this._prepareConfig();
       this.logbookIconScrollService.initialize(this.config);
-      // this.getLogbookData();
+      this.getLogbookData();
     }));
     this.subscriptions.push(this.searchStringSubject.pipe(debounceTime(500)).subscribe(() => {
       this.logbookIconScrollService.config = this._prepareConfig();
