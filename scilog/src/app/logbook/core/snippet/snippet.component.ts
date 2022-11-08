@@ -160,9 +160,9 @@ export class SnippetComponent implements OnInit {
   allowEdit(){
     let _hasAccessPermission = false;
     if (typeof this.userPreferences.userInfo.roles != 'undefined'){
-      _hasAccessPermission = this.userPreferences.userInfo.roles.find(entry => {
+      _hasAccessPermission = this.userPreferences.userInfo.roles.some(entry => {
         return entry == this.snippet.ownerGroup
-      }).length>0;
+      });
     }
 
     let _isExpired = false;
