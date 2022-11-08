@@ -215,13 +215,18 @@ export class OverviewComponent implements OnInit {
     return _config;
   }
 
+  intersectLogbooksWithScroller(scrolledData: Logbooks[]): Logbooks[] {
+    if (this.logbooks)
+      return this.logbooks.filter(
+        logbook => scrolledData.some(
+          scrolled => logbook.id === scrolled.id
+        )
+      );
+  }
+
   ngOnDestroy(): void {
     this.subscriptions.forEach(
       (subscription) => subscription.unsubscribe());
   }
 
-
-
 }
-
-
