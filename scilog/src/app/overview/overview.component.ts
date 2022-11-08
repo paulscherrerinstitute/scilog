@@ -169,7 +169,7 @@ export class OverviewComponent implements OnInit {
       this.logbooks.splice(logIndex, 1);
     }
     await this.dataService.deleteLogbook(logbookId);
-
+    await this.logbookIconScrollService.remove(logbookId)
     console.log("deleted logbook ", logbookId);
   }
 
@@ -188,9 +188,10 @@ export class OverviewComponent implements OnInit {
       default:
         break;
     }
-    this.subscriptions.push(dialogRef.afterClosed().subscribe(result => {
+    this.subscriptions.push(dialogRef.afterClosed().subscribe(async result => {
       if (typeof result != "undefined") {
         this.logbooks.push(result);
+        await this.logbookIconScrollService.datasource.adapter.reload()
       }
     }));
   }
