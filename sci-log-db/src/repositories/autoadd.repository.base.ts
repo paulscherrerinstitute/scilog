@@ -128,24 +128,6 @@ export class AutoAddRepository<
     );
   }
 
-  private aclDefaultOnUpdate(
-    data: (Basesnippet | Logbook) & {
-      ownerGroup?: string;
-      unsetAttribute: Function;
-      accessGroups?: string[];
-    },
-  ) {
-    if (data.ownerGroup) {
-      const ownerGroup = data.ownerGroup;
-      data.updateACL = data.updateACL ?? [ownerGroup]; // ownergroup
-      data.deleteACL = data.deleteACL ?? [ownerGroup]; // admin
-      data.shareACL = data.shareACL ?? [ownerGroup]; // ownerGroup
-      data.readACL = data.readACL ?? [ownerGroup];
-    }
-    delete data.ownerGroup;
-    delete data.accessGroups;
-  }
-
   private async getParent(
     data: (Basesnippet | Logbook) & {
       ownerGroup?: string | undefined;
@@ -328,8 +310,6 @@ export class AutoAddRepository<
         delete ctx.data.createdAt;
         delete ctx.data.createdBy;
         delete ctx.data.expiresAt;
-        // drop any potential ACLs unless admin
-        // this.aclDefaultOnUpdate(ctx.data);
         if (this.acls.some(acl => ctx.data[acl])) {
           const adminCondition = {
             adminACL: {
@@ -418,7 +398,6 @@ export class AutoAddRepository<
     modelClass.observe('loaded', async ctx => {
       // console.log("========= Loaded Observe:", ctx?.options, ctx?.data)
       // TODO check if data field is single document or array
-      // eslint-disable-next-line  @typescript-eslint/no-explicit-any
       if (ctx?.options?.currentUser) {
         const currentUser = ctx.options.currentUser;
         let calculatedACLs = '';

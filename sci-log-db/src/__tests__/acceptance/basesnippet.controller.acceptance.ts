@@ -379,28 +379,6 @@ describe('Basesnippet', function (this: Suite) {
       });
   });
 
-  it('patch snippet ownergroup with token should return 200 and body.count=0', async () => {
-    await client
-      .patch('/basesnippets/')
-      .set('Authorization', 'Bearer ' + token)
-      .set('Content-Type', 'application/json')
-      .send({ownerGroup: 'aNewName'})
-      .expect(200)
-      .then(result => expect(result.body.count).to.be.eql(0))
-      .catch(err => {
-        throw err;
-      });
-  });
-
-  it('patch snippet by id with ownergroup and token should return 404', async () => {
-    await client
-      .patch(`/basesnippets/${baseSnippetId}`)
-      .set('Authorization', 'Bearer ' + token)
-      .set('Content-Type', 'application/json')
-      .send({ownerGroup: 'aNewName'})
-      .expect(404);
-  });
-
   it('post a basesnippet with authentication and parentId from existing snippet should return 200 and have parent ACLS', async () => {
     await client
       .post('/basesnippets')

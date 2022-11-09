@@ -51,7 +51,7 @@ describe('File controller services', function (this: Suite) {
       .then(
         result => (
           expect(result.body).to.containEql(fileSnippet),
-          expect(result.body.snippetType).to.be.eql('filesnippet'),
+          expect(result.body.snippetType).to.be.eql('image'),
           (fileSnippetId = result.body.id)
         ),
       )
@@ -245,7 +245,7 @@ describe('File controller services', function (this: Suite) {
       .then(
         result => (
           expect(result.body.length).to.be.eql(1),
-          expect(result.body[0].snippetType).to.be.eql('filesnippet'),
+          expect(result.body[0].snippetType).to.be.eql('image'),
           expect(result.body[0].tags).to.be.eql(['aSearchableTag'])
         ),
       )

@@ -235,13 +235,7 @@ describe('Logbook', function (this: Suite) {
       .set('Authorization', 'Bearer ' + token)
       .set('Content-Type', 'application/json')
       .expect(200)
-      .then(
-        result => (
-          expect(result.body.length).to.be.eql(1),
-          expect(result.body[0].snippetType).to.be.eql('logbook'),
-          expect(result.body[0].tags).to.be.eql(['aSearchableTag'])
-        ),
-      )
+      .then(result => expect(result.body.length).to.be.eql(0))
       .catch(err => {
         throw err;
       });
