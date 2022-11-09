@@ -166,7 +166,7 @@ for fn in fns:
                 if att in source_attachment:
                     index = ii
                     break
-            if index:
+            if index is not None:
                 attachment = attchs.pop(index) 
             else:
                 # image not contained as attachment

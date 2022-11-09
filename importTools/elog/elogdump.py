@@ -19,7 +19,6 @@ clargs = parser.parse_args()
 
 
 import builtins
-import functools
 import json
 import os
 import shutil
@@ -28,6 +27,7 @@ from tqdm import tqdm
 import elog
 import urllib3
 
+from utils import retry
 
 # Certs are not valid...
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
@@ -96,25 +96,6 @@ class ELogScraper:
 
         json_dump(entry, fname)
         return entry
-
-
-
-def retry(func):
-    @functools.wraps(func)
-    def wrapper(*args, **kwargs):
-        n = 1
-        while True:
-            try:
-                res = func(*args, **kwargs)
-            except Exception as e:
-                print_func = func.__name__
-                all_args = [str(a) for a in args] + ["{k}={v}" for k, v in kwargs.items()]
-                print_args = ", ".join(all_args)
-                print(f"retry #{n}: {print_func}({print_args}), failed  due to:\n{e}")
-                n += 1
-            else:
-                return res
-    return wrapper
 
 def sanitize_message(message):
     return remove_all(message, FORMATTING_CHARS)
