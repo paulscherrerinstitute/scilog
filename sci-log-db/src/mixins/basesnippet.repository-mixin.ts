@@ -68,6 +68,7 @@ function UpdateAndDeleteRepositoryMixin<
       const historySnippet = await this.getHistorySnippet(snippet, user);
       const snippetCopy = _.omit(snippet, 'id');
       snippetCopy.parentId = historySnippet.id;
+      snippetCopy.snippetType = 'updated';
       const baseSnippetRepository = await this.baseSnippetRepository();
       await baseSnippetRepository.create(snippetCopy, {currentUser: user});
     }

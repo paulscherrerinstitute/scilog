@@ -204,7 +204,7 @@ export class LogbookController {
     })
     logbook: Logbook,
   ): Promise<void> {
-    await this.logbookRepository.updateById(id, logbook, {
+    await this.logbookRepository.updateByIdWithHistory(id, logbook, {
       currentUser: this.user,
     });
   }
