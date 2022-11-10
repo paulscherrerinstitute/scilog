@@ -12,7 +12,6 @@
     * [Python SDK Usage](Ingestor/PythonSDK.md)
     * [Import of elog data](Ingestor/MigrateElogData.md)
 * [Operator Guide](Operator/README.md)
-    * [Configuration files](Operator/Environment.md)
     * [Login and Accounts](Operator/Login.md)
     * [Step by Step instruction](Operator/Step_by_Step_Setup.md)
     * [Deploy with Docker Compose](Operator/Step_by_Step_Setup_Docker.md)
