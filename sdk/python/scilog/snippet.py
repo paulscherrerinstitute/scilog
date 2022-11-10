@@ -1,4 +1,5 @@
 import functools
+import warnings
 from typing import get_type_hints
 
 from .utils import typename
@@ -15,6 +16,10 @@ def typechecked(func):
                 raise TypeError(
                     f"{func} expected to receive input of type {dtype.__name__} but received {arg_type.__name__}"
                 )
+            if len(func.__closure__) > 0:
+                property_name = func.__closure__[0].cell_contents.strip('_')
+                if obj._deprecated.get(property_name):
+                    warnings.warn(f"{property_name} is deprecated by {obj._deprecated_by[property_name]}")
         return func(obj, *args, **kwargs)
 
     return typechecked_call
@@ -49,15 +54,13 @@ class Snippet:
             setattr(cls, name, property_maker(name, dtype))
             self._properties.append(name)
 
-    def to_dict(self, include_none=True):
+    def to_dict(self, include_none=True, include_deprecated=True):
+        properties = self._properties if include_deprecated else list(set(self._properties).difference(self._deprecated.keys()))
         if include_none:
-            return {key: getattr(self, key) for key in self._properties}
-        else:
-            return {
-                key: getattr(self, key)
-                for key in self._properties
-                if getattr(self, key) is not None
-            }
+            return {key: getattr(self, key) for key in properties}
+        return {
+            key: getattr(self, key) for key in properties if getattr(self, key) is not None
+        }
 
     def import_dict(self, properties):
         for name, value in properties.items():
@@ -70,7 +73,10 @@ class Snippet:
         return new
 
     def __str__(self):
-        return typename(self)
+        return f"{self.__class__.__name__}: {self.to_dict()}"
+
+    def __repr__(self):
+        return f"{self.__class__.__name__}: {self.to_dict()}"
 
     @classmethod
     def from_http_response(cls, response):
@@ -81,13 +87,20 @@ class Snippet:
 
 
 class Basesnippet(Snippet):
+    _deprecated = {'ownerGroup': str, 'accessGroups': list}
+    _deprecated_by = {'ownerGroup': 'ACLS', 'accessGroups': 'ACLS'}
+
     def __init__(self, snippetType="basesnippet"):
         super().__init__(snippetType=snippetType)
         self.init_properties(
             id=str,
             parentId=str,
-            ownerGroup=str,
-            accessGroups=list,
+            createACL=list,
+            readACL=list,
+            updateACL=list,
+            deleteACL=list,
+            shareACL=list,
+            adminACL=list,
             isPrivate=bool,
             createdAt=str,
             createdBy=str,
@@ -102,19 +115,26 @@ class Basesnippet(Snippet):
             linkType=str,
             versionable=bool,
             deleted=bool,
+            **self._deprecated
         )
 
 
 class Paragraph(Basesnippet):
-    def __init__(self, snippetType="paragraph"):
-        super().__init__(snippetType=snippetType)
+    def __init__(self):
+        super().__init__(snippetType="paragraph")
         self.init_properties(textcontent=str, isMessage=str)
 
 
 class Filesnippet(Basesnippet):
-    def __init__(self, snippetType="paragraph"):
-        super().__init__(snippetType=snippetType)
+    def __init__(self):
+        super().__init__(snippetType="image")
         self.init_properties(fileExtension=str, accessHash=str)
+
+
+class Location(Basesnippet):
+    def __init__(self):
+        super().__init__(snippetType="location")
+        self.init_properties(name=str, location=str)
 
 
 if __name__ == "__main__":

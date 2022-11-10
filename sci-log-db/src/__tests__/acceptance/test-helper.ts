@@ -20,11 +20,20 @@ export interface AppWithClient {
 
 export const userPassword = 'p4ssw0rd';
 
-const userData = {
+export const userData = {
   email: 'test@loopback.io',
   firstName: 'Example',
   lastName: 'User',
-  roles: ['any-authenticated-user'],
+  roles: ['p12345', 'any-authenticated-user'],
+};
+
+export const adminUser = {
+  email: 'admin@loopback.io',
+  firstName: 'Exampleadmin',
+  lastName: 'UserAdmin',
+  roles: ['admin', 'any-authenticated-user'],
+  location: 'anExistingLocation',
+  unxGroup: 'aUnxGroup',
 };
 
 export const oidcOptions = {
@@ -53,13 +62,14 @@ export async function setupApplication(
 export async function createAUser(
   app: SciLogDbApplication,
   additionalRoles: string[] = [],
+  user = userData,
 ): Promise<User> {
   const passwordHasher = await app.get(PasswordHasherBindings.PASSWORD_HASHER);
   const encryptedPassword = await passwordHasher.hashPassword(userPassword);
   const userRepo: UserRepository = await app.get('repositories.UserRepository');
   const newUser = await userRepo.create({
-    ..._.omit(userData, 'roles'),
-    roles: userData.roles.concat(additionalRoles),
+    ..._.omit(user, 'roles'),
+    roles: user.roles.concat(additionalRoles),
   });
   newUser.id = newUser.id.toString();
 
@@ -85,6 +95,19 @@ export async function createUserToken(
   const user = await createAUser(app, additionalRoles);
   const token = await createToken(client, user);
   return token;
+}
+
+export async function createAdminToken(
+  app: SciLogDbApplication,
+  client: Client,
+) {
+  const user = await createAdminUser(app);
+  const token = await createToken(client, user);
+  return token;
+}
+export async function createAdminUser(app: SciLogDbApplication) {
+  const user = await createAUser(app, [], adminUser);
+  return user;
 }
 
 export async function clearDatabase(app: SciLogDbApplication) {

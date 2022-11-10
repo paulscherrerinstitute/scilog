@@ -9,20 +9,12 @@ import {
   repository,
   Where,
 } from '@loopback/repository';
-import {
-  del,
-  get,
-  getModelSchemaRef,
-  param,
-  patch,
-  post,
-  put,
-  requestBody,
-} from '@loopback/rest';
+import {del, get, param, patch, post, requestBody} from '@loopback/rest';
 import {SecurityBindings, UserProfile} from '@loopback/security';
 import {Task} from '../models';
 import {BasesnippetRepository, TaskRepository} from '../repositories';
 import {basicAuthorization} from '../services/basic.authorizor';
+import {getModelSchemaRef} from '../utils/misc';
 import {OPERATION_SECURITY_SPEC} from '../utils/security-spec';
 import {BasesnippetController} from './basesnippet.controller';
 
@@ -211,24 +203,9 @@ export class TaskController {
     })
     task: Task,
   ): Promise<void> {
-    await this.taskRepository.updateByIdWithHistory(id, task, {
+    await this.taskRepository.updateById(id, task, {
       currentUser: this.user,
     });
-  }
-
-  @put('/task/{id}', {
-    security: OPERATION_SECURITY_SPEC,
-    responses: {
-      '204': {
-        description: 'Task PUT success',
-      },
-    },
-  })
-  async replaceById(
-    @param.path.string('id') id: string,
-    @requestBody() task: Task,
-  ): Promise<void> {
-    await this.taskRepository.replaceById(id, task, {currentUser: this.user});
   }
 
   @del('/tasks/{id}', {

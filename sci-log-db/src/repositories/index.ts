@@ -1,5 +1,6 @@
 export * from './basesnippet.repository';
 export * from './image.repository';
+export * from './location.repository';
 export * from './logbook.repository';
 export * from './paragraph.repository';
 export * from './task.repository';

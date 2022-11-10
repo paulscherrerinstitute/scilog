@@ -11,7 +11,7 @@ import {verifyFunctionFactory} from '../../authentication-strategies/types';
 import {oidcOptions, setupApplication} from './test-helper';
 
 describe('OIDC services', function (this: Suite) {
-  this.timeout(5000);
+  this.timeout(1000);
   let app: SciLogDbApplication;
   let client: Client;
   let userRepo: UserRepository;

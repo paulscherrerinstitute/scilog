@@ -1,6 +1,7 @@
 import { Component, EventEmitter, Input, OnInit, Output, ViewChild, ElementRef } from '@angular/core';
 import { ChangeStreamNotification } from '../../changestreamnotification.model';
 import { LogbookItemDataService } from '@shared/remote-data.service';
+import { AppConfigService } from 'src/app/app-config.service';
 
 declare const Zone: any;
 
@@ -21,8 +22,8 @@ export class SnippetContentComponent implements OnInit {
   @Output() isLoading = new EventEmitter<boolean>();
 
 
-  figures: NodeListOf<HTMLElement>;
-  figuresRef: NodeListOf<HTMLElement>;
+  figures: HTMLElement[];
+  figuresRef: HTMLElement[];
   filesRef: NodeListOf<HTMLElement>;
   _content: string;
   dataLoaded = false;
@@ -35,7 +36,10 @@ export class SnippetContentComponent implements OnInit {
 
   @ViewChild('contentDiv') contentRef: ElementRef;
 
-  constructor(private logbookItemDataService: LogbookItemDataService) {
+  constructor(
+    private logbookItemDataService: LogbookItemDataService,     
+    private appConfigService: AppConfigService,
+    ) {
     console.log(this)
   }
 
@@ -80,11 +84,13 @@ export class SnippetContentComponent implements OnInit {
 
     this.span = document.createElement('figure');
     this.span.innerHTML = this.snippet?.textcontent;
-    this.figures = this.span.querySelectorAll("figure");
+    const images = this.span.querySelectorAll("img")
+    this.figures = this._figuresFromImages(images);
 
     this.spanRef = document.createElement('figure');
     this.spanRef.innerHTML = this._content;
-    this.figuresRef = this.spanRef.querySelectorAll("figure");
+    const imagesRef = this.spanRef.querySelectorAll("img")
+    this.figuresRef = this._figuresFromImages(imagesRef);
 
     let fileCounter = 0;
     this.filesLoaded = [];
@@ -135,7 +141,9 @@ export class SnippetContentComponent implements OnInit {
             fig.firstElementChild.setAttribute('height', calc_height + "px")
           }
           let imageId = this.snippet.files[fileIndex].accessHash ?? this.snippet.files[fileIndex].fileId
-          fig.firstChild['src'] = "http://localhost:3000/images/" + imageId;
+          const srcUrl = (this.appConfigService.getConfig().lbBaseURL ?? "http://localhost:3000/") + "images/" + imageId;
+          fig['href'] = srcUrl;
+          fig.firstChild['src'] = srcUrl;
           this.setFileLoaded(fileIndex);
         }
       }
@@ -152,6 +160,21 @@ export class SnippetContentComponent implements OnInit {
       console.log(fileRef);
       this.setFileLoaded(this.fileLoaded.length - 1);
     })
+  }
+
+  private _figuresFromImages(images: any) {
+    const figures = [];
+    for (const image of images) {
+      if (!image.parentElement.firstChild.href) {
+        const hrefElement = document.createElement('a');
+        image.parentElement.appendChild(hrefElement)
+        hrefElement.appendChild(image)
+      }
+      if (image.parentElement.firstChild != image)
+        image.parentElement.insertBefore(image, image.parentElement.firstChild);
+      figures.push(image.parentElement);
+    }
+    return figures;
   }
 
   set content(value: string) {

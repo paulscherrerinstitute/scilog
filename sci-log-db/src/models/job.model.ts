@@ -3,7 +3,7 @@ import {Basesnippet} from './basesnippet.model';
 
 @model({
   settings: {
-    strict: true,
+    strict: false,
     scope: {
       where: {snippetType: 'job'},
     },
@@ -11,6 +11,12 @@ import {Basesnippet} from './basesnippet.model';
   },
 })
 export class Job extends Basesnippet {
+  @property({
+    type: 'string',
+    default: 'job',
+  })
+  snippetType: string;
+
   @property({
     type: 'string',
     description: 'Job description',

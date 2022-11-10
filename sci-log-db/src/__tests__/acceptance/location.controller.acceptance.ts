@@ -1,19 +1,31 @@
+import {User} from '@loopback/authentication-jwt';
 import {Client, expect} from '@loopback/testlab';
-import _ from 'lodash';
 import {Suite} from 'mocha';
 import {SciLogDbApplication} from '../..';
-import {clearDatabase, createUserToken, setupApplication} from './test-helper';
-import {Basesnippet} from '../../models';
+import {
+  clearDatabase,
+  createAdminUser,
+  createUserToken,
+  setupApplication,
+  userData,
+} from './test-helper';
+import _ from 'lodash';
 
-describe('Basesnippet', function (this: Suite) {
+describe('Location', function (this: Suite) {
   this.timeout(5000);
   let app: SciLogDbApplication;
   let client: Client;
   let token: string;
-  let baseSnippetId: string;
-  const baseSnippet = {
-    ownerGroup: 'aOwner',
-    accessGroups: ['basesnippetAcceptance'],
+  let adminUser: User;
+  let locationSnippetId: string;
+  const locationSnippet = {
+    ownerGroup: 'locationAcceptance',
+    createACL: ['locationAcceptance'],
+    readACL: ['locationAcceptance'],
+    updateACL: ['locationAcceptance'],
+    deleteACL: ['locationAcceptance'],
+    adminACL: ['admin'],
+    shareACL: ['locationAcceptance'],
     isPrivate: true,
     defaultOrder: 0,
     expiresAt: '2055-10-10T14:04:19.522Z',
@@ -21,14 +33,14 @@ describe('Basesnippet', function (this: Suite) {
     dashboardName: 'string',
     versionable: true,
     name: 'aSearchableName',
-    description: 'aSearchableDescription',
-    textcontent: 'aSearchableTextContent',
+    location: 'aLocation',
   };
 
   before('setupApplication', async () => {
     ({app, client} = await setupApplication());
     await clearDatabase(app);
-    token = await createUserToken(app, client, ['basesnippetAcceptance']);
+    token = await createUserToken(app, client, ['locationAcceptance']);
+    adminUser = await createAdminUser(app);
   });
 
   after(async () => {
@@ -36,22 +48,22 @@ describe('Basesnippet', function (this: Suite) {
     if (app != null) await app.stop();
   });
 
-  it('post a basesnippet without token should return 401', async () => {
-    await client.post('/basesnippets').send(baseSnippet).expect(401);
+  it('post a location without token should return 401', async () => {
+    await client.post('/locations').send(locationSnippet).expect(401);
   });
 
-  it('post a basesnippet with authentication should return 200 and contain baseSnippet', async () => {
+  it('post a location with authentication should return 200 and contain locationSnippet', async () => {
     await client
-      .post('/basesnippets')
+      .post('/locations')
       .set('Authorization', 'Bearer ' + token)
       .set('Content-Type', 'application/json')
-      .send(baseSnippet)
+      .send(locationSnippet)
       .expect(200)
       .then(
         result => (
-          expect(result.body).to.containEql(baseSnippet),
-          expect(result.body.snippetType).to.be.eql('base'),
-          (baseSnippetId = result.body.id)
+          expect(result.body).to.containEql(locationSnippet),
+          expect(result.body.readACL).to.be.eql([locationSnippet.ownerGroup]),
+          (locationSnippetId = result.body.id)
         ),
       )
       .catch(err => {
@@ -61,14 +73,14 @@ describe('Basesnippet', function (this: Suite) {
 
   it('count snippet without token should return 401', async () => {
     await client
-      .get('/basesnippets/count')
+      .get('/locations/count')
       .set('Content-Type', 'application/json')
       .expect(401);
   });
 
   it('count snippet with token should return body.count=1', async () => {
     await client
-      .get('/basesnippets/count')
+      .get('/locations/count')
       .set('Authorization', 'Bearer ' + token)
       .set('Content-Type', 'application/json')
       .expect(200)
@@ -80,21 +92,21 @@ describe('Basesnippet', function (this: Suite) {
 
   it('get snippets without token should return 401', async () => {
     await client
-      .get('/basesnippets')
+      .get('/locations')
       .set('Content-Type', 'application/json')
       .expect(401);
   });
 
-  it('get snippet with token should be of length one and contain basesnippet', async () => {
+  it('get snippet with token should be of length one and contain location', async () => {
     await client
-      .get('/basesnippets')
+      .get('/locations')
       .set('Authorization', 'Bearer ' + token)
       .set('Content-Type', 'application/json')
       .expect(200)
       .then(
         result => (
           expect(result.body.length).to.be.eql(1),
-          expect(result.body[0]).to.containEql(baseSnippet)
+          expect(result.body[0]).to.containEql(locationSnippet)
         ),
       )
       .catch(err => {
@@ -104,18 +116,18 @@ describe('Basesnippet', function (this: Suite) {
 
   it('get snippets with ID without token should return 401', async () => {
     await client
-      .get(`/basesnippets/${baseSnippetId}`)
+      .get(`/locations/${locationSnippetId}`)
       .set('Content-Type', 'application/json')
       .expect(401);
   });
 
-  it('get snippet with ID with token should return 200 and contain basesnippet', async () => {
+  it('get snippet with ID with token should return 200 and contain location', async () => {
     await client
-      .get(`/basesnippets/${baseSnippetId}`)
+      .get(`/locations/${locationSnippetId}`)
       .set('Authorization', 'Bearer ' + token)
       .set('Content-Type', 'application/json')
       .expect(200)
-      .then(result => expect(result.body).to.containEql(baseSnippet))
+      .then(result => expect(result.body).to.containEql(locationSnippet))
       .catch(err => {
         throw err;
       });
@@ -123,7 +135,7 @@ describe('Basesnippet', function (this: Suite) {
 
   it('patch snippet without token should return 401', async () => {
     await client
-      .patch('/basesnippets/')
+      .patch('/locations/')
       .set('Content-Type', 'application/json')
       .send({dashboardName: 'aNewName'})
       .expect(401);
@@ -131,7 +143,7 @@ describe('Basesnippet', function (this: Suite) {
 
   it('patch snippet with toke should return 200 and body.count=1', async () => {
     await client
-      .patch('/basesnippets')
+      .patch('/locations')
       .set('Authorization', 'Bearer ' + token)
       .set('Content-Type', 'application/json')
       .send({dashboardName: 'aNewName'})
@@ -142,37 +154,16 @@ describe('Basesnippet', function (this: Suite) {
       });
   });
 
-  it('put snippet without token should return 401', async () => {
-    await client
-      .put(`/basesnippets/${baseSnippetId}`)
-      .send(baseSnippet)
-      .set('Content-Type', 'application/json')
-      .expect(401);
-  });
-
-  it('put snippet with token should return 204', async () => {
-    const baseSnippetPut = {
-      ..._.omit(baseSnippet, 'dashboardName'),
-      dashboardName: 'dashboardNamePut',
-    };
-    await client
-      .put(`/basesnippets/${baseSnippetId}`)
-      .set('Authorization', 'Bearer ' + token)
-      .set('Content-Type', 'application/json')
-      .send(baseSnippetPut)
-      .expect(204);
-  });
-
   it('Get index without token should return 401', async () => {
     await client
-      .get(`/basesnippets/index=${baseSnippetId}`)
+      .get(`/locations/index=${locationSnippetId}`)
       .set('Content-Type', 'application/json')
       .expect(401);
   });
 
   it('Get index with token should return 200 and body=0', async () => {
     await client
-      .get(`/basesnippets/index=${baseSnippetId}`)
+      .get(`/locations/index=${locationSnippetId}`)
       .set('Authorization', 'Bearer ' + token)
       .set('Content-Type', 'application/json')
       .expect(200)
@@ -182,33 +173,9 @@ describe('Basesnippet', function (this: Suite) {
       });
   });
 
-  it('Search without token should return 401', async () => {
-    await client
-      .get(`/basesnippets/search=descript`)
-      .set('Content-Type', 'application/json')
-      .expect(401);
-  });
-
-  it('Search index with token should return 200 and matching body.description', async () => {
-    await client
-      .get(`/basesnippets/search=searchabledesc`)
-      .set('Authorization', 'Bearer ' + token)
-      .set('Content-Type', 'application/json')
-      .expect(200)
-      .then(
-        result => (
-          expect(result.body.length).to.be.eql(1),
-          expect(result.body[0].description).to.be.eql('aSearchableDescription')
-        ),
-      )
-      .catch(err => {
-        throw err;
-      });
-  });
-
   it('Search index with token should return 200 and matching body.name', async () => {
     await client
-      .get(`/basesnippets/search=searchablename`)
+      .get(`/locations/search=searchablename`)
       .set('Authorization', 'Bearer ' + token)
       .set('Content-Type', 'application/json')
       .expect(200)
@@ -223,28 +190,11 @@ describe('Basesnippet', function (this: Suite) {
       });
   });
 
-  it('Search index with token should return 200 and matching body.textcontent', async () => {
-    await client
-      .get(`/basesnippets/search=aSearchableText`)
-      .set('Authorization', 'Bearer ' + token)
-      .set('Content-Type', 'application/json')
-      .expect(200)
-      .then(
-        result => (
-          expect(result.body.length).to.be.eql(1),
-          expect(result.body[0].textcontent).to.be.eql('aSearchableTextContent')
-        ),
-      )
-      .catch(err => {
-        throw err;
-      });
-  });
-
   it('Search index with token should return 200 and matching body.tags', async () => {
     const includeTags = {fields: {tags: true}, include: ['subsnippets']};
     await client
       .get(
-        `/basesnippets/search=aSearchabletag?filter=${JSON.stringify(
+        `/locations/search=aSearchabletag?filter=${JSON.stringify(
           includeTags,
         )}`,
       )
@@ -264,8 +214,8 @@ describe('Basesnippet', function (this: Suite) {
 
   it('patch snippet by id without token should return 401', async () => {
     await client
-      .patch(`/basesnippets/${baseSnippetId}`)
-      .send(baseSnippet)
+      .patch(`/locations/${locationSnippetId}`)
+      .send(locationSnippet)
       .set('Content-Type', 'application/json')
       .expect(401);
   });
@@ -275,13 +225,12 @@ describe('Basesnippet', function (this: Suite) {
   // to prevent the search to return too many snippets, the fields used in the subsequent search are updated
   it('patch snippet by id with token should return 204', async () => {
     await client
-      .patch(`/basesnippets/${baseSnippetId}`)
+      .patch(`/locations/${locationSnippetId}`)
       .set('Authorization', 'Bearer ' + token)
       .set('Content-Type', 'application/json')
       .send({
         tags: ['aSearchExcludedTag'],
         name: 'aSearchExcludedName',
-        description: 'aSearchExcludedDescription',
         textcontent: 'aSearchExcludedTextContent',
       })
       .expect(204);
@@ -291,7 +240,7 @@ describe('Basesnippet', function (this: Suite) {
     const includeTags = {fields: {tags: true}, include: ['subsnippets']};
     await client
       .get(
-        `/basesnippets/search=aSearchabletag?filter=${JSON.stringify(
+        `/locations/search=aSearchabletag?filter=${JSON.stringify(
           includeTags,
         )}`,
       )
@@ -300,13 +249,9 @@ describe('Basesnippet', function (this: Suite) {
       .expect(200)
       .then(
         result => (
-          expect(result.body.length).to.be.eql(2),
-          result.body.map((res: Basesnippet) => {
-            if (res.subsnippets) {
-              expect(res.subsnippets[0].tags).to.be.eql(['aSearchableTag']);
-              expect(res.snippetType).to.be.eql('history');
-            } else expect(res.tags).to.be.eql(['aSearchableTag']);
-          })
+          expect(result.body.length).to.be.eql(1),
+          expect(result.body[0].snippetType).to.be.eql('location'),
+          expect(result.body[0].tags).to.be.eql(['aSearchableTag'])
         ),
       )
       .catch(err => {
@@ -316,14 +261,14 @@ describe('Basesnippet', function (this: Suite) {
 
   it('delete snippet by id without token should return 401', async () => {
     await client
-      .delete(`/basesnippets/${baseSnippetId}`)
+      .delete(`/locations/${locationSnippetId}`)
       .set('Content-Type', 'application/json')
       .expect(401);
   });
 
   it('delete snippet by id with token should return 204', async () => {
     await client
-      .delete(`/basesnippets/${baseSnippetId}`)
+      .delete(`/locations/${locationSnippetId}`)
       .set('Authorization', 'Bearer ' + token)
       .set('Content-Type', 'application/json')
       .expect(204);
@@ -331,52 +276,115 @@ describe('Basesnippet', function (this: Suite) {
 
   it('restore snippet by id without token should return 401', async () => {
     await client
-      .patch(`/basesnippets/${baseSnippetId}/restore`)
+      .patch(`/locations/${locationSnippetId}/restore`)
       .set('Content-Type', 'application/json')
       .expect(401);
   });
 
   it('restore snippet by id with token should return 204', async () => {
     await client
-      .patch(`/basesnippets/${baseSnippetId}/restore`)
+      .patch(`/locations/${locationSnippetId}/restore`)
       .set('Authorization', 'Bearer ' + token)
       .set('Content-Type', 'application/json')
       .expect(204);
   });
 
-  it('export snippet without token should return 401', async () => {
+  it('post a location with authentication should return 200 and contain readACL from functional accounts', async () => {
     await client
-      .get(`/basesnippets/export=zip`)
-      .set('Content-Type', 'application/json')
-      .expect(401);
-  });
-
-  it('export snippet with token should return 200 and exported zip', async () => {
-    await client
-      .get(`/basesnippets/export=zip`)
+      .post('/locations')
       .set('Authorization', 'Bearer ' + token)
       .set('Content-Type', 'application/json')
+      .send({
+        ..._.omit(locationSnippet, [
+          'ownerGroup',
+          'createACL',
+          'deleteACL',
+          'readACL',
+          'updateACL',
+          'shareACL',
+          'adminACL',
+          'location',
+        ]),
+        location: 'anExistingLocation',
+      })
       .expect(200)
-      .then(result =>
-        expect(result.headers['content-disposition']).to.be.eql(
-          'attachment; filename="all.zip"',
+      .then(
+        result => (
+          expect(result.body).to.containEql({
+            ..._.omit(locationSnippet, [
+              'ownerGroup',
+              'createACL',
+              'deleteACL',
+              'readACL',
+              'updateACL',
+              'shareACL',
+              'adminACL',
+              'location',
+            ]),
+          }),
+          expect(result.body.readACL).to.be.eql(['any-authenticated-user']),
+          expect(result.body.deleteACL).to.be.eql(['admin']),
+          expect(result.body.adminACL).to.be.eql(['admin']),
+          expect(result.body.shareACL).to.be.eql(undefined),
+          expect(result.body.createACL).to.be.eql(undefined),
+          expect(result.body.updateACL).to.be.eql([
+            adminUser.unxGroup,
+            adminUser.email,
+          ])
         ),
       )
       .catch(err => {
         throw err;
       });
   });
-  it('export snippet with token should return 200 and exported pdf', async () => {
-    await client
-      .get(`/basesnippets/export=pdf`)
+
+  it('tries to create location and linked logbook', async () => {
+    const acls = {
+      createACL: ['unx_sf-bernina-bs'],
+      readACL: ['p12345', 'unx_sf-bernina-bs'],
+      updateACL: ['p12345', 'unx_sf-bernina-bs'],
+      deleteACL: ['unx_sf-bernina-bs'],
+      shareACL: [userData.email, 'p12345'],
+      adminACL: [userData.email, 'unx_sf-bernina-bs'],
+    };
+    const logbook = {
+      snippetType: 'logbook',
+      isPrivate: false,
+      name: 'My logbook',
+      description: 'Logbook description goes here',
+      ...acls,
+    };
+
+    const postResponse = await client
+      .post('/locations')
       .set('Authorization', 'Bearer ' + token)
-      .set('Content-Type', 'application/json')
+      .send({name: 'cSAXS', location: 'PSI/SLS/CSAXS', ...acls})
       .expect(200)
-      .then(result =>
-        expect(result.headers['content-disposition']).to.be.eql(
-          'attachment; filename="export.pdf"',
-        ),
-      )
+      .then()
+      .catch(err => {
+        throw err;
+      });
+    let logbookId;
+    await client
+      .post('/logbooks')
+      .set('Authorization', 'Bearer ' + token)
+      .send({...logbook, location: `${postResponse.body.id}`})
+      .expect(200)
+      .then(result => {
+        expect(postResponse.body.snippetType).to.be.eql('location');
+        logbookId = result.body.id;
+        // console.log("Found logbook id:",logbookId)
+        expect(result.body.snippetType).to.be.eql('logbook');
+      })
+      .catch(err => {
+        throw err;
+      });
+
+    await client
+      .get(`/basesnippets/${logbookId}`)
+      .set('Authorization', 'Bearer ' + token)
+      .expect(200)
+      .then()
       .catch(err => {
         throw err;
       });

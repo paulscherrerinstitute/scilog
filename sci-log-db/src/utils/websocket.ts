@@ -178,6 +178,10 @@ export async function startWebsocket(app: SciLogDbApplication) {
     // console.log(collection);
     // eslint-disable-next-line  @typescript-eslint/no-explicit-any
     changeStream.on('change', function (change: any) {
+      if (change.fullDocument) {
+        change.fullDocument.ownerGroup = change.fullDocument.readACL?.[0] ?? '';
+        change.fullDocument.accessGroups = change.fullDocument.readACL ?? [];
+      }
       if (change.operationType !== 'delete') {
         getId.parentId(db, change.documentKey._id, async (id: string) => {
           if (id != null) {
@@ -188,15 +192,12 @@ export async function startWebsocket(app: SciLogDbApplication) {
             const doc = await collection.findOne({
               _id: Mongo.ObjectId(change.documentKey._id),
             });
-            doc['accessGroups'].push(doc['ownerGroup']);
             // console.log(websocketMap[id])
             if (typeof websocketMap[id] != 'undefined') {
               // eslint-disable-next-line  @typescript-eslint/no-explicit-any
               websocketMap[id].forEach((c: any) => {
                 if (
-                  doc['accessGroups'].some((r: string) =>
-                    c.user.roles.includes(r),
-                  )
+                  doc['readACL'].some((r: string) => c.user.roles.includes(r))
                 ) {
                   if (matchesFilterSettings(doc, c.config))
                     c.ws.send(JSON.stringify({'new-notification': change}));

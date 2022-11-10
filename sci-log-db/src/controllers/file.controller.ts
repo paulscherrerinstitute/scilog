@@ -12,12 +12,11 @@ import {
 import {
   del,
   get,
-  getModelSchemaRef,
   HttpErrors,
+  modelToJsonSchema,
   param,
   patch,
   post,
-  put,
   Request,
   requestBody,
   Response,
@@ -31,10 +30,21 @@ import {STORAGE_DIRECTORY} from '../keys';
 import {Filesnippet} from '../models/file.model';
 import {FileRepository} from '../repositories/file.repository';
 import {basicAuthorization} from '../services/basic.authorizor';
+import {
+  addOwnerGroupAccessGroups,
+  getModelSchemaRefWithStrict,
+  validateFieldsVSModel,
+} from '../utils/misc';
 import {OPERATION_SECURITY_SPEC} from '../utils/security-spec';
 
 const Mongo = require('mongodb');
 const crypto = require('crypto');
+
+const ownerGroupAccessGroupsFilesnippetModel = modelToJsonSchema(
+  addOwnerGroupAccessGroups(Filesnippet, true),
+);
+
+const getModelSchemaRef = getModelSchemaRefWithStrict;
 
 interface FormData {
   fields: Filesnippet;
@@ -139,7 +149,13 @@ export class FileController {
           reject(error);
           return error;
         }
-        resolve({fields: JSON.parse(fields?.fields || '{}'), files: files});
+        const parsedFields = JSON.parse(fields?.fields || '{}');
+        validateFieldsVSModel(
+          parsedFields,
+          ownerGroupAccessGroupsFilesnippetModel,
+          reject,
+        );
+        resolve({fields: parsedFields, files: files});
       });
     });
     return this.uploadToGridfs(formData, async (fm, resolve, reject) => {
@@ -356,7 +372,13 @@ export class FileController {
           reject(error);
           return error;
         }
-        resolve({fields: JSON.parse(fields?.fields), files: files});
+        const parsedFields = JSON.parse(fields?.fields || '{}');
+        validateFieldsVSModel(
+          parsedFields,
+          ownerGroupAccessGroupsFilesnippetModel,
+          reject,
+        );
+        resolve({fields: parsedFields, files: files});
       });
     });
     return this.uploadToGridfs(formData, async (fm, resolve, reject) => {
@@ -395,21 +417,6 @@ export class FileController {
     await this.fileRepository.updateByIdWithHistory(id, file, {
       currentUser: this.user,
     });
-  }
-
-  @put('/filesnippet/{id}', {
-    security: OPERATION_SECURITY_SPEC,
-    responses: {
-      '204': {
-        description: 'File PUT success',
-      },
-    },
-  })
-  async replaceById(
-    @param.path.string('id') id: string,
-    @requestBody() file: Filesnippet,
-  ): Promise<void> {
-    await this.fileRepository.replaceById(id, file, {currentUser: this.user});
   }
 
   @del('/filesnippet/{id}', {
@@ -465,7 +472,6 @@ export class FileController {
           reject({error: error});
         })
         .on('finish', async () => {
-          console.log('done!');
           formData.fields['_fileId'] = id;
           formData.fields['contentType'] = formData.files.file.type;
           // eslint-disable-next-line  @typescript-eslint/no-floating-promises

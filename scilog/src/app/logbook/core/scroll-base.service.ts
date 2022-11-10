@@ -97,6 +97,10 @@ export class ScrollBaseService {
     await this.datasource.adapter.relax();
   }
 
+  async reload() {
+    await this.datasource.adapter.reload();
+  }
+
   get isBOF() {
     return this.datasource.adapter.bof;
   }

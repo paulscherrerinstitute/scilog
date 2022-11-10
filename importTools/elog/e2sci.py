@@ -113,6 +113,9 @@ for fn in fns:
     if default_pgroup == "any-authenticated-user":
         continue
 
+    # if data_in["MID"] > 10757 :
+    #      continue
+
     print ("This msg is selected")
     # remove ignored entries
     for i in ignored:
@@ -142,9 +145,7 @@ for fn in fns:
 
     pgroup = data_in.pop("P-Group", default_pgroup)
     data_out["ownerGroup"] = pgroup
-
-    data_out["accessGroups"] = []
-
+    
     attchs = data_in.pop("attachments")
     # remove empty entries which seem sometimes to appear
     while '' in attchs:
@@ -165,7 +166,7 @@ for fn in fns:
                 if att in source_attachment:
                     index = ii
                     break
-            if index:
+            if index is not None:
                 attachment = attchs.pop(index) 
             else:
                 # image not contained as attachment

@@ -13,6 +13,12 @@ import {Basesnippet} from './basesnippet.model';
 export class Image extends Basesnippet {
   @property({
     type: 'string',
+    default: 'image',
+  })
+  snippetType: string;
+
+  @property({
+    type: 'string',
     description: 'Name of uploaded file',
   })
   filename?: string;

@@ -1,18 +1,22 @@
 import {Client, expect} from '@loopback/testlab';
 import {Suite} from 'mocha';
-import _ from 'lodash';
 import {SciLogDbApplication} from '../..';
 import {clearDatabase, createUserToken, setupApplication} from './test-helper';
 
 describe('File controller services', function (this: Suite) {
-  this.timeout(5000);
+  this.timeout(1000);
   let app: SciLogDbApplication;
   let client: Client;
   let token: string;
   let fileSnippetId: string;
   const fileSnippet = {
-    ownerGroup: 'aOwner',
-    accessGroups: ['filesnippetAcceptance'],
+    ownerGroup: 'filesnippetAcceptance',
+    createACL: ['filesnippetAcceptance'],
+    readACL: ['filesnippetAcceptance'],
+    updateACL: ['filesnippetAcceptance'],
+    deleteACL: ['filesnippetAcceptance'],
+    adminACL: ['admin'],
+    shareACL: ['filesnippetAcceptance'],
     isPrivate: true,
     defaultOrder: 0,
     expiresAt: '2055-10-10T14:04:19.522Z',
@@ -137,27 +141,6 @@ describe('File controller services', function (this: Suite) {
       .catch(err => {
         throw err;
       });
-  });
-
-  it('put snippet without token should return 401', async () => {
-    await client
-      .put(`/filesnippet/${fileSnippetId}`)
-      .send(fileSnippet)
-      .set('Content-Type', 'application/json')
-      .expect(401);
-  });
-
-  it('put snippet with token should return 204', async () => {
-    const filePut = {
-      ..._.omit(fileSnippet, 'dashboardName'),
-      dashboardName: 'dashboardNamePut',
-    };
-    await client
-      .put(`/filesnippet/${fileSnippetId}`)
-      .set('Authorization', 'Bearer ' + token)
-      .set('Content-Type', 'application/json')
-      .send(filePut)
-      .expect(204);
   });
 
   it('Get index without token should return 401', async () => {
@@ -351,7 +334,7 @@ describe('File controller services', function (this: Suite) {
       .post('/filesnippet/files')
       .set('Authorization', 'Bearer ' + token)
       .type('form')
-      .field('fields', '{"ownerGroup": "aOwner"}')
+      .field('fields', '{"readACL": ["aOwner"]}')
       .attach('file', __filename)
       .expect(200)
       .then()
@@ -365,7 +348,7 @@ describe('File controller services', function (this: Suite) {
       .post('/filesnippet/files')
       .set('Authorization', 'Bearer ' + token)
       .type('form')
-      .field('fields', '{"ownerGroup": "any-authenticated-user"}')
+      .field('fields', '{"readACL": ["any-authenticated-user"]}')
       .attach('file', __filename)
       .then()
       .catch(err => {
@@ -390,7 +373,7 @@ describe('File controller services', function (this: Suite) {
       .post('/filesnippet/files')
       .set('Authorization', 'Bearer ' + token)
       .type('form')
-      .field('fields', '{"ownerGroup": "any-authenticated-user"}')
+      .field('fields', '{"readACL": ["any-authenticated-user"]}')
       .attach('file', __filename)
       .then()
       .catch(err => {
@@ -404,6 +387,23 @@ describe('File controller services', function (this: Suite) {
       .attach('file', __filename)
       .expect(204)
       .then()
+      .catch(err => {
+        throw err;
+      });
+  });
+
+  it('tries to post a file with accessGroups should add to readACL', async () => {
+    await client
+      .post('/filesnippet/files')
+      .set('Authorization', 'Bearer ' + token)
+      .type('form')
+      .field('fields', '{"accessGroups": ["anAccessGroup"]}')
+      .attach('file', __filename)
+      .expect(200)
+      .then(result => {
+        expect(result.body.accessGroups).to.be.eql(['anAccessGroup']);
+        expect(result.body.readACL).to.be.eql(['anAccessGroup']);
+      })
       .catch(err => {
         throw err;
       });
