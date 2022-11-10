@@ -113,7 +113,7 @@ def _update_proposals(log, locationStorage, proposalsStorage):
 
         locStr = proposal["location"]
         loc = locationStorage[locStr]
-        
+
         new_snip = {
             "ownerGroup": ownerGroup,
             "isPrivate": False,
