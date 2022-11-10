@@ -211,6 +211,7 @@ function FindWithSearchRepositoryMixin<
               ) {
                 foundSubsnippetEntry = true;
               }
+              if (this._searchReadACL(it, search)) foundSnippetEntry = true;
             }
           });
         }
@@ -237,6 +238,7 @@ function FindWithSearchRepositoryMixin<
         ) {
           foundSnippetEntry = true;
         }
+        if (this._searchReadACL(item, search)) foundSnippetEntry = true;
         if (foundSnippetEntry || foundSubsnippetEntry) {
           foundEntries++;
           if (foundEntries > skip) {
@@ -249,6 +251,12 @@ function FindWithSearchRepositoryMixin<
       }
 
       return snippetsFiltered;
+    }
+
+    private _searchReadACL(item: Basesnippet, search: string) {
+      return item.readACL?.some?.(
+        s => s.toLowerCase() === search.toLowerCase(),
+      );
     }
 
     async findIndexInBuffer(
