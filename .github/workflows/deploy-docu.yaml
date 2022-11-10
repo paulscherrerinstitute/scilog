@@ -2,8 +2,10 @@ name: Build and deploy docu
 
 on:
   push:
-    branches:
-      - feature/addDocumentation
+    branches: [main]
+    paths: 
+      - docs/**
+      - .github/workflows/deploy-docu.yaml
 
 jobs:
   build-and-deploy:
