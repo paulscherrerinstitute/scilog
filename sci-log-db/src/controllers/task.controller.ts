@@ -203,7 +203,7 @@ export class TaskController {
     })
     task: Task,
   ): Promise<void> {
-    await this.taskRepository.updateById(id, task, {
+    await this.taskRepository.updateByIdWithHistory(id, task, {
       currentUser: this.user,
     });
   }

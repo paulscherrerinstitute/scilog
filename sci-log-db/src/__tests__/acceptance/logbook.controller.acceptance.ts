@@ -226,8 +226,8 @@ describe('Logbook', function (this: Suite) {
       .expect(204);
   });
 
-  it('Search index with token should return 200 and matching subsnippets', async () => {
-    const includeTags = {fields: {tags: true}, include: ['subsnippets']};
+  it('Search index with token should return 200 and zero matches', async () => {
+    const includeTags = {fields: {tags: true}};
     await client
       .get(
         `/logbooks/search=aSearchabletag?filter=${JSON.stringify(includeTags)}`,
