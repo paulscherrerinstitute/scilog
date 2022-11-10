@@ -2,6 +2,7 @@
     "lbBaseURL": "http://localhost:3000/",
     "oAuth2Endpoint": {
         "authURL": "auth/thirdparty/keycloak",
-        "displayText": "keycloak"
+        "displayText": "keycloak",
+        "toolTipText": "text to display on top of OIDC login button"
     }
 }
