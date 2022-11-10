@@ -254,8 +254,8 @@ function FindWithSearchRepositoryMixin<
     }
 
     private _searchReadACL(item: Basesnippet, search: string) {
-      return item.readACL?.some?.(
-        s => s.toLowerCase() === search.toLowerCase(),
+      return item.readACL?.some?.(s =>
+        s.toLowerCase().includes(search.toLowerCase()),
       );
     }
 

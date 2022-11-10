@@ -203,7 +203,7 @@ describe('Basesnippet', function (this: Suite) {
       });
   });
 
-  it('Search index with token should return 200 and matching body.name', async () => {
+  it('Search with token should return 200 and matching body.name', async () => {
     await client
       .get(`/basesnippets/search=searchablename`)
       .set('Authorization', 'Bearer ' + token)
@@ -220,7 +220,7 @@ describe('Basesnippet', function (this: Suite) {
       });
   });
 
-  it('Search index with token should return 200 and matching body.textcontent', async () => {
+  it('Search with token should return 200 and matching body.textcontent', async () => {
     await client
       .get(`/basesnippets/search=aSearchableText`)
       .set('Authorization', 'Bearer ' + token)
@@ -237,7 +237,7 @@ describe('Basesnippet', function (this: Suite) {
       });
   });
 
-  it('Search index with token should return 200 and matching body.tags', async () => {
+  it('Search with token should return 200 and matching body.tags', async () => {
     const includeTags = {fields: {tags: true}, include: ['subsnippets']};
     await client
       .get(
@@ -252,6 +252,23 @@ describe('Basesnippet', function (this: Suite) {
         result => (
           expect(result.body.length).to.be.eql(1),
           expect(result.body[0].tags[0]).to.be.eql('aSearchableTag')
+        ),
+      )
+      .catch(err => {
+        throw err;
+      });
+  });
+
+  it('Search with token should return 200 and matching readACL', async () => {
+    await client
+      .get(`/basesnippets/search=basesnippetAccept`)
+      .set('Authorization', 'Bearer ' + token)
+      .set('Content-Type', 'application/json')
+      .expect(200)
+      .then(
+        result => (
+          expect(result.body.length).to.be.eql(1),
+          expect(result.body[0].readACL).to.be.eql(['basesnippetAcceptance'])
         ),
       )
       .catch(err => {
