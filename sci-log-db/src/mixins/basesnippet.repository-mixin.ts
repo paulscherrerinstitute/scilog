@@ -198,16 +198,18 @@ function FindWithSearchRepositoryMixin<
             ) {
               if (it.textcontent.toLowerCase().includes(search.toLowerCase())) {
                 foundSubsnippetEntry = true;
-              } else if (includeTags) {
-                if (
-                  it.tags.some((tag: string) => {
-                    if (tag.toLowerCase() === search.toLowerCase()) {
-                      return true;
-                    }
-                  })
-                ) {
-                  foundSubsnippetEntry = true;
-                }
+              }
+
+              if (
+                includeTags &&
+                it.tags &&
+                it.tags.some((tag: string) => {
+                  if (tag.toLowerCase() === search.toLowerCase()) {
+                    return true;
+                  }
+                })
+              ) {
+                foundSubsnippetEntry = true;
               }
             }
           });
