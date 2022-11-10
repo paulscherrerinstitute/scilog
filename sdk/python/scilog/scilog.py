@@ -78,10 +78,11 @@ class SciLog:
 
     @pinned_to_logbook(["parentId", *ACLS])
     def import_from_dict(self, snippet: dict, **kwargs):
-        msg = snippet.pop("textcontent")
+        msg = snippet["textcontent"]
+        snippet_dict = {k: v for k, v in snippet.items() if k != "textcontent"}
         for key in ACLS:
-            snippet = self._replace_json_placeholder(snippet, key, kwargs.get(key, []))
-        self.send_message(msg, **snippet)
+            snippet_dict = self._replace_json_placeholder(snippet_dict, key, kwargs.get(key, []))
+        self.send_message(msg, **snippet_dict)
 
     @pinned_to_logbook(["parentId", *ACLS])
     def send_message(self, msg, **kwargs):

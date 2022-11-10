@@ -15,4 +15,5 @@ def retry(func):
                 n += 1
             else:
                 return res
+            if n == 10: break
     return wrapper
