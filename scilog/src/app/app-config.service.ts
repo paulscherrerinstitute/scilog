@@ -6,6 +6,7 @@ export interface Oauth2Endpoint {
   displayText: string, 
   authURL: string, 
   displayImage?: string,
+  tooltipText?: string,
 }
 export interface AppConfig {
   lbBaseURL?: string;
