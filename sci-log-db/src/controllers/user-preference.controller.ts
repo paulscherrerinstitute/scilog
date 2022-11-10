@@ -12,7 +12,6 @@ import {
   get,
   getModelSchemaRef,
   patch,
-  put,
   del,
   requestBody,
 } from '@loopback/rest';
@@ -163,21 +162,6 @@ export class UserPreferenceController {
     userPreference: UserPreference,
   ): Promise<void> {
     await this.userPreferenceRepository.updateById(id, userPreference);
-  }
-
-  @put('/user-preferences/{id}', {
-    security: OPERATION_SECURITY_SPEC,
-    responses: {
-      '204': {
-        description: 'UserPreference PUT success',
-      },
-    },
-  })
-  async replaceById(
-    @param.path.string('id') id: string,
-    @requestBody() userPreference: UserPreference,
-  ): Promise<void> {
-    await this.userPreferenceRepository.replaceById(id, userPreference);
   }
 
   @del('/user-preferences/{id}', {

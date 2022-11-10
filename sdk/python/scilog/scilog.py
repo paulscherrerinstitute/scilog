@@ -9,22 +9,26 @@ from typing import Any, Tuple
 
 from .authmixin import HEADER_JSON, AuthError
 from .httpclient import HttpClient
-from .snippet import Basesnippet, Filesnippet, Paragraph, Snippet
+from .snippet import Basesnippet, Filesnippet, Location, Paragraph, Snippet
+
+ACLS = ["createACL", "readACL", "updateACL", "deleteACL", "shareACL", "adminACL"]
 
 
-def pinned_to_logbook(logbook_keys):
+def pinned_to_logbook(logbook_keys, include_none=False):
     def pinned_to_logbook_inner(func):
         @functools.wraps(func)
         def pinned_to_logbook_call(log, *args, **kwargs):
             if not isinstance(log.logbook, Basesnippet):
                 warnings.warn("No logbook selected.")
             else:
+                logbook = log.logbook.to_dict(include_none=include_none)
                 for key in logbook_keys:
                     if key not in kwargs:
                         if key == "parentId":
                             kwargs[key] = log.logbook.id
                         else:
-                            kwargs[key] = getattr(log.logbook, key)
+                            if logbook.get(key): 
+                                kwargs[key] = logbook[key]
             return func(log, *args, **kwargs)
 
         return pinned_to_logbook_call
@@ -47,7 +51,7 @@ class SciLog:
     def select_logbook(self, logbook: Basesnippet):
         self.logbook = logbook
 
-    @pinned_to_logbook(["parentId", "ownerGroup", "accessGroups"])
+    @pinned_to_logbook(["parentId", *ACLS])
     def get_snippets(self, **kwargs):
         url = self.http_client.address + "/basesnippets"
         params = self.http_client.make_filter(where=kwargs)
@@ -58,6 +62,7 @@ class SciLog:
 
     @staticmethod
     def _replace_json_placeholder(snippet: dict, field: str, data: Any) -> dict:
+        if not snippet.get(field): return snippet
         if isinstance(snippet[field], list):
             if "default" in snippet[field]:
                 data = set(data) | set(group for group in snippet[field] if group)
@@ -71,18 +76,15 @@ class SciLog:
 
         raise ValueError("The used placeholder type is not supported. ")
 
-    @pinned_to_logbook(["parentId", "ownerGroup", "accessGroups"])
+    @pinned_to_logbook(["parentId", *ACLS])
     def import_from_dict(self, snippet: dict, **kwargs):
-        msg = snippet.pop("textcontent")
-        snippet = self._replace_json_placeholder(
-            snippet, "accessGroups", kwargs.get("accessGroups", [])
-        )
-        snippet = self._replace_json_placeholder(
-            snippet, "ownerGroup", kwargs.get("ownerGroup", "")
-        )
-        self.send_message(msg, **snippet)
+        msg = snippet["textcontent"]
+        snippet_dict = {k: v for k, v in snippet.items() if k != "textcontent"}
+        for key in ACLS:
+            snippet_dict = self._replace_json_placeholder(snippet_dict, key, kwargs.get(key, []))
+        self.send_message(msg, **snippet_dict)
 
-    @pinned_to_logbook(["parentId", "ownerGroup", "accessGroups"])
+    @pinned_to_logbook(["parentId", *ACLS])
     def send_message(self, msg, **kwargs):
         url = self.http_client.address + "/basesnippets"
         snippet = Paragraph()
@@ -91,13 +93,23 @@ class SciLog:
         payload = snippet.to_dict(include_none=False)
         return self.post_snippet(**payload)
 
-    @pinned_to_logbook(["parentId", "ownerGroup", "accessGroups"])
+    @pinned_to_logbook(["parentId", *ACLS])
     def post_snippet(self, **kwargs):
         url = self.http_client.address + "/basesnippets"
         payload = kwargs
         if payload.get("files"):
             payload = self.upload_files(payload)
         return Paragraph.from_http_response(
+            self.http_client.post_request(url, payload=payload, headers=HEADER_JSON)
+        )
+
+    @pinned_to_logbook(["parentId", *ACLS])
+    def post_location(self, **kwargs):
+        url = self.http_client.address + "/basesnippets"
+        payload = kwargs
+        if payload.get("files"):
+            payload = self.upload_files(payload)
+        return Location.from_http_response(
             self.http_client.post_request(url, payload=payload, headers=HEADER_JSON)
         )
 
@@ -108,14 +120,15 @@ class SciLog:
             print("Posting from filepath:", file["filepath"])
             filesnippet = self._post_filesnippet(
                 file["filepath"],
-                ownerGroup=payload.get("ownerGroup"),
-                accessGroups=payload.get("accessGroups"),
+                **{key: val for key, val in payload.items() if key 
+                in ACLS + [k for k, v in Filesnippet._deprecated_by.items() if v == "ACLS"]},
             )
             file["fileId"] = filesnippet.id
+            file["accessHash"] = filesnippet.accessHash
             file.pop("filepath")
         return payload
 
-    @pinned_to_logbook(["ownerGroup", "accessGroups"])
+    @pinned_to_logbook(ACLS)
     def _post_filesnippet(self, filepath, **kwargs):
         url = self.http_client.address + "/filesnippet/files"
 
@@ -144,17 +157,14 @@ class SciLog:
             )
         )
 
-    @pinned_to_logbook(["ownerGroup", "accessGroups"])
+    @pinned_to_logbook(ACLS)
     def post_file(self, filepath: str, **kwargs) -> Filesnippet:
         """Upload a file
-
         Args:
             filepath (str): Path to the file that ought to be uploaded
-
         Raises:
             FileNotFoundError: Raised if the file specified in filepath does not exist
             ValueError: Raised if the filepath is not pointing to a file
-
         Returns:
             Filesnippet: Filesnippet containing the metadata of the newly created entry
         """
@@ -165,14 +175,12 @@ class SciLog:
         # ret = self._file_upload(filepath, fsnippet.id, file_extension)
         return fsnippet
 
-    @pinned_to_logbook(["ownerGroup", "accessGroups"])
+    @pinned_to_logbook(ACLS)
     def append_files_to_snippet(self, snippet: Paragraph, filepaths: list, **kwargs) -> Paragraph:
         """Append files or images to an already existing snippet. Files and images will be appended following the order given in 'filepaths'.
-
         Args:
             snippet (Paragraph): Snippet to which the files should be appended
             filepaths (list): List of file paths pointing to the files that should be uploaded
-
         Returns:
             Paragraph: Updated snippet
         """
@@ -196,7 +204,8 @@ class SciLog:
     def prepare_file_content(filepath: str, fsnippet: Filesnippet = None) -> Tuple:
         file_extension = filepath.split(".")[-1].lower()
         file_hash = str(uuid.uuid4())
-        file_id = fsnippet.id if fsnippet.id else None  #  str(uuid.uuid4())
+        file_id = fsnippet.id if fsnippet and fsnippet.id else None 
+        accessHash = fsnippet.accessHash if fsnippet and fsnippet.accessHash else None 
 
         if file_extension in SciLog.IMAGE_TYPES:
             textcontent = (
@@ -207,7 +216,7 @@ class SciLog:
                 "filepath": filepath,
                 "fileExtension": f"image/{file_extension}",
                 "fileId": file_id,
-                "accessHash": fsnippet.accessHash,
+                "accessHash": accessHash,
                 "style": {"width": "82.25%", "height": ""},
             }
 
@@ -218,16 +227,14 @@ class SciLog:
                 "filepath": filepath,
                 "fileExtension": f"file/{file_extension}",
                 "fileId": file_id,
-                "accessHash": fsnippet.accessHash,
+                "accessHash": accessHash,
             }
         return (file_info, textcontent)
 
     def patch_snippet(self, snippet: Paragraph, **kwargs) -> Paragraph:
         """Update (patch) snippet with given snippet.
-
         Args:
             snippet (Basesnippet): Snippet containing the newly updated fields
-
         Returns:
             Basesnippet: Updated snippet
         """

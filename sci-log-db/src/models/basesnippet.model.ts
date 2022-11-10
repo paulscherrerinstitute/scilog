@@ -22,20 +22,6 @@ export class Basesnippet extends Entity {
 
   @property({
     type: 'string',
-    description:
-      'Only members of the ownerGroup are allowed to see and work with this snippet',
-    index: true,
-  })
-  ownerGroup?: string;
-
-  @property.array(String, {
-    description: 'groups whose members have read access to this snippet',
-    index: true,
-  })
-  accessGroups?: string[];
-
-  @property({
-    type: 'string',
     default: 'base',
     description:
       'Defines what type of information snippet is added, such as paragraph, image etc.',
@@ -97,6 +83,51 @@ export class Basesnippet extends Entity {
     index: true,
   })
   updatedBy: string;
+
+  @property.array(String, {
+    description: 'groups or users who can create this snippet',
+    index: true,
+  })
+  createACL: string[];
+
+  @property.array(String, {
+    description: 'groups or users who can read this snippet',
+    index: true,
+  })
+  readACL: string[];
+
+  @property.array(String, {
+    description: 'groups or users who can update this snippet',
+    index: true,
+  })
+  updateACL: string[];
+
+  @property.array(String, {
+    description: 'groups or users who can delete this snippet',
+    index: true,
+  })
+  deleteACL: string[];
+
+  @property.array(String, {
+    description: 'groups or users who can share this snippet',
+    index: true,
+  })
+  shareACL: string[];
+
+  @property.array(String, {
+    description: 'groups or users who can administrate this snippet',
+    index: true,
+  })
+  adminACL: string[];
+
+  @property({
+    type: 'string',
+    description:
+      'ACL flags (UDSA) calculated for current user, taking her role into account',
+    readonly: true,
+    index: false,
+  })
+  calculatedACLs?: string;
 
   @hasMany(() => Basesnippet, {keyTo: 'parentId'})
   subsnippets?: Basesnippet[];

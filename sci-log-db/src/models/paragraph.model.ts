@@ -1,5 +1,6 @@
 import {model, property} from '@loopback/repository';
 import {Basesnippet} from './basesnippet.model';
+import {Filecontainer} from './location.model';
 
 enum LinkType {
   PARAGRAPH = 'paragraph',
@@ -7,19 +8,9 @@ enum LinkType {
   QUOTE = 'quote',
 }
 
-export interface Filecontainer {
-  className?: string;
-  childTag?: string;
-  style?: {
-    width: string;
-    height: string;
-  };
-  fileId?: string;
-}
-
 @model({
   settings: {
-    strict: true,
+    strict: false,
     scope: {
       where: {snippetType: 'paragraph'},
     },
@@ -27,6 +18,12 @@ export interface Filecontainer {
   },
 })
 export class Paragraph extends Basesnippet {
+  @property({
+    type: 'string',
+    default: 'paragraph',
+  })
+  snippetType: string;
+
   @property({
     type: 'string',
     description: 'Markup contents in markdown (MD) syntax of this paragraph',

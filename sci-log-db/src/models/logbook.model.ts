@@ -3,7 +3,7 @@ import {Basesnippet} from './basesnippet.model';
 
 @model({
   settings: {
-    strict: true,
+    strict: false,
     scope: {
       where: {snippetType: 'logbook'},
     },
@@ -11,6 +11,12 @@ import {Basesnippet} from './basesnippet.model';
   },
 })
 export class Logbook extends Basesnippet {
+  @property({
+    type: 'string',
+    default: 'logbook',
+  })
+  snippetType: string;
+
   @property({
     type: 'string',
     required: true,

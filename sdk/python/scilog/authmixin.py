@@ -1,5 +1,6 @@
 import getpass
 from abc import ABC, abstractmethod
+from json.decoder import JSONDecodeError
 
 from .config import Config
 from .utils import typename
@@ -11,7 +12,10 @@ class AuthMixin(ABC):
     def __init__(self, address, options=None):
         self.address = address.rstrip("/")
         tn = typename(self).lower()
-        self.config = Config(f".{tn}-tokens")
+        try:
+            self.config = Config(f".{tn}-tokens")
+        except JSONDecodeError: 
+            self.config = {}
         if not options:
             options = {}
         self._token = options.get("token")

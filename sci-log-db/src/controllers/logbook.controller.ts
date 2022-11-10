@@ -9,20 +9,12 @@ import {
   repository,
   Where,
 } from '@loopback/repository';
-import {
-  del,
-  get,
-  getModelSchemaRef,
-  param,
-  patch,
-  post,
-  put,
-  requestBody,
-} from '@loopback/rest';
+import {del, get, param, patch, post, requestBody} from '@loopback/rest';
 import {SecurityBindings, UserProfile} from '@loopback/security';
 import {Logbook} from '../models';
 import {LogbookRepository} from '../repositories';
 import {basicAuthorization} from '../services/basic.authorizor';
+import {getModelSchemaRef} from '../utils/misc';
 import {OPERATION_SECURITY_SPEC} from '../utils/security-spec';
 
 @authenticate('jwt')
@@ -212,24 +204,7 @@ export class LogbookController {
     })
     logbook: Logbook,
   ): Promise<void> {
-    await this.logbookRepository.updateByIdWithHistory(id, logbook, {
-      currentUser: this.user,
-    });
-  }
-
-  @put('/logbooks/{id}', {
-    security: OPERATION_SECURITY_SPEC,
-    responses: {
-      '204': {
-        description: 'Logbook PUT success',
-      },
-    },
-  })
-  async replaceById(
-    @param.path.string('id') id: string,
-    @requestBody() logbook: Logbook,
-  ): Promise<void> {
-    await this.logbookRepository.replaceById(id, logbook, {
+    await this.logbookRepository.updateById(id, logbook, {
       currentUser: this.user,
     });
   }
@@ -243,7 +218,7 @@ export class LogbookController {
     },
   })
   async deleteById(@param.path.string('id') id: string): Promise<void> {
-    await this.logbookRepository.deleteByIdWithHistory(id, {
+    await this.logbookRepository.deleteById(id, {
       currentUser: this.user,
     });
   }

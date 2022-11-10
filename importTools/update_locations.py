@@ -3,13 +3,13 @@
 import os
 
 from dotenv import load_dotenv
-from scilog import SciCat, SciLog
+from scilog import Location, SciCat, SciLog
 
 from psi_webpage_icon_extractor import PSIWebpageIconExtractor
 
 
 def prepare_location_snippet(log):
-    snips = log.get_snippets(title="location", ownerGroup="admin")
+    snips = log.get_snippets(snippetType="location", name="root", ownerGroup="admin")
     if snips:
         print("location snippet exists already:",snips[0].id)
         assert len(snips) == 1
@@ -18,11 +18,11 @@ def prepare_location_snippet(log):
 
     filepath = os.environ["SCILOG_DEFAULT_LOGBOOK_ICON"]
     location_snippet = {
-        "ownerGroup": "admin",
-        "accessGroups": ["any-authenticated-user"],
         "isPrivate": True,
-        "title": "location",
-        "snippetType": "paragraph",
+        "snippetType": "location",
+        "name": "root",
+        "location": "root",
+        "accessGroups": ["any-authenticated-user"],
         "files": [{"filepath": filepath}],
     }
     snip = log.post_snippet(**location_snippet)
@@ -62,7 +62,7 @@ def _collect_data(proposals):
     return accessGroups, locations, proposalsStorage
 
 def _update_locations(log, loc_id, locations):
-    locationStorage = dict()
+    locationStorage = {}
 
     locations_snippet = log.get_snippets(id=loc_id)[0]
 
@@ -93,19 +93,15 @@ def _update_locations(log, loc_id, locations):
         if not files:
             files = locations_snippet.files
 
-        new_snip = {
-            "ownerGroup": group,
-            "accessGroups": ["any-authenticated-user"],
-            "isPrivate": True,
-            "title": loc.split("/")[-1],
-            "location": loc,
-            # "contact": group + "@psi.ch",
-            "snippetType": "image",
-            "parentId": loc_id,
-            "files": files,
-        }
+        new_location = Location()
+        new_location.accessGroups = ["any-authenticated-user"]
+        new_location.isPrivate = True
+        new_location.location = loc
+        new_location.name = loc.split("/")[-1]
+        new_location.files = files
+        new_location.parentId = loc_id
 
-        snip = log.post_snippet(**new_snip)
+        snip = log.post_location(**new_location.to_dict(include_none=False))
         locationStorage[loc] = snip
 
     return locationStorage
@@ -115,12 +111,11 @@ def _update_proposals(log, locationStorage, proposalsStorage):
     for proposal in proposalsStorage:
         ownerGroup = proposal["ownerGroup"]
 
-        loc = proposal["location"]
-        loc = locationStorage[loc]
+        locStr = proposal["location"]
+        loc = locationStorage[locStr]
 
         new_snip = {
             "ownerGroup": ownerGroup,
-            "accessGroups": [loc.ownerGroup],
             "isPrivate": False,
             "name": proposal["title"],
             "location": loc.id,
@@ -159,8 +154,7 @@ class ClientSettingsFromEnv:
 
 
 if __name__ == "__main__":
-    # load_dotenv("./SCICAT.env")
-    # load_dotenv("./SCILOG.env")
+    load_dotenv()
     scicat = ClientSettingsFromEnv("SCICAT")
 
     scilog = ClientSettingsFromEnv("SCILOG")

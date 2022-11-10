@@ -7,8 +7,8 @@ import {
   Where,
 } from '@loopback/repository';
 import {post, param, get, patch, del, requestBody} from '@loopback/rest';
-import {Paragraph} from '../models';
-import {ParagraphRepository} from '../repositories';
+import {Location} from '../models';
+import {LocationRepository} from '../repositories';
 
 import {authenticate} from '@loopback/authentication';
 import {authorize} from '@loopback/authorization';
@@ -23,19 +23,19 @@ import {getModelSchemaRef} from '../utils/misc';
   allowedRoles: ['any-authenticated-user'],
   voters: [basicAuthorization],
 })
-export class ParagraphController {
+export class LocationController {
   constructor(
     @inject(SecurityBindings.USER) private user: UserProfile,
-    @repository(ParagraphRepository)
-    public paragraphRepository: ParagraphRepository,
+    @repository(LocationRepository)
+    public locationRepository: LocationRepository,
   ) {}
 
-  @post('/paragraphs', {
+  @post('/locations', {
     security: OPERATION_SECURITY_SPEC,
     responses: {
       '200': {
-        description: 'Paragraph model instance',
-        content: {'application/json': {schema: getModelSchemaRef(Paragraph)}},
+        description: 'Location model instance',
+        content: {'application/json': {schema: getModelSchemaRef(Location)}},
       },
     },
   })
@@ -43,43 +43,41 @@ export class ParagraphController {
     @requestBody({
       content: {
         'application/json': {
-          schema: getModelSchemaRef(Paragraph, {
-            title: 'NewParagraph',
+          schema: getModelSchemaRef(Location, {
+            title: 'NewLocation',
             exclude: ['id'],
           }),
         },
       },
     })
-    paragraph: Omit<Paragraph, 'id'>,
-  ): Promise<Paragraph> {
-    return this.paragraphRepository.create(paragraph, {currentUser: this.user});
+    location: Omit<Location, 'id'>,
+  ): Promise<Location> {
+    return this.locationRepository.create(location, {currentUser: this.user});
   }
 
-  @get('/paragraphs/count', {
+  @get('/locations/count', {
     security: OPERATION_SECURITY_SPEC,
     responses: {
       '200': {
-        description: 'Paragraph model count',
+        description: 'Location model count',
         content: {'application/json': {schema: CountSchema}},
       },
     },
   })
-  async count(
-    @param.where(Paragraph) where?: Where<Paragraph>,
-  ): Promise<Count> {
-    return this.paragraphRepository.count(where, {currentUser: this.user});
+  async count(@param.where(Location) where?: Where<Location>): Promise<Count> {
+    return this.locationRepository.count(where, {currentUser: this.user});
   }
 
-  @get('/paragraphs/search={search}', {
+  @get('/locations/search={search}', {
     security: OPERATION_SECURITY_SPEC,
     responses: {
       '200': {
-        description: 'Array of paragraphs model instances',
+        description: 'Array of locations model instances',
         content: {
           'application/json': {
             schema: {
               type: 'array',
-              items: getModelSchemaRef(Paragraph, {includeRelations: true}),
+              items: getModelSchemaRef(Location, {includeRelations: true}),
             },
           },
         },
@@ -88,9 +86,9 @@ export class ParagraphController {
   })
   async findWithSearch(
     @param.path.string('search') search: string,
-    @param.filter(Paragraph) filter?: Filter<Paragraph>,
-  ): Promise<Paragraph[]> {
-    const snippetsFiltered = await this.paragraphRepository.findWithSearch(
+    @param.filter(Location) filter?: Filter<Location>,
+  ): Promise<Location[]> {
+    const snippetsFiltered = await this.locationRepository.findWithSearch(
       search,
       this.user,
       filter,
@@ -98,15 +96,15 @@ export class ParagraphController {
     return snippetsFiltered;
   }
 
-  @get('/paragraphs/index={id}', {
+  @get('/locations/index={id}', {
     security: OPERATION_SECURITY_SPEC,
     responses: {
       '200': {
-        description: 'Paragraphs model instance',
+        description: 'Locations model instance',
         content: {
           'application/json': {
             type: 'any',
-            schema: getModelSchemaRef(Paragraph, {includeRelations: true}),
+            schema: getModelSchemaRef(Location, {includeRelations: true}),
           },
         },
       },
@@ -114,21 +112,21 @@ export class ParagraphController {
   })
   async findIndexInBuffer(
     @param.path.string('id') id: string,
-    @param.filter(Paragraph) filter?: Filter<Paragraph>,
+    @param.filter(Location) filter?: Filter<Location>,
   ): Promise<number> {
-    return this.paragraphRepository.findIndexInBuffer(id, this.user, filter);
+    return this.locationRepository.findIndexInBuffer(id, this.user, filter);
   }
 
-  @get('/paragraphs', {
+  @get('/locations', {
     security: OPERATION_SECURITY_SPEC,
     responses: {
       '200': {
-        description: 'Array of Paragraph model instances',
+        description: 'Array of Location model instances',
         content: {
           'application/json': {
             schema: {
               type: 'array',
-              items: getModelSchemaRef(Paragraph, {includeRelations: true}),
+              items: getModelSchemaRef(Location, {includeRelations: true}),
             },
           },
         },
@@ -136,16 +134,16 @@ export class ParagraphController {
     },
   })
   async find(
-    @param.filter(Paragraph) filter?: Filter<Paragraph>,
-  ): Promise<Paragraph[]> {
-    return this.paragraphRepository.find(filter, {currentUser: this.user});
+    @param.filter(Location) filter?: Filter<Location>,
+  ): Promise<Location[]> {
+    return this.locationRepository.find(filter, {currentUser: this.user});
   }
 
-  @patch('/paragraphs', {
+  @patch('/locations', {
     security: OPERATION_SECURITY_SPEC,
     responses: {
       '200': {
-        description: 'Paragraph PATCH success count',
+        description: 'Location PATCH success count',
         content: {'application/json': {schema: CountSchema}},
       },
     },
@@ -154,26 +152,26 @@ export class ParagraphController {
     @requestBody({
       content: {
         'application/json': {
-          schema: getModelSchemaRef(Paragraph, {partial: true}),
+          schema: getModelSchemaRef(Location, {partial: true}),
         },
       },
     })
-    paragraph: Paragraph,
-    @param.where(Paragraph) where?: Where<Paragraph>,
+    location: Location,
+    @param.where(Location) where?: Where<Location>,
   ): Promise<Count> {
-    return this.paragraphRepository.updateAll(paragraph, where, {
+    return this.locationRepository.updateAll(location, where, {
       currentUser: this.user,
     });
   }
 
-  @get('/paragraphs/{id}', {
+  @get('/locations/{id}', {
     security: OPERATION_SECURITY_SPEC,
     responses: {
       '200': {
-        description: 'Paragraph model instance',
+        description: 'Location model instance',
         content: {
           'application/json': {
-            schema: getModelSchemaRef(Paragraph, {includeRelations: true}),
+            schema: getModelSchemaRef(Location, {includeRelations: true}),
           },
         },
       },
@@ -181,19 +179,19 @@ export class ParagraphController {
   })
   async findById(
     @param.path.string('id') id: string,
-    @param.filter(Paragraph, {exclude: 'where'})
-    filter?: FilterExcludingWhere<Paragraph>,
-  ): Promise<Paragraph> {
-    return this.paragraphRepository.findById(id, filter, {
+    @param.filter(Location, {exclude: 'where'})
+    filter?: FilterExcludingWhere<Location>,
+  ): Promise<Location> {
+    return this.locationRepository.findById(id, filter, {
       currentUser: this.user,
     });
   }
 
-  @patch('/paragraphs/{id}', {
+  @patch('/locations/{id}', {
     security: OPERATION_SECURITY_SPEC,
     responses: {
       '204': {
-        description: 'Paragraph PATCH success',
+        description: 'Location PATCH success',
       },
     },
   })
@@ -202,40 +200,40 @@ export class ParagraphController {
     @requestBody({
       content: {
         'application/json': {
-          schema: getModelSchemaRef(Paragraph, {partial: true}),
+          schema: getModelSchemaRef(Location, {partial: true}),
         },
       },
     })
-    paragraph: Paragraph,
+    location: Location,
   ): Promise<void> {
-    await this.paragraphRepository.updateByIdWithHistory(id, paragraph, {
+    await this.locationRepository.updateByIdWithHistory(id, location, {
       currentUser: this.user,
     });
   }
 
-  @del('/paragraphs/{id}', {
+  @del('/locations/{id}', {
     security: OPERATION_SECURITY_SPEC,
     responses: {
       '204': {
-        description: 'Paragraph DELETE success',
+        description: 'Location DELETE success',
       },
     },
   })
   async deleteById(@param.path.string('id') id: string): Promise<void> {
-    await this.paragraphRepository.deleteByIdWithHistory(id, {
+    await this.locationRepository.deleteByIdWithHistory(id, {
       currentUser: this.user,
     });
   }
 
-  @patch('/paragraphs/{id}/restore', {
+  @patch('/locations/{id}/restore', {
     security: OPERATION_SECURITY_SPEC,
     responses: {
       '204': {
-        description: 'Paragraphs RESTORE success',
+        description: 'Locations RESTORE success',
       },
     },
   })
   async restoreDeletedId(@param.path.string('id') id: string): Promise<void> {
-    this.paragraphRepository.restoreDeletedId(id, this.user);
+    this.locationRepository.restoreDeletedId(id, this.user);
   }
 }

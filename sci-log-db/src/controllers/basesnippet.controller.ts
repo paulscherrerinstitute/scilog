@@ -12,11 +12,9 @@ import {
 import {
   del,
   get,
-  getModelSchemaRef,
   param,
   patch,
   post,
-  put,
   requestBody,
   Response,
   RestBindings,
@@ -25,6 +23,7 @@ import {SecurityBindings, UserProfile} from '@loopback/security';
 import {Basesnippet} from '../models';
 import {BasesnippetRepository} from '../repositories';
 import {basicAuthorization} from '../services/basic.authorizor';
+import {getModelSchemaRef} from '../utils/misc';
 import {OPERATION_SECURITY_SPEC} from '../utils/security-spec';
 
 @authenticate('jwt')
@@ -140,7 +139,8 @@ export class BasesnippetController {
     security: OPERATION_SECURITY_SPEC,
     responses: {
       '200': {
-        description: 'Basesnippet model instance',
+        description:
+          'Find the index (i.e position) of a basesnippet within a query.',
         content: {
           'application/json': {
             type: 'any',
@@ -253,23 +253,6 @@ export class BasesnippetController {
     basesnippet: Basesnippet,
   ): Promise<void> {
     await this.basesnippetRepository.updateByIdWithHistory(id, basesnippet, {
-      currentUser: this.user,
-    });
-  }
-
-  @put('/basesnippets/{id}', {
-    security: OPERATION_SECURITY_SPEC,
-    responses: {
-      '204': {
-        description: 'Basesnippet PUT success',
-      },
-    },
-  })
-  async replaceById(
-    @param.path.string('id') id: string,
-    @requestBody() basesnippet: Basesnippet,
-  ): Promise<void> {
-    await this.basesnippetRepository.replaceById(id, basesnippet, {
       currentUser: this.user,
     });
   }

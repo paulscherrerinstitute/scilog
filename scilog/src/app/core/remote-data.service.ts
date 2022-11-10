@@ -44,7 +44,7 @@ export class RemoteDataService {
     if (header == null) {
       header = new HttpHeaders().append('accept', 'application/json');
     }
-    return this.httpClient.post(this.serverSettings.getServerAddress() + "files", formData, { headers: header });
+    return this.httpClient.post(this.serverSettings.getServerAddress() + "filesnippet/files", formData, { headers: header });
   }
 
   protected getSnippets<T>(snippetPath: string, options: Object) {
@@ -310,7 +310,7 @@ export class LogbookDataService extends RemoteDataService {
     let params = new HttpParams();
     let httpFilter: Object = {};
     httpFilter["order"] = ["defaultOrder ASC"];
-    httpFilter["where"] = { "or": [{ "snippetType": "paragraph" }, { "snippetType": "image" }], "title": "location", "ownerGroup": "admin" };
+    httpFilter["where"] = { "snippetType": "location", "location": "root" };
     httpFilter["include"] = [{ "relation": "subsnippets" }];
     // console.log(JSON.stringify(httpFilter));
     params = params.set('filter', JSON.stringify(httpFilter));

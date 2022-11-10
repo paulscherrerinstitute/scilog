@@ -6,5 +6,6 @@ services:
         volumes:
             - .:/usr/src/app
             - .env:/usr/src/app/.env
+            - ../sdk/python/scilog:/usr/local/lib/python3.10/site-packages/scilog
         # infinite loop to keep the container running
         command: /bin/sh -c "while sleep 1000; do :; done"

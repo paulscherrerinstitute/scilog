@@ -1,5 +1,4 @@
 import {Client, expect} from '@loopback/testlab';
-import _ from 'lodash';
 import {Suite} from 'mocha';
 import {SciLogDbApplication} from '../..';
 import {clearDatabase, createUserToken, setupApplication} from './test-helper';
@@ -11,8 +10,13 @@ describe('TaskRepositorySnippet', function (this: Suite) {
   let token: string;
   let taskSnippetId: string;
   const taskSnippet = {
-    ownerGroup: 'aOwner',
-    accessGroups: ['taskAcceptance'],
+    ownerGroup: 'taskAcceptance',
+    createACL: ['taskAcceptance'],
+    readACL: ['taskAcceptance'],
+    updateACL: ['taskAcceptance'],
+    deleteACL: ['taskAcceptance'],
+    adminACL: ['admin'],
+    shareACL: ['taskAcceptance'],
     isPrivate: true,
     defaultOrder: 0,
     expiresAt: '2055-10-10T14:04:19.522Z',
@@ -138,27 +142,6 @@ describe('TaskRepositorySnippet', function (this: Suite) {
       });
   });
 
-  it('put snippet without token should return 401', async () => {
-    await client
-      .put(`/task/${taskSnippetId}`)
-      .send(taskSnippet)
-      .set('Content-Type', 'application/json')
-      .expect(401);
-  });
-
-  it('put snippet with token should return 204', async () => {
-    const taskSnippetPut = {
-      ..._.omit(taskSnippet, 'dashboardName'),
-      dashboardName: 'dashboardNamePut',
-    };
-    await client
-      .put(`/task/${taskSnippetId}`)
-      .set('Authorization', 'Bearer ' + token)
-      .set('Content-Type', 'application/json')
-      .send(taskSnippetPut)
-      .expect(204);
-  });
-
   it('Get index without token should return 401', async () => {
     await client
       .get(`/tasks/index=${taskSnippetId}`)
@@ -228,13 +211,7 @@ describe('TaskRepositorySnippet', function (this: Suite) {
       .set('Authorization', 'Bearer ' + token)
       .set('Content-Type', 'application/json')
       .expect(200)
-      .then(
-        result => (
-          expect(result.body.length).to.be.eql(1),
-          expect(result.body[0].snippetType).to.be.eql('task'),
-          expect(result.body[0].tags).to.be.eql(['aSearchableTag'])
-        ),
-      )
+      .then(result => expect(result.body.length).to.be.eql(0))
       .catch(err => {
         throw err;
       });

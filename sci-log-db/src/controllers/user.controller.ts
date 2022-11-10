@@ -18,7 +18,6 @@ import {
   HttpErrors,
   param,
   post,
-  put,
   requestBody,
 } from '@loopback/rest';
 import {SecurityBindings, securityId, UserProfile} from '@loopback/security';
@@ -83,8 +82,7 @@ export class UserController {
     newUserRequest: NewUserRequest,
   ): Promise<User> {
     // All new users have the "any-authenticated-user" role by default
-    if (!newUserRequest.roles?.includes('any-authenticated-user'))
-      newUserRequest.roles?.push('any-authenticated-user');
+    newUserRequest.roles?.push('any-authenticated-user');
 
     // ensure a valid email value and password value
     validateCredentials({
@@ -109,51 +107,14 @@ export class UserController {
         .create({password});
 
       return savedUser;
-    } catch (error) {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    } catch (error: any) {
       // MongoError 11000 duplicate key
       if (error.code === 11000 && error.errmsg.includes('index: uniqueEmail')) {
         throw new HttpErrors.Conflict('Email value is already taken');
       } else {
         throw error;
       }
-    }
-  }
-
-  @put('/users/{userId}', {
-    security: OPERATION_SECURITY_SPEC,
-    responses: {
-      '200': {
-        description: 'User',
-        content: {
-          'application/json': {
-            schema: {
-              'x-ts-type': User,
-            },
-          },
-        },
-      },
-    },
-  })
-  @authenticate('jwt')
-  @authorize({
-    allowedRoles: ['admin', 'any-authenticated-user'],
-    voters: [basicAuthorization],
-  })
-  async set(
-    @inject(SecurityBindings.USER)
-    currentUserProfile: UserProfile,
-    @param.path.string('userId') userId: string,
-    @requestBody({description: 'update user'}) user: User,
-  ): Promise<void> {
-    try {
-      // Only admin can assign roles
-      if (!currentUserProfile.roles.includes('admin')) {
-        delete user.roles;
-      }
-      const updatedUser = await this.userRepository.updateById(userId, user);
-      return updatedUser;
-    } catch (e) {
-      return e;
     }
   }
 

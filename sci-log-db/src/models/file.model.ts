@@ -4,7 +4,7 @@ import {Image} from './image.model';
 
 @model({
   settings: {
-    strict: true,
+    strict: false,
     scope: {
       where: {snippetType: 'image'},
     },
@@ -12,6 +12,12 @@ import {Image} from './image.model';
   },
 })
 export class Filesnippet extends Basesnippet {
+  @property({
+    type: 'string',
+    default: 'image',
+  })
+  snippetType: string;
+
   @property({
     type: 'string',
     description: 'Optional name of file as presented to user in GUI',
