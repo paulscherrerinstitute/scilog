@@ -33,8 +33,8 @@ export class LogbookWidgetComponent implements OnInit {
     if (this.logbook?.thumbnail) {
       this.getImageFromService();
     }
-    if (this.userPreferences.userInfo?.roles.find(entry => {
-      return entry == this.logbook.ownerGroup
+    if (this.userPreferences.userInfo?.roles.some(entry => {
+      return this.logbook?.readACL?.includes?.(entry)
     })) {
       this.enableEdit = true;
     }
