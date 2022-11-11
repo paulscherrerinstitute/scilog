@@ -198,17 +198,20 @@ function FindWithSearchRepositoryMixin<
             ) {
               if (it.textcontent.toLowerCase().includes(search.toLowerCase())) {
                 foundSubsnippetEntry = true;
-              } else if (includeTags) {
-                if (
-                  it.tags.some((tag: string) => {
-                    if (tag.toLowerCase() === search.toLowerCase()) {
-                      return true;
-                    }
-                  })
-                ) {
-                  foundSubsnippetEntry = true;
-                }
               }
+
+              if (
+                includeTags &&
+                it.tags &&
+                it.tags.some((tag: string) => {
+                  if (tag.toLowerCase() === search.toLowerCase()) {
+                    return true;
+                  }
+                })
+              ) {
+                foundSubsnippetEntry = true;
+              }
+              if (this._searchReadACL(it, search)) foundSnippetEntry = true;
             }
           });
         }
@@ -235,6 +238,7 @@ function FindWithSearchRepositoryMixin<
         ) {
           foundSnippetEntry = true;
         }
+        if (this._searchReadACL(item, search)) foundSnippetEntry = true;
         if (foundSnippetEntry || foundSubsnippetEntry) {
           foundEntries++;
           if (foundEntries > skip) {
@@ -247,6 +251,12 @@ function FindWithSearchRepositoryMixin<
       }
 
       return snippetsFiltered;
+    }
+
+    private _searchReadACL(item: Basesnippet, search: string) {
+      return item.readACL?.some?.(s =>
+        s.toLowerCase().includes(search.toLowerCase()),
+      );
     }
 
     async findIndexInBuffer(
