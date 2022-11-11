@@ -161,7 +161,7 @@ export class SnippetComponent implements OnInit {
     let _hasAccessPermission = false;
     if (typeof this.userPreferences.userInfo.roles != 'undefined'){
       _hasAccessPermission = this.userPreferences.userInfo.roles.some(entry => {
-        return entry == this.snippet.ownerGroup
+        return this.snippet.readACL?.includes?.(entry)
       });
     }
 
