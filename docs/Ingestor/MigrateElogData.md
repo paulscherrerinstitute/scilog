@@ -9,10 +9,10 @@ The whole process is a 3 step procedure: the example scripts are assuming that y
 
 ```
 # get the python SDK to talk to elog logbooks
-conda install -c paulscherrerinstitute elog
+pip install py-elog
 # get the python SDK to talk to SciLog logbooks
 cd importTools
-pip install -r requirements.txt --no-cache-dir
+pip install -r requirements.txt 
 ```
 
 ## Step 1: Dump data from elog
