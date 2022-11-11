@@ -58,19 +58,26 @@ export class CreateFunctionalAccountsObserver implements LifeCycleObserver {
         where: {email: account.email},
       });
       if (accountExists != null) {
-        return;
+        await this.userRepository.updateById(accountExists.id, {
+          ..._.omit(account, ['password', 'roles']),
+          roles: [...new Set([...account.roles, account.email])],
+        });
+      } else {
+        const password = await this.passwordHasher.hashPassword(
+          account.password,
+        );
+
+        // create the new user
+        const savedUser = await this.userRepository.create({
+          ..._.omit(account, ['password', 'roles']),
+          roles: [...new Set([...account.roles, account.email])],
+        });
+
+        // set the password
+        await this.userRepository
+          .userCredentials(savedUser.id)
+          .create({password});
       }
-      const password = await this.passwordHasher.hashPassword(account.password);
-
-      // create the new user
-      const savedUser = await this.userRepository.create(
-        _.omit(account, 'password'),
-      );
-
-      // set the password
-      await this.userRepository
-        .userCredentials(savedUser.id)
-        .create({password});
     });
   }
 

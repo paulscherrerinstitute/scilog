@@ -203,7 +203,7 @@ export class LDAPUserService implements UserService<User, Credentials> {
       [securityId]: user.id,
       name: userName,
       id: user.id,
-      roles: [...(user.roles ?? []), user.email],
+      roles: user.roles,
       email: user.email,
     };
     // console.error("convertToUserProfile:", user, userProfile)
