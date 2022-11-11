@@ -9,7 +9,7 @@ from psi_webpage_icon_extractor import PSIWebpageIconExtractor
 
 
 def prepare_location_snippet(log):
-    snips = log.get_snippets(snippetType="location", name="root", ownerGroup="admin")
+    snips = log.get_snippets(snippetType="location", name="root")
     if snips:
         print("location snippet exists already:",snips[0].id)
         assert len(snips) == 1
