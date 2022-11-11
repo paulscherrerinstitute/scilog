@@ -66,7 +66,7 @@ export class MyUserService implements UserService<User, Credentials> {
       [securityId]: user.id,
       name: userName,
       id: user.id,
-      roles: user.roles,
+      roles: [...(user.roles ?? []), user.email],
       email: user.email,
     };
     // console.error("convertToUserProfile:",user,userProfile)

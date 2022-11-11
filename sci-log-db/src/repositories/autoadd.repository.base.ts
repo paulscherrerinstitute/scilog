@@ -379,10 +379,7 @@ export class AutoAddRepository<
       this.groupsToAclFilter(ctx.query.where);
       // console.log("roles:", currentUser?.roles);
       // console.log("access case:", JSON.stringify(ctx, null, 3));
-      const groups = [
-        ...ctx?.options?.currentUser?.roles,
-        ctx?.options?.currentUser?.email,
-      ];
+      const groups = ctx?.options?.currentUser?.roles;
       if (!groups.includes('admin')) {
         const groupCondition = {
           readACL: {

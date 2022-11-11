@@ -122,7 +122,7 @@ describe('authentication services', function (this: Suite) {
       [securityId]: newUser.id,
       id: newUser.id,
       name: `${newUser.firstName} ${newUser.lastName}`,
-      roles: ['any-authenticated-user'],
+      roles: ['any-authenticated-user', newUser.email],
     };
     const userProfile = userService.convertToUserProfile(newUser);
     expect(userProfile).to.deepEqual(expectedUserProfile);
