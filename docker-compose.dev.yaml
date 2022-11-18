@@ -1,0 +1,48 @@
+services:
+  mongodb:
+    image: mongo
+    volumes:
+      - mongodb_data:/bitnami
+      - ./config/mongo/rs-init.sh:/rs-init.sh:ro
+    command: ["--replSet", "rs0", "--bind_ip_all"]
+    healthcheck:
+      test: ./rs-init.sh
+      interval: 5s
+  backend:
+    build: 
+      context: ./sci-log-db/.
+    depends_on:
+      mongodb:
+        condition: service_healthy
+    volumes:
+      - ./sci-log-db:/home/node/app
+      - ./config/be/oidc.json:/home/node/app/oidc.json
+      - ./sci-log-db/functionalAccounts-example.json:/home/node/app/functionalAccounts.json
+      - /home/node/app/node_modules
+    environment:
+      - JWT_SECRET=jwt_secret
+    command: /bin/sh -c "while true; do sleep 600; done"
+
+  frontend:
+    build: 
+      context: ./scilog/.
+      target: builder
+    volumes:
+      - ./scilog:/frontend
+      - ./config/fe/config.json:/frontend/src/assets/config.json
+      - /frontend/node_modules
+    command: /bin/sh -c "while true; do sleep 600; done"
+
+  python: 
+    build:
+      context: ./importTools
+    volumes:
+        - ./importTools:/usr/src/app
+        - ./sdk/python/scilog:/usr/local/lib/python3.10/site-packages/scilog
+    # infinite loop to keep the container running
+    command: /bin/sh -c "while sleep 1000; do :; done"
+
+
+volumes:
+  mongodb_data:
+    driver: local

@@ -1,0 +1,17 @@
+{
+    "session": false,
+    "provider": "oidc",
+    "authScheme": "openid connect",
+    "module": "passport-openidconnect",
+    "failureFlash": true,
+    "issuer": "YOURKC/YOURREALM",
+    "authorizationURL": "YOURKC/YOURREALM/protocol/openid-connect/auth",
+    "tokenURL": "YOURKC/YOURREALM/openid-connect/token",
+    "userInfoURL": "YOURKC/YOURREALM/openid-connect/userinfo",
+    "clientID": "YOURCLIENT",
+    "clientSecret": "YOURSECRET",
+    "callbackURL": "http://localhost:3000/auth/keycloak/callback",
+    "scope": ["email", "profile", "openid"],
+    "successRedirect": "http://localhost:4200/login",
+    "skipUserProfile": false
+}

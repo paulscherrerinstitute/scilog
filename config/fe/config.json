@@ -1,0 +1,7 @@
+{
+    "lbBaseURL": "http://localhost:3000/",
+    "oAuth2Endpoint": {
+        "authURL": "auth/thirdparty/keycloak",
+        "displayText": "keycloak"
+    }
+}
