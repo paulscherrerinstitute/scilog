@@ -14,5 +14,4 @@
     "scope": ["email", "profile", "openid"],
     "successRedirect": "http://localhost:4200/login",
     "skipUserProfile": false
-  }
-  
+}
