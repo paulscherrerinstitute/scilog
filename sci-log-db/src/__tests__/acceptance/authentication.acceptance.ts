@@ -36,6 +36,12 @@ describe('authentication services', function (this: Suite) {
   let userService: UserService<User, Credentials>;
   let bcryptHasher: PasswordHasher;
 
+  const env = Object.assign({}, process.env);
+
+  after(() => {
+    process.env = env;
+  });
+
   before(setupApp);
   after(async () => {
     if (app != null) await app.stop();
@@ -168,8 +174,19 @@ describe('authentication services', function (this: Suite) {
     const userProfile = userService.convertToUserProfile(newUser);
     const token = await jwtService.generateToken(userProfile);
     const userProfileFromToken = await jwtService.verifyToken(token);
-
     expect(userProfileFromToken).to.deepEqual(userProfile);
+  });
+
+  it('token service verifyToken() should fail because expired', async () => {
+    const expiredError = new HttpErrors.Unauthorized(
+      `Error verifying token : jwt expired`,
+    );
+    const userProfile = userService.convertToUserProfile(newUser);
+    const token = await jwtService.generateToken(userProfile);
+    await new Promise(r => setTimeout(r, 3000));
+    await expect(jwtService.verifyToken(token)).to.be.rejectedWith(
+      expiredError,
+    );
   });
 
   it('token service verifyToken() fails', async () => {
@@ -206,6 +223,7 @@ describe('authentication services', function (this: Suite) {
   });
 
   async function setupApp() {
+    process.env.JWT_ACCESS_TOKEN_EXPIRES_IN = '3';
     const appWithClient = await setupApplication();
     app = appWithClient.app;
     app.bind(PasswordHasherBindings.ROUNDS).to(2);
