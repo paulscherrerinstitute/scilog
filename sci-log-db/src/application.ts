@@ -149,6 +149,10 @@ export class SciLogDbApplication extends BootMixin(
     this.bind(PasswordHasherBindings.ROUNDS).to(10);
     this.bind(PasswordHasherBindings.PASSWORD_HASHER).toClass(BcryptHasher);
     this.bind(TokenServiceBindings.TOKEN_SERVICE).toClass(JWTService);
+    if (process.env.JWT_ACCESS_TOKEN_EXPIRES_IN)
+      this.bind(TokenServiceBindings.TOKEN_EXPIRES_IN).to(
+        process.env.JWT_ACCESS_TOKEN_EXPIRES_IN,
+      );
     this.bind(TokenServiceBindings.TOKEN_SECRET).to(
       (process.env.JWT_SECRET as string) ??
         crypto.randomBytes(12).toString('hex'),
