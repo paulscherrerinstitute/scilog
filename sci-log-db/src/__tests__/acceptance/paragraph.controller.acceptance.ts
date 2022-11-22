@@ -52,6 +52,7 @@ describe('Paragraph', function (this: Suite) {
         result => (
           expect(result.body).to.containEql(paragraphSnippet),
           expect(result.body.snippetType).to.be.eql('paragraph'),
+          expect(result.body.linkType).to.be.eql('paragraph'),
           (paragraphSnippetId = result.body.id)
         ),
       )
