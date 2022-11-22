@@ -37,6 +37,7 @@ export class Paragraph extends Basesnippet {
     },
     description:
       'Defines if this entry is considered a comment (to be displayed near the parent info) or an entry which refers to previous discussion entries in which case the entry is shown in chronological order and the parent entry is partially duplicated as a quote',
+    default: 'paragraph',
   })
   linkType?: LinkType;
 
