@@ -10,6 +10,8 @@ export async function main(options: ApplicationConfig = {}) {
   await app.boot();
   await app.start();
   await app.startWebsocket();
+  app.restServer.httpServer!.server.keepAliveTimeout = 76000;
+  app.restServer.httpServer!.server.headersTimeout = 77000;
   const url = app.restServer.url;
   console.log(`Server is running at ${url}`);
 
@@ -29,7 +31,7 @@ if (require.main === module) {
       // (don't force-close). If you want to immediately destroy all sockets
       // upon stop, set its value to `0`.
       // See https://www.npmjs.com/package/stoppable
-      gracePeriodForClose: 5000, // 5 seconds
+      gracePeriodForClose: 50000, // 5 seconds
       openApiSpec: {
         // useful when used with OpenAPI-to-GraphQL to locate your application
         setServersFromRequest: true,
