@@ -124,7 +124,14 @@ function UpdateAndDeleteRepositoryMixin<
             options?.currentUser,
           );
           console.log('deleteById:parentHistory:', parentHistory);
+          await this.updateById(
+            id as ID,
+            {parentId: parentHistory.id},
+            options,
+          );
         }
+      } else {
+        await this.deleteById(id as ID, options);
       }
     }
 

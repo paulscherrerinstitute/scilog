@@ -209,28 +209,28 @@ export async function startWebsocket(app: SciLogDbApplication) {
             //      cannot be done by simply sending a delete command. Instead
             //      an update of the document is requested and the tags are
             //      set to _delete_.
-            if (change.operationType === 'update') {
-              const updatedFields = change.updateDescription.updatedFields;
-              if (updatedFields.deleted) {
-                console.log('delete');
-                console.log('updated doc', doc);
-                if (doc?.versionable) {
-                  const history = await collection.findOne({
-                    parentId: Mongo.ObjectId(doc.parentId),
-                    snippetType: 'history',
-                  });
-                  console.log('history: ', history);
-                  collection.updateOne(
-                    {_id: Mongo.ObjectId(change.documentKey._id)},
-                    {$set: {parentId: Mongo.ObjectId(history._id)}},
-                  );
-                } else {
-                  collection.deleteOne({
-                    _id: Mongo.ObjectId(change.documentKey._id),
-                  });
-                }
-              }
-            }
+            // if (change.operationType === 'update') {
+            //   const updatedFields = change.updateDescription.updatedFields;
+            //   if (updatedFields.deleted) {
+            //     console.log('delete');
+            //     console.log('updated doc', doc);
+            //     if (doc?.versionable) {
+            //       const history = await collection.findOne({
+            //         parentId: Mongo.ObjectId(doc.parentId),
+            //         snippetType: 'history',
+            //       });
+            //       console.log('history: ', history);
+            //       collection.updateOne(
+            //         {_id: Mongo.ObjectId(change.documentKey._id)},
+            //         {$set: {parentId: Mongo.ObjectId(history._id)}},
+            //       );
+            //     } else {
+            //       collection.deleteOne({
+            //         _id: Mongo.ObjectId(change.documentKey._id),
+            //       });
+            //     }
+            //   }
+            // }
             // io.to(id).emit('new-notification', change);
           }
         });
