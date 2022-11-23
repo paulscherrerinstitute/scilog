@@ -1,7 +1,7 @@
-import {TokenServiceBindings} from '@loopback/authentication-jwt';
-import {AnyObject} from '@loopback/repository';
-import {SciLogDbApplication} from '../application';
-import {MongoDataSource} from '../datasources';
+import { TokenServiceBindings } from '@loopback/authentication-jwt';
+import { AnyObject } from '@loopback/repository';
+import { SciLogDbApplication } from '../application';
+import { MongoDataSource } from '../datasources';
 
 export interface WebsocketClient {
   // eslint-disable-next-line  @typescript-eslint/no-explicit-any
@@ -23,7 +23,7 @@ export async function startWebsocket(app: SciLogDbApplication) {
   const jwtService = await app.get(TokenServiceBindings.TOKEN_SERVICE);
 
   // console.log(app.restServer)
-  const wss = new WebSocket.Server({server: app.restServer.httpServer?.server});
+  const wss = new WebSocket.Server({ server: app.restServer.httpServer?.server });
 
   // console.log(app.restServer)
   // eslint-disable-next-line  @typescript-eslint/no-explicit-any
@@ -46,7 +46,7 @@ export async function startWebsocket(app: SciLogDbApplication) {
                 msgContainer['message']['token'],
               );
             } catch (error) {
-              ws.send(JSON.stringify({error: 'Token invalid'}));
+              ws.send(JSON.stringify({ error: 'Token invalid' }));
             }
             if (userProfileFromToken != null) {
               const logbookID: string = msgContainer['message']['join'];
@@ -61,7 +61,7 @@ export async function startWebsocket(app: SciLogDbApplication) {
                 });
               } else {
                 websocketMap[logbookID] = [
-                  {ws: ws, user: userProfileFromToken, config: config},
+                  { ws: ws, user: userProfileFromToken, config: config },
                 ]; //push({ws: ws, user: userProfileFromToken});
               }
             }
@@ -105,7 +105,7 @@ export async function startWebsocket(app: SciLogDbApplication) {
   };
   // eslint-disable-next-line  @typescript-eslint/no-explicit-any
   const ping = (ws: any) => {
-    ws.send(JSON.stringify({ping: 'ping'}));
+    ws.send(JSON.stringify({ ping: 'ping' }));
     // console.log('server: ping');
   };
 
@@ -134,7 +134,7 @@ export async function startWebsocket(app: SciLogDbApplication) {
     ) => {
       const parentDoc = db
         .collection('Basesnippet')
-        .findOne({_id: Mongo.ObjectId(parentId)});
+        .findOne({ _id: Mongo.ObjectId(parentId) });
       // eslint-disable-next-line  @typescript-eslint/no-explicit-any
       return parentDoc.then((document: any) => {
         if (document.snippetType === 'logbook') {
@@ -200,7 +200,7 @@ export async function startWebsocket(app: SciLogDbApplication) {
                   doc['readACL'].some((r: string) => c.user.roles.includes(r))
                 ) {
                   if (matchesFilterSettings(doc, c.config))
-                    c.ws.send(JSON.stringify({'new-notification': change}));
+                    c.ws.send(JSON.stringify({ 'new-notification': change }));
                 }
               });
             }
@@ -209,28 +209,28 @@ export async function startWebsocket(app: SciLogDbApplication) {
             //      cannot be done by simply sending a delete command. Instead
             //      an update of the document is requested and the tags are
             //      set to _delete_.
-            if (change.operationType === 'update') {
-              const updatedFields = change.updateDescription.updatedFields;
-              if (updatedFields.deleted) {
-                console.log('delete');
-                console.log('updated doc', doc);
-                if (doc?.versionable) {
-                  const history = await collection.findOne({
-                    parentId: Mongo.ObjectId(doc.parentId),
-                    snippetType: 'history',
-                  });
-                  console.log('history: ', history);
-                  collection.updateOne(
-                    {_id: Mongo.ObjectId(change.documentKey._id)},
-                    {$set: {parentId: Mongo.ObjectId(history._id)}},
-                  );
-                } else {
-                  collection.deleteOne({
-                    _id: Mongo.ObjectId(change.documentKey._id),
-                  });
-                }
-              }
-            }
+            // if (change.operationType === 'update') {
+            //   const updatedFields = change.updateDescription.updatedFields;
+            //   if (updatedFields.deleted) {
+            //     console.log('delete');
+            //     console.log('updated doc', doc);
+            //     if (doc?.versionable) {
+            //       const history = await collection.findOne({
+            //         parentId: Mongo.ObjectId(doc.parentId),
+            //         snippetType: 'history',
+            //       });
+            //       console.log('history: ', history);
+            //       collection.updateOne(
+            //         {_id: Mongo.ObjectId(change.documentKey._id)},
+            //         {$set: {parentId: Mongo.ObjectId(history._id)}},
+            //       );
+            //     } else {
+            //       collection.deleteOne({
+            //         _id: Mongo.ObjectId(change.documentKey._id),
+            //       });
+            //     }
+            //   }
+            // }
             // io.to(id).emit('new-notification', change);
           }
         });

@@ -1,4 +1,4 @@
-import {Getter, inject, MixinTarget} from '@loopback/core';
+import { Getter, inject, MixinTarget } from '@loopback/core';
 import {
   DefaultCrudRepository,
   Entity,
@@ -6,14 +6,14 @@ import {
   Options,
   repository,
 } from '@loopback/repository';
-import {Basesnippet} from '../models';
-import {UserProfile} from '@loopback/security';
-import {HttpErrors, Response} from '@loopback/rest';
+import { Basesnippet } from '../models';
+import { UserProfile } from '@loopback/security';
+import { HttpErrors, Response } from '@loopback/rest';
 import _ from 'lodash';
-import {BasesnippetRepository} from '../repositories/basesnippet.repository';
-import {JobRepository} from '../repositories/job.repository';
-import {EXPORT_SERVICE} from '../keys';
-import {ExportService} from '../services/export-snippets.service';
+import { BasesnippetRepository } from '../repositories/basesnippet.repository';
+import { JobRepository } from '../repositories/job.repository';
+import { EXPORT_SERVICE } from '../keys';
+import { ExportService } from '../services/export-snippets.service';
 
 function UpdateAndDeleteRepositoryMixin<
   M extends Entity & {
@@ -70,7 +70,7 @@ function UpdateAndDeleteRepositoryMixin<
       snippetCopy.parentId = historySnippet.id;
       snippetCopy.snippetType = 'updated';
       const baseSnippetRepository = await this.baseSnippetRepository();
-      await baseSnippetRepository.create(snippetCopy, {currentUser: user});
+      await baseSnippetRepository.create(snippetCopy, { currentUser: user });
     }
 
     private async getHistorySnippet(
@@ -79,8 +79,8 @@ function UpdateAndDeleteRepositoryMixin<
     ): Promise<Basesnippet> {
       const baseSnippetRepository = await this.baseSnippetRepository();
       let historySnippet = await baseSnippetRepository.findOne(
-        {where: {snippetType: 'history', parentId: snippet.id}},
-        {currentUser: user},
+        { where: { snippetType: 'history', parentId: snippet.id } },
+        { currentUser: user },
       );
 
       if (historySnippet == null) {
@@ -99,7 +99,7 @@ function UpdateAndDeleteRepositoryMixin<
         historySnippetPayload.snippetType = 'history';
         historySnippet = await baseSnippetRepository.create(
           historySnippetPayload,
-          {currentUser: user},
+          { currentUser: user },
         );
       }
       return historySnippet;
@@ -109,7 +109,7 @@ function UpdateAndDeleteRepositoryMixin<
       // Two steps:
       // 1. set snippet to 'deleted=true'
       // 2. inside websocket and after informing the clients, replace the parentId or delete the snippet
-      await this.updateById(id as ID, {deleted: true}, options);
+      await this.updateById(id as ID, { deleted: true }, options);
       const snippet = await this.findById(id, {}, options);
       if (snippet?.versionable) {
         if (snippet?.parentId) {
@@ -124,18 +124,21 @@ function UpdateAndDeleteRepositoryMixin<
             options?.currentUser,
           );
           console.log('deleteById:parentHistory:', parentHistory);
+          await this.updateById(id as ID, { parentId: parentHistory.id }, options);
         }
+      } else {
+        await this.deleteById(id as ID, options);
       }
     }
 
     async restoreDeletedId(id: ID, user: UserProfile): Promise<void> {
-      const snippet = await this.findById(id, {}, {currentUser: user});
+      const snippet = await this.findById(id, {}, { currentUser: user });
       if (snippet?.deleted && snippet.parentId) {
         const baseSnippetRepository = await this.baseSnippetRepository();
         const historySnippet = await baseSnippetRepository.findById(
           (snippet.parentId as unknown) as ID,
           {},
-          {currentUser: user},
+          { currentUser: user },
         );
         const restoredSnippet = {
           deleted: false,
@@ -151,7 +154,7 @@ function UpdateAndDeleteRepositoryMixin<
 }
 
 function FindWithSearchRepositoryMixin<
-  M extends Entity & {id: ID},
+  M extends Entity & { id: ID },
   ID,
   Relations extends object,
   R extends MixinTarget<DefaultCrudRepository<M, ID, Relations>>
@@ -311,7 +314,7 @@ function ExportRepositoryMixin<
           const parent = await this.findById(
             (snippets[0].parentId as unknown) as ID,
             filter,
-            {currentUser: user},
+            { currentUser: user },
           );
           job = {
             ownerGroup: parent.ownerGroup,
@@ -342,7 +345,7 @@ function ExportRepositoryMixin<
       const fs = require('fs');
       this.exportDir = basePath + jobEntity.id;
       if (!fs.existsSync(this.exportDir)) {
-        fs.mkdirSync(this.exportDir, {recursive: true});
+        fs.mkdirSync(this.exportDir, { recursive: true });
       }
 
       const exportService = await this.exportServiceGetter();
@@ -362,7 +365,7 @@ function ExportRepositoryMixin<
       response.download(downloadFile, (err, path = this.exportDir) => {
         console.log('file transferred successfully', err);
         if (path.includes(basePath)) {
-          fs.rmdirSync(path, {recursive: true});
+          fs.rmdirSync(path, { recursive: true });
         }
       });
       return response;
