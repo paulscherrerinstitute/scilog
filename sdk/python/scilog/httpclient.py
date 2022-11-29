@@ -38,7 +38,7 @@ class HttpClient(AuthMixin):
     def __init__(self, *args, **kwargs):
         self._verify_certificate = True
         super().__init__(*args, **kwargs)
-        self.login_path = self._login_path or (self.address + "/users/login")
+        self.login_path = self._login_path or (self.address + "/api/v1/users/login")
 
     def authenticate(self, username, password):
         auth_payload = {"principal": username, "password": password}
