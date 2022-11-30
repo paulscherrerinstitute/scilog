@@ -380,6 +380,7 @@ describe('Basesnippet', function (this: Suite) {
         throw err;
       });
   });
+
   it('export snippet with token should return 200 and exported pdf', async () => {
     await client
       .get(`/basesnippets/export=pdf`)
@@ -588,6 +589,29 @@ describe('Basesnippet', function (this: Suite) {
       .set('Content-Type', 'application/json')
       .expect(200)
       .then(result => expect(result.body.length).to.be.eql(0))
+      .catch(err => {
+        throw err;
+      });
+  });
+
+  it('export snippet with token and parentId should return 200 and exported pdf', async () => {
+    await client
+      .post('/basesnippets')
+      .set('Authorization', 'Bearer ' + token)
+      .set('Content-Type', 'application/json')
+      .send({...baseSnippet, parentId: baseSnippetId});
+
+    const whereParentId = {where: {parentId: baseSnippetId}};
+    await client
+      .get(`/basesnippets/export=pdf?filter=${JSON.stringify(whereParentId)}`)
+      .set('Authorization', 'Bearer ' + token)
+      .set('Content-Type', 'application/json')
+      .expect(200)
+      .then(result =>
+        expect(result.headers['content-disposition']).to.be.eql(
+          'attachment; filename="export.pdf"',
+        ),
+      )
       .catch(err => {
         throw err;
       });

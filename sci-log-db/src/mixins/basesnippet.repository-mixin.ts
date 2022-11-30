@@ -4,14 +4,11 @@ import {
   Entity,
   Filter,
   Options,
-  repository,
 } from '@loopback/repository';
 import {Basesnippet} from '../models';
 import {UserProfile} from '@loopback/security';
 import {HttpErrors, Response} from '@loopback/rest';
 import _ from 'lodash';
-import {BasesnippetRepository} from '../repositories/basesnippet.repository';
-import {JobRepository} from '../repositories/job.repository';
 import {EXPORT_SERVICE} from '../keys';
 import {ExportService} from '../services/export-snippets.service';
 
@@ -29,16 +26,7 @@ function UpdateAndDeleteRepositoryMixin<
   R extends MixinTarget<DefaultCrudRepository<M, ID, Relations>>
 >(superClass: R) {
   class Mixed extends superClass {
-    @repository.getter('BasesnippetRepository')
-    readonly baseSnippetRepositoryGetter: Getter<BasesnippetRepository>;
-
-    private async baseSnippetRepository(): Promise<BasesnippetRepository> {
-      const basesnippetRepository =
-        this.constructor.name === 'BasesnippetRepository'
-          ? this
-          : await this.baseSnippetRepositoryGetter();
-      return basesnippetRepository as BasesnippetRepository;
-    }
+    readonly baseSnippetRepository: Function;
 
     async updateByIdWithHistory(
       id: ID,
@@ -295,8 +283,6 @@ function ExportRepositoryMixin<
 >(superClass: R) {
   class Mixed extends superClass {
     exportDir: string;
-    @repository.getter('JobRepository')
-    readonly jobRepositoryGetter: Getter<JobRepository>;
     @inject.getter(EXPORT_SERVICE)
     readonly exportServiceGetter: Getter<ExportService>;
 
@@ -326,23 +312,20 @@ function ExportRepositoryMixin<
             parentId: parent.id,
             description: 'export',
             params: filter,
+            snippetType: 'job',
           };
         } else {
           job = {
             description: 'export',
             params: filter,
+            snippetType: 'job',
           };
         }
       } else {
         throw new HttpErrors.RangeNotSatisfiable();
       }
 
-      const jobRepository =
-        this.constructor.name === 'JobRepository'
-          ? this
-          : await this.jobRepositoryGetter();
-
-      const jobEntity = await jobRepository.create(job, {
+      const jobEntity = await this.create(job, {
         currentUser: user,
       });
       const basePath = '/tmp/';
