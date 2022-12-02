@@ -31,39 +31,52 @@ describe('Authentication strategies roles', function (this: Suite) {
     expect(emptyRoles).to.be.eql(['g12345', 'g78910']);
   });
 
-  it('Should return the list of roles including the p-group from e group', () => {
+  it('Should return the list of roles without applying any regex', () => {
     const profile = {} as Profile;
     const emptyRoles = roles({
       ...profile,
       _json: {roles: ['g12345', 'g78910', 'e98765']},
     });
-    expect(emptyRoles).to.be.eql(['g12345', 'g78910', 'e98765', 'p98765']);
+    expect(emptyRoles).to.be.eql(['g12345', 'g78910', 'e98765']);
+  });
+
+  it('Should return the list of roles including the p-group from e group', () => {
+    const profile = {} as Profile;
+    const emptyRoles = roles({
+      ...profile,
+      _json: {roles: ['g12345', 'g78910']},
+      username: 'e98765',
+    });
+    expect(emptyRoles).to.be.eql(['g12345', 'g78910', 'p98765']);
   });
 
   it('Should return the list of roles not including the p-group from e group as smaller than 5 digits', () => {
     const profile = {} as Profile;
     const emptyRoles = roles({
       ...profile,
-      _json: {roles: ['g12345', 'g78910', 'e9876']},
+      _json: {roles: ['g12345', 'g78910']},
+      username: 'e9876',
     });
-    expect(emptyRoles).to.be.eql(['g12345', 'g78910', 'e9876']);
+    expect(emptyRoles).to.be.eql(['g12345', 'g78910']);
   });
 
   it('Should return the list of roles not including the p-group from e group as not made of digits only', () => {
     const profile = {} as Profile;
     const emptyRoles = roles({
       ...profile,
-      _json: {roles: ['g12345', 'g78910', 'e987a']},
+      _json: {roles: ['g12345', 'g78910']},
+      username: 'e987a',
     });
-    expect(emptyRoles).to.be.eql(['g12345', 'g78910', 'e987a']);
+    expect(emptyRoles).to.be.eql(['g12345', 'g78910']);
   });
 
   it('Should return the list of roles not including the p-group from e group as longer than 5 digits', () => {
     const profile = {} as Profile;
     const emptyRoles = roles({
       ...profile,
-      _json: {roles: ['g12345', 'g78910', 'e987654']},
+      _json: {roles: ['g12345', 'g78910']},
+      username: 'e987654',
     });
-    expect(emptyRoles).to.be.eql(['g12345', 'g78910', 'e987654']);
+    expect(emptyRoles).to.be.eql(['g12345', 'g78910']);
   });
 });
