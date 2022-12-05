@@ -43,6 +43,10 @@ npm run start
 
 After that the API server is running on http://localhost:3000 . You can check that it is working by navigating to the [API explorer](http://localhost:3000/explorer)
 
+#### Add Mongo indices
+
+Just execute the commands in file sci-log-db/createIndexCommands.txt in a Mongo shell connected to your scilog repository.
+
 #### Start Frontend
 In a separate terminal type the following commands
 ```

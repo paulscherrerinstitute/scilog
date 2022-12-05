@@ -6,6 +6,37 @@ table {
   td {
     border: 1px solid black;
   }
+  
+  ::ng-deep .pen-red {
+    background-color: white;
+    color: red;
+  }
+  
+  ::ng-deep .pen-green {
+    background-color: white;
+    color: green;
+  }
+
+  ::ng-deep .marker-green {
+    background-color: white;
+    color: green;
+  }
+
+  ::ng-deep .marker-yellow {
+    background-color: white;
+    color: yellow;
+  }
+
+  ::ng-deep .marker-pink {
+    background-color: white;
+    color: pink;
+  }
+
+  ::ng-deep .marker-blue {
+    background-color: white;
+    color: blue;
+  }
+
   ::ng-deep .snippet-content p {
     margin: 5px;
   }

@@ -7,6 +7,7 @@ import {Profile} from 'passport';
 import {User} from '../models';
 import {UserProfile, securityId} from '@loopback/security';
 import {UserRepository} from '../repositories';
+import {roles} from './roles';
 
 type ProfileUser = {
   email: string;
@@ -16,11 +17,9 @@ type ProfileUser = {
   roles: string[];
 };
 
-type UserRolesProfile = Profile & {_json: {roles: string[]}};
-
 export type VerifyFunction = (
   claimIss: string,
-  profile: UserRolesProfile,
+  profile: Profile,
   idProfile: ProfileUser,
   // eslint-disable-next-line  @typescript-eslint/no-explicit-any
   context: any,
@@ -46,7 +45,7 @@ export const verifyFunctionFactory = function (
 ): VerifyFunction {
   return function (
     claimIss: string,
-    profile: UserRolesProfile,
+    profile: Profile,
     idProfile: ProfileUser,
     // eslint-disable-next-line  @typescript-eslint/no-explicit-any
     context: any,
@@ -74,7 +73,7 @@ export const verifyFunctionFactory = function (
       lastName: lastName,
       username: profile.username,
       roles: [
-        ...(profile._json.roles ?? []),
+        ...roles(profile),
         'any-authenticated-user',
         profile.emails[0].value,
       ],

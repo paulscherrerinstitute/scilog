@@ -17,8 +17,10 @@ services:
     volumes:
       - ./sci-log-db:/home/node/app
       - ./config/be/oidc.json:/home/node/app/oidc.json
+      # - ./config/be/roles.js:/home/node/app/dist/authentication-strategies/roles.js
       - ./sci-log-db/functionalAccounts-example.json:/home/node/app/functionalAccounts.json
       - /home/node/app/node_modules
+      - /home/node/app/dist
     environment:
       - JWT_SECRET=jwt_secret
     command: /bin/sh -c "while true; do sleep 600; done"
