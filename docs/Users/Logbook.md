@@ -1,9 +1,9 @@
 # Adding, Displaying and Searching contents
 
 ## Display View options
-The following screenshot illustrates the standard *dashboard* view for an electronic logbook ![logbook](img/logbook.png) which consists of a logbook widget on the right and a task/todo widget on the left.
+The following screenshot illustrates the standard *dashboard* view for an electronic logbook ![logbook](img/logbook-enhanced.png) which consists of a logbook widget on the right and a task/todo widget on the left.
 
-You can switch to a view where a single widget takes all the screen space by using the navigation buttons to the left. For example the resulting view  for a logboook widget would be ![logbook](img/fulllogbookview.png)
+You can switch to a view where a single widget takes all the screen space by using the navigation buttons to the left. For example the resulting view  for a logboook widget would be ![logbook](img/fulllogbookview-enhanced.png)
 
 You can always switch back to the *dashboard* like view with the 2nd top most button in the navigation bar to the left.
 
@@ -24,7 +24,7 @@ With the *three-dot* menu on the right of entries you can decide to edit, commen
 Please note that editing entries will be permitted only for a certain pre-defined time , the default being 1 week. After that time the entries can no longer be modified. In the screenshot above this period has passed, therefore the edit functionality is greyed out.
 
 There are keyboard shortcuts defined, a description of which you get via the help icon on the top right:
-![Keyboard Shortcut Help](img/help.png)
+![Keyboard Shortcut Help](img/help-enhanced.png)
 
 
 ## Multi User Behaviour
@@ -32,14 +32,14 @@ There are keyboard shortcuts defined, a description of which you get via the hel
 It may well be that several people make entries to the same logbook at the same time. The view is always kept up-to-date automatically with entries from all participants.
 
 ## Searching contents
-Use the text entry field on the top center to start a search. The search syntax is explained via examples. The search results are displayed within the serach popup dialog ![search popup widget](img/search.png). 
+Use the text entry field on the top center to start a search. The search syntax is explained via examples. The search results are displayed within the serach popup dialog ![search popup widget](img/search-enhanced.png). 
 
 The search happens only within the current logbook. Via the *:global* flag the search extended to all logbooks for which one has read access.
 
 ## Defining Virtual Logbooks (inject data)
 Usually you see only data connected to a single logbook. However you can *inject* information from *other* logbooks to your current logbook via the logbook configuration button. In particular you can select a set from your other logbooks under the item *Filter Settings* from a drop down list. Then all information *snippets* from the other logbooks will be added to your current logbook in proper chronological order. In addition you can define a set of tags. Then only those snippets, which have all the corresponding tags set, are added to your logbook. 
 
-![definition of virtual logbooks](img/virtual-logbook.png)
+![definition of virtual logbooks](img/virtual-logbook-enhanced.png)
 
 Please note, that any change you apply to such injected snippets are made also in the original logbook, from where the snippets were added originally. The reason for this behaviour is, that no copies of the snippet data are produced, but just the original snippet instances are made visible (and editable) in your current logbook.
 
