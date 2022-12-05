@@ -2,7 +2,7 @@
 
 To get access to the data, for which you have read access, you first have to login. 
 
-TODO add screenshot ![Login to SciLog](img/login.png)
+![Login to SciLog](img/login.png)
 
 There are two types of account associated with SciLog: *User* and *Functional* . 
 
