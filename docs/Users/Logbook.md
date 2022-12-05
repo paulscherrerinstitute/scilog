@@ -36,5 +36,10 @@ Use the text entry field on the top center to start a search. The search syntax 
 
 The search happens only within the current logbook. Via the *:global* flag the search extended to all logbooks for which one has read access.
 
-## Defining Virtual Logbooks
-TODO
+## Defining Virtual Logbooks (inject data)
+Usually you see only data connected to a single logbook. However you can *inject* information from *other* logbooks to your current logbook via the logbook configuration button. In particular you can select a set from your other logbooks under the item *Filter Settings* from a drop down list. Then all information *snippets* from the other logbooks will be added to your current logbook in proper chronological order. In addition you can define a set of tags. Then only those snippets, which have all the corresponding tags set, are added to your logbook. 
+
+![definition of virtual logbooks](img/virtual-logbook.png)
+
+Please note, that any change you apply to such injected snippets are made also in the original logbook, from where the snippets were added originally. The reason for this behaviour is, that no copies of the snippet data are produced, but just the original snippet instances are made visible (and editable) in your current logbook.
+
