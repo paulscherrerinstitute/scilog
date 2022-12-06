@@ -1,0 +1,17 @@
+from __future__ import absolute_import
+
+# flake8: noqa
+
+# import apis into api package
+from swagger_client.api.basesnippet_controller_api import BasesnippetControllerApi
+from swagger_client.api.file_controller_api import FileControllerApi
+from swagger_client.api.image_controller_api import ImageControllerApi
+from swagger_client.api.job_controller_api import JobControllerApi
+from swagger_client.api.location_controller_api import LocationControllerApi
+from swagger_client.api.logbook_controller_api import LogbookControllerApi
+from swagger_client.api.oidc_controller_api import OIDCControllerApi
+from swagger_client.api.paragraph_controller_api import ParagraphControllerApi
+from swagger_client.api.task_controller_api import TaskControllerApi
+from swagger_client.api.user_controller_api import UserControllerApi
+from swagger_client.api.user_preference_controller_api import UserPreferenceControllerApi
+from swagger_client.api.view_controller_api import ViewControllerApi
