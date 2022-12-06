@@ -273,11 +273,23 @@ export class ExportService {
             nodeTag = await this.translateHTMLTags(n.nodeName, n);
             this.updateFileCounter = true;
           }
-          content += nodeTag.header;
-          content += tmpContent;
-          content = this.appendContent(content, nodeTag.footer, nodeTag);
+          content = this.sumContents(nodeTag, tmpContent, content);
         }
       }
+    }
+    return content;
+  }
+
+  private sumContents(nodeTag: LateXTag, tmpContent: string, content: string) {
+    if (
+      nodeTag.header === '\\begin{verbatim}\r\n' &&
+      tmpContent.startsWith('\\begin{verbatim}\r\n')
+    ) {
+      content += tmpContent;
+    } else {
+      content += nodeTag.header;
+      content += tmpContent;
+      content = this.appendContent(content, nodeTag.footer, nodeTag);
     }
     return content;
   }
