@@ -143,8 +143,7 @@ export class BasesnippetController {
           'Find the index (i.e position) of a basesnippet within a query.',
         content: {
           'application/json': {
-            type: 'any',
-            schema: getModelSchemaRef(Basesnippet, {includeRelations: true}),
+            schema: {type: 'number'},
           },
         },
       },

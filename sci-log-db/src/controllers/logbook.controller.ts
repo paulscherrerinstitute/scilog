@@ -98,11 +98,11 @@ export class LogbookController {
     security: OPERATION_SECURITY_SPEC,
     responses: {
       '200': {
-        description: 'Logbooks model instance',
+        description:
+          'Find the index (i.e position) of a logbook within a query.',
         content: {
           'application/json': {
-            type: 'any',
-            schema: getModelSchemaRef(Logbook, {includeRelations: true}),
+            schema: {type: 'number'},
           },
         },
       },
