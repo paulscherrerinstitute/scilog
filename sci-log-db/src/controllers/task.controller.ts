@@ -104,11 +104,10 @@ export class TaskController {
     security: OPERATION_SECURITY_SPEC,
     responses: {
       '200': {
-        description: 'Tasks model instance',
+        description: 'Find the index (i.e position) of a task within a query.',
         content: {
           'application/json': {
-            type: 'any',
-            schema: getModelSchemaRef(Task, {includeRelations: true}),
+            schema: {type: 'number'},
           },
         },
       },

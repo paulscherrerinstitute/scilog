@@ -102,11 +102,11 @@ export class ParagraphController {
     security: OPERATION_SECURITY_SPEC,
     responses: {
       '200': {
-        description: 'Paragraphs model instance',
+        description:
+          'Find the index (i.e position) of a paragraph within a query.',
         content: {
           'application/json': {
-            type: 'any',
-            schema: getModelSchemaRef(Paragraph, {includeRelations: true}),
+            schema: {type: 'number'},
           },
         },
       },

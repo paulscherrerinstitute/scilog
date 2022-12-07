@@ -100,11 +100,11 @@ export class LocationController {
     security: OPERATION_SECURITY_SPEC,
     responses: {
       '200': {
-        description: 'Locations model instance',
+        description:
+          'Find the index (i.e position) of a location within a query.',
         content: {
           'application/json': {
-            type: 'any',
-            schema: getModelSchemaRef(Location, {includeRelations: true}),
+            schema: {type: 'number'},
           },
         },
       },
