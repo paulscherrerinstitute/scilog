@@ -16,7 +16,8 @@ export function getModelSchemaRefWithDeprecated<T extends Entity>(
   options?: JsonSchemaOptions<T> & {deprecated?: (keyof T)[]},
 ) {
   const deprecated = options?.deprecated ?? [];
-  const title = `${options?.title ?? modelCtor.name}${JSON.stringify(options)}`;
+  const stringOptions = JSON.stringify(options).replace(/[^a-zA-Z0-9 ]/g, '');
+  const title = `${options?.title ?? modelCtor.name}${stringOptions}`;
   const modelSchemaRef = loobpackGetModelSchemaRef(modelCtor, {
     ..._.omit(options, ['deprecated', 'title']),
     title: title,
