@@ -10,9 +10,16 @@ describe('Utils unit tests', function (this: Suite) {
     position: 1,
   };
 
-  const nodeTagNonVerbatim = {
+  const genericNodeTag = {
     header: '\\begin{figure}\r\n',
     footer: '\\end{figure}\r\n',
+    waitUntilRead: false,
+    position: 1,
+  };
+
+  const nodeTagHref = {
+    header: '\\href{h}\r\n{',
+    footer: '}\r\n',
     waitUntilRead: false,
     position: 1,
   };
@@ -50,7 +57,7 @@ describe('Utils unit tests', function (this: Suite) {
     },
     {
       message: 'Non verbatim outer node',
-      nodeTag: nodeTagNonVerbatim,
+      nodeTag: genericNodeTag,
       baseContent: '',
       tmpContent: '\\begin{verbatim}\r\na\\end{verbatim}\r\n',
       expected:
@@ -58,10 +65,42 @@ describe('Utils unit tests', function (this: Suite) {
     },
     {
       message: 'Non verbatim outer and inner node',
-      nodeTag: nodeTagNonVerbatim,
+      nodeTag: genericNodeTag,
       baseContent: '',
       tmpContent: 'a',
       expected: '\\begin{figure}\r\na\\end{figure}\r\n',
+    },
+    {
+      message: 'Href after non center',
+      nodeTag: nodeTagHref,
+      baseContent: '',
+      tmpContent: 'someNonCenterContent',
+      expected: '\\href{h}\r\n{someNonCenterContent}\r\n',
+    },
+    {
+      message: 'Href after tmpContent starting with center',
+      nodeTag: nodeTagHref,
+      baseContent: '',
+      tmpContent: '\\begin{center}\r\nsomeCenterContent\\end{center}\r\n',
+      expected:
+        '\\begin{center}\r\n\\href{h}\r\n{someCenterContent}\r\n\\end{center}\r\n',
+    },
+    {
+      message: 'Href after tmpContent with center after another tag',
+      nodeTag: nodeTagHref,
+      baseContent: '',
+      tmpContent:
+        '\\begin{figure}\r\n\\begin{center}\r\nsomeCenterContent\\end{center}\r\n\\end{figure}\r\n',
+      expected:
+        '\\begin{figure}\r\n\\begin{center}\r\n\\href{h}\r\n{someCenterContent}\r\n\\end{center}\r\n\\end{figure}\r\n',
+    },
+    {
+      message: 'Generic node after tmpContent with center',
+      nodeTag: genericNodeTag,
+      baseContent: '',
+      tmpContent: '\\begin{center}\r\nsomeCenterContent\\end{center}\r\n',
+      expected:
+        '\\begin{figure}\r\n\\begin{center}\r\nsomeCenterContent\\end{center}\r\n\\end{figure}\r\n',
     },
   ];
 
@@ -74,5 +113,14 @@ describe('Utils unit tests', function (this: Suite) {
       );
       expect(content).to.be.eql(t.expected);
     });
+  });
+
+  it('Replace special', () => {
+    const testWord =
+      'a first # and a second _ and a third % and fourth % and a fifth # and a sixth _';
+    const replaced = ExportService.prototype['replaceSpecial'](testWord);
+    expect(replaced).to.be.eql(
+      'a first \\# and a second \\_ and a third \\% and fourth \\% and a fifth \\# and a sixth \\_',
+    );
   });
 });

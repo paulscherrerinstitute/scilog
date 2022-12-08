@@ -120,8 +120,13 @@ export class ExportService {
           this.exportDir +
           '; pdflatex -interaction=nonstopmode ./export.tex',
         (error: string, stdout: string, stderr: string) => {
-          if (error) {
-            console.warn(error);
+          if (
+            error &&
+            stdout.includes(
+              'Fatal error occurred, no output PDF file produced!',
+            )
+          ) {
+            console.warn(stdout);
           }
 
           resolve(stdout ? stdout : stderr);
@@ -217,6 +222,10 @@ export class ExportService {
     return footer;
   }
 
+  private replaceSpecial(nodeValue: string) {
+    return nodeValue.replace(/[_#%]/g, '\\$&');
+  }
+
   private async translate2LaTeX(inputString: string): Promise<string> {
     let out = '';
     const jsdom = require('jsdom');
@@ -257,8 +266,7 @@ export class ExportService {
           if (n.nodeType === 3) {
             // if child node is **final base-case** text node
             // console.log("nodeValue", nodeList[i].nodeValue);
-            tmpContent = n.nodeValue.replace(/_/g, '\\_');
-            tmpContent = tmpContent.replace(/#/g, '\\#');
+            tmpContent = this.replaceSpecial(n.nodeValue);
             // content += tmpContent;
           } else {
             object[element.nodeName].push({}); // push {} into empty [] array where {} for recursivable elements
@@ -286,6 +294,13 @@ export class ExportService {
       tmpContent.startsWith('\\begin{verbatim}\r\n')
     ) {
       content += tmpContent;
+    } else if (
+      nodeTag.header.startsWith('\\href{') &&
+      tmpContent.includes('\\begin{center}\r\n')
+    ) {
+      content += tmpContent
+        .replace(/(\\begin{center}\r\n)/, `$1${nodeTag.header}`)
+        .replace(/(\\end{center}\r\n)/, `${nodeTag.footer}$1`);
     } else {
       content += nodeTag.header;
       content += tmpContent;
