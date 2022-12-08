@@ -18,7 +18,7 @@ describe('Utils unit tests', function (this: Suite) {
   };
 
   const nodeTagHref = {
-    header: '\\href{h}\r\n{',
+    header: '\\href{h}{',
     footer: '}\r\n',
     waitUntilRead: false,
     position: 1,
@@ -75,7 +75,7 @@ describe('Utils unit tests', function (this: Suite) {
       nodeTag: nodeTagHref,
       baseContent: '',
       tmpContent: 'someNonCenterContent',
-      expected: '\\href{h}\r\n{someNonCenterContent}\r\n',
+      expected: '\\href{h}{someNonCenterContent}\r\n',
     },
     {
       message: 'Href after tmpContent starting with center',
@@ -83,7 +83,7 @@ describe('Utils unit tests', function (this: Suite) {
       baseContent: '',
       tmpContent: '\\begin{center}\r\nsomeCenterContent\\end{center}\r\n',
       expected:
-        '\\begin{center}\r\n\\href{h}\r\n{someCenterContent}\r\n\\end{center}\r\n',
+        '\\begin{center}\r\n\\href{h}{someCenterContent}\r\n\\end{center}\r\n',
     },
     {
       message: 'Href after tmpContent with center after another tag',
@@ -92,7 +92,16 @@ describe('Utils unit tests', function (this: Suite) {
       tmpContent:
         '\\begin{figure}\r\n\\begin{center}\r\nsomeCenterContent\\end{center}\r\n\\end{figure}\r\n',
       expected:
-        '\\begin{figure}\r\n\\begin{center}\r\n\\href{h}\r\n{someCenterContent}\r\n\\end{center}\r\n\\end{figure}\r\n',
+        '\\begin{figure}\r\n\\begin{center}\r\n\\href{h}{someCenterContent}\r\n\\end{center}\r\n\\end{figure}\r\n',
+    },
+    {
+      message: 'Href after tmpContent with multiple centers',
+      nodeTag: nodeTagHref,
+      baseContent: '',
+      tmpContent:
+        '\\begin{center}\r\n\\begin{center}\r\nsomeCenterContent\\end{center}\r\n\\end{center}\r\n',
+      expected:
+        '\\begin{center}\r\n\\begin{center}\r\n\\href{h}{someCenterContent}\r\n\\end{center}\r\n\\end{center}\r\n',
     },
     {
       message: 'Generic node after tmpContent with center',

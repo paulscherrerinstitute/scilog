@@ -298,9 +298,14 @@ export class ExportService {
       nodeTag.header.startsWith('\\href{') &&
       tmpContent.includes('\\begin{center}\r\n')
     ) {
-      content += tmpContent
-        .replace(/(\\begin{center}\r\n)/, `$1${nodeTag.header}`)
-        .replace(/(\\end{center}\r\n)/, `${nodeTag.footer}$1`);
+      const begin = '\\begin{center}\r\n';
+      const position = tmpContent.lastIndexOf(begin) + begin.length;
+      content += `${tmpContent.substring(0, position)}${
+        nodeTag.header
+      }${tmpContent.substring(position)}`.replace(
+        /(\\end{center}\r\n)/,
+        `${nodeTag.footer}$1`,
+      );
     } else {
       content += nodeTag.header;
       content += tmpContent;
