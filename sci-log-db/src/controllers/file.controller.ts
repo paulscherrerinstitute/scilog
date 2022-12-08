@@ -461,8 +461,10 @@ export class FileController {
       const bucket = new Mongo.GridFSBucket(
         this.fileRepository.dataSource.connector?.db,
       );
-      const readStream = fs.createReadStream(formData.files.file.path);
-      const uploadStream = bucket.openUploadStream(formData.files.file.path);
+      const readStream = fs.createReadStream(formData.files.file.filepath);
+      const uploadStream = bucket.openUploadStream(
+        formData.files.file.filepath,
+      );
       readStream.pipe(uploadStream);
       const id = uploadStream.id;
       uploadStream
@@ -473,7 +475,7 @@ export class FileController {
         })
         .on('finish', async () => {
           formData.fields['_fileId'] = id;
-          formData.fields['contentType'] = formData.files.file.type;
+          formData.fields['contentType'] = formData.files.file.mimetype;
           // eslint-disable-next-line  @typescript-eslint/no-floating-promises
           cb(formData, resolve, reject);
         });

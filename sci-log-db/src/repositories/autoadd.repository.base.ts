@@ -21,7 +21,7 @@ import _ from 'lodash';
 export class AutoAddRepository<
   T extends Entity,
   ID,
-  Relations extends object = {}
+  Relations extends object = {},
 > extends DefaultCrudRepository<T, ID, Relations> {
   // eslint-disable-next-line  @typescript-eslint/no-explicit-any
   public readonly parent: BelongsToAccessor<Entity, any>;
@@ -142,11 +142,11 @@ export class AutoAddRepository<
     if (parentId) {
       const baseSnippetRepository = await this.baseSnippetRepository();
       try {
-        parentACL = ((await baseSnippetRepository.findById(
-          (parentId as unknown) as ID,
+        parentACL = (await baseSnippetRepository.findById(
+          parentId as unknown as ID,
           {},
           {currentUser: {roles: ['admin']}},
-        )) as unknown) as Basesnippet | Logbook;
+        )) as unknown as Basesnippet | Logbook;
       } catch {
         console.warn(
           `Cannot find snippet with ID from parentId or location: ${parentId}`,
@@ -314,7 +314,7 @@ export class AutoAddRepository<
           const adminCondition = {
             adminACL: {
               inq: [
-                ...ctx?.options?.currentUser?.roles,
+                ...(ctx?.options?.currentUser?.roles ?? []),
                 ctx?.options?.currentUser?.email,
               ],
             },

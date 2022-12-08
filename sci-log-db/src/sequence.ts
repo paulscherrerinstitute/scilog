@@ -19,7 +19,11 @@ const SequenceActions = RestBindings.SequenceActions;
 
 const middlewareList: ExpressRequestHandler[] = [
   cors(),
-  session({secret: 'someSecret', resave: false, saveUninitialized: true}),
+  session({
+    secret: 'someSecret',
+    resave: false,
+    saveUninitialized: true,
+  }) as ExpressRequestHandler,
 ];
 
 export class MySequence implements SequenceHandler {

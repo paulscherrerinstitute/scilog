@@ -23,7 +23,7 @@ function UpdateAndDeleteRepositoryMixin<
   },
   ID,
   Relations extends object,
-  R extends MixinTarget<DefaultCrudRepository<M, ID, Relations>>
+  R extends MixinTarget<DefaultCrudRepository<M, ID, Relations>>,
 >(superClass: R) {
   class Mixed extends superClass {
     readonly baseSnippetRepository: Function;
@@ -103,7 +103,7 @@ function UpdateAndDeleteRepositoryMixin<
         if (snippet?.parentId) {
           const baseSnippetRepository = await this.baseSnippetRepository();
           const parent = await baseSnippetRepository.findById(
-            (snippet.parentId as unknown) as ID,
+            snippet.parentId as unknown as ID,
             {},
             options,
           );
@@ -128,7 +128,7 @@ function UpdateAndDeleteRepositoryMixin<
       if (snippet?.deleted && snippet.parentId) {
         const baseSnippetRepository = await this.baseSnippetRepository();
         const historySnippet = await baseSnippetRepository.findById(
-          (snippet.parentId as unknown) as ID,
+          snippet.parentId as unknown as ID,
           {},
           {currentUser: user},
         );
@@ -149,7 +149,7 @@ function FindWithSearchRepositoryMixin<
   M extends Entity & {id: ID},
   ID,
   Relations extends object,
-  R extends MixinTarget<DefaultCrudRepository<M, ID, Relations>>
+  R extends MixinTarget<DefaultCrudRepository<M, ID, Relations>>,
 >(superClass: R) {
   class Mixed extends superClass {
     async findWithSearch(
@@ -279,7 +279,7 @@ function ExportRepositoryMixin<
   },
   ID,
   Relations extends object,
-  R extends MixinTarget<DefaultCrudRepository<M, ID, Relations>>
+  R extends MixinTarget<DefaultCrudRepository<M, ID, Relations>>,
 >(superClass: R) {
   class Mixed extends superClass {
     exportDir: string;
@@ -302,7 +302,7 @@ function ExportRepositoryMixin<
       if (snippets.length > 0) {
         if (snippets[0]?.parentId) {
           const parent = await this.findById(
-            (snippets[0].parentId as unknown) as ID,
+            snippets[0].parentId as unknown as ID,
             filter,
             {currentUser: user},
           );
@@ -371,7 +371,7 @@ export function SnippetRepositoryMixin<
   },
   ID,
   Relations extends object,
-  R extends MixinTarget<DefaultCrudRepository<M, ID, Relations>>
+  R extends MixinTarget<DefaultCrudRepository<M, ID, Relations>>,
 >(superClass: R) {
   return [
     UpdateAndDeleteRepositoryMixin,

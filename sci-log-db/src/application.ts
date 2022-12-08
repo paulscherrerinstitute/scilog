@@ -25,7 +25,7 @@ import {
   RepositoryMixin,
   SchemaMigrationOptions,
 } from '@loopback/repository';
-import {RestApplication} from '@loopback/rest';
+import {ExpressRequestHandler, RestApplication} from '@loopback/rest';
 import {
   RestExplorerBindings,
   RestExplorerComponent,
@@ -183,7 +183,9 @@ export class SciLogDbApplication extends BootMixin(
       this.bind('oidcOptions').to(this.options.oidcOptions);
       registerAuthenticationStrategy(this, OIDCAuthentication);
       this.add(createBindingFromClass(OIDCAuthentication));
-      this.bind('passport-init-mw').to(toInterceptor(passport.initialize()));
+      this.bind('passport-init-mw').to(
+        toInterceptor(passport.initialize() as ExpressRequestHandler),
+      );
       this.bind('passport-session-mw').to(toInterceptor(passport.session()));
       this.bind('passport-oidc').to(
         toInterceptor(passport.authenticate('openidconnect')),

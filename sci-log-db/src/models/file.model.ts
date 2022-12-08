@@ -73,4 +73,4 @@ export interface FileRelations {
   // describe navigational properties here
 }
 
-export type FileWithRelations = File & FileRelations;
+export type FileWithRelations = Filesnippet & FileRelations;
