@@ -58,7 +58,7 @@ export const verifyFunctionFactory = function (
     done: (error: any, user?: any, info?: any) => void,
   ) {
     // look up a linked user for the profile
-    if (!profile.emails || !profile.emails.length) {
+    if (!profile?.emails?.length) {
       throw new Error('email-id is required in returned profile to login');
     }
     const name = profile.name?.givenName

@@ -165,9 +165,9 @@ export async function startWebsocket(app: SciLogDbApplication) {
     };
   })();
 
-  const dataSourceSettings: AnyObject = (app.getSync(
-    'datasources.mongo',
-  ) as MongoDataSource).settings;
+  const dataSourceSettings: AnyObject = (
+    app.getSync('datasources.mongo') as MongoDataSource
+  ).settings;
   Mongo.MongoClient.connect(dataSourceSettings.url, {
     useUnifiedTopology: dataSourceSettings.useUnifiedTopology,
     // eslint-disable-next-line  @typescript-eslint/no-explicit-any

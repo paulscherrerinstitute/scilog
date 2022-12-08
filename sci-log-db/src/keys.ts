@@ -12,9 +12,8 @@ import {PasswordHasher} from './services/hash.password.bcryptjs';
 import {FileUploadHandler} from './types';
 
 export namespace PasswordHasherBindings {
-  export const PASSWORD_HASHER = BindingKey.create<PasswordHasher>(
-    'services.hasher',
-  );
+  export const PASSWORD_HASHER =
+    BindingKey.create<PasswordHasher>('services.hasher');
   export const ROUNDS = BindingKey.create<number>('services.hasher.round');
 }
 
@@ -39,6 +38,5 @@ export const STORAGE_DIRECTORY = BindingKey.create<string>('storage.directory');
 /**
  * Binding key for the export service
  */
-export const EXPORT_SERVICE = BindingKey.create<ExportService>(
-  'services.Export',
-);
+export const EXPORT_SERVICE =
+  BindingKey.create<ExportService>('services.Export');

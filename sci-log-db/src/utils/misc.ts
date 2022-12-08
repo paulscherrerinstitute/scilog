@@ -32,7 +32,7 @@ export function getModelSchemaRefWithDeprecated<T extends Entity>(
 }
 
 function getModelSchemaRefWithDeprecatedOwnerGroupAccessGroups<
-  T extends Entity
+  T extends Entity,
 >(
   modelCtor: Function & {prototype: T; definition?: ModelDefinition},
   options?: JsonSchemaOptions<T> & {strict?: boolean},
@@ -116,7 +116,8 @@ export const validateFieldsVSModel = (
   }
 };
 
-export const getModelSchemaRef = getModelSchemaRefWithDeprecatedOwnerGroupAccessGroups;
+export const getModelSchemaRef =
+  getModelSchemaRefWithDeprecatedOwnerGroupAccessGroups;
 export function getModelSchemaRefWithStrict<T extends Entity>(
   modelCtor: Function & {prototype: T; definition?: ModelDefinition},
   options?: JsonSchemaOptions<T> & {strict?: boolean},
