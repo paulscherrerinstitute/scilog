@@ -61,12 +61,7 @@ export const verifyFunctionFactory = function (
     if (!profile?.emails?.length) {
       throw new Error('email-id is required in returned profile to login');
     }
-    const name = profile.name?.givenName
-      ? profile.name.givenName + ' ' + profile.name.familyName
-      : profile.displayName;
-    const [firstName, lastName] = (name || JSON.stringify(profile.name)).split(
-      ' ',
-    );
+    const {firstName, lastName} = extractFirstLastName(profile);
     const user = {
       email: profile.emails[0].value,
       firstName: firstName,
@@ -121,4 +116,13 @@ export const findOrCreateUser = async function (
     }); // username can be removed later
   }
   return foundUser;
+};
+export const extractFirstLastName = function (profile: Profile): {
+  firstName: string;
+  lastName: string;
+} {
+  const displayNameSplit: string[] = (profile.displayName ?? '').split(' ');
+  const lastName = profile.name?.familyName ?? displayNameSplit.pop() ?? '';
+  const firstName = profile.name?.givenName ?? displayNameSplit.join(' ');
+  return {firstName, lastName};
 };
