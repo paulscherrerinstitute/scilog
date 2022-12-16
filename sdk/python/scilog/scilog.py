@@ -5,13 +5,18 @@ import json
 import os
 import uuid
 import warnings
-from typing import Any, Tuple
+from typing import TYPE_CHECKING, Any, Tuple
+
+from typeguard import typechecked
 
 from .authmixin import HEADER_JSON, AuthError
 from .httpclient import HttpClient
 from .snippet import Basesnippet, Filesnippet, Location, Paragraph, Snippet
 
 ACLS = ["createACL", "readACL", "updateACL", "deleteACL", "shareACL", "adminACL"]
+
+if TYPE_CHECKING:
+    from .logbook_message import LogbookMessage
 
 
 def pinned_to_logbook(logbook_keys, include_none=False):
@@ -27,7 +32,7 @@ def pinned_to_logbook(logbook_keys, include_none=False):
                         if key == "parentId":
                             kwargs[key] = log.logbook.id
                         else:
-                            if logbook.get(key): 
+                            if logbook.get(key):
                                 kwargs[key] = logbook[key]
             return func(log, *args, **kwargs)
 
@@ -62,7 +67,8 @@ class SciLog:
 
     @staticmethod
     def _replace_json_placeholder(snippet: dict, field: str, data: Any) -> dict:
-        if not snippet.get(field): return snippet
+        if not snippet.get(field):
+            return snippet
         if isinstance(snippet[field], list):
             if "default" in snippet[field]:
                 data = set(data) | set(group for group in snippet[field] if group)
@@ -120,8 +126,12 @@ class SciLog:
             print("Posting from filepath:", file["filepath"])
             filesnippet = self._post_filesnippet(
                 file["filepath"],
-                **{key: val for key, val in payload.items() if key 
-                in ACLS + [k for k, v in Filesnippet._deprecated_by.items() if v == "ACLS"]},
+                **{
+                    key: val
+                    for key, val in payload.items()
+                    if key
+                    in ACLS + [k for k, v in Filesnippet._deprecated_by.items() if v == "ACLS"]
+                },
             )
             file["fileId"] = filesnippet.id
             file["accessHash"] = filesnippet.accessHash
@@ -200,12 +210,21 @@ class SciLog:
 
         return self.patch_snippet(snippet)
 
+    @typechecked
+    def send_logbook_message(self, msg: LogbookMessage) -> None:
+        payload = msg._content.to_dict(include_none=False)
+        payload["linkType"] = "paragraph"
+        # FIXME the python sdk should not use the ownergroup
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore")
+            self.post_snippet(**payload)
+
     @staticmethod
     def prepare_file_content(filepath: str, fsnippet: Filesnippet = None) -> Tuple:
         file_extension = filepath.split(".")[-1].lower()
         file_hash = str(uuid.uuid4())
-        file_id = fsnippet.id if fsnippet and fsnippet.id else None 
-        accessHash = fsnippet.accessHash if fsnippet and fsnippet.accessHash else None 
+        file_id = fsnippet.id if fsnippet and fsnippet.id else None
+        accessHash = fsnippet.accessHash if fsnippet and fsnippet.accessHash else None
 
         if file_extension in SciLog.IMAGE_TYPES:
             textcontent = (
