@@ -167,8 +167,13 @@ export class SnippetContentComponent implements OnInit {
     for (const image of images) {
       if (!image.parentElement.firstChild.href) {
         const hrefElement = document.createElement('a');
+        hrefElement.setAttribute('target', '_blank');
+        hrefElement.setAttribute('rel', 'noopener noreferrer');
         image.parentElement.appendChild(hrefElement)
         hrefElement.appendChild(image)
+      } else {
+        image.parentElement.firstChild.setAttribute('target', '_blank');
+        image.parentElement.firstChild.setAttribute('rel', 'noopener noreferrer');
       }
       if (image.parentElement.firstChild != image)
         image.parentElement.insertBefore(image, image.parentElement.firstChild);
