@@ -2,7 +2,7 @@ import {expect} from '@loopback/testlab';
 import {Suite} from 'mocha';
 import {Profile} from 'passport';
 import {roles} from '../../authentication-strategies/roles';
-import {} from '../../utils/misc';
+import {extractFirstLastName} from '../../authentication-strategies/types';
 
 describe('Authentication strategies roles', function (this: Suite) {
   it('Should return an empty list', () => {
@@ -78,5 +78,32 @@ describe('Authentication strategies roles', function (this: Suite) {
       username: 'e987654',
     });
     expect(emptyRoles).to.be.eql(['g12345', 'g78910']);
+  });
+
+  [
+    {
+      profile: {
+        name: {familyName: 'aFamilyName', givenName: 'aFirstName aSecondName'},
+      },
+      expected: {firstName: 'aFirstName aSecondName', lastName: 'aFamilyName'},
+    },
+    {
+      profile: {name: {familyName: 'aFamilyName', givenName: 'aFirstName'}},
+      expected: {firstName: 'aFirstName', lastName: 'aFamilyName'},
+    },
+    {
+      profile: {displayName: 'aFirstName aSecondName aFamilyName'},
+      expected: {firstName: 'aFirstName aSecondName', lastName: 'aFamilyName'},
+    },
+    {
+      profile: {displayName: 'aFirstName aFamilyName'},
+      expected: {firstName: 'aFirstName', lastName: 'aFamilyName'},
+    },
+  ].forEach((test, i) => {
+    it(`Should return the first name and last name splitted accordingly ${i}`, () => {
+      expect(extractFirstLastName(test.profile as Profile)).to.be.eql(
+        test.expected,
+      );
+    });
   });
 });
