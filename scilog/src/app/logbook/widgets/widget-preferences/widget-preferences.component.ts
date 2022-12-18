@@ -1,5 +1,5 @@
 import { Component, OnInit, Input, Inject, ViewChild, NgZone, ElementRef } from '@angular/core';
-import { FormArray, FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
+import { UntypedFormArray, UntypedFormBuilder, UntypedFormControl, UntypedFormGroup, Validators } from '@angular/forms';
 import { MatChipInputEvent } from '@angular/material/chips';
 import { COMMA, ENTER, SPACE } from '@angular/cdk/keycodes';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
@@ -24,22 +24,22 @@ export class WidgetPreferencesComponent implements OnInit {
 
 
   data: WidgetItemConfig;
-  filters = new FormArray([]);
-  options: FormGroup;
-  filterBasics: FormGroup;
-  hideMetadata = new FormControl(false);
-  showSnippetHeader = new FormControl(false);
-  readOnlyLogbook = new FormControl(false);
-  hideRequiredControl = new FormControl(false);
-  descendingOrder = new FormControl(false);
-  floatLabelControl = new FormControl('auto');
+  filters = new UntypedFormArray([]);
+  options: UntypedFormGroup;
+  filterBasics: UntypedFormGroup;
+  hideMetadata = new UntypedFormControl(false);
+  showSnippetHeader = new UntypedFormControl(false);
+  readOnlyLogbook = new UntypedFormControl(false);
+  hideRequiredControl = new UntypedFormControl(false);
+  descendingOrder = new UntypedFormControl(false);
+  floatLabelControl = new UntypedFormControl('auto');
   tag: Tags[] = [];
   additionalLogbooks: Logbooks[] = [];
-  title = new FormControl('');
-  widgetType = new FormControl('');
-  snippetViewerControl = new FormControl();
-  plotControl = new FormControl();
-  additionalLogbooksCtrl = new FormControl();
+  title = new UntypedFormControl('');
+  widgetType = new UntypedFormControl('');
+  snippetViewerControl = new UntypedFormControl();
+  plotControl = new UntypedFormControl();
+  additionalLogbooksCtrl = new UntypedFormControl();
 
   visible = true;
   selectable = true;
@@ -64,7 +64,7 @@ export class WidgetPreferencesComponent implements OnInit {
   readonly separatorKeysCodes: number[] = [ENTER, COMMA, SPACE];
 
   constructor(
-    fb: FormBuilder,
+    fb: UntypedFormBuilder,
     private dialogRef: MatDialogRef<WidgetPreferencesComponent>,
     private logbookInfo: LogbookInfoService,
     private userPreferences: UserPreferencesService,
@@ -75,12 +75,12 @@ export class WidgetPreferencesComponent implements OnInit {
     this.options = fb.group({
       hideRequired: this.hideRequiredControl,
       floatLabel: this.floatLabelControl,
-      enableAdvanced: new FormControl(false),
+      enableAdvanced: new UntypedFormControl(false),
     });
     this.filterBasics = fb.group({
-      ownerGroup: new FormControl(''),
-      logbook: new FormControl(''),
-      description: new FormControl({ value: "", disabled: true })
+      ownerGroup: new UntypedFormControl(''),
+      logbook: new UntypedFormControl(''),
+      description: new UntypedFormControl({ value: "", disabled: true })
     });
 
   }
@@ -248,10 +248,10 @@ export class WidgetPreferencesComponent implements OnInit {
   }
 
   addFormGroup() {
-    const group = new FormGroup({
-      name: new FormControl(''),
-      operator: new FormControl(''),
-      value: new FormControl('')
+    const group = new UntypedFormGroup({
+      name: new UntypedFormControl(''),
+      operator: new UntypedFormControl(''),
+      value: new UntypedFormControl('')
     });
     this.filters.push(group);
   }

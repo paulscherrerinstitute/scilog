@@ -1,4 +1,4 @@
-import { async, ComponentFixture, TestBed } from '@angular/core/testing';
+import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 
 import { ChartComponent } from './chart.component';
 import { ViewsService } from '@shared/views.service';
@@ -28,7 +28,7 @@ describe('ChartComponent', () => {
   // let logbookSpy:any;
   let changestreamSpy:any;
 
-  beforeEach(async(() => {
+  beforeEach(waitForAsync(() => {
 
     plotSpy = jasmine.createSpyObj("PlotDataService", ["getPlotSnippets"]);
     // logbookSpy = jasmine.createSpyObj("LogbookInfoService", ['currentView']);

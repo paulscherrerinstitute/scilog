@@ -1,4 +1,4 @@
-import { async, ComponentFixture, TestBed } from '@angular/core/testing';
+import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 
 import { DownloadComponent } from './download.component';
 import { ActivatedRoute } from '@angular/router';
@@ -27,10 +27,10 @@ describe('DownloadComponent', () => {
  };
 
  logbookItemDataServiceSpy = jasmine.createSpyObj("LogbookItemDataService", ["getFilesnippet", "getImage"]);
- logbookItemDataServiceSpy.getFilesnippet.and.returnValue(of({}).toPromise());
+ logbookItemDataServiceSpy.getFilesnippet.and.returnValue(of({}));
  logbookItemDataServiceSpy.getImage.and.returnValue(of(new Blob(['data:image/png;base64,iVBORw0KGgoAAAANSUhE'], {type: 'image/png'})).toPromise());
 
-  beforeEach(async(() => {
+  beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       providers:[
       { provide: ActivatedRoute, useValue: activatedRouteMock },
@@ -55,7 +55,7 @@ describe('DownloadComponent', () => {
 
   it('should create', () => {
     const asyncFunc: () => Promise<void> = async () => {
-      await new Promise(resolve => resolve());
+      await new Promise(resolve => resolve(undefined));
   };
     component.exportData = asyncFunc;
     component['downloadLink'].nativeElement = new NativeElementMock;

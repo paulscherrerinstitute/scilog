@@ -2,7 +2,6 @@ import { Component, OnInit } from '@angular/core';
 import { CompactType, DisplayGrid, GridsterConfig, GridsterItem, GridsterItemComponent, GridsterPush, GridType } from 'angular-gridster2';
 import { MatOptionSelectionChange } from '@angular/material/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { stringToKeyValue } from '@angular/flex-layout/extended/typings/style/style-transforms';
 import { Subscription } from 'rxjs';
 import { ViewsService } from '@shared/views.service';
 import { WidgetConfig } from '@model/config';

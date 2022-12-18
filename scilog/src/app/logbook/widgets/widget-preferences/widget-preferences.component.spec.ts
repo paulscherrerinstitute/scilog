@@ -1,5 +1,5 @@
-import { async, ComponentFixture, TestBed } from '@angular/core/testing';
-import { FormBuilder } from '@angular/forms';
+import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
+import { UntypedFormBuilder } from '@angular/forms';
 import { MatDialogModule, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 
 import { WidgetPreferencesComponent } from './widget-preferences.component';
@@ -33,12 +33,12 @@ describe('WidgetPreferencesComponent', () => {
   widgetPreferencesSpy.getSnippetsForLogbook.and.returnValue(of({}));
   widgetPreferencesSpy.getPlotSnippets.and.returnValue(of({}));
 
-  beforeEach(async(() => {
+  beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       declarations: [WidgetPreferencesComponent, CdkTextareaAutosize,],
       imports: [MatDialogModule, MatAutocompleteModule],
       providers: [
-        FormBuilder,
+        UntypedFormBuilder,
         { provide: MatDialogRef, useValue: MatDialogRef },
         {
           provide: MAT_DIALOG_DATA, useValue: {

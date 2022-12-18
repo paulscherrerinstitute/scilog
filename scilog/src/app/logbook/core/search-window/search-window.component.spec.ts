@@ -1,5 +1,5 @@
 import { HttpClientTestingModule } from '@angular/common/http/testing';
-import { async, ComponentFixture, TestBed } from '@angular/core/testing';
+import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 import { MatDialog } from '@angular/material/dialog';
 import { LogbookInfoService } from '@shared/logbook-info.service';
 import { AppConfigService } from 'src/app/app-config.service';
@@ -12,7 +12,7 @@ describe('SearchWindowComponent', () => {
   let component: SearchWindowComponent;
   let fixture: ComponentFixture<SearchWindowComponent>;
 
-  beforeEach(async(() => {
+  beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       declarations: [ SearchWindowComponent ],
       providers: [

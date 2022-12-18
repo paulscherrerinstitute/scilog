@@ -1,5 +1,5 @@
 import { Component, Input, OnInit } from '@angular/core';
-import { FormControl } from '@angular/forms';
+import { UntypedFormControl } from '@angular/forms';
 import { Tasks } from '@model/tasks';
 import { TasksService } from '@shared/tasks.service';
 import { LogbookInfoService } from '@shared/logbook-info.service';
@@ -20,7 +20,7 @@ export class TodosComponent implements OnInit {
   configIndex: number;
 
   tasks: Tasks[] = [];
-  newTask = new FormControl('');
+  newTask = new UntypedFormControl('');
   numTasks: number = 0;
   subscriptions: Subscription[] = [];
 

@@ -1,5 +1,5 @@
 import { HttpClientTestingModule } from '@angular/common/http/testing';
-import { async, ComponentFixture, TestBed } from '@angular/core/testing';
+import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 import { AppConfigService } from 'src/app/app-config.service';
 
 import { CollectionWidgetComponent } from './collection-widget.component';
@@ -10,7 +10,7 @@ describe('CollectionWidgetComponent', () => {
   let component: CollectionWidgetComponent;
   let fixture: ComponentFixture<CollectionWidgetComponent>;
 
-  beforeEach(async(() => {
+  beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       declarations: [ CollectionWidgetComponent ],
       imports: [HttpClientTestingModule],

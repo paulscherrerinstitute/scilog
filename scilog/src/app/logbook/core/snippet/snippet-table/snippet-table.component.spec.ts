@@ -1,4 +1,4 @@
-import { async, ComponentFixture, TestBed } from '@angular/core/testing';
+import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 import { AppConfigService } from 'src/app/app-config.service';
 
 import { SnippetTableComponent } from './snippet-table.component';
@@ -9,7 +9,7 @@ describe('SnippetTableComponent', () => {
   let component: SnippetTableComponent;
   let fixture: ComponentFixture<SnippetTableComponent>;
 
-  beforeEach(async(() => {
+  beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       declarations: [ SnippetTableComponent ],
       providers: [{ provide: AppConfigService, useValue: { getConfig } }],

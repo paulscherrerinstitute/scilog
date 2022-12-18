@@ -1,4 +1,4 @@
-import { async, ComponentFixture, TestBed } from '@angular/core/testing';
+import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 import { MatDialogModule, MAT_DIALOG_DATA } from '@angular/material/dialog';
 
 import { OverviewComponent } from './overview.component';
@@ -43,7 +43,7 @@ describe('OverviewComponent', () => {
   cookiesSpy = jasmine.createSpyObj("CookieService", ["lastLogbook"]);
   cookiesSpy.lastLogbook.and.returnValue([]);
   
-  beforeEach(async(() => {
+  beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       declarations: [ OverviewComponent, LogbookSearchMockPipe],
       imports: [MatDialogModule, RouterTestingModule],

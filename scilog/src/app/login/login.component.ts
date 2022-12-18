@@ -1,5 +1,5 @@
 import { Component, Inject, OnInit } from '@angular/core';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { UntypedFormBuilder, UntypedFormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { AuthService } from '@shared/auth-services/auth.service';
 import { AppConfig, AppConfigService, Oauth2Endpoint } from '../app-config.service';
@@ -13,7 +13,7 @@ import { DOCUMENT } from '@angular/common';
 export class LoginComponent implements OnInit {
 
   hide = true;
-  form: FormGroup;
+  form: UntypedFormGroup;
   loginMessage = ' ';
   appConfig: AppConfig = this.appConfigService.getConfig();
   oAuth2Endpoint: Oauth2Endpoint;
@@ -21,7 +21,7 @@ export class LoginComponent implements OnInit {
   
   constructor(
     private appConfigService: AppConfigService,
-    private fb: FormBuilder,
+    private fb: UntypedFormBuilder,
     private authService: AuthService,
     private router: Router,
     private route: ActivatedRoute,

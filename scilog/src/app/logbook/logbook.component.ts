@@ -3,7 +3,6 @@ import { ChangeStreamService } from '@shared/change-stream.service';
 import { ChangeStreamNotification } from '@shared/changestreamnotification.model'
 import { MediaObserver, MediaChange } from '@angular/flex-layout';
 import { Subscription } from 'rxjs';
-import { stringToKeyValue } from '@angular/flex-layout/extended/typings/style/style-transforms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { LogbookInfoService } from '@shared/logbook-info.service';
 import { Logbooks } from '@model/logbooks';

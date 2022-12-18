@@ -1,6 +1,6 @@
 import { COMMA, ENTER, SPACE } from '@angular/cdk/keycodes';
 import { Component, ElementRef, Input, OnInit, ViewChild } from '@angular/core';
-import { FormBuilder, FormControl, FormGroup, ValidatorFn, Validators } from '@angular/forms';
+import { UntypedFormBuilder, UntypedFormControl, UntypedFormGroup, ValidatorFn, Validators } from '@angular/forms';
 import { MatAutocomplete, MatAutocompleteSelectedEvent } from '@angular/material/autocomplete';
 import { MatChipInputEvent } from '@angular/material/chips';
 import { Observable } from 'rxjs';
@@ -32,8 +32,8 @@ export class ViewEditComponent implements OnInit {
   availLocations: Basesnippets[];
 
 
-  editFormGroup: FormGroup;
-  formBuilder: FormBuilder;
+  editFormGroup: UntypedFormGroup;
+  formBuilder: UntypedFormBuilder;
   visible = true;
   selectable = true;
   removable = true;
@@ -50,7 +50,7 @@ export class ViewEditComponent implements OnInit {
   @ViewChild('accessGroupsInput') accessGroupsInput: ElementRef<HTMLInputElement>;
   @ViewChild('auto') matAutocomplete: MatAutocomplete;
 
-  constructor(fb: FormBuilder,
+  constructor(fb: UntypedFormBuilder,
     private userPreferences: UserPreferencesService,
     private viewDataService: ViewDataService) {
     this.formBuilder = fb;
@@ -59,15 +59,15 @@ export class ViewEditComponent implements OnInit {
   ngOnInit(): void {
 
     this.editFormGroup = this.formBuilder.group({
-      name: new FormControl('', [Validators.required]),
-      views: new FormControl('', [Validators.required]),
-      description: new FormControl(''),
-      location: new FormControl('', Validators.required),
-      ownerGroup: new FormControl('', Validators.required),
-      accessGroupsCtrl: new FormControl({value: '', disabled: true}),
-      shareWithLocation: new FormControl({ value: false, disabled: true }),
-      shareWithLogbook: new FormControl(false),
-      applyCurrentView: new FormControl(false),
+      name: new UntypedFormControl('', [Validators.required]),
+      views: new UntypedFormControl('', [Validators.required]),
+      description: new UntypedFormControl(''),
+      location: new UntypedFormControl('', Validators.required),
+      ownerGroup: new UntypedFormControl('', Validators.required),
+      accessGroupsCtrl: new UntypedFormControl({value: '', disabled: true}),
+      shareWithLocation: new UntypedFormControl({ value: false, disabled: true }),
+      shareWithLogbook: new UntypedFormControl(false),
+      applyCurrentView: new UntypedFormControl(false),
     });
     this.toggleEnableForms(false);
 

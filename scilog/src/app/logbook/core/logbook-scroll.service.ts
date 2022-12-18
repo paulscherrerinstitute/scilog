@@ -9,7 +9,7 @@ export class LogbookScrollService extends ScrollBaseService {
 
   currentViewSubscription: Subscription = null;
   private itemsStatus = new Map();
-  isLoadedSubject: Subject<any> = new Subject();
+  isLoadedSubject: Subject<void> = new Subject();
   subscriptions: Subscription[] = [];
   containerRef: ElementRef = null;
   scrollToEnd = false;

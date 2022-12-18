@@ -1,4 +1,4 @@
-import { async, ComponentFixture, TestBed } from '@angular/core/testing';
+import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 
 import { TodosComponent } from './todos.component';
 import { LogbookInfoService } from '@shared/logbook-info.service';
@@ -40,7 +40,7 @@ describe('TodosComponent', () => {
   let fixture: ComponentFixture<TodosComponent>;
 
 
-  beforeEach(async(() => {
+  beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       providers:[
         {provide: LogbookInfoService, useClass: LogbookInfoMock},

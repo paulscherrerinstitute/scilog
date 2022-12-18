@@ -1,11 +1,11 @@
-import { async, ComponentFixture, TestBed } from '@angular/core/testing';
+import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 
 import { ViewSettingsComponent } from './view-settings.component';
 import { LogbookInfoService } from '@shared/logbook-info.service';
 import { UserPreferencesService } from '@shared/user-preferences.service';
 import { LogbookDataService, ViewDataService } from '@shared/remote-data.service';
 import { ViewsService } from '@shared/views.service';
-import { FormBuilder } from '@angular/forms';
+import { UntypedFormBuilder } from '@angular/forms';
 import { of } from 'rxjs';
 
 
@@ -33,10 +33,10 @@ describe('ViewSettingsComponent', () => {
 
   logbookDataSpy = jasmine.createSpyObj("LogbookDataService", ["getLocations"]);
 
-  beforeEach(async(() => {
+  beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       providers:[
-        FormBuilder,
+        UntypedFormBuilder,
         {provide: LogbookInfoService, useValue: logbookSpy},
         {provide: UserPreferencesService, useClass: UserPreferencesMock},
         {provide: LogbookDataService, useValue: logbookDataSpy},
