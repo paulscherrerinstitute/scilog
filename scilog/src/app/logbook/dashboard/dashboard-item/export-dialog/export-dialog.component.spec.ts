@@ -1,4 +1,4 @@
-import { async, ComponentFixture, TestBed } from '@angular/core/testing';
+import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 
 import { ExportDialogComponent } from './export-dialog.component';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
@@ -26,7 +26,7 @@ describe('ExportDialogComponent', () => {
   logbookItemDataSpy = jasmine.createSpyObj("LogbookItemDataService", ["exportLogbook"]);
   logbookItemDataSpy.exportLogbook.and.returnValue(of(new Blob(['data:image/png;base64,iVBORw0KGgoAAAANSUhE'], {type: 'image/png'})).toPromise());
 
-  beforeEach(async(() => {
+  beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       providers: [
         { provide: MatDialogRef, useValue: mockDialogRef },

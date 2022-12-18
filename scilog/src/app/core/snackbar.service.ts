@@ -18,7 +18,7 @@ export interface SnackbarConfig {
 })
 export class SnackbarService {
 
-  snackbarConfig: SnackbarConfig;
+  snackbarConfig: SnackbarConfig = {message:"",show:false,type:""};
   private serverMessageShown: boolean = false;
   private serverMessage: MatSnackBarRef<TextOnlySnackBar>;
   private snackbarConfigSource = new BehaviorSubject(this.snackbarConfig);

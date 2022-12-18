@@ -1,4 +1,4 @@
-import { async, ComponentFixture, TestBed } from '@angular/core/testing';
+import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 
 import { SnippetInfoSectionComponent } from './snippet-info-section.component';
 
@@ -6,7 +6,7 @@ describe('SnippetInfoSectionComponent', () => {
   let component: SnippetInfoSectionComponent;
   let fixture: ComponentFixture<SnippetInfoSectionComponent>;
 
-  beforeEach(async(() => {
+  beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       declarations: [ SnippetInfoSectionComponent ]
     })

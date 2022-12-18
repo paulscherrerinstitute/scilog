@@ -1,6 +1,6 @@
+@use '@angular/material' as mat;
 
-@import '~@angular/material/theming';
-@include mat-core();
+@include mat.core();
   
 
 
@@ -39,13 +39,13 @@ $scilog-colors: (
   
 
 /* ======== Angular material custom themes ======== */ 
-$my-custom-primary: mat-palette($scilog-colors, 900, 700, 900);
-$my-custom-accent: mat-palette($scilog-colors, 500, 200, A100);
-$my-custom-warn: mat-palette($scilog-colors, A700);
+$my-custom-primary: mat.define-palette($scilog-colors, 900, 700, 900);
+$my-custom-accent: mat.define-palette($scilog-colors, 500, 200, A100);
+$my-custom-warn: mat.define-palette($scilog-colors, A700);
 
-$my-custom-theme: mat-light-theme($my-custom-primary, $my-custom-accent, $my-custom-warn);
+$my-custom-theme: mat.define-light-theme($my-custom-primary, $my-custom-accent, $my-custom-warn);
 
-@include angular-material-theme($my-custom-theme);
+@include mat.all-component-themes($my-custom-theme);
 
 
 .warning-snackbar {

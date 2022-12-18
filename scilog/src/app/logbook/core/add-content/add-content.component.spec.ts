@@ -1,4 +1,4 @@
-import { async, ComponentFixture, TestBed } from '@angular/core/testing';
+import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 import { MatDialogModule, MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import {HttpClientTestingModule} from '@angular/common/http/testing'
 import { AddContentComponent, extractNotificationMessage } from './add-content.component';
@@ -63,7 +63,7 @@ describe('AddContentComponent', () => {
     ]
   };
 
-  beforeEach(async(() => {
+  beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       imports: [MatDialogModule,HttpClientTestingModule],
       providers: [

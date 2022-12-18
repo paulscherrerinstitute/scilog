@@ -1,4 +1,4 @@
-import { async, ComponentFixture, TestBed } from '@angular/core/testing';
+import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 
 import { SettingsComponent } from './settings.component';
@@ -11,7 +11,7 @@ describe('SettingsComponent', () => {
 
   routerSpy = jasmine.createSpyObj("Router", ["navigate"]);
 
-  beforeEach(async(() => {
+  beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       declarations: [ SettingsComponent ],
       providers: [

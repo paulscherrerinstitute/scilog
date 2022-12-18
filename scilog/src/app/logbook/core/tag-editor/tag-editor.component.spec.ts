@@ -1,4 +1,4 @@
-import { async, ComponentFixture, TestBed } from '@angular/core/testing';
+import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 
 import { TagEditorComponent } from './tag-editor.component';
 import { TagService } from '../tag.service';
@@ -17,7 +17,7 @@ describe('TagEditorComponent', () => {
   viewSpy = jasmine.createSpyObj("ViewsService", ["views"]);
   viewSpy.views.and.returnValue([]);
 
-  beforeEach(async(() => {
+  beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       declarations: [ TagEditorComponent ],
       imports: [MatAutocompleteModule],

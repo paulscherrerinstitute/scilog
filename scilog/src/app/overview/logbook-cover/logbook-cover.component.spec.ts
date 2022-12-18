@@ -1,4 +1,4 @@
-import { async, ComponentFixture, TestBed } from '@angular/core/testing';
+import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
 import { LogbookWidgetComponent } from './logbook-cover.component';
 import { LogbookItemDataService } from '@shared/remote-data.service';
@@ -47,7 +47,7 @@ describe('LogbookWidgetComponent', () => {
   logbookItemDataSpy = jasmine.createSpyObj("LogbookItemDataService", ["getFile"]);
   logbookItemDataSpy.getFile.and.returnValue(of({}));
 
-  beforeEach(async(() => {
+  beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       providers: [
         {provide: LogbookInfoService, useValue: logbookSpy},

@@ -1,5 +1,5 @@
 import { Component, ElementRef, Inject, Input, OnInit, ViewChild } from '@angular/core';
-import { AbstractControl, FormBuilder, FormControl, FormGroup, ValidatorFn, Validators } from '@angular/forms';
+import { AbstractControl, UntypedFormBuilder, UntypedFormControl, UntypedFormGroup, ValidatorFn, Validators } from '@angular/forms';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { Observable, Subscription } from 'rxjs';
 import { CompactType, DisplayGrid, GridsterConfig, GridsterItem,GridType } from 'angular-gridster2';
@@ -31,7 +31,7 @@ export class AddLogbookComponent implements OnInit {
   logbook: Logbooks;
 
   // general form settings and variables
-  optionsFormGroup: FormGroup;
+  optionsFormGroup: UntypedFormGroup;
   fileId: string = '';
 
 
@@ -95,7 +95,7 @@ export class AddLogbookComponent implements OnInit {
   selectable = true;
   removable = true;
   separatorKeysCodes: number[] = [ENTER, COMMA, SPACE];
-  accessGroupsCtrl = new FormControl();
+  accessGroupsCtrl = new UntypedFormControl();
   filteredAccessGroups: Observable<string[]>;
   filteredOwnerGroups: Observable<string[]>;
   accessGroupsSelected: string[] = [];
@@ -107,21 +107,21 @@ export class AddLogbookComponent implements OnInit {
 
 
   constructor(
-    fb: FormBuilder,
+    fb: UntypedFormBuilder,
     private dialogRef: MatDialogRef<AddLogbookComponent>,
     private logbookItemDataService: LogbookItemDataService,
     private userPreferences: UserPreferencesService,
     private logbookDataService: LogbookDataService,
     @Inject(MAT_DIALOG_DATA) data) {
     this.optionsFormGroup = fb.group({
-      hideRequired: new FormControl(false),
-      floatLabel: new FormControl('auto'),
-      title: new FormControl('', Validators.required),
-      description: new FormControl(''),
-      location: new FormControl('', Validators.required),
-      ownerGroup: new FormControl('', Validators.required),
-      accessGroups: new FormControl(''),
-      isPrivate: new FormControl(false)
+      hideRequired: new UntypedFormControl(false),
+      floatLabel: new UntypedFormControl('auto'),
+      title: new UntypedFormControl('', Validators.required),
+      description: new UntypedFormControl(''),
+      location: new UntypedFormControl('', Validators.required),
+      ownerGroup: new UntypedFormControl('', Validators.required),
+      accessGroups: new UntypedFormControl(''),
+      isPrivate: new UntypedFormControl(false)
     });
     this.logbook = data;
     console.log("inputData: ", data);

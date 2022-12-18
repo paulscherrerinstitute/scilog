@@ -38,7 +38,7 @@ export class SearchWindowComponent implements OnInit {
   @ViewChild('searchSnippets') searchSnippets: ElementRef;
 
   private _searchString: string = '';
-  searchStringSubject: Subject<any> = new Subject();
+  searchStringSubject: Subject<void> = new Subject();
   searchSnippetIndex: string = '';
   showResults = false;
   showHelp = true;

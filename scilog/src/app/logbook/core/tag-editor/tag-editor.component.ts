@@ -3,7 +3,7 @@ import { MatChipInputEvent } from '@angular/material/chips';
 import { Tags } from '@model/metadata';
 import { COMMA, ENTER, SPACE } from '@angular/cdk/keycodes';
 import { TagService } from '../tag.service';
-import { FormControl } from '@angular/forms';
+import { UntypedFormControl } from '@angular/forms';
 import { MatAutocompleteSelectedEvent } from '@angular/material/autocomplete';
 import { Observable, Subscription } from 'rxjs';
 import { startWith, map } from 'rxjs/operators';
@@ -35,7 +35,7 @@ export class TagEditorComponent implements OnInit {
   removable = true;
   addOnBlur = true;
   readonly separatorKeysCodes: number[] = [ENTER, COMMA, SPACE];
-  tagsCtrl = new FormControl();
+  tagsCtrl = new UntypedFormControl();
   filteredTags: Observable<string[] | Tags[]>;
   tagsAvail: Tags[] = [];
   currentViewSubscription: Subscription = null;

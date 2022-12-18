@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { UserPreferencesService } from '@shared/user-preferences.service';
-import { FormBuilder, FormGroup, FormControl } from '@angular/forms';
+import { UntypedFormBuilder, UntypedFormGroup, UntypedFormControl } from '@angular/forms';
 
 @Component({
   selector: 'app-profile-settings',
@@ -9,13 +9,13 @@ import { FormBuilder, FormGroup, FormControl } from '@angular/forms';
 })
 export class ProfileSettingsComponent implements OnInit {
 
-  formBuilder: FormBuilder;
-  profileFormGroup: FormGroup;
+  formBuilder: UntypedFormBuilder;
+  profileFormGroup: UntypedFormGroup;
 
 
   constructor(
     private userPreferences: UserPreferencesService,
-    fb: FormBuilder,
+    fb: UntypedFormBuilder,
   ) { 
     this.formBuilder = fb;
 
@@ -23,10 +23,10 @@ export class ProfileSettingsComponent implements OnInit {
 
   ngOnInit(): void {
     this.profileFormGroup = this.formBuilder.group({
-      name: new FormControl({ value: this.userPreferences.userInfo.firstName, disabled: true }),
-      lastname: new FormControl({ value: this.userPreferences.userInfo.lastName, disabled: true }),
-      email: new FormControl({ value: this.userPreferences.userInfo.email, disabled: true }),
-      username: new FormControl({ value: this.userPreferences.userInfo.email, disabled: true }),
+      name: new UntypedFormControl({ value: this.userPreferences.userInfo.firstName, disabled: true }),
+      lastname: new UntypedFormControl({ value: this.userPreferences.userInfo.lastName, disabled: true }),
+      email: new UntypedFormControl({ value: this.userPreferences.userInfo.email, disabled: true }),
+      username: new UntypedFormControl({ value: this.userPreferences.userInfo.email, disabled: true }),
 
     });
     console.log(this.userPreferences.userInfo)

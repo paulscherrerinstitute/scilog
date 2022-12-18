@@ -1,6 +1,6 @@
 import { COMMA, ENTER, SPACE } from '@angular/cdk/keycodes';
 import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
-import { AbstractControl, AsyncValidator, FormBuilder, FormControl, FormGroup, ValidatorFn, Validators } from '@angular/forms';
+import { AbstractControl, AsyncValidator, UntypedFormBuilder, UntypedFormControl, UntypedFormGroup, ValidatorFn, Validators } from '@angular/forms';
 import { MatAutocomplete, MatAutocompleteSelectedEvent } from '@angular/material/autocomplete';
 import { MatChipInputEvent } from '@angular/material/chips';
 import { Observable, Subscription } from 'rxjs';
@@ -62,7 +62,7 @@ export class ViewSettingsComponent implements OnInit {
   sidenavOpened = true;
   sidenavOver = 'side';
   views: Views[] = [];
-  viewFormGroup: FormGroup;
+  viewFormGroup: UntypedFormGroup;
 
 
   selectedLocation: any;
@@ -79,14 +79,14 @@ export class ViewSettingsComponent implements OnInit {
   currentLocation: Basesnippets = {};
   showSaveMessage = false;
   saveMessage: string = '';
-  formBuilder: FormBuilder;
+  formBuilder: UntypedFormBuilder;
 
 
   @ViewChild('accessGroupsInput') accessGroupsInput: ElementRef<HTMLInputElement>;
   @ViewChild('auto') matAutocomplete: MatAutocomplete;
 
   constructor(public viewService: ViewsService,
-    fb: FormBuilder,
+    fb: UntypedFormBuilder,
     private logbookService: LogbookInfoService,
     private userPreferences: UserPreferencesService,
     private logbookDataService: LogbookDataService,
@@ -113,14 +113,14 @@ export class ViewSettingsComponent implements OnInit {
     this.getData();
 
     this.viewFormGroup = this.formBuilder.group({
-      name: new FormControl('', [Validators.required]),
-      description: new FormControl(''),
-      location: new FormControl('', Validators.required),
-      ownerGroup: new FormControl('', Validators.required),
-      accessGroupsCtrl: new FormControl(''),
-      enableAdvanced: new FormControl({ value: false, disabled: false }),
-      shareWithLocation: new FormControl({ value: false, disabled: true }),
-      shareWithLogbook: new FormControl(false),
+      name: new UntypedFormControl('', [Validators.required]),
+      description: new UntypedFormControl(''),
+      location: new UntypedFormControl('', Validators.required),
+      ownerGroup: new UntypedFormControl('', Validators.required),
+      accessGroupsCtrl: new UntypedFormControl(''),
+      enableAdvanced: new UntypedFormControl({ value: false, disabled: false }),
+      shareWithLocation: new UntypedFormControl({ value: false, disabled: true }),
+      shareWithLogbook: new UntypedFormControl(false),
     });
 
   }
