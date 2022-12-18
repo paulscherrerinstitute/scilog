@@ -58,7 +58,6 @@
     "ng2-charts": "^2.4.1",
     "ngx-cookie-service": "^10.1.1",
     "ngx-jdenticon": "^1.0.3",
-    "ngx-tui": "^2.0.0",
     "ngx-ui-scroll": "^1.11.0-rc.1",
     "postcss-loader": "^3.0.0",
     "primeicons": "^4.0.0",
