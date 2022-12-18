@@ -1,4 +1,4 @@
-import { async, ComponentFixture, TestBed } from '@angular/core/testing';
+import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 
 import { ViewEditComponent } from './view-edit.component';
 import { FormBuilder } from '@angular/forms';
@@ -20,7 +20,7 @@ describe('ViewEditComponent', () => {
   let viewDataServiceSpy:any;
   viewDataServiceSpy = jasmine.createSpyObj("ViewDataService", ["getViews", "patchView", "postView"]);
 
-  beforeEach(async(() => {
+  beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       providers: [
         FormBuilder,

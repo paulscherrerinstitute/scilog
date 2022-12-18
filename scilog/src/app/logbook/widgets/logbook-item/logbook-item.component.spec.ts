@@ -1,4 +1,4 @@
-import { async, ComponentFixture, TestBed } from '@angular/core/testing';
+import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
 import { MatDialogModule, MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { LogbookItemComponent } from './logbook-item.component';
@@ -206,7 +206,7 @@ describe('LogbookItemComponent', () => {
      parent: { url: of(queryParams) },
      snapshot: { queryParams: {id: '1234'}}
   };
-  beforeEach(async(() => {
+  beforeEach(waitForAsync(() => {
 
     viewsSpy = jasmine.createSpyObj("ViewsService", ["getLogbookViews"]);
 

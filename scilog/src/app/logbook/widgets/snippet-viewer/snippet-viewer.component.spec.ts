@@ -1,4 +1,4 @@
-import { async, ComponentFixture, TestBed } from '@angular/core/testing';
+import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 
 import { SnippetViewerComponent } from './snippet-viewer.component';
 import { LogbookInfoService } from '@shared/logbook-info.service';
@@ -26,7 +26,7 @@ describe('SnippetViewerComponent', () => {
   changestreamSpy = jasmine.createSpyObj("ChangeStreamService", ["getNotification"]);
   changestreamSpy.getNotification.and.returnValue(of({}));
 
-  beforeEach(async(() => {
+  beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       providers:[
         {provide: LogbookInfoService, useValue: logbookInfoSpy},

@@ -3,7 +3,7 @@ import { TestBed } from '@angular/core/testing';
 import { ChangeStreamService } from './change-stream.service';
 import { SnackbarService } from '@shared/snackbar.service';
 import { ServerSettingsService } from '@shared/config/server-settings.service';
-import {async} from '@angular/core/testing';
+import { waitForAsync } from '@angular/core/testing';
 
 describe('ChangeStreamService', () => {
   let service: ChangeStreamService;
