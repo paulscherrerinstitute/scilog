@@ -17,7 +17,8 @@
               "lodash",
               "css-element-queries",
               "chart.js",
-              "uuid"
+              "uuid",
+              "browserify-zlib" 
             ],
             "outputPath": "dist/scilog",
             "index": "src/index.html",
@@ -109,19 +110,6 @@
               "src/app/theme.scss"
             ],
             "scripts": []
-          }
-        },
-        "lint": {
-          "builder": "@angular-devkit/build-angular:tslint",
-          "options": {
-            "tsConfig": [
-              "tsconfig.app.json",
-              "tsconfig.spec.json",
-              "e2e/tsconfig.json"
-            ],
-            "exclude": [
-              "**/node_modules/**"
-            ]
           }
         },
         "e2e": {

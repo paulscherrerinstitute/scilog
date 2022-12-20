@@ -102,7 +102,7 @@ export class LogbookItemComponent implements OnInit {
 
 
   private _searchString: string = '';
-  searchStringSubject: Subject<any> = new Subject();
+  searchStringSubject: Subject<void> = new Subject();
   searchSnippetIndex: string = '';
 
   dataService: Subscription = null;

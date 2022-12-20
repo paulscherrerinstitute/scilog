@@ -38,7 +38,7 @@ export class OverviewComponent implements OnInit {
   logbookSubscription: Subscription = null;
   subscriptions: Subscription[] = [];
   private _searchString: string = '';
-  searchStringSubject: Subject<any> = new Subject();
+  searchStringSubject: Subject<void> = new Subject();
 
 
   constructor(
