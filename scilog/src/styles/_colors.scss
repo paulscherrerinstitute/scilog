@@ -1,5 +1,5 @@
-@import '~@angular/material/theming';
-@include mat-core();
+@use '~@angular/material' as mat;
+@include mat.core();
 
 $scilog-colors-light: (
     50 : #f0f0f0, // background
@@ -35,49 +35,49 @@ $scilog-colors-dark: (
     A700 : #ec2300,
 );
 // 1ea54c
-$header-color: mat-color($scilog-colors-light, 500);
-$header-color-dark: mat-color($scilog-colors-dark, 500);
+$header-color: mat.get-color-from-palette($scilog-colors-light, 500);
+$header-color-dark: mat.get-color-from-palette($scilog-colors-dark, 500);
 
-$subheader-color: mat-color($scilog-colors-light, 500);
-$subheader-color-dark: mat-color($scilog-colors-dark, 500);
+$subheader-color: mat.get-color-from-palette($scilog-colors-light, 500);
+$subheader-color-dark: mat.get-color-from-palette($scilog-colors-dark, 500);
 
-$subsubheader-color: mat-color($scilog-colors-light, 100);
-$subsubheader-color-dark: mat-color($scilog-colors-dark, 100);
+$subsubheader-color: mat.get-color-from-palette($scilog-colors-light, 100);
+$subsubheader-color-dark: mat.get-color-from-palette($scilog-colors-dark, 100);
 
-$ckeditor-content: mat-color($scilog-colors-light, A200);
-$ckeditor-content-dark: mat-color($scilog-colors-dark, 800);
+$ckeditor-content: mat.get-color-from-palette($scilog-colors-light, A200);
+$ckeditor-content-dark: mat.get-color-from-palette($scilog-colors-dark, 800);
 
 $ckeditor-toolbar: #fafafa;
-$ckeditor-toolbar-dark: mat-color($scilog-colors-dark, 800);
+$ckeditor-toolbar-dark: mat.get-color-from-palette($scilog-colors-dark, 800);
 
 $ckeditor-toolbar-border: #c4c4c4;
-$ckeditor-toolbar-border-dark: mat-color($scilog-colors-dark, 800);
+$ckeditor-toolbar-border-dark: mat.get-color-from-palette($scilog-colors-dark, 800);
 
 $ckeditor-toolbar-button-hover: #c4c4c4;
-$ckeditor-toolbar-button-hover-dark: mat-color($scilog-colors-dark, 800);
+$ckeditor-toolbar-button-hover-dark: mat.get-color-from-palette($scilog-colors-dark, 800);
 
 $ckeditor-content-border: #c4c4c4;
-$ckeditor-content-border-dark: mat-color($scilog-colors-dark, 800);
+$ckeditor-content-border-dark: mat.get-color-from-palette($scilog-colors-dark, 800);
 
-$default-text-color: mat-color($scilog-colors-light, A400);
-$default-text-color-dark: mat-color($scilog-colors-dark, A400);
+$default-text-color: mat.get-color-from-palette($scilog-colors-light, A400);
+$default-text-color-dark: mat.get-color-from-palette($scilog-colors-dark, A400);
 
 $accent-color: #FF0000;
-$accent-color-dark: mat-color($scilog-colors-dark, 500);
+$accent-color-dark: mat.get-color-from-palette($scilog-colors-dark, 500);
 
-$button-accent: mat-color($scilog-colors-light, 500);
-$button-accent-dark: mat-color($scilog-colors-dark, 500);
+$button-accent: mat.get-color-from-palette($scilog-colors-light, 500);
+$button-accent-dark: mat.get-color-from-palette($scilog-colors-dark, 500);
 
-$button-accent-icon: mat-color($scilog-colors-light, A200);
-$button-accent-icon-dark: mat-color($scilog-colors-dark, 500);
+$button-accent-icon: mat.get-color-from-palette($scilog-colors-light, A200);
+$button-accent-icon-dark: mat.get-color-from-palette($scilog-colors-dark, 500);
 
-$dashboard-item: mat-color($scilog-colors-light, A200);
-$dashboard-item-dark: mat-color($scilog-colors-dark, 700);
+$dashboard-item: mat.get-color-from-palette($scilog-colors-light, A200);
+$dashboard-item-dark: mat.get-color-from-palette($scilog-colors-dark, 700);
 
-$toolbar-color: mat-color($scilog-colors-light, 900);
-$toolbar-color-dark: mat-color($scilog-colors-dark, 900);
+$toolbar-color: mat.get-color-from-palette($scilog-colors-light, 900);
+$toolbar-color-dark: mat.get-color-from-palette($scilog-colors-dark, 900);
 
-$toolbar-text-color: mat-color($scilog-colors-light, A200);
+$toolbar-text-color: mat.get-color-from-palette($scilog-colors-light, A200);
 $toolbar-text-color-dark: $toolbar-color;
 
 $default-shadow-0: rgba(0, 0, 0, .2);
@@ -89,32 +89,32 @@ $default-shadow-1-dark: rgba(40, 60, 73, .14);
 $default-shadow-2: rgba(0, 0, 0, .12);
 $default-shadow-2-dark:rgba(40, 60, 73, .2);
 
-$sidenav-color: mat-color($scilog-colors-light, A100);
-$sidenav-color-dark: mat-color($scilog-colors-dark, 600);
+$sidenav-color: mat.get-color-from-palette($scilog-colors-light, A100);
+$sidenav-color-dark: mat.get-color-from-palette($scilog-colors-dark, 600);
 
 $sidenav-text-color: $toolbar-color-dark;
 $sidenav-text-color-dark: $toolbar-color;
 
-$snippet: mat-color($scilog-colors-light, A200);
-$snippet-dark: mat-color($scilog-colors-dark, 700);
+$snippet: mat.get-color-from-palette($scilog-colors-light, A200);
+$snippet-dark: mat.get-color-from-palette($scilog-colors-dark, 700);
 
-$slider-checked: mat-color($scilog-colors-light, 500);
-$slider-checked-dark: mat-color($scilog-colors-dark, 500);
+$slider-checked: mat.get-color-from-palette($scilog-colors-light, 500);
+$slider-checked-dark: mat.get-color-from-palette($scilog-colors-dark, 500);
 
-$slider-checked-bg: mat-color($scilog-colors-light, 200);
-$slider-checked-bg-dark: mat-color($scilog-colors-dark, 500);
+$slider-checked-bg: mat.get-color-from-palette($scilog-colors-light, 200);
+$slider-checked-bg-dark: mat.get-color-from-palette($scilog-colors-dark, 500);
 
-$slider-not-checked: mat-color($scilog-colors-light, 50);
-$slider-not-checked-dark: mat-color($scilog-colors-dark, 500);
+$slider-not-checked: mat.get-color-from-palette($scilog-colors-light, 50);
+$slider-not-checked-dark: mat.get-color-from-palette($scilog-colors-dark, 500);
 
-$slider-not-checked-bg: mat-color($scilog-colors-light, 100);
-$slider-not-checked-bg-dark: mat-color($scilog-colors-dark, 500);
+$slider-not-checked-bg: mat.get-color-from-palette($scilog-colors-light, 100);
+$slider-not-checked-bg-dark: mat.get-color-from-palette($scilog-colors-dark, 500);
 
 $logbook-name-tag: rgba(0, 74, 97, 0.5);
 $logbook-name-tag-dark: rgba(179, 201, 208, 0.5);
 
-$main-background: mat-color($scilog-colors-light, 50);
-$main-background-dark: mat-color($scilog-colors-dark, 800);
+$main-background: mat.get-color-from-palette($scilog-colors-light, 50);
+$main-background-dark: mat.get-color-from-palette($scilog-colors-dark, 800);
 
 
 $colors: (
