@@ -1,5 +1,4 @@
 import { TestBed } from '@angular/core/testing';
-import {HttpClientTestingModule, HttpTestingController} from '@angular/common/http/testing';
 
 import { UserPreferencesService } from './user-preferences.service';
 import { UserPreferencesDataService } from '@shared/remote-data.service';
@@ -9,7 +8,8 @@ describe('UserPreferencesService', () => {
   let service: UserPreferencesService;
   let dataServiceSpy:any;
 
-  dataServiceSpy = jasmine.createSpyObj("UserPreferencesDataService", ["getUserPreferences", "getUserInfo"]);
+  dataServiceSpy = jasmine.createSpyObj("UserPreferencesDataService", 
+  ["getUserPreferences", "getUserInfo", "postUserPreferences"]);
   dataServiceSpy.getUserPreferences.and.returnValue(of({}));
 
   beforeEach(() => {

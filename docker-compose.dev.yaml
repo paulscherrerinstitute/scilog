@@ -29,6 +29,9 @@ services:
     build: 
       context: ./scilog/.
       target: builder
+    environment:
+      CHROME_BIN: /usr/bin/chromium-browser
+      CHROME_PATH: /usr/lib/chromium/
     volumes:
       - ./scilog:/frontend
       - ./config/fe/config.json:/frontend/src/assets/config.json

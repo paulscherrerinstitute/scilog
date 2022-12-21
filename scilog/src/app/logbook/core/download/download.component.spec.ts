@@ -26,9 +26,9 @@ describe('DownloadComponent', () => {
     snapshot: { params: {fileId: '1234'}}
  };
 
- logbookItemDataServiceSpy = jasmine.createSpyObj("LogbookItemDataService", ["getFilesnippet", "getFile"]);
+ logbookItemDataServiceSpy = jasmine.createSpyObj("LogbookItemDataService", ["getFilesnippet", "getImage"]);
  logbookItemDataServiceSpy.getFilesnippet.and.returnValue(of({}).toPromise());
- logbookItemDataServiceSpy.getFile.and.returnValue(of(new Blob(['data:image/png;base64,iVBORw0KGgoAAAANSUhE'], {type: 'image/png'})).toPromise());
+ logbookItemDataServiceSpy.getImage.and.returnValue(of(new Blob(['data:image/png;base64,iVBORw0KGgoAAAANSUhE'], {type: 'image/png'})).toPromise());
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
@@ -50,7 +50,7 @@ describe('DownloadComponent', () => {
 
   afterEach(()=>{
     logbookItemDataServiceSpy.getFilesnippet.calls.reset();
-    logbookItemDataServiceSpy.getFile.calls.reset();
+    logbookItemDataServiceSpy.getImage.calls.reset();
   })
 
   it('should create', () => {
@@ -65,12 +65,12 @@ describe('DownloadComponent', () => {
   it('should export data', async ()=>{
     component['downloadLink'].nativeElement = new NativeElementMock;
     logbookItemDataServiceSpy.getFilesnippet.calls.reset();
-    logbookItemDataServiceSpy.getFile.calls.reset();
+    logbookItemDataServiceSpy.getImage.calls.reset();
 
 
     await component.exportData();
     expect(component['logbookItemDataService'].getFilesnippet).toHaveBeenCalled();
-    expect(component['logbookItemDataService'].getFile).toHaveBeenCalled();
+    expect(component['logbookItemDataService'].getImage).toHaveBeenCalled();
 
   })
 
