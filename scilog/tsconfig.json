@@ -13,13 +13,8 @@
     "target": "es2015",
     "module": "es2020",
     "lib": [
-      "es2018",
+      "es2020",
       "dom"
-    ],
-    "paths": {
-      "zlib": [
-        "node_modules/browserify-zlib"
-      ]
-    }
+    ]
   }
 }
