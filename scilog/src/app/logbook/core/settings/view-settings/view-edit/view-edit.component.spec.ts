@@ -1,7 +1,7 @@
 import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 
 import { ViewEditComponent } from './view-edit.component';
-import { FormBuilder } from '@angular/forms';
+import { UntypedFormBuilder } from '@angular/forms';
 import { UserPreferencesService } from '@shared/user-preferences.service';
 import { ViewDataService } from '@shared/remote-data.service';
 import { MatAutocomplete } from '@angular/material/autocomplete';
@@ -23,7 +23,7 @@ describe('ViewEditComponent', () => {
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       providers: [
-        FormBuilder,
+        UntypedFormBuilder,
         {provide: UserPreferencesService, useClass: UserPreferencesMock},
         {provide: ViewDataService, useValue: viewDataServiceSpy}
       ],

@@ -1,6 +1,6 @@
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
-import { FormBuilder } from '@angular/forms';
+import { UntypedFormBuilder } from '@angular/forms';
 import { RouterTestingModule } from '@angular/router/testing';
 import { AppConfigService, Oauth2Endpoint } from '../app-config.service';
 
@@ -15,7 +15,7 @@ describe('LoginComponent', () => {
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       declarations: [ LoginComponent ],
-      providers: [FormBuilder, {
+      providers: [UntypedFormBuilder, {
         provide: AppConfigService,
         useValue: { getConfig },
       },

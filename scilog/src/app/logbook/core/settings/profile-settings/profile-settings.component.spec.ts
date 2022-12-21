@@ -2,7 +2,7 @@ import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 
 import { ProfileSettingsComponent } from './profile-settings.component';
 import { UserPreferencesService } from '@shared/user-preferences.service';
-import { FormBuilder } from '@angular/forms';
+import { UntypedFormBuilder } from '@angular/forms';
 import { AppConfigService } from 'src/app/app-config.service';
 
 
@@ -22,7 +22,7 @@ describe('ProfileSettingsComponent', () => {
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       providers:[
-        FormBuilder,
+        UntypedFormBuilder,
         {provide: UserPreferencesService, useClass: UserPreferencesMock},
         {provide: AppConfigService, useValue: { getConfig }}
       ],

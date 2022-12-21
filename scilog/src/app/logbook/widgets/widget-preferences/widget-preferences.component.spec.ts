@@ -1,5 +1,5 @@
 import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
-import { FormBuilder } from '@angular/forms';
+import { UntypedFormBuilder } from '@angular/forms';
 import { MatDialogModule, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 
 import { WidgetPreferencesComponent } from './widget-preferences.component';
@@ -38,7 +38,7 @@ describe('WidgetPreferencesComponent', () => {
       declarations: [WidgetPreferencesComponent, CdkTextareaAutosize,],
       imports: [MatDialogModule, MatAutocompleteModule],
       providers: [
-        FormBuilder,
+        UntypedFormBuilder,
         { provide: MatDialogRef, useValue: MatDialogRef },
         {
           provide: MAT_DIALOG_DATA, useValue: {

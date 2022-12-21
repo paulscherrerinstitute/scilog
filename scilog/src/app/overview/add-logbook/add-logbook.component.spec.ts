@@ -1,5 +1,5 @@
 import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
-import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
+import { UntypedFormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 import { AddLogbookComponent } from './add-logbook.component';
 import { MatDialogModule, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
@@ -38,7 +38,7 @@ describe('AddLogbookComponent', () => {
       declarations: [AddLogbookComponent],
       imports: [MatDialogModule, MatAutocompleteModule],
       providers: [
-        FormBuilder,
+        UntypedFormBuilder,
         {provide: MatDialogRef, useValue: mockDialogRef},
         {provide: MAT_DIALOG_DATA, useValue: {}},
         {provide: LogbookItemDataService, useValue: logbookItemDataServiceSpy},
