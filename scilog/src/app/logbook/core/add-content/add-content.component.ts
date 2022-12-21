@@ -235,7 +235,6 @@ export class AddContentComponent implements OnInit {
 
     console.log("figNew", figuresNew)
     console.log("figOld", figuresOld)
-
     if (figuresNew.length != figuresOld.length) {
       fileHasChanged = true;
       return fileHasChanged;

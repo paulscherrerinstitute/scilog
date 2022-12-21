@@ -1,5 +1,4 @@
 import { Injectable } from '@angular/core';
-import { Subscription } from 'rxjs';
 import { LogbookDataService } from '@shared/remote-data.service';
 import { ScrollBaseService } from '@shared/scroll-base.service';
 import { Datasource } from 'ngx-ui-scroll';

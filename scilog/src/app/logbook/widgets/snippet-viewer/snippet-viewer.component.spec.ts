@@ -8,11 +8,7 @@ import { ViewsService } from '@shared/views.service';
 import { of } from 'rxjs';
 
 class ViewsServiceMock {
-  currentWidgetConfigs = of({});
-
-}
-
-class ChangeStreamServiceMock {
+  currentWidgetConfigs = of([{config: {filter: {targetId: 1}}}]);
 
 }
 
@@ -46,6 +42,7 @@ describe('SnippetViewerComponent', () => {
   beforeEach(() => {
     fixture = TestBed.createComponent(SnippetViewerComponent);
     component = fixture.componentInstance;
+    component.configIndex = 0;
     fixture.detectChanges();
   });
 

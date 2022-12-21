@@ -21,7 +21,6 @@ describe('ViewSettingsComponent', () => {
   let component: ViewSettingsComponent;
   let fixture: ComponentFixture<ViewSettingsComponent>;
   let logbookSpy:any;
-  let userPreferencesSpy:any;
   let logbookDataSpy:any;
   let viewDataSpy:any;
   let viewSpy:any;

@@ -7,6 +7,7 @@ import { of } from 'rxjs';
 import { ChangeStreamService } from '@shared/change-stream.service';
 import { AppConfigService } from 'src/app/app-config.service';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
+import { ViewsService } from '@shared/views.service';
 
 class ChangeStreamServiceMock {
   getNotification(id:string){
@@ -18,6 +19,10 @@ class TasksServiceMock {
   numTasks = 0;
   currentTasks = of([{}]);
   taskChange(data: any){}
+}
+
+class ViewsServiceMock {
+  currentWidgetConfigs = of([{config: {filter: {}}}])
 }
 
 class LogbookInfoMock {
@@ -42,6 +47,7 @@ describe('TodosComponent', () => {
         {provide: TasksService, useClass: TasksServiceMock},
         { provide: ChangeStreamService, useClass: ChangeStreamServiceMock },
         { provide: AppConfigService, useValue: { getConfig } },
+        { provide: ViewsService, useClass: ViewsServiceMock },
       ],
       imports: [HttpClientTestingModule],
       declarations: [ TodosComponent ]
@@ -52,6 +58,7 @@ describe('TodosComponent', () => {
   beforeEach(() => {
     fixture = TestBed.createComponent(TodosComponent);
     component = fixture.componentInstance;
+    component.configIndex = 0;
     fixture.detectChanges();
   });
 

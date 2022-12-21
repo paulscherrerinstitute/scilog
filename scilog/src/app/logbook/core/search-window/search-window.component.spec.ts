@@ -1,6 +1,7 @@
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 import { MatDialog } from '@angular/material/dialog';
+import { LogbookInfoService } from '@shared/logbook-info.service';
 import { AppConfigService } from 'src/app/app-config.service';
 
 import { SearchWindowComponent } from './search-window.component';
@@ -17,6 +18,7 @@ describe('SearchWindowComponent', () => {
       providers: [
         { provide: AppConfigService, useValue: { getConfig } },
         { provide: MatDialog, useValue: {} },
+        { provide: LogbookInfoService, useValue: { logbookInfo: {id: 'id'} } },
       ],
       imports: [HttpClientTestingModule],
     })
