@@ -3,7 +3,7 @@ import warnings
 from typing import get_type_hints
 
 
-def typechecked(func):
+def scilog_typechecked(func):
     @functools.wraps(func)
     def typechecked_call(obj, *args, **kwargs):
         type_hints = get_type_hints(func)
@@ -33,7 +33,7 @@ def property_maker(name, dtype):
         return getattr(self, storage_name)
 
     @prop.setter
-    @typechecked
+    @scilog_typechecked
     def prop(self, value: dtype) -> None:
         setattr(self, storage_name, value)
 
@@ -137,9 +137,3 @@ class Location(Basesnippet):
     def __init__(self):
         super().__init__(snippetType="location")
         self.init_properties(name=str, location=str)
-
-
-if __name__ == "__main__":
-    tmp = Snippet(id=str, textcontent=str, defaultOrder=int)
-    print(tmp.id)
-    tmp.id = 2
