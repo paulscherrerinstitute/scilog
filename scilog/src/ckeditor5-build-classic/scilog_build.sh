@@ -1,3 +1,3 @@
 yarn run build
-rm -r /Users/wakonig_k/software/scilog/scilog/src/app/ckeditor5/build
-cp -r ./build /Users/wakonig_k/software/scilog/scilog/src/app/ckeditor5/
+rm -r ../app/logbook/core/ckeditor/ckeditor5/build
+cp -r ./build ../app/logbook/core/ckeditor/ckeditor5/

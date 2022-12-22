@@ -101,7 +101,7 @@
             "polyfills": "src/polyfills.ts",
             "tsConfig": "tsconfig.spec.json",
             "karmaConfig": "karma.conf.js",
-            "codeCoverageExclude": ["src/app/ckeditor5/**"],
+            "codeCoverageExclude": ["src/ckeditor5-build-classic/**"],
             "assets": [
               "src/favicon.ico",
               "src/favicon.png",
