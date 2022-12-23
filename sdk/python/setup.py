@@ -11,6 +11,6 @@ setup(
     ],
     install_requires=[
         "requests >= 2.28.1",
-        "typeguard",
+        "typeguard==2.13.3",
     ],
 )

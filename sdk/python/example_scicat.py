@@ -14,6 +14,3 @@ props = cat.proposals
 nprops = len(props)
 print(f"got {nprops} proposals")
 print(props[0])
-
-
-

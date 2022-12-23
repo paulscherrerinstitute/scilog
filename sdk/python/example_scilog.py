@@ -23,7 +23,7 @@ tmp = Basesnippet()
 tmp.id = "2"
 
 log = SciLog(url)
-#print(log.token)
+# print(log.token)
 logbooks = log.get_logbooks(ownerGroup=pgroup)
 print(logbooks)
 
@@ -33,8 +33,10 @@ print(logbook)
 
 log.select_logbook(logbook)
 import time
+
 time.sleep(5)
 import datetime
+
 begin_time = datetime.datetime.now()
 for ii in range(1000):
     log.send_message(f"<p>from python; number: {ii}</p>")
@@ -43,6 +45,3 @@ print(datetime.datetime.now() - begin_time)
 
 # snips = log.get_snippets(snippetType="paragraph", ownerGroup=pgroup)
 # print(snips)
-
-
-
