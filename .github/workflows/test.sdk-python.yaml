@@ -1,0 +1,56 @@
+name: Test python
+
+on:
+  pull_request:
+    branches: [main]
+    paths: 
+      - sdk/python/**
+      - .github/workflows/test.sdk-python.yaml
+  push:
+    branches: [main]
+    paths: 
+      - sdk/python/**
+      - .github/workflows/test.sdk-python.yaml
+  release:
+    types: [published]
+    paths: 
+      - sdk/python/**
+      - .github/workflows/test.sdk-python.yaml
+
+env:
+  CONTAINER_REGISTRY: ghcr.io
+  IMAGE_NAME: ${{ github.repository }}/be
+
+jobs:
+  test:
+    name: Test and build image on PR
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: sdk/python
+    strategy:
+      matrix:
+        python-version: ["3.7", "3.8", "3.9", "3.10"]
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install pytest black
+          pip install -e .
+
+      - name: Lint with black
+        run: |
+          black --line-length=100 .
+
+      - name: Test with pytest
+        run: |
+          pytest
