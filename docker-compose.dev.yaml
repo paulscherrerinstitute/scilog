@@ -2,7 +2,7 @@ services:
   mongodb:
     image: mongo
     volumes:
-      - mongodb_data:/bitnami
+      - mongodb_data:/data/db
       - ./config/mongo/rs-init.sh:/rs-init.sh:ro
     command: ["--replSet", "rs0", "--bind_ip_all"]
     healthcheck:
@@ -33,7 +33,7 @@ services:
       - ./scilog:/frontend
       - ./config/fe/config.json:/frontend/src/assets/config.json
       - /frontend/node_modules
-    command: /bin/sh -c "while true; do sleep 600; done"
+    command: /bin/sh -c "apk add --no-cache chromium && while true; do sleep 600; done"
 
   python: 
     build:
