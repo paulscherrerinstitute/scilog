@@ -14,7 +14,7 @@ class AuthMixin(ABC):
         tn = typename(self).lower()
         try:
             self.config = Config(f".{tn}-tokens")
-        except JSONDecodeError: 
+        except JSONDecodeError:
             self.config = {}
         if not options:
             options = {}

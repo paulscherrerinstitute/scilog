@@ -8,10 +8,7 @@ class SciCatRestAPI(HttpClient):
         self.login_path = self._login_path or "https://dacat.psi.ch/auth/msad"
 
     def authenticate(self, username, password):
-        auth_payload = {
-            "username": username,
-            "password": password
-        }
+        auth_payload = {"username": username, "password": password}
         res = self._login(auth_payload, HEADER_JSON)
         try:
             token = res["id"]
@@ -20,11 +17,10 @@ class SciCatRestAPI(HttpClient):
         else:
             return token
 
-class SciCat():
 
+class SciCat:
     def __init__(self, *args, **kwargs):
         self.http_client = SciCatRestAPI(*args, **kwargs)
-
 
     @property
     def proposals(self):
@@ -32,9 +28,5 @@ class SciCat():
         return self.http_client.get_request(url, headers=HEADER_JSON)
 
 
-
 class SciCatAuthError(AuthError):
     pass
-
-
-
