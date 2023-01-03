@@ -5,18 +5,16 @@ import json
 import os
 import uuid
 import warnings
-from typing import TYPE_CHECKING, Any, Tuple
+from typing import Any, Tuple
 
 from typeguard import typechecked
 
+import scilog.logbook_message as lm
 from .authmixin import HEADER_JSON, AuthError
 from .httpclient import HttpClient
-from .snippet import Basesnippet, Filesnippet, Location, Paragraph, Snippet
+from .snippet import Basesnippet, Filesnippet, Location, Paragraph
 
 ACLS = ["createACL", "readACL", "updateACL", "deleteACL", "shareACL", "adminACL"]
-
-if TYPE_CHECKING:
-    from .logbook_message import LogbookMessage
 
 
 def pinned_to_logbook(logbook_keys, include_none=False):
@@ -211,7 +209,7 @@ class SciLog:
         return self.patch_snippet(snippet)
 
     @typechecked
-    def send_logbook_message(self, msg: LogbookMessage) -> None:
+    def send_logbook_message(self, msg: lm.LogbookMessage) -> None:
         payload = msg._content.to_dict(include_none=False)
         payload["linkType"] = "paragraph"
         # FIXME the python sdk should not use the ownergroup
