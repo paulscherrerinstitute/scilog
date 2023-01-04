@@ -1,6 +1,6 @@
 services:
   mongodb:
-    image: mongo
+    image: mongo:4.2
     volumes:
       - mongodb_data:/data/db
       - ./config/mongo/rs-init.sh:/rs-init.sh:ro
@@ -8,6 +8,12 @@ services:
     healthcheck:
       test: ./rs-init.sh
       interval: 5s
+    profiles: 
+      - be
+      - bf
+      - bfp
+      - bp
+
   backend:
     build: 
       context: ./sci-log-db/.
@@ -24,6 +30,11 @@ services:
     environment:
       - JWT_SECRET=jwt_secret
     command: /bin/sh -c "while true; do sleep 600; done"
+    profiles: 
+      - be
+      - bf
+      - bfp
+      - bp
 
   frontend:
     build: 
@@ -37,6 +48,11 @@ services:
       - ./config/fe/config.json:/frontend/src/assets/config.json
       - /frontend/node_modules
     command: /bin/sh -c "apk add --no-cache chromium && while true; do sleep 600; done"
+    profiles: 
+      - fe
+      - bf
+      - fp
+      - bfp
 
   python: 
     build:
@@ -46,6 +62,11 @@ services:
         - ./sdk/python/scilog:/usr/local/lib/python3.10/site-packages/scilog
     # infinite loop to keep the container running
     command: /bin/sh -c "while sleep 1000; do :; done"
+    profiles: 
+      - py
+      - bp
+      - fp
+      - bfp
 
 
 volumes:
