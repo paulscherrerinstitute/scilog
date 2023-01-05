@@ -39,6 +39,9 @@ export class SnippetComponent implements OnInit {
   index: number;
 
   @Input()
+  indexOrdered: number;
+
+  @Input()
   isLogbook: boolean = true;
 
   @Input()

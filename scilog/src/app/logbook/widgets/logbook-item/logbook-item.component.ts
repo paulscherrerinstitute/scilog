@@ -1,4 +1,4 @@
-import { Component, ElementRef, Input, OnInit, QueryList, Renderer2, ViewChild, ViewChildren } from '@angular/core';
+import { ChangeDetectorRef, Component, ElementRef, Input, OnInit, QueryList, Renderer2, ViewChild, ViewChildren } from '@angular/core';
 import { ChangeStreamService } from '@shared/change-stream.service';
 import { ChangeStreamNotification } from '@shared/changestreamnotification.model'
 import { HttpClient } from '@angular/common/http';
@@ -136,6 +136,8 @@ export class LogbookItemComponent implements OnInit {
 
   forceScrollToEnd = false;
 
+  logbookCount = 0;
+
   @ViewChildren(SnippetComponent) childSnippets: QueryList<SnippetComponent>;
 
   @ViewChild('snippetContainer') snippetContainerRef: ElementRef;
@@ -166,7 +168,8 @@ export class LogbookItemComponent implements OnInit {
     private hotkeys: Hotkeys,
     private tagService: TagService,
     public logbookScrollService: LogbookScrollService,
-    private scrollToElementService: ScrollToElementService
+    private scrollToElementService: ScrollToElementService,
+    private cdr: ChangeDetectorRef
   ) {
 
     this.subscriptions.push(this.hotkeys.addShortcut({ keys: 'control.shift.n', description: { label: 'Set focus to editor', group: "Logbook" } }).subscribe(() => {
@@ -241,6 +244,7 @@ export class LogbookItemComponent implements OnInit {
         this.targetId = this.config.filter.targetId;
         this.isReadOnly = this.config.general.readonly;
         await this.logbookScrollService.initialize(this.config);
+        this.logbookCount = (await this.logbookItemDataService.getCount(this.config)).count;
         this.logbookScrollService.containerRef = this.snippetContainerRef;
         // console.log(res)
         this.startNotificationManager();
@@ -304,6 +308,7 @@ export class LogbookItemComponent implements OnInit {
               console.log("deleting snippet:", updatePos);
               this.logbookScrollService.remove(notification.id);
             }
+            this.logbookCount -= 1;
           } else if (notification.content.parentId) {
             // if the parentID changed, we have to get the snippet from the DB
             let snippetTmp = await this.logbookItemDataService.getBasesnippet(notification.id);
@@ -648,6 +653,7 @@ export class LogbookItemComponent implements OnInit {
     //Called after ngAfterContentInit when the component's view has been initialized. Applies to components only.
     //Add 'implements AfterViewInit' to the class.
     this.updateViewHeights({});
+    this.cdr.detectChanges();
   }
 
 
@@ -740,6 +746,13 @@ export class LogbookItemComponent implements OnInit {
     this.logbookItemDataService.searchString = value;
     this._searchString = value;
     this.searchStringSubject.next();
+  }
+
+  private _indexOrder(i: number) {
+    if (this.config.view.order[0].split(" ")[1] == 'DESC') {
+      return this.logbookCount - i
+    }
+    return i + 1
   }
 
   ngOnDestroy() {
