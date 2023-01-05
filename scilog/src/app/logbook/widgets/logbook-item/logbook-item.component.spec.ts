@@ -247,6 +247,7 @@ describe('LogbookItemComponent', () => {
     component['views'].currentWidgetConfigs = of(defaultConfig);
     component.config = defaultConfig[1].config;
     component.configIndex = 1;
+    component.logbookCount = 10;
 
     fixture.detectChanges();
     // views = TestBed.get(ViewsService);
@@ -260,7 +261,6 @@ describe('LogbookItemComponent', () => {
     expect(component).toBeTruthy();
   });
 
-
   // PARSENOTIFICATION
   it('should parse new update notification', ()=>{
     spyOn(component["logbookScrollService"], "updateViewportEstimate");
@@ -269,7 +269,6 @@ describe('LogbookItemComponent', () => {
     ];
     component.parseNotification(notificationMock[0]);
     expect(component["logbookScrollService"].updateViewportEstimate).toHaveBeenCalledTimes(1);
-
   })
   // it('should remove snippet if notification has _delete_ tag', ()=>{
   //   component.dash
@@ -408,6 +407,21 @@ describe('LogbookItemComponent', () => {
     res = component._preparePostPayload(referenceEntry, msgWithParentId);
     expect(res.textcontent).toEqual(msgWithParentId.textcontent);
     expect(res.parentId).toEqual(msgWithParentId.parentId);
+  })
+
+  it('Should add to index', ()=>{
+    expect(component["_indexOrder"](2)).toEqual(3);
+  })
+
+  it('Should remove from index', ()=>{
+    component.config = {view: {order: ["defaultOrder DESC"]}, general: {}, filter: {}};
+    expect(component["_indexOrder"](2)).toEqual(8);
+  })
+
+  it('should delete notebook and update logbook count', ()=>{
+    let notificationMock: ChangeStreamNotification = {operationType: "update", content: {deleted: true}};
+    component.parseNotification(notificationMock);
+    expect(component.logbookCount).toEqual(9);
   })
 
 

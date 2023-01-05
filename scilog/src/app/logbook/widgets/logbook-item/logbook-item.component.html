@@ -18,7 +18,7 @@
   </mat-form-field> -->
   <div #snippetContainer class="logbook-content">
     <div *uiScroll="let snippet of logbookScrollService.datasource; let i = index">
-      <snippet [snippet]="snippet" [updatedAt]="snippet.updatedAt" [index]=i+1 [config]="config" (isLoading)="logbookScrollService.setItemStatus(snippet.id, $event)">
+      <snippet [snippet]="snippet" [updatedAt]="snippet.updatedAt" [index]=i+1 [config]="config" [indexOrdered]="_indexOrder(i)" (isLoading)="logbookScrollService.setItemStatus(snippet.id, $event)">
       </snippet>
     </div>
   </div>

@@ -75,7 +75,7 @@
     </div> -->
     <!-- {{index}} -->
     <span class="snippet-header" *ngIf="config.view.showSnippetHeader">
-      {{index}} / {{ snippet.createdAt | date:'medium' }} / {{snippet.createdBy}}
+      {{indexOrdered}} / {{ snippet.createdAt | date:'medium' }} / {{snippet.createdBy}}
     </span>
     <snippet-content #snippetContent [snippet]='snippet' (htmlContent)="updateHtmlContent($event)" (isLoading)="setElementLoading($event)">
     </snippet-content>
