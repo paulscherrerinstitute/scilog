@@ -418,10 +418,12 @@ describe('LogbookItemComponent', () => {
     expect(component["_indexOrder"](2)).toEqual(8);
   })
 
-  it('should delete notebook and update logbook count', ()=>{
+  it('should delete logbook and update logbook count', ()=>{
+    spyOn(component["logbookScrollService"], "remove");
     let notificationMock: ChangeStreamNotification = {operationType: "update", content: {deleted: true}};
     component.parseNotification(notificationMock);
     expect(component.logbookCount).toEqual(9);
+    expect(component["logbookScrollService"].remove).toHaveBeenCalled();
   })
 
 
