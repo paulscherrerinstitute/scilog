@@ -307,8 +307,8 @@ export class LogbookItemComponent implements OnInit {
               // first-level snippets can be removed directly by using the datasource adapter
               console.log("deleting snippet:", updatePos);
               this.logbookScrollService.remove(notification.id);
+              this.logbookCount -= 1;
             }
-            this.logbookCount -= 1;
           } else if (notification.content.parentId) {
             // if the parentID changed, we have to get the snippet from the DB
             let snippetTmp = await this.logbookItemDataService.getBasesnippet(notification.id);
