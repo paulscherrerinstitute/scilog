@@ -1,6 +1,9 @@
 from unittest import mock
 
-from scilog import LogbookMessage, SciLog
+import pytest
+
+from scilog import Basesnippet, LogbookMessage, SciLog
+from scilog.scilog import SciLogCore
 
 
 def test_send_logbook_message():
@@ -39,4 +42,37 @@ def test_send_logbook_message_data():
         log.core.http_client.address + "/basesnippets",
         payload={"parentId": "logbook_id", "textcontent": "msg", "snippetType": "paragraph"},
         headers={"Content-type": "application/json", "Accept": "application/json"},
+    )
+
+
+@pytest.mark.parametrize("filepath,fsnippet", [("./test_file.png", None)])
+def test_prepare_file_content_image(filepath, fsnippet):
+    core = SciLogCore(SciLogMock())
+    info, textcontent = core.prepare_file_content(filepath, fsnippet)
+    assert isinstance(info["fileHash"], str)
+    assert len(info["fileHash"]) > 5
+    assert info["filepath"] == filepath
+    assert info["fileExtension"] == "image/png"
+    assert info["fileId"] is None
+    assert info["style"] == {"width": "82.25%", "height": ""}
+
+    assert (
+        textcontent
+        == f'<figure class="image image_resized"><img src="" title="{info["fileHash"]}"></figure>'
+    )
+
+
+@pytest.mark.parametrize("filepath,fsnippet", [("./test_file.pdf", None)])
+def test_prepare_file_content_file(filepath, fsnippet):
+    core = SciLogCore(SciLogMock())
+    info, textcontent = core.prepare_file_content(filepath, fsnippet)
+    assert isinstance(info["fileHash"], str)
+    assert len(info["fileHash"]) > 5
+    assert info["filepath"] == filepath
+    assert info["fileExtension"] == "file/pdf"
+    assert info["fileId"] is None
+
+    assert (
+        textcontent
+        == f'<p><a class="fileLink" target="_blank" href="file:{info["fileHash"]}">test_file.pdf</a></p>'
     )
