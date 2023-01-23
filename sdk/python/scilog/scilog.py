@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import functools
 import json
+import logging
 import os
 import uuid
 import warnings
@@ -10,11 +11,16 @@ from typing import Any, Tuple
 from typeguard import typechecked
 
 import scilog.logbook_message as lm
+
 from .authmixin import HEADER_JSON, AuthError
 from .httpclient import HttpClient
 from .snippet import Basesnippet, Filesnippet, Location, Paragraph, snippet_factory
 
 ACLS = ["createACL", "readACL", "updateACL", "deleteACL", "shareACL", "adminACL"]
+
+
+logger = logging.getLogger(__name__)
+
 
 def pinned_to_logbook(logbook_keys, include_none=False):
     def pinned_to_logbook_inner(func):
@@ -24,20 +30,22 @@ def pinned_to_logbook(logbook_keys, include_none=False):
                 warnings.warn("No logbook selected.")
             else:
                 logbook = log.logbook.to_dict(include_none=include_none)
-                # print("====== pinned to logbook:",kwargs)
+                logger.debug(f"====== pinned to logbook: {kwargs}")
                 for key in logbook_keys:
-                    # print("======pinned to logbook:",key)
+                    logger.debug(f"======pinned to logbook: {key}")
                     if key not in kwargs:
-                        if key == "parentId":  #mapping from childinstance to parentinstance
-                            if ("where" not in kwargs):
-                               kwargs[key] = log.logbook.id
+                        if key == "parentId":  # mapping from childinstance to parentinstance
+                            if "where" not in kwargs:
+                                kwargs[key] = log.logbook.id
                             else:
-                               kwargs["where"]={"and": [kwargs["where"],{"parentId":log.logbook.id}]}
+                                kwargs["where"] = {
+                                    "and": [kwargs["where"], {"parentId": log.logbook.id}]
+                                }
                         else:
-                            print("Non parentId condition in pinned_to_logbook:",key)
+                            logger.info(f"Non parentId condition in pinned_to_logbook: {key}")
                             if logbook.get(key):
                                 kwargs[key] = logbook[key]
-                # print("========= pinned to logbook: resulting kwargs:",kwargs)
+                logger.debug(f"========= pinned to logbook: resulting kwargs: {kwargs}")
             return func(log, *args, **kwargs)  # real call happens here
 
         return pinned_to_logbook_call
@@ -50,17 +58,15 @@ class SciLogRestAPI(HttpClient):
         super().__init__(*args, **kwargs)
 
 
-class SciLog:
+class SciLogCore:
     IMAGE_TYPES = ["png", "jpg", "jpeg"]
 
-    def __init__(self, *args, **kwargs):
-        self.http_client = SciLogRestAPI(*args, **kwargs)
-        self.logbook = None
+    def __init__(self, high_level_interface) -> None:
+        self.http_client = high_level_interface.http_client
+        self.logbook = high_level_interface.logbook
 
-    def select_logbook(self, logbook: Basesnippet):
-        self.logbook = logbook
-
-    def make_filter(self, 
+    def make_filter(
+        self,
         where: dict = None,
         limit: int = 0,
         skip: int = 0,
@@ -71,7 +77,7 @@ class SciLog:
         filt = dict()
         if where is not None:
             # TOOD needed ? items = [where.copy()]
-            filt["where"] =  where # 
+            filt["where"] = where  #
         if limit > 0:
             filt["limit"] = limit
         if skip > 0:
@@ -84,23 +90,6 @@ class SciLog:
             filt["order"] = order
         filt = json.dumps(filt)
         return {"filter": filt}
-
-    @pinned_to_logbook(["parentId"])
-    def get_snippets(self, where: dict = None, limit: int = 0, skip: int = 0, fields: dict = None, include: dict = None, order: list = None, **kwargs):
-        url = self.http_client.address + "/basesnippets"
-        if not where: 
-            items=[kwargs.copy()]
-            wh={"and": items}
-            # print("==== where condition defined via keyword arguments:",wh)
-            params = self.make_filter(where=wh, limit=limit, skip=skip, fields=fields, include=include, order=order)
-        else: 
-            # print("==== where condition defined directly:",where)
-            params = self.make_filter(where=where, limit=limit, skip=skip, fields=fields, include=include, order=order)
-        # TODO dont allow case that both where and kwargs are defined, return error in this case
-        return snippet_factory(
-            self.http_client.get_request(url, params=params, headers=HEADER_JSON)
-        )
-
 
     @staticmethod
     def _replace_json_placeholder(snippet: dict, field: str, data: Any) -> dict:
@@ -118,21 +107,6 @@ class SciLog:
             return snippet
 
         raise ValueError("The used placeholder type is not supported. ")
-
-    @pinned_to_logbook(["parentId", *ACLS])
-    def import_from_dict(self, snippet: dict, **kwargs):
-        msg = snippet["textcontent"]
-        snippet_dict = {k: v for k, v in snippet.items() if k != "textcontent"}
-        self.send_message(msg, **snippet_dict)
-
-    @pinned_to_logbook(["parentId", *ACLS])
-    def send_message(self, msg, **kwargs):
-        url = self.http_client.address + "/basesnippets"
-        snippet = Paragraph()
-        snippet.import_dict(kwargs)
-        snippet.textcontent = msg
-        payload = snippet.to_dict(include_none=False)
-        return self.post_snippet(**payload)
 
     # TODO if this is a user function add docstring
     @pinned_to_logbook(["parentId", *ACLS])
@@ -160,20 +134,16 @@ class SciLog:
         for file in payload.get("files"):
             if "fileId" in file and file["fileId"] is not None:
                 continue
-            # print("Posting from filepath:", file["filepath"])
+            logger.debug(f"Posting from filepath: {file['filepath']}")
             filesnippet = self._post_filesnippet(
                 file["filepath"],
-                **{
-                    key: val
-                    for key, val in payload.items()
-                },
+                **{key: val for key, val in payload.items() if key in [*ACLS, "tags"]},
             )
             file["fileId"] = filesnippet.id
             file["accessHash"] = filesnippet.accessHash
             file.pop("filepath")
         return payload
 
-    # TODO not needed ? @pinned_to_logbook(ACLS)
     def _post_filesnippet(self, filepath, **kwargs):
         url = self.http_client.address + "/filesnippet/files"
 
@@ -202,9 +172,11 @@ class SciLog:
             )
         )
 
-    @pinned_to_logbook(ACLS) # TODO should that be pinned to snippet ? Why no parentId ?
+    @pinned_to_logbook(ACLS)
     def post_file(self, filepath: str, **kwargs) -> Filesnippet:
-        """Upload a file
+        """Upload a file. As they are disconnected from paragraphs and logbooks, there
+        is no need to copy the parentId. Instead we simply keep the ACLS.
+
         Args:
             filepath (str): Path to the file that ought to be uploaded
         Raises:
@@ -220,9 +192,13 @@ class SciLog:
         # ret = self._file_upload(filepath, fsnippet.id, file_extension)
         return fsnippet
 
-    @pinned_to_logbook(ACLS) # TODO should that be pinned to snippet ? Why no parentId ?
+    @pinned_to_logbook(ACLS)
     def append_files_to_snippet(self, snippet: Paragraph, filepaths: list, **kwargs) -> Paragraph:
-        """Append files or images to an already existing snippet. Files and images will be appended following the order given in 'filepaths'.
+        """Append files or images to an already existing snippet. Files and images will be
+        appended following the order given in 'filepaths'. As the files / images are disconnected
+        from paragraphs and logbooks, there is no need to copy the parentId. Instead we simply
+        keep the ACLS.
+
         Args:
             snippet (Paragraph): Snippet to which the files should be appended
             filepaths (list): List of file paths pointing to the files that should be uploaded
@@ -244,15 +220,6 @@ class SciLog:
 
         return self.patch_snippet(snippet)
 
-    @typechecked
-    # TODO : User function ? Add docstring
-    def send_logbook_message(self, msg: lm.LogbookMessage) -> None:
-        payload = msg._content.to_dict(include_none=False)
-        payload["linkType"] = "paragraph"
-        with warnings.catch_warnings():
-            warnings.simplefilter("ignore")
-            self.post_snippet(**payload)
-
     @staticmethod
     def prepare_file_content(filepath: str, fsnippet: Filesnippet = None) -> Tuple:
         file_extension = filepath.split(".")[-1].lower()
@@ -260,7 +227,7 @@ class SciLog:
         file_id = fsnippet.id if fsnippet and fsnippet.id else None
         accessHash = fsnippet.accessHash if fsnippet and fsnippet.accessHash else None
 
-        if file_extension in SciLog.IMAGE_TYPES:
+        if file_extension in SciLogCore.IMAGE_TYPES:
             textcontent = (
                 f'<figure class="image image_resized"><img src="" title="{file_hash}"></figure>'
             )
@@ -284,8 +251,7 @@ class SciLog:
             }
         return (file_info, textcontent)
 
-    #  TODO: Basesnippet or different snippet types to be supported ?
-    def patch_snippet(self, snippet: Paragraph, **kwargs) -> Paragraph:
+    def patch_snippet(self, snippet: Basesnippet, **kwargs) -> Basesnippet:
         """Update (patch) snippet with given snippet.
         Args:
             snippet (Basesnippet): Snippet containing the newly updated fields
@@ -300,23 +266,121 @@ class SciLog:
         snippet.updatedBy = None
         snippet.expiresAt = None
         payload = snippet.to_dict(include_none=False)
-        return Basesnippet.from_http_response(  # replace Basesnippet by function or factory with proper type
+        return snippet_factory(
             self.http_client.patch_request(url, payload=payload, headers=HEADER_JSON)
         )
 
-    def get_logbooks(self, where: dict = None, limit: int = 0, skip: int = 0, fields: dict = None, include: dict = None, order: list = None, **kwargs):
-        url = self.http_client.address + "/logbooks"
-        if not where: 
-            items=[kwargs.copy()]
-            wh={"and": items}
-            # print("==== where condition defined via keyword arguments:",wh)
-            params = self.make_filter(where=wh, limit=limit, skip=skip, fields=fields, include=include, order=order)
-        else: 
-            # print("==== where condition defined directly:",where)
-            params = self.make_filter(where=where, limit=limit, skip=skip, fields=fields, include=include, order=order)
-        return  snippet_factory(
+
+class SciLog:
+    def __init__(self, *args, **kwargs):
+        self.http_client = SciLogRestAPI(*args, **kwargs)
+        self.logbook = None
+        self.core = SciLogCore(self)
+
+    def select_logbook(self, logbook: Basesnippet):
+        self.logbook = logbook
+
+    @pinned_to_logbook(["parentId"])
+    def get_snippets(
+        self,
+        where: dict = None,
+        limit: int = 0,
+        skip: int = 0,
+        fields: dict = None,
+        include: dict = None,
+        order: list = None,
+        **kwargs,
+    ):
+        url = self.http_client.address + "/basesnippets"
+        if not where:
+            items = [kwargs.copy()]
+            where_keys = {"and": items}
+            logger.debug(f"==== where condition defined via keyword arguments:{where_keys}")
+            params = self.core.make_filter(
+                where=where_keys,
+                limit=limit,
+                skip=skip,
+                fields=fields,
+                include=include,
+                order=order,
+            )
+        else:
+            logger.debug(f"==== where condition defined directly:{where}")
+            params = self.core.make_filter(
+                where=where, limit=limit, skip=skip, fields=fields, include=include, order=order
+            )
+        # TODO dont allow case that both where and kwargs are defined, return error in this case
+        return snippet_factory(
             self.http_client.get_request(url, params=params, headers=HEADER_JSON)
         )
+
+    @pinned_to_logbook(["parentId", *ACLS])
+    def import_from_dict(self, snippet: dict, **kwargs):
+        msg = snippet["textcontent"]
+        snippet_dict = {k: v for k, v in snippet.items() if k != "textcontent"}
+        self.send_message(msg, **snippet_dict)
+
+    @pinned_to_logbook(["parentId", *ACLS])
+    def send_message(self, msg, **kwargs):
+        url = self.http_client.address + "/basesnippets"
+        snippet = Paragraph()
+        snippet.import_dict(kwargs)
+        snippet.textcontent = msg
+        payload = snippet.to_dict(include_none=False)
+        return self.core.post_snippet(**payload)
+
+    @typechecked
+    # TODO : User function ? Add docstring
+    def send_logbook_message(self, msg: lm.LogbookMessage) -> None:
+        """Upload a new message to SciLog.
+
+        Args:
+            msg (lm.LogbookMessage): Previously composed LogbookMessage.
+
+        Example:
+            >>> msg = LogbookMessage()
+            >>> msg.add_text("Another example text").add_tag(["color"])
+            >>> log.send_logbook_message(msg)
+
+        """
+        payload = msg._content.to_dict(include_none=False)
+        payload["linkType"] = "paragraph"
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore")
+            self.core.post_snippet(**payload)
+
+    def get_logbooks(
+        self,
+        where: dict = None,
+        limit: int = 0,
+        skip: int = 0,
+        fields: dict = None,
+        include: dict = None,
+        order: list = None,
+        **kwargs,
+    ):
+        url = self.http_client.address + "/logbooks"
+        if not where:
+            items = [kwargs.copy()]
+            where_keys = {"and": items}
+            logger.debug(f"==== where condition defined via keyword arguments:{where_keys}")
+            params = self.core.make_filter(
+                where=where_keys,
+                limit=limit,
+                skip=skip,
+                fields=fields,
+                include=include,
+                order=order,
+            )
+        else:
+            logger.debug(f"==== where condition defined directly:{where}")
+            params = self.core.make_filter(
+                where=where, limit=limit, skip=skip, fields=fields, include=include, order=order
+            )
+        return snippet_factory(
+            self.http_client.get_request(url, params=params, headers=HEADER_JSON)
+        )
+
 
 class SciLogAuthError(AuthError):
     pass
