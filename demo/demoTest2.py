@@ -1,6 +1,10 @@
 #!/usr/bin/env python
 import argparse
 import json
+import logging
+
+logging.basicConfig(format="%(levelname)s:%(message)s", level=logging.INFO)
+logger = logging.getLogger(__name__)
 
 # ./testing.py -u https://scilog.qa.psi.ch/api/v1 scilog-adminQA@psi.ch
 
@@ -14,12 +18,11 @@ url = clargs.url
 
 
 import urllib3
-from scilog import SciLog, LogbookMessage
-
+from scilog import LogbookMessage, SciLog
 
 # urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
-# connect under a given user name 
+# connect under a given user name
 # (likely this will be a functional account like a beamline account)
 # (note: OIDC authenticated users can not authenticate from the CLI)
 
@@ -28,11 +31,11 @@ log = SciLog(url, options={"username": "swissfelaramis-bernina@psi.ch"})
 # there are two ways of defining a query expression
 
 # simple case: the where condition is built from the individual fields
-#logbooks = log.get_logbooks(ownerGroup=pgroup)
+# logbooks = log.get_logbooks(ownerGroup=pgroup)
 
 # most flexible case: specify the where expression in Mongo Syntax as python dictionary
 
-logbooks = log.get_logbooks(where={"ownerGroup": pgroup},limit=10,skip=0)
+logbooks = log.get_logbooks(where={"ownerGroup": pgroup}, limit=10, skip=0)
 assert len(logbooks) >= 1
 logbook = logbooks[0]
 # print("Logbook:",logbook)
@@ -53,7 +56,12 @@ log.select_logbook(logbook)
 # # examples with *simplified* filter condition (All key value pairs ANDed)
 # snippets = log.get_snippets(limit=10,skip=5)
 # snippets = log.get_snippets(createdBy='swissfelaramis-bernina@psi.ch',limit=10,skip=5)
-snippets = log.get_snippets(createdBy='swissfelaramis-bernina@psi.ch',limit=10,skip=5,fields={"snippetType":1,"createdBy":1,"createdAt":1})
+snippets = log.get_snippets(
+    createdBy="swissfelaramis-bernina@psi.ch",
+    limit=10,
+    skip=5,
+    fields={"snippetType": 1, "createdBy": 1, "createdAt": 1},
+)
 
 for snippet in snippets:
-  print("==== Snippet:",snippet)
+    print("==== Snippet:", snippet)
