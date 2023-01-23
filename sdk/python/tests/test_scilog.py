@@ -1,3 +1,4 @@
+import os
 from unittest import mock
 
 import pytest
@@ -74,5 +75,5 @@ def test_prepare_file_content_file(filepath, fsnippet):
 
     assert (
         textcontent
-        == f'<p><a class="fileLink" target="_blank" href="file:{info["fileHash"]}">test_file.pdf</a></p>'
+        == f'<p><a class="fileLink" target="_blank" href="file:{info["fileHash"]}">{os.path.basename(filepath)}</a></p>'
     )
