@@ -387,7 +387,6 @@ export class AutoAddRepository<
           },
         };
         ctx.query.where = this.addACLToFilter(ctx.query.where, groupCondition);
-        console.log();
       }
       // console.log("query:", JSON.stringify(ctx.query, null, 3));
     });
