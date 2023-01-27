@@ -4,6 +4,12 @@ import {
   Entity,
   Filter,
   Options,
+  Where,
+  WhereBuilder,
+  FilterBuilder,
+  Inclusion,
+  Condition,
+  OrClause,
 } from '@loopback/repository';
 import {Basesnippet} from '../models';
 import {UserProfile} from '@loopback/security';
@@ -146,9 +152,9 @@ function UpdateAndDeleteRepositoryMixin<
 }
 
 function FindWithSearchRepositoryMixin<
-  M extends Entity & {id: ID},
+  M extends Entity & {id: ID; tags?: string[]},
   ID,
-  Relations extends object,
+  Relations extends {subsnippets: M},
   R extends MixinTarget<DefaultCrudRepository<M, ID, Relations>>,
 >(superClass: R) {
   class Mixed extends superClass {
@@ -157,102 +163,124 @@ function FindWithSearchRepositoryMixin<
       user: UserProfile,
       filter?: Filter<M>,
     ): Promise<M[]> {
-      const skip = typeof filter?.skip == 'undefined' ? -1 : filter.skip;
-      const limit =
-        typeof filter?.limit == 'undefined' ? +Infinity : filter.limit;
-      let includeTags = false;
-      // eslint-disable-next-line  no-prototype-builtins
-      if (filter?.fields?.hasOwnProperty('tags')) {
-        // eslint-disable-next-line  @typescript-eslint/no-explicit-any
-        const fields: any = filter?.fields;
-        if (fields['tags'] === true) {
-          includeTags = true;
-        }
-      }
+      const includeTags =
+        (filter?.fields as {[P in keyof M]: boolean})?.tags ?? false;
 
       delete filter?.fields;
-      delete filter?.limit;
-      delete filter?.skip;
+      const searchRegex = {regexp: new RegExp(`.*?${search}.*?`, 'i')};
+      const commonSearchableFields = {
+        textcontent: {
+          regexp: new RegExp(
+            `(?<=<p>)((?!&).)*${search}((?!&).)*(?=<\/p>)`,
+            'i',
+          ),
+        },
+        tags: searchRegex,
+        readACL: searchRegex,
+      } as Condition<M>;
 
-      // If we experience performance issues, the query can be split into junks of size <filter.limit>*<number_of_junks>.
-      // For now it seems to be fine though...
+      const withSubsnippets = await this._searchForSubsnippets(
+        filter,
+        commonSearchableFields,
+        includeTags,
+        user,
+      );
+
+      const logbookSearchableFields = {
+        ...commonSearchableFields,
+        name: searchRegex,
+        description: searchRegex,
+        id: {inq: withSubsnippets.map(s => s.id)},
+      };
+      const snippets = await this._searchForSnippets(
+        filter,
+        logbookSearchableFields,
+        includeTags,
+        user,
+      );
+      return snippets;
+    }
+
+    private async _searchForSnippets(
+      filter: Filter<M> | undefined,
+      logbookSearchableFields: Condition<M>,
+      includeTags: boolean,
+      user: UserProfile,
+    ) {
+      const ors = this._searchConditionBuilder(
+        logbookSearchableFields,
+        includeTags,
+      );
+
+      filter = this._addSearchCondition(filter, ors);
+
       const snippets = await this.find(filter, {
         currentUser: user,
       });
-      const snippetsFiltered: M[] = [];
-      let foundEntries = 0;
-      for (const s of snippets) {
-        // eslint-disable-next-line  @typescript-eslint/no-explicit-any
-        const item: any = s;
-        let foundSubsnippetEntry = false;
-        if (item.subsnippets) {
-          // eslint-disable-next-line  @typescript-eslint/no-explicit-any
-          item.subsnippets.forEach((it: any) => {
-            if (
-              typeof it.textcontent != 'undefined' &&
-              it.textcontent.length > 0
-            ) {
-              if (it.textcontent.toLowerCase().includes(search.toLowerCase())) {
-                foundSubsnippetEntry = true;
-              }
-
-              if (
-                includeTags &&
-                it.tags &&
-                it.tags.some((tag: string) => {
-                  if (tag.toLowerCase() === search.toLowerCase()) {
-                    return true;
-                  }
-                })
-              ) {
-                foundSubsnippetEntry = true;
-              }
-              if (this._searchReadACL(it, search)) foundSnippetEntry = true;
-            }
-          });
-        }
-        let foundSnippetEntry = false;
-
-        // look for search string in these fields
-        const fields = ['textcontent', 'name', 'description'];
-        for (const f of fields) {
-          if (!item[f]) {
-            continue;
-          }
-          if (item[f].toLowerCase().includes(search.toLowerCase())) {
-            foundSnippetEntry = true;
-          }
-        }
-        if (
-          includeTags &&
-          item.tags &&
-          item.tags.some((_it: string) => {
-            if (_it.toLowerCase() === search.toLowerCase()) {
-              return true;
-            }
-          })
-        ) {
-          foundSnippetEntry = true;
-        }
-        if (this._searchReadACL(item, search)) foundSnippetEntry = true;
-        if (foundSnippetEntry || foundSubsnippetEntry) {
-          foundEntries++;
-          if (foundEntries > skip) {
-            snippetsFiltered.push(item);
-          }
-          if (foundEntries > limit + skip) {
-            break;
-          }
-        }
-      }
-
-      return snippetsFiltered;
+      return snippets;
     }
 
-    private _searchReadACL(item: Basesnippet, search: string) {
-      return item.readACL?.some?.(s =>
-        s.toLowerCase().includes(search.toLowerCase()),
-      );
+    private async _searchForSubsnippets(
+      filter: Filter<M> | undefined,
+      commonSearchableFields: Condition<M>,
+      includeTags: boolean,
+      user: UserProfile,
+    ) {
+      const subsnippetsIncludeIndex = (filter?.include ?? []).findIndex(
+        include =>
+          (include as Inclusion).relation === 'subsnippets' ||
+          include === 'subsnippets',
+      ) as number;
+
+      let withSubsnippets: (M & Relations)[] = [];
+      if (filter?.include && subsnippetsIncludeIndex !== -1) {
+        const includeOrs = this._searchConditionBuilder(
+          commonSearchableFields,
+          includeTags,
+        );
+        const includeFilter = this._addSearchCondition(
+          (filter.include[subsnippetsIncludeIndex] as Inclusion)
+            .scope as Filter<M>,
+          includeOrs,
+        );
+
+        const filterCopy = JSON.parse(JSON.stringify(filter));
+        if (filterCopy.include[subsnippetsIncludeIndex] === 'subsnippets')
+          filterCopy.include[subsnippetsIncludeIndex] = {
+            relation: 'subsnippets',
+          };
+        (filterCopy.include[subsnippetsIncludeIndex] as Inclusion).scope =
+          includeFilter;
+        withSubsnippets = await this.find(
+          {...filterCopy, fields: ['id']},
+          {
+            currentUser: user,
+          },
+        );
+      }
+      return withSubsnippets.filter(s => s.subsnippets);
+    }
+
+    private _addSearchCondition(
+      filter: Filter<M> | undefined,
+      includeOrs: OrClause<M>,
+    ) {
+      const searchCondition = new WhereBuilder(filter?.where)
+        .and(includeOrs)
+        .build();
+      return new FilterBuilder(filter).where(searchCondition).build();
+    }
+
+    private _searchConditionBuilder(
+      commonSearchableFields: Condition<M>,
+      includeTags: boolean,
+    ) {
+      return {
+        or: Object.entries(commonSearchableFields).flatMap(([k, v]) => {
+          if (!includeTags && k === 'tags') return [] as Where<M>;
+          return {[k]: v} as Where<M>;
+        }),
+      };
     }
 
     async findIndexInBuffer(

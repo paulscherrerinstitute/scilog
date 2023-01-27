@@ -34,7 +34,7 @@ describe('Basesnippet', function (this: Suite) {
     versionable: true,
     name: 'aSearchableName',
     description: 'aSearchableDescription',
-    textcontent: 'aSearchableTextContent',
+    textcontent: '<p>aSearchableTextContent</p>',
   };
 
   before('setupApplication', async () => {
@@ -229,7 +229,9 @@ describe('Basesnippet', function (this: Suite) {
       .then(
         result => (
           expect(result.body.length).to.be.eql(1),
-          expect(result.body[0].textcontent).to.be.eql('aSearchableTextContent')
+          expect(result.body[0].textcontent).to.be.eql(
+            '<p>aSearchableTextContent</p>',
+          )
         ),
       )
       .catch(err => {
@@ -296,7 +298,8 @@ describe('Basesnippet', function (this: Suite) {
         tags: ['aSearchExcludedTag'],
         name: 'aSearchExcludedName',
         description: 'aSearchExcludedDescription',
-        textcontent: 'aSearchExcludedTextContent',
+        textcontent:
+          '<p>aSearchExcludedTextContent</p><p>&aSearchableTextContent</p>',
       })
       .expect(204);
   });
