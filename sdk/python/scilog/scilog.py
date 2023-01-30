@@ -322,15 +322,12 @@ class SciLog:
 
     @pinned_to_logbook(["parentId", *ACLS])
     def send_message(self, msg, **kwargs):
-        url = self.http_client.address + "/basesnippets"
-        snippet = Paragraph()
-        snippet.import_dict(kwargs)
-        snippet.textcontent = msg
-        payload = snippet.to_dict(include_none=False)
-        return self.core.post_snippet(**payload)
+        lm_msg = lm.LogbookMessage(**kwargs)
+        lm_msg.add_text(msg)
+
+        return self.send_logbook_message(lm_msg)
 
     @typechecked
-    # TODO : User function ? Add docstring
     def send_logbook_message(self, msg: lm.LogbookMessage) -> None:
         """Upload a new message to SciLog.
 

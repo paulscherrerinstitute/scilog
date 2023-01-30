@@ -38,10 +38,31 @@ def test_send_logbook_message_data():
     msg.add_text("some text")
     log = SciLog("fake_url")
     log.core = SciLogCore(SciLogMock())
-    log.send_message("msg")
+    log.send_logbook_message(msg)
     log.core.http_client.post_request.assert_called_with(
         log.core.http_client.address + "/basesnippets",
-        payload={"parentId": "logbook_id", "textcontent": "msg", "snippetType": "paragraph"},
+        payload={
+            "snippetType": "paragraph",
+            "parentId": "logbook_id",
+            "textcontent": "<p>some text</p>",
+            "linkType": "paragraph",
+        },
+        headers={"Content-type": "application/json", "Accept": "application/json"},
+    )
+
+
+def test_send_message_data():
+    log = SciLog("fake_url")
+    log.core = SciLogCore(SciLogMock())
+    log.send_message("some text")
+    log.core.http_client.post_request.assert_called_with(
+        log.core.http_client.address + "/basesnippets",
+        payload={
+            "snippetType": "paragraph",
+            "parentId": "logbook_id",
+            "textcontent": "<p>some text</p>",
+            "linkType": "paragraph",
+        },
         headers={"Content-type": "application/json", "Accept": "application/json"},
     )
 
