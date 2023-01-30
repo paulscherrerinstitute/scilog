@@ -62,8 +62,19 @@ class SciLogCore:
     IMAGE_TYPES = ["png", "jpg", "jpeg"]
 
     def __init__(self, high_level_interface) -> None:
-        self.http_client = high_level_interface.http_client
-        self.logbook = high_level_interface.logbook
+        self._hli = high_level_interface
+
+    @property
+    def logbook(self):
+        return self._hli.logbook
+
+    @logbook.setter
+    def logbook(self, val):
+        self._hli.logbook = val
+
+    @property
+    def http_client(self):
+        return self._hli.http_client
 
     def make_filter(
         self,
@@ -322,7 +333,8 @@ class SciLog:
 
     @pinned_to_logbook(["parentId", *ACLS])
     def send_message(self, msg, **kwargs):
-        lm_msg = lm.LogbookMessage(**kwargs)
+        lm_msg = lm.LogbookMessage()
+        lm_msg._content.import_dict(kwargs)
         lm_msg.add_text(msg)
 
         return self.send_logbook_message(lm_msg)
