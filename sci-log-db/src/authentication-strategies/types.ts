@@ -113,10 +113,13 @@ export const findOrCreateUser = async function (
     await userRepo.updateById(foundUser.id, {
       roles: user.roles,
       username: user.username,
+      firstName: user.firstName,
+      lastName: user.lastName,
     }); // username can be removed later
   }
   return foundUser;
 };
+
 export const extractFirstLastName = function (profile: Profile): {
   firstName: string;
   lastName: string;

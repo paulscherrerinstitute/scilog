@@ -1,8 +1,13 @@
-import {expect} from '@loopback/testlab';
+import {createStubInstance, expect} from '@loopback/testlab';
 import {Suite} from 'mocha';
 import {Profile} from 'passport';
 import {roles} from '../../authentication-strategies/roles';
-import {extractFirstLastName} from '../../authentication-strategies/types';
+import {
+  extractFirstLastName,
+  findOrCreateUser,
+} from '../../authentication-strategies/types';
+import {UserRepository} from '../../repositories';
+import _ from 'lodash';
 
 describe('Authentication strategies roles', function (this: Suite) {
   it('Should return an empty list', () => {
@@ -105,5 +110,58 @@ describe('Authentication strategies roles', function (this: Suite) {
         test.expected,
       );
     });
+  });
+
+  it('Should create a user', async () => {
+    const stubUserRepo = createStubInstance(UserRepository);
+    const user = {
+      email: 'anEmail',
+      firstName: 'firstName',
+      lastName: 'lastName',
+      username: 'username',
+      roles: ['role1', 'role2'],
+    };
+    const finOneStub = (stubUserRepo.findOne as sinon.SinonStub).resolves([
+      false,
+    ]);
+    const createStub = (stubUserRepo.create as sinon.SinonStub).resolves();
+    const updateById = (stubUserRepo.updateById as sinon.SinonStub).resolves();
+    await findOrCreateUser(stubUserRepo, user);
+    // eslint-disable-next-line no-unused-expressions
+    expect(createStub.calledWith(user)).to.be.true;
+    // eslint-disable-next-line no-unused-expressions
+    expect(finOneStub.calledWith({where: {username: user.username}})).to.be
+      .true;
+    // eslint-disable-next-line no-unused-expressions
+    expect(updateById.notCalled).to.be.true;
+  });
+
+  it('Should update a user', async () => {
+    const stubUserRepo = createStubInstance(UserRepository);
+    const user = {
+      email: 'anEmail',
+      firstName: 'firstName',
+      lastName: 'lastName',
+      username: 'username',
+      roles: ['role1', 'role2'],
+    };
+    const finOneStub = (stubUserRepo.findOne as sinon.SinonStub).resolves(
+      '123',
+    );
+    const createStub = (stubUserRepo.create as sinon.SinonStub).resolves();
+    const updateById = (stubUserRepo.updateById as sinon.SinonStub).resolves();
+    await findOrCreateUser(stubUserRepo, user);
+    // eslint-disable-next-line no-unused-expressions
+    expect(createStub.notCalled).to.be.true;
+    // eslint-disable-next-line no-unused-expressions
+    expect(finOneStub.calledWith({where: {username: user.username}})).to.be
+      .true;
+    // eslint-disable-next-line no-unused-expressions
+    expect(
+      updateById.calledWith(
+        '123',
+        _.pick(user, ['roles', 'username', 'firstname', 'lastname']),
+      ),
+    ).to.be.true;
   });
 });

@@ -2,7 +2,7 @@ import {expect} from '@loopback/testlab';
 import {Suite} from 'mocha';
 import {ExportService} from '../../services/export-snippets.service';
 
-describe('Utils unit tests', function (this: Suite) {
+describe('Latex unit', function (this: Suite) {
   const nodeTagVerbatim = {
     header: '\\begin{verbatim}\r\n',
     footer: '\\end{verbatim}\r\n',
