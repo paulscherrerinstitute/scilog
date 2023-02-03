@@ -42,7 +42,7 @@ def pinned_to_logbook(logbook_keys, include_none=False):
                                     "and": [kwargs["where"], {"parentId": log.logbook.id}]
                                 }
                         else:
-                            logger.info(f"Non parentId condition in pinned_to_logbook: {key}")
+                            logger.debug(f"Non parentId condition in pinned_to_logbook: {key}")
                             if logbook.get(key):
                                 kwargs[key] = logbook[key]
                 logger.debug(f"========= pinned to logbook: resulting kwargs: {kwargs}")
