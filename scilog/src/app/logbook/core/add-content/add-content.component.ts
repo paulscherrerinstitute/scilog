@@ -88,7 +88,7 @@ export class AddContentComponent implements OnInit {
           this.dialogTitle = "Reply";
           this.notification.linkType = LinkType.QUOTE;
           console.log(this.message);
-          this.notification.subsnippets = this.message.subsnippets;
+          this.notification.subsnippets = JSON.parse(JSON.stringify(this.message.subsnippets));
           this.prepareSubsnippetsQuoteContainer();
 
         } else {
