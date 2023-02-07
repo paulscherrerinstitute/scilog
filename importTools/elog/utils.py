@@ -1,5 +1,6 @@
 import functools
 
+
 def retry(func):
     @functools.wraps(func)
     def wrapper(*args, **kwargs):
@@ -15,5 +16,7 @@ def retry(func):
                 n += 1
             else:
                 return res
-            if n == 10: break
+            if n == 10:
+                break
+
     return wrapper

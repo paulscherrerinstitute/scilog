@@ -12,7 +12,9 @@ import requests
 from scilog.scilog import SciLog
 
 import pprint
+
 pp = pprint.PrettyPrinter(indent=4)
+
 
 def json_load(filename, *args, **kwargs):
     with open(filename, "r") as f:
@@ -116,7 +118,7 @@ for fn in fns:
     # if data_in["MID"] > 10757 :
     #      continue
 
-    print ("This msg is selected")
+    print("This msg is selected")
     # remove ignored entries
     for i in ignored:
         data_in.pop(i, None)
@@ -145,11 +147,11 @@ for fn in fns:
 
     pgroup = data_in.pop("P-Group", default_pgroup)
     data_out["ownerGroup"] = pgroup
-    
+
     attchs = data_in.pop("attachments")
     # remove empty entries which seem sometimes to appear
-    while '' in attchs:
-       attchs.remove('')
+    while "" in attchs:
+        attchs.remove("")
 
     mesg = data_in.pop("message")
 
@@ -167,7 +169,7 @@ for fn in fns:
                     index = ii
                     break
             if index is not None:
-                attachment = attchs.pop(index) 
+                attachment = attchs.pop(index)
             else:
                 # image not contained as attachment
                 for att in attachment_lib:
@@ -190,7 +192,10 @@ for fn in fns:
                                 f"{os.path.basename(fn).split('.')[0]}_{str(uuid.uuid4())}.png"
                             )
                             r = requests.get(source_attachment[1:-1].replace("_", "/"))
-                            print("==== adding missing http external file to attachments:",f"{attachments_path}{attachment}")
+                            print(
+                                "==== adding missing http external file to attachments:",
+                                f"{attachments_path}{attachment}",
+                            )
                             with open(f"{attachments_path}{attachment}", "wb") as output:
                                 output.write(r.content)
                         else:
@@ -198,7 +203,10 @@ for fn in fns:
                             source_attachment = source_attachment.split(",")[1][0:-1].replace(
                                 "_", "/"
                             )
-                            print("==== adding base64 file to attachments:",f"{attachments_path}{attachment}")
+                            print(
+                                "==== adding base64 file to attachments:",
+                                f"{attachments_path}{attachment}",
+                            )
                             with open(f"{attachments_path}{attachment}", "wb") as file_stream:
                                 file_stream.write(base64.decodebytes(source_attachment.encode()))
                     except Exception as e:

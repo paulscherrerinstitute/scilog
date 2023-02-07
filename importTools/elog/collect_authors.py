@@ -9,11 +9,15 @@ parser = argparse.ArgumentParser(description="Collect authors from an elog dump 
 
 parser.add_argument("-d", "--dump", default="dump", help="Folder containing the elog dump")
 parser.add_argument("-o", "--output", default="authors", help="Output file name")
-parser.add_argument("-s", "--separator", default=DEFAULT_SEP, help=f"Key-value separator in the output (default: \"{DEFAULT_SEP}\")")
+parser.add_argument(
+    "-s",
+    "--separator",
+    default=DEFAULT_SEP,
+    help=f'Key-value separator in the output (default: "{DEFAULT_SEP}")',
+)
 parser.add_argument("-p", "--print", action="store_true", help="Print authors")
 
 clargs = parser.parse_args()
-
 
 
 from pathlib import Path
@@ -40,7 +44,7 @@ def check(authors, print_all=False):
 
         stripped_author = a.strip()
         if a != stripped_author:
-            print(f"Warning: Author \"{author}\" has strippable spaces.")
+            print(f'Warning: Author "{author}" has strippable spaces.')
 
         if a == "":
             print("Warning: Author is the empty string.")
@@ -55,6 +59,7 @@ def json_load(fname):
     with open(fname, "r") as f:
         return json.load(f)
 
+
 def text_save(data, fname):
     with open(fname, "w") as f:
         for line in data:
@@ -62,13 +67,7 @@ def text_save(data, fname):
             f.write("\n")
 
 
-
-
-
 if __name__ == "__main__":
     authors = collect(clargs.dump)
     check(authors, clargs.print)
     save(authors, clargs.output, clargs.separator)
-
-
-
