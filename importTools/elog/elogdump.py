@@ -26,9 +26,9 @@ import shutil
 
 import urllib3
 from tqdm import tqdm
+from utils import retry
 
 import elog
-from utils import retry
 
 # Certs are not valid...
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
