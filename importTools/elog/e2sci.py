@@ -3,6 +3,7 @@
 import base64
 import json
 import os
+import pprint
 import uuid
 from datetime import datetime
 from glob import iglob
@@ -10,8 +11,6 @@ from os import walk
 
 import requests
 from scilog.scilog import SciLog
-
-import pprint
 
 pp = pprint.PrettyPrinter(indent=4)
 

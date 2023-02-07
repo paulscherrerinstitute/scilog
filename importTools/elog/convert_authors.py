@@ -4,7 +4,7 @@ DEFAULT_SEP = " : "
 
 
 import argparse
-from subprocess import Popen, PIPE
+from subprocess import PIPE, Popen
 
 parser = argparse.ArgumentParser(description="Convert collected and mapped authors to json ...")
 
@@ -22,8 +22,9 @@ parser.add_argument("-p", "--print", action="store_true", help="Print authors")
 clargs = parser.parse_args()
 
 
-from pathlib import Path
 import json
+from pathlib import Path
+
 import ldap
 
 con = ldap.initialize("ldaps://d.psi.ch")

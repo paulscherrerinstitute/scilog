@@ -24,10 +24,10 @@ import json
 import os
 import shutil
 
-from tqdm import tqdm
-import elog
 import urllib3
+from tqdm import tqdm
 
+import elog
 from utils import retry
 
 # Certs are not valid...

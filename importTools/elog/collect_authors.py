@@ -20,8 +20,8 @@ parser.add_argument("-p", "--print", action="store_true", help="Print authors")
 clargs = parser.parse_args()
 
 
-from pathlib import Path
 import json
+from pathlib import Path
 
 
 def collect(folder):
