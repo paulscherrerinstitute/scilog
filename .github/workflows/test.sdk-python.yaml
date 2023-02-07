@@ -49,7 +49,7 @@ jobs:
 
       - name: Isort check
         run: |
-          isort --check --diff known-local-folder scilog .
+          isort --check --diff --known-local-folder scilog .
 
       - name: Test with pytest
         run: |
