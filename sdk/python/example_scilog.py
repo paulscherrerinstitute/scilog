@@ -16,8 +16,7 @@ import urllib3
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
 
-from scilog import SciLog
-from scilog import Basesnippet, Paragraph
+from scilog import Basesnippet, Paragraph, SciLog
 
 tmp = Basesnippet()
 tmp.id = "2"

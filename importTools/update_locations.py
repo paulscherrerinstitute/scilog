@@ -11,7 +11,7 @@ from psi_webpage_icon_extractor import PSIWebpageIconExtractor
 def prepare_location_snippet(log):
     snips = log.get_snippets(snippetType="location", name="root")
     if snips:
-        print("location snippet exists already:",snips[0].id)
+        print("location snippet exists already:", snips[0].id)
         assert len(snips) == 1
         loc_id = snips[0].id
         return loc_id
@@ -61,6 +61,7 @@ def _collect_data(proposals):
 
     return accessGroups, locations, proposalsStorage
 
+
 def _update_locations(log, loc_id, locations):
     locationStorage = {}
 
@@ -86,7 +87,7 @@ def _update_locations(log, loc_id, locations):
                 "https://www.psi.ch/", f"en/{loc[5:].lower()}", loc[5:].split("/")[-1]
             )
             filepath = os.path.abspath(img.filepath)
-            files = [{"filepath": filepath}] 
+            files = [{"filepath": filepath}]
         except IndexError as exc:
             print(exc)
 

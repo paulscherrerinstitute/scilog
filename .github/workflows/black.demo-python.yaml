@@ -1,0 +1,24 @@
+name: Demo formatting
+
+on:
+  pull_request:
+    branches: [main]
+    paths: 
+      - demo/**
+      - .github/workflows/black.demo-python.yaml
+  push:
+    branches: [main]
+    paths: 
+      - demo/**
+      - .github/workflows/black.demo-python.yaml
+  release:
+    types: [published]
+    paths: 
+      - demo/**
+      - .github/workflows/black.demo-python.yaml
+
+jobs:
+  black:
+    uses: ./.github/workflows/reusable.python-black.yaml
+    with: 
+      working-directory: demo

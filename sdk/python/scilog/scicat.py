@@ -1,4 +1,4 @@
-from .authmixin import AuthMixin, AuthError, HEADER_JSON
+from .authmixin import HEADER_JSON, AuthError, AuthMixin
 from .httpclient import HttpClient
 
 

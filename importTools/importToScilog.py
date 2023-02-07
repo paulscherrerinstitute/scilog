@@ -15,6 +15,7 @@ import urllib3
 from scilog import SciLog
 
 from elog.utils import retry
+
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
 
@@ -28,9 +29,9 @@ with open("./elog/scilog.json", "r") as stream:
 
 retry_get = retry(log.get_logbooks)
 retry_import = retry(log.import_from_dict)
-previous_owner = ''
+previous_owner = ""
 for snippet in snippets:
-    owner=snippet["ownerGroup"]
+    owner = snippet["ownerGroup"]
     if owner == "any-authenticated-user":
         continue
     if owner != previous_owner:

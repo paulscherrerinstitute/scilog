@@ -1,6 +1,6 @@
 from unittest.mock import patch
 
-from scilog import SciLog, LogbookMessage
+from scilog import LogbookMessage, SciLog
 
 
 @patch.object(SciLog, "post_snippet")
