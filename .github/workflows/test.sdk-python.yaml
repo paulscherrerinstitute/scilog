@@ -49,7 +49,7 @@ jobs:
 
       - name: Lint with black
         run: |
-          black --line-length=100 .
+          black --check --diff --no-color --line-length=100 .
 
       - name: Test with pytest
         run: |
