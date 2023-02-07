@@ -11,10 +11,10 @@ from typing import Any, Tuple
 from typeguard import typechecked
 
 import scilog.logbook_message as lm
-
 from .authmixin import HEADER_JSON, AuthError
 from .httpclient import HttpClient
-from .snippet import Basesnippet, Filesnippet, Location, Paragraph, snippet_factory
+from .snippet import (Basesnippet, Filesnippet, Location, Paragraph,
+                      snippet_factory)
 
 ACLS = ["createACL", "readACL", "updateACL", "deleteACL", "shareACL", "adminACL"]
 
