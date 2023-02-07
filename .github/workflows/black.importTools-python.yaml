@@ -1,21 +1,21 @@
-name: Test python
+name: Import tools formatting
 
 on:
   pull_request:
     branches: [main]
     paths: 
-      - sdk/python/**
-      - .github/workflows/test.sdk-python.yaml
+      - importTools/**
+      - .github/workflows/black.importTools-python.yaml
   push:
     branches: [main]
     paths: 
-      - sdk/python/**
-      - .github/workflows/test.sdk-python.yaml
+      - importTools/**
+      - .github/workflows/black.importTools-python.yaml
   release:
     types: [published]
     paths: 
-      - sdk/python/**
-      - .github/workflows/test.sdk-python.yaml
+      - importTools/**
+      - .github/workflows/black.importTools-python.yaml
 
 jobs:
   test:
@@ -23,30 +23,23 @@ jobs:
     runs-on: ubuntu-latest
     defaults:
       run:
-        working-directory: sdk/python
-    strategy:
-      matrix:
-        python-version: ["3.7", "3.8", "3.9", "3.10"]
+        working-directory: importTools
 
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
 
-      - name: Set up Python ${{ matrix.python-version }}
+      - name: Set up Python 3.10
         uses: actions/setup-python@v4
         with:
-          python-version: ${{ matrix.python-version }}
+          python-version: "3.10"
 
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install pytest black
+          pip install black
           pip install -e .
 
       - name: Lint with black
         run: |
           black --check --diff --no-color --line-length=100 .
-
-      - name: Test with pytest
-        run: |
-          pytest
