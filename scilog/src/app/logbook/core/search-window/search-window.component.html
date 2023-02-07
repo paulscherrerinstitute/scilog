@@ -40,12 +40,6 @@
     
             </div>
             <div>
-                Global search:
-                <button class="suggestion-button" (click)="addToSearch(':global')">
-                    :global
-                </button>
-            </div>
-            <div>
                 Owner:
                 <button class="suggestion-button" (click)="addToSearch('$' + _sample_user)">
                     ${{_sample_user}}
@@ -57,8 +51,8 @@
             Examples:
             <div>
                 Search everywhere for entries created by "{{_sample_user}}" that contain the word "alignment" and have a tag "{{tags[0]}}":
-                <button class="suggestion-button" (click)="addToSearch(':global' + ' #' + tags[0] + ' @' + _sample_user + ' alignment')">
-                    :global #{{tags[0]}} @{{_sample_user}} alignment
+                <button class="suggestion-button" (click)="addToSearch('#' + tags[0] + ' @' + _sample_user + ' alignment')">
+                    #{{tags[0]}} @{{_sample_user}} alignment
                 </button>
             </div>
         </div>
