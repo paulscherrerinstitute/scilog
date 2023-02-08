@@ -1,16 +1,16 @@
 import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 import { MatDialogModule, MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
-import {HttpClientTestingModule} from '@angular/common/http/testing'
+import { HttpClientTestingModule } from '@angular/common/http/testing'
 import { AddContentComponent, extractNotificationMessage } from './add-content.component';
 import { AddContentService } from '@shared/add-content.service';
 import { of } from 'rxjs';
 import { ChangeStreamNotification } from '@shared/changestreamnotification.model';
-import { LinkType } from '@model/paragraphs';
+import { LinkType, Paragraphs } from '@model/paragraphs';
 import { AppConfigService } from 'src/app/app-config.service';
 
 class AddContentServiceMock {
   currentMessage = of({});
-  changeMessage(notification: ChangeStreamNotification){}
+  changeMessage(notification: ChangeStreamNotification) { }
 
 }
 
@@ -65,16 +65,16 @@ describe('AddContentComponent', () => {
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      imports: [MatDialogModule,HttpClientTestingModule],
+      imports: [MatDialogModule, HttpClientTestingModule],
       providers: [
         { provide: MAT_DIALOG_DATA, useValue: {} },
         { provide: MatDialogRef, useValue: {} },
-        { provide: AddContentService, useClass: AddContentServiceMock},
+        { provide: AddContentService, useClass: AddContentServiceMock },
         { provide: AppConfigService, useValue: { getConfig } }
       ],
-      declarations: [ AddContentComponent ]
+      declarations: [AddContentComponent]
     })
-    .compileComponents();
+      .compileComponents();
   }));
 
   beforeEach(() => {
@@ -87,7 +87,82 @@ describe('AddContentComponent', () => {
     expect(component).toBeTruthy();
   });
 
-  it('should toggle metadata panel', ()=>{
+  it('should prepare subsnippet paragraph', () => {
+
+    component.message = {
+      "ownerGroup": "p16298",
+      "accessGroups": [
+        "slscsaxs"
+      ],
+      "snippetType": "paragraph",
+      "isPrivate": false,
+      "defaultOrder": 1617025441332000,
+      "createdAt": "2021-03-29T13:44:01.332Z",
+      "createdBy": "wakonig_k@psi.ch",
+      "updatedAt": "2021-03-29T13:44:01.332Z",
+      "updatedBy": "wakonig_k@psi.ch",
+      "parentId": "6061d9a13587f37b851694d5",
+      "tags": [],
+      "versionable": true,
+      "deleted": false,
+      "linkType": "paragraph",
+      "textcontent": "<p>msg 2</p>",
+      "files": [],
+      "id": "6061d9a13587f37b851694d6"
+    };
+    component.setupComponent();
+    expect(component.notification.linkType).toEqual(LinkType.PARAGRAPH);
+    expect(component.liveFeedback).toBe(true);
+    expect(component.addButtonLabel).toBe("Done");
+  });
+
+
+  it('should prepare quote', () => {
+    let quoted_snippet = {
+      "ownerGroup": "p16298",
+      "accessGroups": [
+        "slscsaxs"
+      ],
+      "snippetType": "paragraph",
+      "isPrivate": false,
+      "tags": [],
+      "versionable": true,
+      "deleted": false,
+      "linkType": "quote",
+      "textcontent": "<p>msg 2</p>",
+      "files": [],
+    };
+    let snippet: Paragraphs = {
+      parentId: "6061d9a13587f37b851694d5",
+      linkType: LinkType.QUOTE,
+      subsnippets: [quoted_snippet]
+    };
+    component.message = snippet
+    component.setupComponent();
+    expect(component.notification.linkType).toEqual(LinkType.QUOTE);
+    expect(component.liveFeedback).toBe(false);
+    expect(component.addButtonLabel).toBe("Add");
+    expect(component.dialogTitle).toBe("Reply");
+    expect(component.notification.subsnippets).not.toBe(snippet.subsnippets);
+    expect(component.notification.subsnippets).toEqual(snippet.subsnippets);
+
+  });
+
+  it('should prepare comment', () => {
+    let snippet: Paragraphs = {
+      parentId: "6061d9a13587f37b851694d5",
+      linkType: LinkType.COMMENT,
+    };
+    component.message = snippet
+    component.setupComponent();
+    expect(component.notification.linkType).toEqual(LinkType.COMMENT);
+    expect(component.liveFeedback).toBe(false);
+    expect(component.addButtonLabel).toBe("Add");
+    expect(component.dialogTitle).toBe("Add comment");
+
+  });
+
+  it('should toggle metadata panel', () => {
     component.metadataPanelExpanded = true;
     component.toggleMetadataPanel();
     expect(component.metadataPanelExpanded).toBe(false);
@@ -95,7 +170,7 @@ describe('AddContentComponent', () => {
     expect(component.metadataPanelExpanded).toBe(true);
   })
 
-  it('should update tags', ()=>{
+  it('should update tags', () => {
     spyOn(component, 'changeChain')
     let defaultTags = ['tag1', 'tag2'];
     component.updateTags(defaultTags);
@@ -103,13 +178,13 @@ describe('AddContentComponent', () => {
     expect(component.changeChain).toHaveBeenCalledTimes(1);
   })
 
-  it('should send message', ()=> {
+  it('should send message', () => {
     spyOn(component['dataService'], 'changeMessage');
     component.sendMessage();
     expect(component['dataService'].changeMessage).toHaveBeenCalledWith(component.notification);
   })
 
-  it('should adjust figure HTML content for ckeditor', ()=>{
+  it('should adjust figure HTML content for ckeditor', () => {
     let figureMockNoSize = '<figure class="image image_resized"><img src="source" title="d3cc95ad-45d5-48c4-ba0e-db6fcfd252ce"></figure>'
 
     component.data = figureMockNoSize;
@@ -124,7 +199,7 @@ describe('AddContentComponent', () => {
   })
 
   // TODO: try to make work after angular upgrade
-  // it('should detect new files', ()=>{
+  // it('should detect new files', () => {
   //   let dataMock = '<figure class="image image_resized" style="width:79%;"><img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAEjgAAA2oCAIAAACtz6bAAAAACXBIWXMAAHsIAAB7CAF"></figure>"'
   //   component.data = dataMock;
   //   let dataMockMod = '<figure class="image image_resized" style="width:79%;"><img src="data:image/png;base64,iVBORw0KGgoAAAANSIhEUgAAEjgAAA2oCAIAAACtz6bAAAAACXBIWXMAAHsIAAB7CAF"></figure>"'
@@ -132,13 +207,13 @@ describe('AddContentComponent', () => {
   //   expect(component.fileChanged(dataMock)).toBeFalsy();
   // })
 
-  // it('should extract notification with new files', ()=>{
+  // it('should extract notification with new files', () => {
   //   let figureMock = '<figure class="image image_resized" style="width:79%;"><img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAEjgAAA2oCAIAAACtz6bAAAAACXBIWXMAAHsIAAB7CAF"></figure>"'
   //   let figureMockNoSrc = ['<figure class="image image_resized"><img src=""', '></figure>"']
 
   //   let message = extractNotificationMessage(figureMock);
-  //   expect(message.files[0].style).toEqual({"height": "", "width": "79%"});
-  //   expect(message.files[0].style).toEqual({"height": "", "width": "79%"});
+  //   expect(message.files[0].style).toEqual({ "height": "", "width": "79%" });
+  //   expect(message.files[0].style).toEqual({ "height": "", "width": "79%" });
   //   expect(message.files[0].fileExtension).toEqual("image/png");
   //   expect(message.files[0].file).toBeTruthy();
   //   expect(message.files[0].fileHash).toBeTruthy();
@@ -147,29 +222,29 @@ describe('AddContentComponent', () => {
 
   // })
 
-  // it('should extract notification without files', ()=>{
+  // it('should extract notification without files', () => {
   //   let figureMock = '<figure class="image image_resized" style="width:79%;"><img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAEjgAAA2oCAIAAACtz6bAAAAACXBIWXMAAHsIAAB7CAF"></figure>"'
   //   let figureMockNoSrc = ['<figure class="image image_resized"><img src=""', '></figure>"']
-  //   let fileStorageMock = [{fileHash: "myHash"}];
+  //   let fileStorageMock = [{ fileHash: "myHash" }];
 
   //   let message = extractNotificationMessage(figureMock, false, fileStorageMock);
-  //   expect(message.files[0].style).toEqual({"height": "", "width": "79%"});
-  //   expect(message.files[0].style).toEqual({"height": "", "width": "79%"});
+  //   expect(message.files[0].style).toEqual({ "height": "", "width": "79%" });
+  //   expect(message.files[0].style).toEqual({ "height": "", "width": "79%" });
   //   expect(message.files[0].fileHash).toBeTruthy();
   //   combineHtmlFigureHash(figureMockNoSrc, message.files[0].fileHash)
   //   expect(message.textcontent).toEqual(combineHtmlFigureHash(figureMockNoSrc, message.files[0].fileHash));
 
   // })
 
-  // it('should extract links', ()=>{
-  //   let linkMock = '<p><a class="fileLink" href="file:myHash">myFile.pdf</a></p>'
-  //   let linkStorageMock = [{fileHash: "myHash"}];
-  //   let message = extractNotificationMessage(linkMock, false, linkStorageMock);
-  //   expect(message.files[0].fileHash).toEqual("myHash")
-  // })
+  it('should extract links', () => {
+    let linkMock = '<p><a class="fileLink" href="file:myHash">myFile.pdf</a></p>'
+    let linkStorageMock = [{ fileHash: "myHash" }];
+    let message = extractNotificationMessage(linkMock, false, linkStorageMock);
+    expect(message.files[0].fileHash).toEqual("myHash")
+  })
 
-  it('should prepare subsnippets container for quotes', ()=>{
-    
+  it('should prepare subsnippets container for quotes', () => {
+
     component.notification = notificationMock;
     component.prepareSubsnippetsQuoteContainer();
     expect(component.notification.subsnippets[0].id).toBeFalsy();
@@ -184,7 +259,7 @@ describe('AddContentComponent', () => {
 
   })
 
-  it('should send a message during liveFeedback', ()=>{
+  it('should send a message during liveFeedback', () => {
     spyOn(component, 'sendMessage');
     component.liveFeedback = true;
     component.message = notificationMock;
@@ -194,14 +269,14 @@ describe('AddContentComponent', () => {
 
   })
 
-  it('should not send messages if liveFeedback is disabled', ()=>{
+  it('should not send messages if liveFeedback is disabled', () => {
     spyOn(component, 'sendMessage');
     component.liveFeedback = false;
     component.changeChain(notificationMock)
     expect(component.sendMessage).toHaveBeenCalledTimes(0);
   })
 
-  function combineHtmlFigureHash(figureMock:string[], hash:string){
+  function combineHtmlFigureHash(figureMock: string[], hash: string) {
     return (figureMock[0] + ' title="' + hash + '"' + figureMock[1]);
   }
 
