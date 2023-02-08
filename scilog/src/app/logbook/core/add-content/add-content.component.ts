@@ -70,35 +70,20 @@ export class AddContentComponent implements OnInit {
       this.initialized = true;
       console.log(this.data);
     }
+  }
 
-    if (this.message) {
-      if (this.message.id) {
-        this.notification = this.message;
-        this.liveFeedback = true;
-        this.addButtonLabel = "Done";
-        this.dialogTitle = "Modify data snippet";
-        this.notification.linkType = LinkType.PARAGRAPH;
-      } else if (this.message.parentId) {
-        this.data = '';
-        this.liveFeedback = false;
-        this.addButtonLabel = "Add";
-        this.notification.parentId = this.message.parentId;
-
-        if (this.message.linkType == LinkType.QUOTE) {
-          this.dialogTitle = "Reply";
-          this.notification.linkType = LinkType.QUOTE;
-          console.log(this.message);
-          this.notification.subsnippets = JSON.parse(JSON.stringify(this.message.subsnippets));
-          this.prepareSubsnippetsQuoteContainer();
-
-        } else {
-          this.dialogTitle = "Add comment";
-          this.notification.linkType = LinkType.COMMENT;
-        }
-
+  ngOnInit(): void {
+    this.setupComponent()
+    this.subscriptions.push(this.dataService.currentMessage.subscribe(message => {
+      console.log(message);
+      if (message != null) {
+        // this.message = message;
       }
+    }));
+  }
 
-    } else {
+  setupComponent() {
+    if (!this.message) {
       this.data = '';
       this.liveFeedback = false;
       this.addButtonLabel = "Add";
@@ -110,17 +95,36 @@ export class AddContentComponent implements OnInit {
       }
       this.notification.linkType = LinkType.PARAGRAPH;
       console.log(this.notification)
+      return;
     }
 
-  }
+    if (this.message.id) {
+      this.notification = this.message;
+      this.liveFeedback = true;
+      this.addButtonLabel = "Done";
+      this.dialogTitle = "Modify data snippet";
+      this.notification.linkType = LinkType.PARAGRAPH;
+      return;
+    }
+    if (this.message.parentId) {
+      this.data = '';
+      this.liveFeedback = false;
+      this.addButtonLabel = "Add";
+      this.notification.parentId = this.message.parentId;
 
-  ngOnInit(): void {
-    this.subscriptions.push(this.dataService.currentMessage.subscribe(message => {
-      console.log(message);
-      if (message != null) {
-        // this.message = message;
+      if (this.message.linkType == LinkType.QUOTE) {
+        this.dialogTitle = "Reply";
+        this.notification.linkType = LinkType.QUOTE;
+        console.log(this.message);
+        this.notification.subsnippets = JSON.parse(JSON.stringify(this.message.subsnippets));
+        this.prepareSubsnippetsQuoteContainer();
+
+      } else {
+        this.dialogTitle = "Add comment";
+        this.notification.linkType = LinkType.COMMENT;
       }
-    }));
+    }
+    return;
   }
 
   onEditorReady($event: any) {
