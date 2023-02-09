@@ -1,6 +1,6 @@
-import { Component, OnInit, Input, SecurityContext, ElementRef, ViewChild, Output, EventEmitter} from '@angular/core';
+import { Component, OnInit, Input, SecurityContext, ElementRef, ViewChild, Output, EventEmitter } from '@angular/core';
 import { ChangeStreamNotification } from '../changestreamnotification.model';
-import { DomSanitizer} from '@angular/platform-browser';
+import { DomSanitizer } from '@angular/platform-browser';
 import { MatDialogConfig, MatDialog } from '@angular/material/dialog';
 import { AddContentComponent } from '../add-content/add-content.component';
 import { Paragraphs, LinkType } from '@model/paragraphs';
@@ -12,7 +12,7 @@ import { SnippetInfoComponent } from './snippet-info/snippet-info.component';
 import { LogbookItemDataService } from '@shared/remote-data.service';
 import { trigger, state, style, transition, animate } from '@angular/animations';
 import { WidgetItemConfig } from '@model/config';
- 
+
 
 @Component({
   selector: 'snippet',
@@ -46,7 +46,7 @@ export class SnippetComponent implements OnInit {
 
   @Input()
   config: WidgetItemConfig = {
-    general:{},
+    general: {},
     filter: {},
     view: {}
   };
@@ -111,9 +111,9 @@ export class SnippetComponent implements OnInit {
       this.avatarHash = this.snippet.updatedBy;
 
     }
-    if (this.snippet.linkType == LinkType.COMMENT) { 
-        this.styleClass = 'snippetComment';
-        this.enableComments = false;
+    if (this.snippet.linkType == LinkType.COMMENT) {
+      this.styleClass = 'snippetComment';
+      this.enableComments = false;
     } else if (this.snippet.linkType == LinkType.QUOTE) {
       this.styleClass = 'snippetQuote';
       this.showEditButtonsMenu = false;
@@ -129,8 +129,8 @@ export class SnippetComponent implements OnInit {
     }
     this.content = this.sanitizer.sanitize(SecurityContext.HTML, this.content);
 
-    if (!this.config.view.hideMetadata){
-      if ((typeof this.snippet?.tags == 'undefined') || (this.snippet.tags.length == 0)){
+    if (!this.config.view.hideMetadata) {
+      if ((typeof this.snippet?.tags == 'undefined') || (this.snippet.tags.length == 0)) {
         this._hideMetadata = true;
       } else {
         this._hideMetadata = false;
@@ -142,14 +142,14 @@ export class SnippetComponent implements OnInit {
     this.enableEdit = true;
   }
 
-  
-  public get enableEdit() : boolean {
+
+  public get enableEdit(): boolean {
     return this._enableEdit;
   }
-  
-  
-  public set enableEdit(v : boolean) {
-    if (v){
+
+
+  public set enableEdit(v: boolean) {
+    if (v) {
       // check if user a member of the ownerGroup before enabling access
       if (this.allowEdit()) {
         this._enableEdit = v;
@@ -157,19 +157,19 @@ export class SnippetComponent implements OnInit {
     } else {
       this._enableEdit = v;
     }
-    
+
   }
-  
-  allowEdit(){
+
+  allowEdit() {
     let _hasAccessPermission = false;
-    if (typeof this.userPreferences.userInfo.roles != 'undefined'){
+    if (typeof this.userPreferences.userInfo.roles != 'undefined') {
       _hasAccessPermission = this.userPreferences.userInfo.roles.some(entry => {
         return this.snippet.readACL?.includes?.(entry)
       });
     }
 
     let _isExpired = false;
-    if (typeof this.snippet?.expiresAt == 'undefined'){
+    if (typeof this.snippet?.expiresAt == 'undefined') {
       _isExpired = true;
     } else {
       let _expirationTime = Date.parse(this.snippet.expiresAt);
@@ -182,21 +182,21 @@ export class SnippetComponent implements OnInit {
   ngAfterViewChecked(): void {
     //Called after every check of the component's view. Applies to components only.
     //Add 'implements AfterViewChecked' to the class.
-    if (this.snippetContainerRef.nativeElement.offsetHeight != this.renderedHeight){
+    if (this.snippetContainerRef.nativeElement.offsetHeight != this.renderedHeight) {
       this.renderedHeight = this.snippetContainerRef.nativeElement.offsetHeight;
     }
-    
+
   }
 
   highlightSnippetBorder(): void {
     this.highlightState = 'highlight';
-    setTimeout(()=>{this.highlightState='default'}, 1000)
+    setTimeout(() => { this.highlightState = 'default' }, 1000)
   }
 
-  updateContent(){
+  updateContent() {
     this.snippetContentRef.prepareContent();
-    if (!this.config.view.hideMetadata){
-      if ((typeof this.snippet?.tags == 'undefined') || (this.snippet.tags.length == 0)){
+    if (!this.config.view.hideMetadata) {
+      if ((typeof this.snippet?.tags == 'undefined') || (this.snippet.tags.length == 0)) {
         this._hideMetadata = true;
       } else {
         this._hideMetadata = false;
@@ -206,7 +206,7 @@ export class SnippetComponent implements OnInit {
     }
     // console.log(this.content)
   }
-  
+
   updateHtmlContent(content: string) {
     this.content = content;
     // this.snippetContainerRef.nativeElement.
@@ -217,7 +217,7 @@ export class SnippetComponent implements OnInit {
     console.log(this.snippet.id);
     const dialogConfig = new MatDialogConfig();
     dialogConfig.autoFocus = true;
-    dialogConfig.data = { "snippet": this.snippet, "content": this.content, "defaultTags": this.snippet.tags, "config": this.config};
+    dialogConfig.data = { "snippet": this.snippet, "content": this.content, "defaultTags": this.snippet.tags, "config": this.config };
     const dialogRef = this.dialog.open(AddContentComponent, dialogConfig);
     this.subscriptions.push(dialogRef.afterClosed().subscribe(result => {
       console.log(`Dialog result: ${result}`);
@@ -267,15 +267,17 @@ export class SnippetComponent implements OnInit {
     console.log(this.snippet.id);
     const dialogConfig = new MatDialogConfig();
     dialogConfig.autoFocus = true;
+
+    let parentId = this.snippet.id;
+    if (this.linkType == LinkType.COMMENT) {
+      parentId = this.snippet.parentId;
+    }
     let snippet: Paragraphs = {
-      parentId: this.snippet.id,
+      parentId: parentId,
       linkType: LinkType.COMMENT
     }
-    dialogConfig.data = { "snippet": snippet, "defaultTags": this.snippet.tags, "config": this.config};
-    const dialogRef = this.dialog.open(AddContentComponent, dialogConfig);
-    this.subscriptions.push(dialogRef.afterClosed().subscribe(result => {
-      console.log(`Dialog result: ${result}`);
-    }));
+    dialogConfig.data = { "snippet": snippet, "defaultTags": this.snippet.tags, "config": this.config };
+    this.openAddContentComponent(dialogConfig);
   }
 
   setDashboardName() {
@@ -290,28 +292,39 @@ export class SnippetComponent implements OnInit {
     // }));
   }
 
-  addCitation() {
+  async addCitation() {
     console.log("adding a citation")
     console.log(this.snippet.id);
     const dialogConfig = new MatDialogConfig();
     dialogConfig.autoFocus = true;
+
+    let parentId = this.snippet.parentId;
+    if (this.snippet.linkType == LinkType.COMMENT) {
+      let parent_snippet = await this.logbookItemDataService.getBasesnippet(this.snippet.parentId);
+      parentId = parent_snippet.parentId;
+    }
+
     let snippet: Paragraphs = {
-      parentId: this.snippet.parentId,
+      parentId: parentId,
       linkType: LinkType.QUOTE,
       subsnippets: [this.snippet],
     }
-    dialogConfig.data = { "snippet": snippet, "defaultTags": this.snippet.tags, "config": this.config};
+    dialogConfig.data = { "snippet": snippet, "defaultTags": this.snippet.tags, "config": this.config };
+    this.openAddContentComponent(dialogConfig);
+  }
+
+  openAddContentComponent(dialogConfig: MatDialogConfig) {
     const dialogRef = this.dialog.open(AddContentComponent, dialogConfig);
     this.subscriptions.push(dialogRef.afterClosed().subscribe(result => {
       console.log(`Dialog result: ${result}`);
     }));
   }
 
-  setElementLoading($event){
+  setElementLoading($event) {
     this.isLoading.emit($event);
   }
 
-  showInfo(){
+  showInfo() {
     console.log(this.snippet.id);
     const dialogConfig = new MatDialogConfig();
     dialogConfig.autoFocus = true;

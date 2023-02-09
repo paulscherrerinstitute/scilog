@@ -1,9 +1,9 @@
-
 <mat-card #snippetContainer [ngClass]="styleClass" (click)="selectSnippet($event)" [@highlightSnippet]="highlightState">
   <!-- [ngStyle]="{'border':isSelected ? '2px solid #26677a' : '2px solid #ffffff' }"> -->
   <mat-icon class="mat-fab-top-right-star" *ngIf="isHighlighted">star</mat-icon>
   <!-- <mat-icon class="mat-fab-top-right-user" *ngIf="!enableEdit" matTooltip="Another user is currently editing this snippet.">account_circle</mat-icon> -->
-  <svg class="mat-fab-top-right-user" [data-jdenticon-value]="avatarHash" *ngIf="snippetIsAccessedByAnotherUser && !snippet.isMessage"
+  <svg class="mat-fab-top-right-user" [data-jdenticon-value]="avatarHash"
+    *ngIf="snippetIsAccessedByAnotherUser && !snippet.isMessage"
     matTooltip="Another user is currently editing this snippet."></svg>
   <!-- <svg class="mat-fab-top-right-user" [data-jdenticon-value]="avatarHash" *ngIf="snippet.isMessage" [matTooltip]="snippet.updatedBy"></svg> -->
   <ng-container *ngIf="showEditButtonsMenu">
@@ -77,7 +77,8 @@
     <span class="snippet-header" *ngIf="config.view.showSnippetHeader">
       {{indexOrdered}} / {{ snippet.createdAt | date:'medium' }} / {{snippet.createdBy}}
     </span>
-    <snippet-content #snippetContent [snippet]='snippet' (htmlContent)="updateHtmlContent($event)" (isLoading)="setElementLoading($event)">
+    <snippet-content #snippetContent [snippet]='snippet' (htmlContent)="updateHtmlContent($event)"
+      (isLoading)="setElementLoading($event)">
     </snippet-content>
     <div class="snippet-tags-container" *ngIf="!_hideMetadata">
       <span class="snippet-tag" *ngFor="let tag of snippet?.tags">
@@ -91,6 +92,7 @@
 
 <div *ngFor="let snippet of snippet?.subsnippets; let i = index">
   <ng-container *ngIf="(snippet?.linkType!='quote') && (snippet?.snippetType=='paragraph')">
-    <snippet [snippet]="snippet" [updatedAt]="snippet?.updatedAt" [index]=i [hideMetadata]='hideMetadata'></snippet>
+    <snippet [snippet]="snippet" [updatedAt]="snippet?.updatedAt" [index]=i [config]="config"
+      [hideMetadata]='hideMetadata'></snippet>
   </ng-container>
 </div>
