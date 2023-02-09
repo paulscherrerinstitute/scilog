@@ -1,6 +1,8 @@
 import functools
-import warnings
+import logging
 from typing import get_type_hints
+
+logger = logging.getLogger(__name__)
 
 
 def scilog_typechecked(func):
@@ -16,10 +18,10 @@ def scilog_typechecked(func):
                 )
             if len(func.__closure__) > 0:
                 property_name = func.__closure__[0].cell_contents.strip("_")
-                # if obj._deprecated.get(property_name):
-                #     warnings.warn(
-                #         f"{property_name} is deprecated by {obj._deprecated_by[property_name]}"
-                #     )
+                if obj._deprecated.get(property_name):
+                    logger.warning(
+                        f"{property_name} is deprecated by {obj._deprecated_by[property_name]}"
+                    )
         return func(obj, *args, **kwargs)
 
     return typechecked_call

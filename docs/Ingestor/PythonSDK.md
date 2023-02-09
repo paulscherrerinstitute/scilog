@@ -1,6 +1,6 @@
 # Use of Python SDK
 
-You find an example script in the demo folder https://github.com/paulscherrerinstitute/scilog/tree/main/demo/demo.py . The example will add a paragraph containg tet, images and tags as well querying the existing snippet data in a logbook.
+You find an example script in the demo folder https://github.com/paulscherrerinstitute/scilog/tree/main/demo/demo.py . The example will add a paragraph containg text, images and tags as well querying the existing snippet data in a logbook.
 
 ```
 cd demo

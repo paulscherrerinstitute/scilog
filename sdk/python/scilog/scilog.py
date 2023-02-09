@@ -24,7 +24,7 @@ logger = logging.getLogger(__name__)
 def pinned_to_logbook(logbook_keys, include_none=False):
     def pinned_to_logbook_inner(func):
         @functools.wraps(func)
-        def pinned_to_logbook_call(log, *args, **kwargs):  # vor AUfruf
+        def pinned_to_logbook_call(log, *args, **kwargs):
             if not isinstance(log.logbook, Basesnippet):
                 warnings.warn("No logbook selected.")
             else:

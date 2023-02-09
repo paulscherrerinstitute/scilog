@@ -1,5 +1,4 @@
 import functools
-import json
 import logging
 
 import requests
@@ -111,5 +110,4 @@ class HttpClient(AuthMixin):
             timeout=timeout,
             verify=self._verify_certificate,
         )
-        # print("Result of login request:",x)
         return x.json()
