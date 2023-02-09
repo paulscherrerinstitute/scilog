@@ -354,7 +354,10 @@ export class LogbookDataService extends RemoteDataService {
     if (index > 0) {
       httpFilter["skip"] = index;
     }
-
+    
+    if (this._searchString.length > 0) {
+      httpFilter["include"] = [{ "relation": "subsnippets" }];
+    }
     let params = new HttpParams();
     params = params.set('filter', JSON.stringify(httpFilter))
 

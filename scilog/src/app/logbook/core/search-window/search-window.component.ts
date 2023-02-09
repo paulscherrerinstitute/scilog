@@ -150,16 +150,11 @@ export class SearchWindowComponent implements OnInit {
     }
     let searchValue = "";
     let searchParts = this.searchString.split(" ");
-    let _globalSearch = false;
     searchParts.forEach(searchPart => {
       console.log(searchPart);
       if (searchPart.length > 0) {
         if (searchPart.startsWith("@")) {
           searchResult.ownerGroup = searchPart.slice(1);
-        } else if (searchPart.startsWith(":")) {
-          if (searchPart == ":global") {
-            _globalSearch = true;
-          }
         } else if (searchPart.startsWith("#")) {
           console.log(searchPart)
           searchResult.tags.push(searchPart.slice(1));
@@ -168,10 +163,8 @@ export class SearchWindowComponent implements OnInit {
         }
       }
     })
-    if (!_globalSearch) {
-      console.log("local search")
-      searchResult.location.push(this.logbookInfo.logbookInfo.id);
-    }
+    console.log("local search")
+    searchResult.location.push(this.logbookInfo.logbookInfo.id);
     console.log("Search value: ", searchValue);
     console.log("Search config: ", searchResult)
     this.searchDataservice.searchString = searchValue;
