@@ -1,20 +1,7 @@
-# Use of Python SDK
-
-You find an example script in the demo folder https://github.com/paulscherrerinstitute/scilog/tree/main/demo/demo.py . The example will add a paragraph containg text, images and tags as well querying the existing snippet data in a logbook.
-
-```
-cd demo
-pip install -r requirements.txt 
-python3 ./demo.py -u https://scilog.qa.psi.ch/api/v1 p20580
-```
-
-It contains  a lot of comments explaining the various steps and query options you have. For simplicity the code is repeated here:
-
-```
 #!/usr/bin/env python
 
-# call it like below, specifying the URL of the API server and the group, 
-# for which you want to search a logbook 
+# call it like below, specifying the URL of the API server and the group,
+# for which you want to search a logbook
 # The first logbook found will be used to add some example data and retrieve
 # data back
 # The account used is predefined in the code , change it to your needs
@@ -23,6 +10,7 @@ It contains  a lot of comments explaining the various steps and query options yo
 
 import argparse
 import logging
+
 from scilog import LogbookMessage, SciLog
 
 logging.basicConfig(format="%(levelname)s:%(message)s", level=logging.INFO)
@@ -52,7 +40,9 @@ log.select_logbook(logbook)
 
 # example of *adding* information (text,images,tags) to this  logbook. You can concatenate as much informationas you like
 msg = LogbookMessage()
-msg.add_text("<p>Another example text<p>").add_file("./Image1.png").add_tag(["color"]).add_text("<p>After the image<p>").add_file("./Image2.png").add_tag(["testtag"])
+msg.add_text("<p>Another example text<p>").add_file("./Image1.png").add_tag(["color"]).add_text(
+    "<p>After the image<p>"
+).add_file("./Image2.png").add_tag(["testtag"])
 log.send_logbook_message(msg)
 
 # Querying data: (the skip and limit arguments are optional)
@@ -74,11 +64,9 @@ log.send_logbook_message(msg)
 snippets = log.get_snippets(
     createdBy="swissfelaramis-bernina@psi.ch",
     skip=5,
-    fields={"id": 1, "snippetType": 1, "createdBy": 1, "createdAt": 1, "parentId":1},
-    include=["subsnippets"]
+    fields={"id": 1, "snippetType": 1, "createdBy": 1, "createdAt": 1, "parentId": 1},
+    include=["subsnippets"],
 )
 
 for snippet in snippets:
     print("==== Snippet:", snippet)
-
-```

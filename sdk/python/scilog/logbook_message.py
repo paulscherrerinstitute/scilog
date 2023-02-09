@@ -3,7 +3,7 @@ from typing import List, Union
 
 from typeguard import typechecked
 
-from .scilog import SciLog
+from .scilog import SciLogCore
 from .snippet import Paragraph
 
 
@@ -51,7 +51,7 @@ class LogbookMessage:
         """
         if not os.path.exists(file_path):
             raise FileNotFoundError(f"File {file_path} could not be found.")
-        file_info, textcontent = SciLog.prepare_file_content(file_path)
+        file_info, textcontent = SciLogCore.prepare_file_content(file_path)
         if self._content.files:
             self._content.files.append(file_info)
         else:

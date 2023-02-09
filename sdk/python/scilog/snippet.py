@@ -1,6 +1,8 @@
 import functools
-import warnings
+import logging
 from typing import get_type_hints
+
+logger = logging.getLogger(__name__)
 
 
 def scilog_typechecked(func):
@@ -17,7 +19,7 @@ def scilog_typechecked(func):
             if len(func.__closure__) > 0:
                 property_name = func.__closure__[0].cell_contents.strip("_")
                 if obj._deprecated.get(property_name):
-                    warnings.warn(
+                    logger.warning(
                         f"{property_name} is deprecated by {obj._deprecated_by[property_name]}"
                     )
         return func(obj, *args, **kwargs)
@@ -75,10 +77,10 @@ class Snippet:
         return new
 
     def __str__(self):
-        return f"{self.__class__.__name__}: {self.to_dict()}"
+        return f"{self.__class__.__name__}: {self.to_dict(include_none=False)}"
 
     def __repr__(self):
-        return f"{self.__class__.__name__}: {self.to_dict()}"
+        return f"{self.__class__.__name__}: {self.to_dict(include_none=False)}"
 
     @classmethod
     def from_http_response(cls, response):
@@ -121,6 +123,18 @@ class Basesnippet(Snippet):
         )
 
 
+class Location(Basesnippet):
+    def __init__(self):
+        super().__init__(snippetType="location")
+        self.init_properties(name=str, location=str)
+
+
+class Logbook(Basesnippet):
+    def __init__(self):
+        super().__init__(snippetType="logbook")
+        self.init_properties(name=str, description=str, thumbnail=str, location=str)
+
+
 class Paragraph(Basesnippet):
     def __init__(self):
         super().__init__(snippetType="paragraph")
@@ -129,11 +143,26 @@ class Paragraph(Basesnippet):
 
 class Filesnippet(Basesnippet):
     def __init__(self):
-        super().__init__(snippetType="image")
+        super().__init__(snippetType="image")  # TODO make that type "file" eventually ?
         self.init_properties(fileExtension=str, accessHash=str)
 
 
-class Location(Basesnippet):
-    def __init__(self):
-        super().__init__(snippetType="location")
-        self.init_properties(name=str, location=str)
+def snippet_factory(response):
+    if isinstance(response, list):
+        return [get_snippet_response(resp) for resp in response]
+    return get_snippet_response(response)
+
+
+def get_snippet_response(response):
+    # extract snippetType from response
+    snippetType = response["snippetType"]
+    if snippetType == "location":
+        return Location.from_http_response(response)
+    if snippetType == "logbook":
+        return Logbook.from_http_response(response)
+    if snippetType == "paragraph":
+        return Paragraph.from_http_response(response)
+    if snippetType == "image":
+        return Filesnippet.from_http_response(response)
+    if snippetType == "basesnippet":
+        return Basesnippet.from_http_response(response)
