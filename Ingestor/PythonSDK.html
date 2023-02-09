@@ -470,10 +470,80 @@
                                 <section class="normal markdown-section">
                                 
                                 <h1 id="use-of-python-sdk">Use of Python SDK</h1>
-<p>You find an example script in the demo folder <a href="https://github.com/paulscherrerinstitute/scilog/tree/main/demo" target="_blank">https://github.com/paulscherrerinstitute/scilog/tree/main/demo</a> . The example will add a paragraph text and a second paragraph including two figures.</p>
+<p>You find an example script in the demo folder <a href="https://github.com/paulscherrerinstitute/scilog/tree/main/demo/demo.py" target="_blank">https://github.com/paulscherrerinstitute/scilog/tree/main/demo/demo.py</a> . The example will add a paragraph containg text, images and tags as well querying the existing snippet data in a logbook.</p>
 <pre><code>cd demo
 pip install -r requirements.txt 
-./demoTest.py p12345
+python3 ./demo.py -u https://scilog.qa.psi.ch/api/v1 p20580
+</code></pre><p>It contains  a lot of comments explaining the various steps and query options you have. For simplicity the code is repeated here:</p>
+<pre><code>#!/usr/bin/env python
+
+# call it like below, specifying the URL of the API server and the group, 
+# for which you want to search a logbook 
+# The first logbook found will be used to add some example data and retrieve
+# data back
+# The account used is predefined in the code , change it to your needs
+#
+# python3 ./demo.py -u https://scilog.qa.psi.ch/api/v1 p12345
+
+import argparse
+import logging
+from scilog import LogbookMessage, SciLog
+
+logging.basicConfig(format=&quot;%(levelname)s:%(message)s&quot;, level=logging.INFO)
+logger = logging.getLogger(__name__)
+
+parser = argparse.ArgumentParser(formatter_class=argparse.ArgumentDefaultsHelpFormatter)
+parser.add_argument(&quot;pgroup&quot;, help=&quot;Expected form: p12345&quot;)
+parser.add_argument(&quot;-u&quot;, &quot;--url&quot;, default=&quot;http://localhost:3000&quot;, help=&quot;Server address&quot;)
+
+clargs = parser.parse_args()
+pgroup = clargs.pgroup
+url = clargs.url
+
+# urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
+
+# connect under a given user name
+# (likely this will be a functional account like a beamline account)
+# (note: at PSI OIDC authenticated users can not authenticate from the CLI)
+
+log = SciLog(url, options={&quot;username&quot;: &quot;swissfelaramis-bernina@psi.ch&quot;})
+logbooks = log.get_logbooks(where={&quot;ownerGroup&quot;: pgroup}, limit=10, skip=0)
+assert len(logbooks) &gt;= 1
+logbook = logbooks[0]
+
+# make sure that further actions to this logbook
+log.select_logbook(logbook)
+
+# example of *adding* information (text,images,tags) to this  logbook. You can concatenate as much informationas you like
+msg = LogbookMessage()
+msg.add_text(&quot;&lt;p&gt;Another example text&lt;p&gt;&quot;).add_file(&quot;./Image1.png&quot;).add_tag([&quot;color&quot;]).add_text(&quot;&lt;p&gt;After the image&lt;p&gt;&quot;).add_file(&quot;./Image2.png&quot;).add_tag([&quot;testtag&quot;])
+log.send_logbook_message(msg)
+
+# Querying data: (the skip and limit arguments are optional)
+
+# there are two ways of defining a query expression
+
+# simple case:
+# the where condition is built from the individual fields, all key value pairs ANDed
+# snippets = log.get_snippets(limit=10,skip=5)
+# snippets = log.get_snippets(createdBy=&apos;swissfelaramis-bernina@psi.ch&apos;,limit=10,skip=5)
+
+# most flexible case: specify the where expression in Mongo/Loopback Syntax as python dictionary
+# snippets = log.get_snippets(where={&quot;createdBy&quot;:&apos;swissfelaramis-bernina@psi.ch&apos;})
+# snippets = log.get_snippets(where={&quot;createdBy&quot;:&apos;swissfelaramis-bernina@psi.ch&apos;,&apos;createdAt&apos;: {&quot;gt&quot;: &apos;2023-01-05T15:12:00Z&apos;}})
+
+# Warning: DO NOT USE fields key in queries or if you need to use it, always add the id field
+# like in the example below
+
+snippets = log.get_snippets(
+    createdBy=&quot;swissfelaramis-bernina@psi.ch&quot;,
+    skip=5,
+    fields={&quot;id&quot;: 1, &quot;snippetType&quot;: 1, &quot;createdBy&quot;: 1, &quot;createdAt&quot;: 1, &quot;parentId&quot;:1},
+    include=[&quot;subsnippets&quot;]
+)
+
+for snippet in snippets:
+    print(&quot;==== Snippet:&quot;, snippet)
 </code></pre>
                                 
                                 </section>
@@ -517,7 +587,7 @@ pip install -r requirements.txt
     <script>
         var gitbook = gitbook || [];
         gitbook.push(function() {
-            gitbook.page.hasChanged({"page":{"title":"Python SDK Usage","level":"1.3.2","depth":2,"next":{"title":"Import of elog data","level":"1.3.3","depth":2,"path":"Ingestor/MigrateElogData.md","ref":"Ingestor/MigrateElogData.md","articles":[]},"previous":{"title":"REST API Examples","level":"1.3.1","depth":2,"path":"Ingestor/RestAPI.md","ref":"Ingestor/RestAPI.md","articles":[]},"dir":"ltr"},"config":{"gitbook":"*","theme":"default","variables":{},"plugins":[],"pluginsConfig":{"highlight":{},"search":{},"lunr":{"maxIndexSize":1000000,"ignoreSpecialCharacters":false},"fontsettings":{"theme":"white","family":"sans","size":2},"theme-default":{"styles":{"website":"styles/website.css","pdf":"styles/pdf.css","epub":"styles/epub.css","mobi":"styles/mobi.css","ebook":"styles/ebook.css","print":"styles/print.css"},"showLevel":false}},"structure":{"langs":"LANGS.md","readme":"README.md","glossary":"GLOSSARY.md","summary":"SUMMARY.md"},"pdf":{"pageNumbers":true,"fontSize":12,"fontFamily":"Arial","paperSize":"a4","chapterMark":"pagebreak","pageBreaksBefore":"/","margin":{"right":62,"left":62,"top":56,"bottom":56},"embedFonts":false},"styles":{"website":"styles/website.css","pdf":"styles/pdf.css","epub":"styles/epub.css","mobi":"styles/mobi.css","ebook":"styles/ebook.css","print":"styles/print.css"}},"file":{"path":"Ingestor/PythonSDK.md","mtime":"2022-12-05T15:34:38.853Z","type":"markdown"},"gitbook":{"version":"4.0.4","time":"2022-12-05T15:34:57.087Z"},"basePath":"..","book":{"language":""}});
+            gitbook.page.hasChanged({"page":{"title":"Python SDK Usage","level":"1.3.2","depth":2,"next":{"title":"Import of elog data","level":"1.3.3","depth":2,"path":"Ingestor/MigrateElogData.md","ref":"Ingestor/MigrateElogData.md","articles":[]},"previous":{"title":"REST API Examples","level":"1.3.1","depth":2,"path":"Ingestor/RestAPI.md","ref":"Ingestor/RestAPI.md","articles":[]},"dir":"ltr"},"config":{"gitbook":"*","theme":"default","variables":{},"plugins":[],"pluginsConfig":{"highlight":{},"search":{},"lunr":{"maxIndexSize":1000000,"ignoreSpecialCharacters":false},"fontsettings":{"theme":"white","family":"sans","size":2},"theme-default":{"styles":{"website":"styles/website.css","pdf":"styles/pdf.css","epub":"styles/epub.css","mobi":"styles/mobi.css","ebook":"styles/ebook.css","print":"styles/print.css"},"showLevel":false}},"structure":{"langs":"LANGS.md","readme":"README.md","glossary":"GLOSSARY.md","summary":"SUMMARY.md"},"pdf":{"pageNumbers":true,"fontSize":12,"fontFamily":"Arial","paperSize":"a4","chapterMark":"pagebreak","pageBreaksBefore":"/","margin":{"right":62,"left":62,"top":56,"bottom":56},"embedFonts":false},"styles":{"website":"styles/website.css","pdf":"styles/pdf.css","epub":"styles/epub.css","mobi":"styles/mobi.css","ebook":"styles/ebook.css","print":"styles/print.css"}},"file":{"path":"Ingestor/PythonSDK.md","mtime":"2023-02-09T09:28:45.382Z","type":"markdown"},"gitbook":{"version":"4.0.4","time":"2023-02-09T09:28:58.553Z"},"basePath":"..","book":{"language":""}});
         });
     </script>
 </div>
