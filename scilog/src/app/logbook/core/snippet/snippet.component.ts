@@ -277,10 +277,7 @@ export class SnippetComponent implements OnInit {
       linkType: LinkType.COMMENT
     }
     dialogConfig.data = { "snippet": snippet, "defaultTags": this.snippet.tags, "config": this.config };
-    const dialogRef = this.dialog.open(AddContentComponent, dialogConfig);
-    this.subscriptions.push(dialogRef.afterClosed().subscribe(result => {
-      console.log(`Dialog result: ${result}`);
-    }));
+    this.openAddContentComponent(dialogConfig);
   }
 
   setDashboardName() {
@@ -313,6 +310,10 @@ export class SnippetComponent implements OnInit {
       subsnippets: [this.snippet],
     }
     dialogConfig.data = { "snippet": snippet, "defaultTags": this.snippet.tags, "config": this.config };
+    this.openAddContentComponent(dialogConfig);
+  }
+
+  openAddContentComponent(dialogConfig: MatDialogConfig) {
     const dialogRef = this.dialog.open(AddContentComponent, dialogConfig);
     this.subscriptions.push(dialogRef.afterClosed().subscribe(result => {
       console.log(`Dialog result: ${result}`);
