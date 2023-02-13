@@ -33,4 +33,8 @@ export class CookiesService {
     return this._lastView;
   }
 
+  set idToken(token: string) {
+    this.cookieService.set('id_token', token);
+  }
+
 }

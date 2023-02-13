@@ -12,6 +12,8 @@ import { Views } from '@model/views';
 import { SettingsComponent } from '@shared/settings/settings.component'
 import { WidgetConfig } from '@model/config';
 import { SearchWindowComponent } from '@shared/search-window/search-window.component';
+import { AppConfigService, AppConfig } from 'src/app/app-config.service';
+import { CookiesService } from '../cookies.service';
 
 @Component({
   selector: 'app-toolbar',
@@ -47,15 +49,18 @@ export class ToolbarComponent implements OnInit {
  @ViewChild('searchWindow') searchWindow: SearchWindowComponent;
 
   views: Views[] = [];
+  appConfig: AppConfig = this.appConfigService.getConfig();
 
   constructor(
     private router: Router,
+    private appConfigService: AppConfigService,
     private authService: AuthService,
     private dialog: MatDialog,
     private logbookService: LogbookInfoService,
     private userPreferences: UserPreferencesService,
     private viewService: ViewsService,
-    private hotkeys: Hotkeys
+    private hotkeys: Hotkeys,
+    private cookie: CookiesService
     ) { }
 
   ngOnInit(): void {
@@ -92,9 +97,10 @@ export class ToolbarComponent implements OnInit {
 
 
   logout() {
-    console.log("logout")
-    this.router.navigateByUrl('/login');
+    console.log("logout");
+    this.cookie.idToken = localStorage.getItem('id_token');
     this.authService.logout();
+    location.href = `${this.appConfig.lbBaseURL}/${this.appConfig.oAuth2Endpoint.authURL}/logout`;
   }
 
   openSideMenu() {
