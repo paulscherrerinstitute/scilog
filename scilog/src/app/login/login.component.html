@@ -7,9 +7,9 @@
     </mat-card-title>
     <mat-card-content class="content-container">
       <mat-tab-group mat-stretch-tabs="false" mat-align-tabs="center" fitInkBarToContent>
-        <mat-tab label="{{oAuth2Endpoint.displayText}}" *ngIf="oAuth2Endpoint">
+        <mat-tab label="User login" *ngIf="oAuth2Endpoint">
           <ng-template mat-tab-label>
-            <label matTooltip="{{ oAuth2Endpoint.toolTipText }}" matTooltipClass="example-tooltip-red1">
+            <label matTooltipClass="example-tooltip-red1">
               {{oAuth2Endpoint.displayText}}
             </label>
           </ng-template>
