@@ -9,7 +9,7 @@
       <mat-tab-group mat-stretch-tabs="false" mat-align-tabs="center" fitInkBarToContent>
         <mat-tab label="{{oAuth2Endpoint.displayText}}" *ngIf="oAuth2Endpoint">
           <ng-template mat-tab-label>
-            <label matTooltip="{{ oAuth2Endpoint.toolTipText }}" matTooltipClass="example-tooltip-red1">
+            <label matTooltip="{{ oAuth2Endpoint.toolTipText }}" matTooltipClass="example-tooltip-red1" [matTooltipPosition]="'above'">
               {{oAuth2Endpoint.displayText}}
             </label>
           </ng-template>
@@ -23,7 +23,7 @@
         </mat-tab>
         <mat-tab label="Admin">
           <ng-template mat-tab-label>
-            <label matTooltip="Login with functional or admin accounts." matTooltipClass="example-tooltip-red1">
+            <label matTooltip="Login with functional or admin accounts." matTooltipClass="example-tooltip-red1" [matTooltipPosition]="'above'">
               Admin
             </label>
           </ng-template>
