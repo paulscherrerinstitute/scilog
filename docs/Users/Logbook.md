@@ -21,7 +21,7 @@ An entry is actually added to the logbook by either clicking the send icon (tria
 With the *three-dot* menu on the right of entries you can decide to edit, comment or delete existing entries.
 ![Editing existing contents](img/edit-popup.png)
 
-Please note that editing entries will be permitted only for a certain pre-defined time , the default being 1 week. After that time the entries can no longer be modified. In the screenshot above this period has passed, therefore the edit functionality is greyed out.
+Please note that editing entries will be permitted only for a certain pre-defined time , the default being 3 days. After that time the entries can no longer be modified. In the screenshot above this period has passed, therefore the edit functionality is greyed out.
 
 There are keyboard shortcuts defined, a description of which you get via the help icon on the top right:
 ![Keyboard Shortcut Help](img/help-enhanced.png)
