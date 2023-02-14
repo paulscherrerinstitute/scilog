@@ -9,15 +9,15 @@
       <mat-tab-group mat-stretch-tabs="false" mat-align-tabs="center" fitInkBarToContent>
         <mat-tab label="{{oAuth2Endpoint.displayText}}" *ngIf="oAuth2Endpoint">
           <ng-template mat-tab-label>
-            <label matTooltipClass="example-tooltip-red1">
-              User Login
+            <label matTooltip="{{ oAuth2Endpoint.toolTipText }}" matTooltipClass="example-tooltip-red1">
+              {{oAuth2Endpoint.displayText}}
             </label>
           </ng-template>
           <div style="padding: 20px;">
-            <button class="oauth-login-button" mat-raised-button type="submit"
-              matTooltip=" {{ oAuth2Endpoint.toolTipText }}" (click)=" redirectOIDC(oAuth2Endpoint.authURL)">
+            <button class="oauth-login-button" mat-raised-button type="submit" color="primary"
+              (click)=" redirectOIDC(oAuth2Endpoint.authURL)">
               <img class="oauth-login-image" *ngIf="oAuth2Endpoint.displayImage" [src]="oAuth2Endpoint.displayImage" />
-              {{ oAuth2Endpoint.displayText }}
+              Login
             </button>
           </div>
         </mat-tab>
