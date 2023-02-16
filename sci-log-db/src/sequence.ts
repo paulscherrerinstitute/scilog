@@ -14,11 +14,13 @@ import {
 } from '@loopback/rest';
 import session from 'express-session';
 import cors from 'cors';
+import {cookieToToken} from './express-handlers/cookie-to-token';
 
 const SequenceActions = RestBindings.SequenceActions;
 
 const middlewareList: ExpressRequestHandler[] = [
   cors(),
+  cookieToToken,
   session({
     secret: 'someSecret',
     resave: false,

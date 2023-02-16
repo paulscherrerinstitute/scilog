@@ -42,6 +42,8 @@ export const oidcOptions = {
   tokenURL: 'tokenURL',
   clientID: 'clientID',
   successRedirect: 'success-redirect',
+  endSessionEndpoint: 'aUrl',
+  postLogoutRedirectUri: 'aRedirectUrl',
 };
 
 export async function setupApplication(

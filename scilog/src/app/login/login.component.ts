@@ -71,7 +71,7 @@ export class LoginComponent implements OnInit {
   }
 
   redirectOIDC(authURL: string) {
-    this.document.location.href = `${this.appConfig.lbBaseURL}/${authURL}`;
+    this.document.location.href = `${this.appConfig.lbBaseURL}/${authURL}/login`;
   };
 
 };

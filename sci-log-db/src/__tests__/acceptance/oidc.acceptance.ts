@@ -8,13 +8,14 @@ const oidcStrategy = require('passport-openidconnect');
 import {RequestContext, RestBindings} from '@loopback/rest';
 import {InvocationContext, Next} from '@loopback/core';
 import {verifyFunctionFactory} from '../../authentication-strategies/types';
-import {oidcOptions, setupApplication} from './test-helper';
+import {createUserToken, oidcOptions, setupApplication} from './test-helper';
 
 describe('OIDC services', function (this: Suite) {
   this.timeout(1000);
   let app: SciLogDbApplication;
   let client: Client;
   let userRepo: UserRepository;
+  let token: string;
 
   const profileData = {
     name: {
@@ -45,6 +46,7 @@ describe('OIDC services', function (this: Suite) {
 
   before('setupApplication', async () => {
     ({app, client} = await setupApplication({oidcOptions: oidcOptions}));
+    token = await createUserToken(app, client, ['logbookAcceptance']);
   });
   before('userRepo', async () => {
     userRepo = await app.get('repositories.UserRepository');
@@ -65,7 +67,7 @@ describe('OIDC services', function (this: Suite) {
       'authenticate',
     );
 
-    const res = await client.get('/auth/thirdparty/oidc').expect(303);
+    const res = await client.get('/auth/oidc/login').expect(303);
     // eslint-disable-next-line no-unused-expressions
     expect(mockAuthenticate.calledOnce).to.be.true;
     expect(res.headers.location).to.startWith('oidc-authorization-url');
@@ -114,5 +116,45 @@ describe('OIDC services', function (this: Suite) {
     expect(verifiedUser)
       .to.have.property('roles')
       .and.to.be.eql(userData.roles);
+  });
+
+  it('Logout with unauthenticated user should fail', async () => {
+    await client
+      .get('/auth/oidc/logout')
+      .set('Accept', 'application/json')
+      .expect(401);
+  });
+
+  it('Logout with bearer authenticated user should redirect', async () => {
+    await client
+      .get('/auth/oidc/logout')
+      .set({Authorization: `Bearer ${token}`})
+      .set('Cookie', ['connect.sid=12345'])
+      .expect(302)
+      .then(result => {
+        expect(result.headers.location).to.be.eql(
+          'aUrl?post_logout_redirect_uri=aRedirectUrl&client_id=clientID',
+        );
+        expect(result.headers['set-cookie']).to.be.eql([
+          'id_token=; Path=/; Expires=Thu, 01 Jan 1970 00:00:00 GMT',
+          'connect.sid=; Path=/; Expires=Thu, 01 Jan 1970 00:00:00 GMT',
+        ]);
+      });
+  });
+
+  it('Logout with cookie authenticated user should redirect', async () => {
+    await client
+      .get('/auth/oidc/logout')
+      .set('Cookie', [`id_token=${token}`, 'connect.sid=12345'])
+      .expect(302)
+      .then(result => {
+        expect(result.headers.location).to.be.eql(
+          'aUrl?post_logout_redirect_uri=aRedirectUrl&client_id=clientID',
+        );
+        expect(result.headers['set-cookie']).to.be.eql([
+          'id_token=; Path=/; Expires=Thu, 01 Jan 1970 00:00:00 GMT',
+          'connect.sid=; Path=/; Expires=Thu, 01 Jan 1970 00:00:00 GMT',
+        ]);
+      });
   });
 });

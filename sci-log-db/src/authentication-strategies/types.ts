@@ -17,6 +17,26 @@ type ProfileUser = {
   roles: string[];
 };
 
+export type OIDCOptions = {
+  session: boolean;
+  provider: string;
+  authScheme: string;
+  module: string;
+  failureFlash: boolean;
+  issuer: string;
+  authorizationURL: string;
+  tokenURL: string;
+  userInfoURL: string;
+  clientID: string;
+  clientSecret: string;
+  callbackURL: string;
+  scope: string[];
+  successRedirect: string;
+  skipUserProfile: boolean;
+  endSessionEndpoint: string;
+  postLogoutRedirectUri: string;
+};
+
 export type VerifyFunction = (
   claimIss: string,
   profile: Profile,

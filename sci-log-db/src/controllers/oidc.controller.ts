@@ -11,7 +11,7 @@ import {
   TokenService,
 } from '@loopback/authentication';
 import {inject, intercept} from '@loopback/core';
-import {mapProfile} from '../authentication-strategies/types';
+import {mapProfile, OIDCOptions} from '../authentication-strategies/types';
 import {TokenServiceBindings, User} from '@loopback/authentication-jwt';
 
 /**
@@ -27,7 +27,7 @@ export class OIDCController {
   ) {}
 
   @authenticate('oidc')
-  @get('/auth/thirdparty/{provider}')
+  @get('/auth/{provider}/login')
   /**
    * This method uses the @authenticate decorator to plugin passport strategies independently
    *
@@ -61,8 +61,7 @@ export class OIDCController {
   async thirdPartyCallBack(
     @param.path.string('provider') provider: string,
     @inject(RestBindings.Http.REQUEST) request: RequestWithSession,
-    // eslint-disable-next-line  @typescript-eslint/no-explicit-any
-    @inject('oidcOptions') oidcOptions: any,
+    @inject('oidcOptions') oidcOptions: OIDCOptions,
     @inject(RestBindings.Http.RESPONSE) response: Response,
   ) {
     if (!request.user) throw new Error('user not found from request');
@@ -72,6 +71,23 @@ export class OIDCController {
     const token = await this.jwtService.generateToken(userProfile);
 
     response.redirect(`${oidcOptions.successRedirect}?token=${token}`);
+    return response;
+  }
+
+  @authenticate('jwt')
+  @get('/auth/{provider}/logout')
+  async logout(
+    @param.path.string('provider') provider: string,
+    @inject(RestBindings.Http.REQUEST) request: RequestWithSession,
+    @inject(RestBindings.Http.RESPONSE) response: Response,
+    @inject('oidcOptions') oidcOptions: OIDCOptions,
+  ) {
+    await request.session.destroy();
+    response.clearCookie('id_token');
+    response.clearCookie('connect.sid');
+    response.redirect(
+      `${oidcOptions.endSessionEndpoint}?post_logout_redirect_uri=${oidcOptions.postLogoutRedirectUri}&client_id=${oidcOptions.clientID}`,
+    );
     return response;
   }
 }

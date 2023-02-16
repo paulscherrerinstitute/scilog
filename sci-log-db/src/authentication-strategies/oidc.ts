@@ -8,7 +8,7 @@ import {UserProfile} from '@loopback/security';
 import {Strategy} from 'passport';
 const oidcStrategy = require('passport-openidconnect');
 import {User} from '../models';
-import {mapProfile, verifyFunctionFactory} from './types';
+import {mapProfile, OIDCOptions, verifyFunctionFactory} from './types';
 import {UserRepository} from '../repositories';
 import {repository} from '@loopback/repository';
 const passport = require('passport');
@@ -23,7 +23,7 @@ export class OIDCAuthentication implements AuthenticationStrategy {
    */
   constructor(
     @inject('oidcOptions')
-    private oidcOptions: any,
+    private oidcOptions: OIDCOptions,
     @repository(UserRepository)
     public userRepository: UserRepository,
   ) {
