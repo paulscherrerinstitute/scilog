@@ -393,5 +393,6 @@ class SciLog:
     def post_snippet(self, **kwargs):
         return self.core.post_snippet(**kwargs)
 
+
 class SciLogAuthError(AuthError):
     pass
