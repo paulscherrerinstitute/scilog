@@ -119,6 +119,7 @@ class SciLogCore:
         raise ValueError("The used placeholder type is not supported. ")
 
     # TODO if this is a user function add docstring
+    @pinned_to_logbook(["parentId", *ACLS])
     def post_snippet(self, **kwargs):
         url = self.http_client.address + "/basesnippets"
         payload = kwargs
@@ -389,7 +390,6 @@ class SciLog:
         )
 
     # TODO: review and potentially move the whole core logic here
-    @pinned_to_logbook(["parentId", *ACLS])
     def post_snippet(self, **kwargs):
         return self.core.post_snippet(**kwargs)
 
