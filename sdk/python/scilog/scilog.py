@@ -389,7 +389,8 @@ class SciLog:
             self.http_client.get_request(url, params=params, headers=HEADER_JSON)
         )
 
-    @pinned_to_logbook(["parentId"])
+    # TODO: review and potentially move the whole core logic here
+    @pinned_to_logbook(["parentId", *ACLS])
     def post_snippet(self, **kwargs):
         return self.core.post_snippet(**kwargs)
 
