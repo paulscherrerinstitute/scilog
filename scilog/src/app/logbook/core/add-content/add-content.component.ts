@@ -56,7 +56,8 @@ export class AddContentComponent implements OnInit {
     this.editorConfig["autosave"] = {
       save: (editor) => {
         return this.editorChange(editor);
-      }
+      },
+      waitingTime: 5000
     }
     if (data != null) {
       this.message = data.snippet;
