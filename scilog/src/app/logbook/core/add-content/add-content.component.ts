@@ -249,7 +249,10 @@ export class AddContentComponent implements OnInit {
       if (typeof figuresNew[figIndex].firstChild['currentSrc'] != 'undefined') {
         let notSameSource = (figuresNew[figIndex].firstChild['currentSrc'] != figuresOld[figIndex].firstChild['href']);
         let notSameHref = (figuresNew[figIndex].firstChild['currentSrc'] != figuresOld[figIndex].firstChild['currentSrc']);
-        let notSameLinkedSource = (figuresNew[figIndex].firstChild['currentSrc'] != figuresOld[figIndex].firstChild.firstChild['currentSrc']);
+        let notSameLinkedSource=true
+        if (figuresOld[figIndex].firstChild.firstChild != null){
+           notSameLinkedSource = (figuresNew[figIndex].firstChild['currentSrc'] != figuresOld[figIndex].firstChild.firstChild['currentSrc']);
+        } 
         if (notSameSource && notSameLinkedSource && notSameHref) {
           fileHasChanged = true;
           return fileHasChanged;
