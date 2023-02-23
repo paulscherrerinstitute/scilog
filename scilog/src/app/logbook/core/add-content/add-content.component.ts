@@ -247,7 +247,10 @@ export class AddContentComponent implements OnInit {
     let figIndex = 0;
     while (figIndex < figuresNew.length) {
       if (typeof figuresNew[figIndex].firstChild['currentSrc'] != 'undefined') {
-        if (figuresNew[figIndex].firstChild['currentSrc'] != figuresOld[figIndex].firstChild['currentSrc']) {
+        let notSameSource = (figuresNew[figIndex].firstChild['currentSrc'] != figuresOld[figIndex].firstChild['href']);
+        let notSameHref = (figuresNew[figIndex].firstChild['currentSrc'] != figuresOld[figIndex].firstChild['currentSrc']);
+        let notSameLinkedSource = (figuresNew[figIndex].firstChild['currentSrc'] != figuresOld[figIndex].firstChild.firstChild['currentSrc']);
+        if (notSameSource && notSameLinkedSource && notSameHref) {
           fileHasChanged = true;
           return fileHasChanged;
         }
@@ -321,23 +324,25 @@ export function extractNotificationMessage(htmlData: string, updateFiles: boolea
     console.log("figureStyle: ", fig.style.width);
     if ((typeof fig.firstChild['currentSrc'] != 'undefined') && fig.firstChild['currentSrc'] != "") {
       let blobData = dataURItoBlob(fig.firstChild['currentSrc']);
-      let type = fig.firstChild['currentSrc'].split(',')[0].split(':')[1].split(';')[0];
+
       let container: Filecontainer = {
         style: {
           width: fig.style.width,
           height: fig.style.height
-        },
-        fileExtension: type
+        }
       }
       let fileHash = uuid();
       if (updateFiles) {
+        let type = fig.firstChild['currentSrc'].split(',')[0].split(':')[1].split(';')[0];
         let file = new File([blobData], 'subFigure', { type: type })
         container.file = file;
         container.fileHash = fileHash;
+        container.fileExtension = type;
         fig.firstChild['title'] = fileHash;
       } else {
         if (fileStorage.length > fileIndex) {
           container.fileHash = fileStorage[fileIndex].fileHash;
+          container.fileExtension = fileStorage[fileIndex].fileExtension;
           fig.firstChild['title'] = fileStorage[fileIndex].fileHash;
         }
       }
