@@ -198,66 +198,20 @@ export class AddContentComponent implements OnInit {
   }
 
   prepareMessage(data: string) {
-    if (this.fileChanged(data)) {
-      // update files
-      console.log("files changed");
-      let notification = extractNotificationMessage(data, true);
-      if (notification != null) {
-        this.notification.textcontent = notification.textcontent;
-        this.notification.files = notification.files;
-        this.notification.tags = this.tag;
-      } else {
-        this.notification.textcontent = "";
-      }
-
-    } else {
-      // update textcontent only
-      console.log("files did not change");
-      let notification = extractNotificationMessage(data, false, this.message?.files ? this.message.files : []);
-      console.log(notification)
+    let notification = extractNotificationMessage(data, this.message?.files ? this.message.files : []);
+    if (notification != null) {
       this.notification.textcontent = notification.textcontent;
-      console.log(this.notification)
+      this.notification.files = notification.files;
+      this.notification.tags = this.tag;
+    } else {
+      this.notification.textcontent = "";
     }
+
     if (this.notification.linkType == LinkType.QUOTE) {
       console.log("preparing quote");
       // send paragraph and subsnippet (that is a copy of the reference);
       this.notification.linkType = LinkType.PARAGRAPH;
     }
-  }
-
-  fileChanged(data: string) {
-    // console.log(data);
-    // console.log(this.data);
-    let fileHasChanged = false;
-
-    var spanNew = document.createElement('figure');
-    spanNew.innerHTML = data;
-    let figuresNew = spanNew.querySelectorAll("figure");
-
-    var spanOld = document.createElement('figure');
-    spanOld.innerHTML = this.data;
-    let figuresOld = spanOld.querySelectorAll("figure");
-
-    console.log("figNew", figuresNew)
-    console.log("figOld", figuresOld)
-    if (figuresNew.length != figuresOld.length) {
-      fileHasChanged = true;
-      return fileHasChanged;
-    }
-
-    let figIndex = 0;
-    while (figIndex < figuresNew.length) {
-      if (typeof figuresNew[figIndex].firstChild['currentSrc'] != 'undefined') {
-        if (figuresNew[figIndex].firstChild['currentSrc'] != figuresOld[figIndex].firstChild['currentSrc']) {
-          fileHasChanged = true;
-          return fileHasChanged;
-        }
-
-      }
-      figIndex++;
-    }
-
-    return fileHasChanged;
   }
 
   sendMessage() {
@@ -303,7 +257,7 @@ export class AddContentComponent implements OnInit {
 
 }
 
-export function extractNotificationMessage(htmlData: string, updateFiles: boolean = true, fileStorage: any = []) {
+export function extractNotificationMessage(htmlData: string, fileStorage: any = []) {
 
   console.log("extracting notification");
 
@@ -311,45 +265,45 @@ export function extractNotificationMessage(htmlData: string, updateFiles: boolea
   var span = document.createElement('figure');
   span.innerHTML = dataEditor;
 
-  console.log(span.innerHTML)
+  let imgCollection = span.getElementsByTagName('img');
 
-  let figures = span.querySelectorAll("figure");
   let snippetFiles: Filecontainer[] = [];
 
-  let fileIndex = 0;
-  figures.forEach(fig => {
-    console.log(fig)
-    console.log("figureStyle: ", fig.style.width);
-    if ((typeof fig.firstChild['currentSrc'] != 'undefined') && fig.firstChild['currentSrc'] != "") {
-      let blobData = dataURItoBlob(fig.firstChild['currentSrc']);
-      let type = fig.firstChild['currentSrc'].split(',')[0].split(':')[1].split(';')[0];
-      let container: Filecontainer = {
+  for (let index = 0; index < imgCollection.length; index++) {
+    let img = imgCollection[index];
+    console.log(img);
+    let container: Filecontainer;
+    if (img.src.startsWith("data:")) {
+      // new image
+      let blobData = dataURItoBlob(img.src);
+      let type = img.src.split(',')[0].split(':')[1].split(';')[0];
+      let file = new File([blobData], 'subFigure', { type: type });
+      container = {
         style: {
-          width: fig.style.width,
-          height: fig.style.height
+          width: img.parentElement.style.width,
+          height: img.parentElement.style.height
         },
+        file: file,
+        fileHash: uuid(),
         fileExtension: type
       }
-      let fileHash = uuid();
-      if (updateFiles) {
-        let file = new File([blobData], 'subFigure', { type: type })
-        container.file = file;
-        container.fileHash = fileHash;
-        fig.firstChild['title'] = fileHash;
-      } else {
-        if (fileStorage.length > fileIndex) {
-          container.fileHash = fileStorage[fileIndex].fileHash;
-          fig.firstChild['title'] = fileStorage[fileIndex].fileHash;
-        }
-      }
-      snippetFiles.push(container);
-
-      fig.removeAttribute('style');
-      fig.firstChild['src'] = '';
-      console.log(fig);
+      img.src = "";
+    } else if (img.src.startsWith("http")) {
+      // check for existing file
+      container = fileStorage.find(fileEntry => img.src.includes(fileEntry.accessHash));
+      container.style = {
+        width: img.parentElement.style.width,
+        height: img.parentElement.style.height
+      };
     }
-    fileIndex++;
-  });
+
+    if (container != undefined) {
+      snippetFiles.push(container);
+      img.parentElement.removeAttribute('style')
+      img.title = container.fileHash;
+    }
+
+  };
 
   let links = span.querySelectorAll("a");
   links.forEach(link => {

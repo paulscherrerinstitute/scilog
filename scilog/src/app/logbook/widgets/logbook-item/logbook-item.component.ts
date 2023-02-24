@@ -217,14 +217,14 @@ export class LogbookItemComponent implements OnInit {
 
     this.updateViewSubscription();
 
-    this.subscriptions.push(this.scrollToElementService.$selectedItem.subscribe(async (element)=>{
-      if (element != null){
-        if (typeof element.id == 'string'){
+    this.subscriptions.push(this.scrollToElementService.$selectedItem.subscribe(async (element) => {
+      if (element != null) {
+        if (typeof element.id == 'string') {
           let index = await this.logbookItemDataService.getIndex(element.id, this.config);
           console.log("snippet:", element);
           console.log("index: ", index)
           console.log(this.config);
-          if (index>=0){
+          if (index >= 0) {
             this.goToSnippetIndex(index);
           }
         }
@@ -405,7 +405,7 @@ export class LogbookItemComponent implements OnInit {
                       this.forceScrollToEnd = false;
                       let count = await this.logbookItemDataService.getCount(this.config);
                       await this.logbookScrollService.goToSnippetIndex(count.count - 1, () => {
-                        this.logbookScrollService.datasource.adapter.relax(()=>{
+                        this.logbookScrollService.datasource.adapter.relax(() => {
                           setTimeout(() => {
                             this.snippetContainerRef.nativeElement.scrollTop = this.snippetContainerRef.nativeElement.scrollHeight;
                           }, 50);
@@ -702,7 +702,7 @@ export class LogbookItemComponent implements OnInit {
   addContent(isMessage = false) {
     this.forceScrollToEnd = true;
     console.log(this.editorContentRef.editorInstance.prel_filestorage);
-    let notification: ChangeStreamNotification = extractNotificationMessage(this.editorContentRef.editorInstance.getData(), true, this.editorContentRef.editorInstance.prel_filestorage);
+    let notification: ChangeStreamNotification = extractNotificationMessage(this.editorContentRef.editorInstance.getData(), this.editorContentRef.editorInstance.prel_filestorage);
 
     if (notification != null) {
       notification.parentId = this.targetId;
@@ -720,7 +720,7 @@ export class LogbookItemComponent implements OnInit {
 
   };
 
-  snippetIsLoading(status:boolean, id:string){
+  snippetIsLoading(status: boolean, id: string) {
     console.log(status, id);
     this.logbookScrollService.setItemStatus(id, status);
   }
