@@ -272,10 +272,10 @@ export function extractNotificationMessage(htmlData: string, fileStorage: any = 
     let img = imgCollection[index];
     console.log(img);
     let container: Filecontainer;
-    if (img.currentSrc.startsWith("data:")) {
+    if (img.src.startsWith("data:")) {
       // new image
-      let blobData = dataURItoBlob(img.currentSrc);
-      let type = img.currentSrc.split(',')[0].split(':')[1].split(';')[0];
+      let blobData = dataURItoBlob(img.src);
+      let type = img.src.split(',')[0].split(':')[1].split(';')[0];
       let file = new File([blobData], 'subFigure', { type: type });
       container = {
         style: {
@@ -287,9 +287,13 @@ export function extractNotificationMessage(htmlData: string, fileStorage: any = 
         fileExtension: type
       }
       img.src = "";
-    } else if (img.currentSrc.startsWith("http")) {
+    } else if (img.src.startsWith("http")) {
       // check for existing file
-      container = fileStorage.find(fileEntry => img.currentSrc.includes(fileEntry.accessHash));
+      container = fileStorage.find(fileEntry => img.src.includes(fileEntry.accessHash));
+      container.style = {
+        width: img.parentElement.style.width,
+        height: img.parentElement.style.height
+      };
     }
 
     if (container != undefined) {
