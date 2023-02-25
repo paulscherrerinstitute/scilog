@@ -38,7 +38,7 @@ export default class InsertFile extends Plugin {
                     let fnameParts = file.name.split('.');
                     let fileStorage = {
                         file: file,
-                        fileHash: fnameHash,
+                        fnameHash: fnameHash,
                         fileExtension: 'file/' + fnameParts[fnameParts.length-1]
                     }
                     this.editor.prel_filestorage = [fileStorage];

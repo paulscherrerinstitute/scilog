@@ -2,6 +2,7 @@ import { Component, EventEmitter, Input, OnInit, Output, ViewChild, ElementRef }
 import { ChangeStreamNotification } from '../../changestreamnotification.model';
 import { AppConfigService } from 'src/app/app-config.service';
 import { Filecontainer } from 'src/app/core/model/basesnippets';
+import { PrismService } from '../../prism.service';
 
 @Component({
   selector: 'snippet-content',
@@ -28,6 +29,7 @@ export class SnippetContentComponent implements OnInit {
 
   constructor(
     private appConfigService: AppConfigService,
+    private prismservice: PrismService
   ) {
     console.log(this)
   }
@@ -43,6 +45,8 @@ export class SnippetContentComponent implements OnInit {
     //Add 'implements AfterViewInit' to the class.
     console.log(this.contentRef.nativeElement.offsetWidth);
     this.contentWidth = this.contentRef.nativeElement.parentElement.offsetWidth;
+    this.prismservice.highlightAll();
+
   }
 
   prepareContent() {

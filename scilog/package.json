@@ -45,6 +45,7 @@
     "node-polyfill-webpack-plugin": "^2.0.1",
     "postcss-loader": "^3.0.0",
     "primeicons": "^4.0.0",
+    "prismjs": "^1.29.0",
     "process": "^0.11.10",
     "raw-loader": "^3.1.0",
     "rxjs": "^7.8.0",
