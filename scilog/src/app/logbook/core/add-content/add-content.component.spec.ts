@@ -185,20 +185,42 @@ describe('AddContentComponent', () => {
   })
 
   it('should adjust figure HTML content for ckeditor', () => {
-    let figureMockNoSize = '<figure class="image image_resized"><img src="source" title="d3cc95ad-45d5-48c4-ba0e-db6fcfd252ce"></figure>'
+    let figureMockNoSize = '<figure class="image"><img src="source" title="d3cc95ad-45d5-48c4-ba0e-db6fcfd252ce"></figure>';
 
     component.data = figureMockNoSize;
     component.adjustContentForEditor();
     expect(component.data).toBe(figureMockNoSize);
 
-    let figureMockSize = '<figure class="image image_resized" style="width:2971;"><img src="source" title="528b041f-e2d2-4164-8d37-6e0f814abecb" width="2971"></figure>"'
-    component.data = figureMockSize;
+    let figureMockNoSizeResized = '<figure class="image image_resized"><img src="source" title="d3cc95ad-45d5-48c4-ba0e-db6fcfd252ce"></figure>';
+
+    component.data = figureMockNoSizeResized;
     component.adjustContentForEditor();
-    expect(component.data).toBe(figureMockSize);
+    expect(component.data).toBe(figureMockNoSizeResized);
+
+    let figureMockSizeBefore = '<figure class="image image_resized"><img src="source" title="528b041f-e2d2-4164-8d37-6e0f814abecb" width="2971"></figure>"'
+    let figureMockSizeAfter = '<figure class="image image_resized" style="width:2971;"><img src="source" title="528b041f-e2d2-4164-8d37-6e0f814abecb" width="2971"></figure>"'
+    component.data = figureMockSizeBefore;
+    component.adjustContentForEditor();
+    expect(component.data).toBe(figureMockSizeAfter);
 
   })
 
-  // TODO: try to make work after angular upgrade
+
+  it('should adjust figure HTML content with links for ckeditor ', () => {
+    let figureMockNoSize = '<figure class="image image_resized"><a target="_blank" rel="noopener noreferrer" href="source"><img src="source" title="efb7f211-ad6a-4fad-b91c-e33ebd8d410a"></a></figure>';
+
+    component.data = figureMockNoSize;
+    component.adjustContentForEditor();
+    expect(component.data).toBe(figureMockNoSize);
+
+    let figureMockSizeBefore = '<figure class="image image_resized" ><a target="_blank" rel="noopener noreferrer" href="source"><img src="source" title="efb7f211-ad6a-4fad-b91c-e33ebd8d410a" width="1234"></a></figure>';
+    let figureMockSizeAfter = '<figure class="image image_resized" style="width:1234;"><a target="_blank" rel="noopener noreferrer" href="source"><img src="source" title="efb7f211-ad6a-4fad-b91c-e33ebd8d410a" width="1234"></a></figure>';
+    component.data = figureMockSizeBefore;
+    component.adjustContentForEditor();
+    expect(component.data).toBe(figureMockSizeAfter);
+
+  })
+
   it('should extract notification with new files', () => {
     let figureMock = '<figure class="image image_resized" style="width:79%;"><img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAEjgAAA2oCAIAAACtz6bAAAAACXBIWXMAAHsIAAB7CAF"></figure>"';
     let figureMockNoSrc = ['<figure class="image image_resized"><img src=""', '></figure>"']
