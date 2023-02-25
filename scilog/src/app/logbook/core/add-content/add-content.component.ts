@@ -227,13 +227,15 @@ export class AddContentComponent implements OnInit {
     span.innerHTML = this.data;
     let figures = span.querySelectorAll("figure");
     figures.forEach(fig => {
-      console.log(fig);
-      if ((typeof fig.firstChild['currentSrc'] != 'undefined') && fig.firstChild['currentSrc'] != "") {
-        if ((fig.firstElementChild.getAttribute('width') != "") && fig.firstElementChild.getAttribute('width') != null) {
-          fig.setAttribute("style", "width:" + fig.firstElementChild.getAttribute('width') + ";");
-        }
-        console.log(fig);
+      const imgCollection = fig.getElementsByTagName('img');
+      if (imgCollection.length != 1) {
+        return;
       }
+      const img = imgCollection[0];
+      if (!img.hasAttribute('width')) {
+        return;
+      }
+      fig.setAttribute("style", "width:" + img.getAttribute('width') + ";");
     });
     this.data = span.innerHTML;
 
