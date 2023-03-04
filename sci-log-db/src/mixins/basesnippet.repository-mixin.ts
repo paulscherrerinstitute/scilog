@@ -68,8 +68,7 @@ function UpdateAndDeleteRepositoryMixin<
       // no need to check if we are dealing with an admin
       let isAdmin = user.roles.find((role: string) => role == "admin");
       if (isAdmin != undefined) {
-        await baseSnippetRepository.create(snippet, { currentUser: user });
-        return;
+        return baseSnippetRepository.create(snippet, { currentUser: user });
       }
       let roles = [...user.roles];
       let index = roles.indexOf('any-authenticated-user');
@@ -91,7 +90,8 @@ function UpdateAndDeleteRepositoryMixin<
         if (roles.find((role: any) => role == requiredRole) == undefined) {
           throw new HttpErrors.Forbidden('Permission denied to create entry for group ' + requiredRole)
         }
-      })
+      });
+      return baseSnippetRepository.create(snippet, { currentUser: user });
     }
 
     private async addToHistory(snippet: M, user: UserProfile): Promise<void> {
