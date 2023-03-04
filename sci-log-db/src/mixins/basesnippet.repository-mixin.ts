@@ -79,7 +79,8 @@ function UpdateAndDeleteRepositoryMixin<
       let requiredRoles: string[] = [];
       roleContainers.forEach((roleContainer: any) => {
         if (snippet.hasOwnProperty(roleContainer)) {
-          requiredRoles.push(snippet[roleContainer]);
+          requiredRoles = requiredRoles.concat(snippet[roleContainer])
+          // requiredRoles.push(snippet[roleContainer]);
         }
       });
       console.log("Required roles: ", requiredRoles)
