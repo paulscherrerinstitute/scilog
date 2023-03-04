@@ -1,6 +1,6 @@
-import {authenticate} from '@loopback/authentication';
-import {authorize} from '@loopback/authorization';
-import {inject} from '@loopback/core';
+import { authenticate } from '@loopback/authentication';
+import { authorize } from '@loopback/authorization';
+import { inject } from '@loopback/core';
 import {
   Count,
   CountSchema,
@@ -9,14 +9,14 @@ import {
   repository,
   Where,
 } from '@loopback/repository';
-import {del, get, param, patch, post, requestBody} from '@loopback/rest';
-import {SecurityBindings, UserProfile} from '@loopback/security';
-import {Task} from '../models';
-import {BasesnippetRepository, TaskRepository} from '../repositories';
-import {basicAuthorization} from '../services/basic.authorizor';
-import {getModelSchemaRef} from '../utils/misc';
-import {OPERATION_SECURITY_SPEC} from '../utils/security-spec';
-import {BasesnippetController} from './basesnippet.controller';
+import { del, get, param, patch, post, requestBody } from '@loopback/rest';
+import { SecurityBindings, UserProfile } from '@loopback/security';
+import { Task } from '../models';
+import { BasesnippetRepository, TaskRepository } from '../repositories';
+import { basicAuthorization } from '../services/basic.authorizor';
+import { getModelSchemaRef } from '../utils/misc';
+import { OPERATION_SECURITY_SPEC } from '../utils/security-spec';
+import { BasesnippetController } from './basesnippet.controller';
 
 @authenticate('jwt')
 @authorize({
@@ -32,14 +32,14 @@ export class TaskController {
     public basesnippetRepository: BasesnippetRepository,
     @inject('controllers.BasesnippetController')
     public basesnippetController: BasesnippetController,
-  ) {}
+  ) { }
 
   @post('/tasks', {
     security: OPERATION_SECURITY_SPEC,
     responses: {
       '200': {
         description: 'Task model instance',
-        content: {'application/json': {schema: getModelSchemaRef(Task)}},
+        content: { 'application/json': { schema: getModelSchemaRef(Task) } },
       },
     },
   })
@@ -56,7 +56,7 @@ export class TaskController {
     })
     task: Omit<Task, 'id'>,
   ): Promise<Task> {
-    return this.taskRepository.create(task, {currentUser: this.user});
+    return this.taskRepository.authorizedCreate(task, { currentUser: this.user });
   }
 
   @get('/tasks/count', {
@@ -64,12 +64,12 @@ export class TaskController {
     responses: {
       '200': {
         description: 'Task model count',
-        content: {'application/json': {schema: CountSchema}},
+        content: { 'application/json': { schema: CountSchema } },
       },
     },
   })
   async count(@param.where(Task) where?: Where<Task>): Promise<Count> {
-    return this.taskRepository.count(where, {currentUser: this.user});
+    return this.taskRepository.count(where, { currentUser: this.user });
   }
 
   @get('/tasks/search={search}', {
@@ -81,7 +81,7 @@ export class TaskController {
           'application/json': {
             schema: {
               type: 'array',
-              items: getModelSchemaRef(Task, {includeRelations: true}),
+              items: getModelSchemaRef(Task, { includeRelations: true }),
             },
           },
         },
@@ -107,7 +107,7 @@ export class TaskController {
         description: 'Find the index (i.e position) of a task within a query.',
         content: {
           'application/json': {
-            schema: {type: 'number'},
+            schema: { type: 'number' },
           },
         },
       },
@@ -129,7 +129,7 @@ export class TaskController {
           'application/json': {
             schema: {
               type: 'array',
-              items: getModelSchemaRef(Task, {includeRelations: true}),
+              items: getModelSchemaRef(Task, { includeRelations: true }),
             },
           },
         },
@@ -137,7 +137,7 @@ export class TaskController {
     },
   })
   async find(@param.filter(Task) filter?: Filter<Task>): Promise<Task[]> {
-    return this.taskRepository.find(filter, {currentUser: this.user});
+    return this.taskRepository.find(filter, { currentUser: this.user });
   }
 
   @patch('/tasks', {
@@ -145,7 +145,7 @@ export class TaskController {
     responses: {
       '200': {
         description: 'Task PATCH success count',
-        content: {'application/json': {schema: CountSchema}},
+        content: { 'application/json': { schema: CountSchema } },
       },
     },
   })
@@ -153,14 +153,14 @@ export class TaskController {
     @requestBody({
       content: {
         'application/json': {
-          schema: getModelSchemaRef(Task, {partial: true}),
+          schema: getModelSchemaRef(Task, { partial: true }),
         },
       },
     })
     task: Task,
     @param.where(Task) where?: Where<Task>,
   ): Promise<Count> {
-    return this.taskRepository.updateAll(task, where, {currentUser: this.user});
+    return this.taskRepository.updateAll(task, where, { currentUser: this.user });
   }
 
   @get('/tasks/{id}', {
@@ -170,7 +170,7 @@ export class TaskController {
         description: 'Task model instance',
         content: {
           'application/json': {
-            schema: getModelSchemaRef(Task, {includeRelations: true}),
+            schema: getModelSchemaRef(Task, { includeRelations: true }),
           },
         },
       },
@@ -178,9 +178,9 @@ export class TaskController {
   })
   async findById(
     @param.path.string('id') id: string,
-    @param.filter(Task, {exclude: 'where'}) filter?: FilterExcludingWhere<Task>,
+    @param.filter(Task, { exclude: 'where' }) filter?: FilterExcludingWhere<Task>,
   ): Promise<Task> {
-    return this.taskRepository.findById(id, filter, {currentUser: this.user});
+    return this.taskRepository.findById(id, filter, { currentUser: this.user });
   }
 
   @patch('/tasks/{id}', {
@@ -196,7 +196,7 @@ export class TaskController {
     @requestBody({
       content: {
         'application/json': {
-          schema: getModelSchemaRef(Task, {partial: true}),
+          schema: getModelSchemaRef(Task, { partial: true }),
         },
       },
     })

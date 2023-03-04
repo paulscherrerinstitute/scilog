@@ -1,4 +1,4 @@
-import {Getter, inject, MixinTarget} from '@loopback/core';
+import { Getter, inject, MixinTarget } from '@loopback/core';
 import {
   DefaultCrudRepository,
   Entity,
@@ -11,12 +11,12 @@ import {
   Condition,
   OrClause,
 } from '@loopback/repository';
-import {Basesnippet} from '../models';
-import {UserProfile} from '@loopback/security';
-import {HttpErrors, Response} from '@loopback/rest';
+import { Basesnippet } from '../models';
+import { UserProfile } from '@loopback/security';
+import { HttpErrors, Response } from '@loopback/rest';
 import _ from 'lodash';
-import {EXPORT_SERVICE} from '../keys';
-import {ExportService} from '../services/export-snippets.service';
+import { EXPORT_SERVICE } from '../keys';
+import { ExportService } from '../services/export-snippets.service';
 
 function UpdateAndDeleteRepositoryMixin<
   M extends Entity & {
@@ -58,13 +58,49 @@ function UpdateAndDeleteRepositoryMixin<
       } else await this.updateById(id, basesnippet, options);
     }
 
+    async authorizedCreate(snippet: any, options?: Options) {
+      let user = options?.currentUser;
+      if (user == undefined) {
+        throw new HttpErrors.Forbidden('Cannot create new entries without user info.')
+      }
+      const baseSnippetRepository = await this.baseSnippetRepository();
+
+      // no need to check if we are dealing with an admin
+      let isAdmin = user.roles.find((role: string) => role == "admin");
+      if (isAdmin != undefined) {
+        await baseSnippetRepository.create(snippet, { currentUser: user });
+        return;
+      }
+      let roles = [...user.roles];
+      let index = roles.indexOf('any-authenticated-user');
+      if (index !== -1) {
+        roles.splice(index, 1);
+      }
+      let roleContainers = ['ownerGroup', 'accessGroups', 'readACL', 'createACL', 'updateACL', 'shareACL', 'adminACL', 'deleteACL'];
+      let requiredRoles: string[] = [];
+      roleContainers.forEach((roleContainer: any) => {
+        if (snippet.hasOwnProperty(roleContainer)) {
+          requiredRoles.push(snippet[roleContainer]);
+        }
+      });
+      console.log("Required roles: ", requiredRoles)
+      if (requiredRoles.length == 0) {
+        throw new HttpErrors.Forbidden('Cannot create new entry without defining access roles.')
+      }
+      requiredRoles.forEach((requiredRole: any) => {
+        if (roles.find((role: any) => role == requiredRole) == undefined) {
+          throw new HttpErrors.Forbidden('Permission denied to create entry for group ' + requiredRole)
+        }
+      })
+    }
+
     private async addToHistory(snippet: M, user: UserProfile): Promise<void> {
       const historySnippet = await this.getHistorySnippet(snippet, user);
       const snippetCopy = _.omit(snippet, 'id');
       snippetCopy.parentId = historySnippet.id;
       snippetCopy.snippetType = 'updated';
       const baseSnippetRepository = await this.baseSnippetRepository();
-      await baseSnippetRepository.create(snippetCopy, {currentUser: user});
+      await baseSnippetRepository.create(snippetCopy, { currentUser: user });
     }
 
     private async getHistorySnippet(
@@ -73,8 +109,8 @@ function UpdateAndDeleteRepositoryMixin<
     ): Promise<Basesnippet> {
       const baseSnippetRepository = await this.baseSnippetRepository();
       let historySnippet = await baseSnippetRepository.findOne(
-        {where: {snippetType: 'history', parentId: snippet.id}},
-        {currentUser: user},
+        { where: { snippetType: 'history', parentId: snippet.id } },
+        { currentUser: user },
       );
 
       if (historySnippet == null) {
@@ -93,7 +129,7 @@ function UpdateAndDeleteRepositoryMixin<
         historySnippetPayload.snippetType = 'history';
         historySnippet = await baseSnippetRepository.create(
           historySnippetPayload,
-          {currentUser: user},
+          { currentUser: user },
         );
       }
       return historySnippet;
@@ -103,7 +139,7 @@ function UpdateAndDeleteRepositoryMixin<
       // Two steps:
       // 1. set snippet to 'deleted=true'
       // 2. inside websocket and after informing the clients, replace the parentId or delete the snippet
-      await this.updateById(id as ID, {deleted: true}, options);
+      await this.updateById(id as ID, { deleted: true }, options);
       const snippet = await this.findById(id, {}, options);
       if (snippet?.versionable) {
         if (snippet?.parentId) {
@@ -120,7 +156,7 @@ function UpdateAndDeleteRepositoryMixin<
           console.log('deleteById:parentHistory:', parentHistory);
           await this.updateById(
             id as ID,
-            {parentId: parentHistory.id},
+            { parentId: parentHistory.id },
             options,
           );
         }
@@ -130,13 +166,13 @@ function UpdateAndDeleteRepositoryMixin<
     }
 
     async restoreDeletedId(id: ID, user: UserProfile): Promise<void> {
-      const snippet = await this.findById(id, {}, {currentUser: user});
+      const snippet = await this.findById(id, {}, { currentUser: user });
       if (snippet?.deleted && snippet.parentId) {
         const baseSnippetRepository = await this.baseSnippetRepository();
         const historySnippet = await baseSnippetRepository.findById(
           snippet.parentId as unknown as ID,
           {},
-          {currentUser: user},
+          { currentUser: user },
         );
         const restoredSnippet = {
           deleted: false,
@@ -152,9 +188,9 @@ function UpdateAndDeleteRepositoryMixin<
 }
 
 function FindWithSearchRepositoryMixin<
-  M extends Entity & {id: ID; tags?: string[]},
+  M extends Entity & { id: ID; tags?: string[] },
   ID,
-  Relations extends {subsnippets: M},
+  Relations extends { subsnippets: M },
   R extends MixinTarget<DefaultCrudRepository<M, ID, Relations>>,
 >(superClass: R) {
   class Mixed extends superClass {
@@ -164,10 +200,10 @@ function FindWithSearchRepositoryMixin<
       filter?: Filter<M>,
     ): Promise<M[]> {
       const includeTags =
-        (filter?.fields as {[P in keyof M]: boolean})?.tags ?? false;
+        (filter?.fields as { [P in keyof M]: boolean })?.tags ?? false;
 
       delete filter?.fields;
-      const searchRegex = {regexp: new RegExp(`.*?${search}.*?`, 'i')};
+      const searchRegex = { regexp: new RegExp(`.*?${search}.*?`, 'i') };
       const commonSearchableFields = {
         textcontent: {
           regexp: new RegExp(
@@ -190,7 +226,7 @@ function FindWithSearchRepositoryMixin<
         ...commonSearchableFields,
         name: searchRegex,
         description: searchRegex,
-        id: {inq: withSubsnippets.map(s => s.id)},
+        id: { inq: withSubsnippets.map(s => s.id) },
       };
       const snippets = await this._searchForSnippets(
         filter,
@@ -252,7 +288,7 @@ function FindWithSearchRepositoryMixin<
         (filterCopy.include[subsnippetsIncludeIndex] as Inclusion).scope =
           includeFilter;
         withSubsnippets = await this.find(
-          {...filterCopy, fields: ['id']},
+          { ...filterCopy, fields: ['id'] },
           {
             currentUser: user,
           },
@@ -278,7 +314,7 @@ function FindWithSearchRepositoryMixin<
       return {
         or: Object.entries(commonSearchableFields).flatMap(([k, v]) => {
           if (!includeTags && k === 'tags') return [] as Where<M>;
-          return {[k]: v} as Where<M>;
+          return { [k]: v } as Where<M>;
         }),
       };
     }
@@ -332,7 +368,7 @@ function ExportRepositoryMixin<
           const parent = await this.findById(
             snippets[0].parentId as unknown as ID,
             filter,
-            {currentUser: user},
+            { currentUser: user },
           );
           job = {
             ownerGroup: parent.ownerGroup,
@@ -360,7 +396,7 @@ function ExportRepositoryMixin<
       const fs = require('fs');
       this.exportDir = basePath + jobEntity.id;
       if (!fs.existsSync(this.exportDir)) {
-        fs.mkdirSync(this.exportDir, {recursive: true});
+        fs.mkdirSync(this.exportDir, { recursive: true });
       }
 
       const exportService = await this.exportServiceGetter();
@@ -380,7 +416,7 @@ function ExportRepositoryMixin<
       response.download(downloadFile, (err, path = this.exportDir) => {
         console.log('file transferred successfully', err);
         if (path.includes(basePath)) {
-          fs.rmdirSync(path, {recursive: true});
+          fs.rmdirSync(path, { recursive: true });
         }
       });
       return response;

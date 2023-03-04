@@ -6,22 +6,22 @@ import {
   repository,
   Where,
 } from '@loopback/repository';
-import {post, param, get, patch, del, requestBody} from '@loopback/rest';
-import {View} from '../models';
-import {ViewRepository} from '../repositories';
-import {getModelSchemaRef} from '../utils/misc';
+import { post, param, get, patch, del, requestBody } from '@loopback/rest';
+import { View } from '../models';
+import { ViewRepository } from '../repositories';
+import { getModelSchemaRef } from '../utils/misc';
 
 export class ViewController {
   constructor(
     @repository(ViewRepository)
     public viewRepository: ViewRepository,
-  ) {}
+  ) { }
 
   @post('/views', {
     responses: {
       '200': {
         description: 'View model instance',
-        content: {'application/json': {schema: getModelSchemaRef(View)}},
+        content: { 'application/json': { schema: getModelSchemaRef(View) } },
       },
     },
   })
@@ -45,7 +45,7 @@ export class ViewController {
     responses: {
       '200': {
         description: 'View model count',
-        content: {'application/json': {schema: CountSchema}},
+        content: { 'application/json': { schema: CountSchema } },
       },
     },
   })
@@ -61,7 +61,7 @@ export class ViewController {
           'application/json': {
             schema: {
               type: 'array',
-              items: getModelSchemaRef(View, {includeRelations: true}),
+              items: getModelSchemaRef(View, { includeRelations: true }),
             },
           },
         },
@@ -76,7 +76,7 @@ export class ViewController {
     responses: {
       '200': {
         description: 'View PATCH success count',
-        content: {'application/json': {schema: CountSchema}},
+        content: { 'application/json': { schema: CountSchema } },
       },
     },
   })
@@ -84,7 +84,7 @@ export class ViewController {
     @requestBody({
       content: {
         'application/json': {
-          schema: getModelSchemaRef(View, {partial: true}),
+          schema: getModelSchemaRef(View, { partial: true }),
         },
       },
     })
@@ -100,7 +100,7 @@ export class ViewController {
         description: 'View model instance',
         content: {
           'application/json': {
-            schema: getModelSchemaRef(View, {includeRelations: true}),
+            schema: getModelSchemaRef(View, { includeRelations: true }),
           },
         },
       },
@@ -108,7 +108,7 @@ export class ViewController {
   })
   async findById(
     @param.path.string('id') id: string,
-    @param.filter(View, {exclude: 'where'}) filter?: FilterExcludingWhere<View>,
+    @param.filter(View, { exclude: 'where' }) filter?: FilterExcludingWhere<View>,
   ): Promise<View> {
     return this.viewRepository.findById(id, filter);
   }
@@ -125,7 +125,7 @@ export class ViewController {
     @requestBody({
       content: {
         'application/json': {
-          schema: getModelSchemaRef(View, {partial: true}),
+          schema: getModelSchemaRef(View, { partial: true }),
         },
       },
     })

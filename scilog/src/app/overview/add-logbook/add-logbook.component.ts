@@ -2,7 +2,7 @@ import { Component, ElementRef, Inject, Input, OnInit, ViewChild } from '@angula
 import { AbstractControl, UntypedFormBuilder, UntypedFormControl, UntypedFormGroup, ValidatorFn, Validators } from '@angular/forms';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { Observable, Subscription } from 'rxjs';
-import { CompactType, DisplayGrid, GridsterConfig, GridsterItem,GridType } from 'angular-gridster2';
+import { CompactType, DisplayGrid, GridsterConfig, GridsterItem, GridType } from 'angular-gridster2';
 import { COMMA, ENTER, SPACE } from '@angular/cdk/keycodes';
 import { MatAutocompleteSelectedEvent, MatAutocomplete } from '@angular/material/autocomplete';
 import { MatChipInputEvent } from '@angular/material/chips';
@@ -133,7 +133,7 @@ export class AddLogbookComponent implements OnInit {
     this.setDefaults();
   }
 
-  setDefaults(){
+  setDefaults() {
     if (this.logbook) {
       this.optionsFormGroup.get('title').setValue(this.logbook.name);
       this.optionsFormGroup.get('description').setValue(this.logbook.description);
@@ -148,7 +148,12 @@ export class AddLogbookComponent implements OnInit {
       console.log("editing existing logbook");
     }
 
-    this.accessGroupsAvail = this.userPreferences.userInfo?.roles;
+    let roles = [...this.userPreferences.userInfo?.roles];
+    let index = roles.indexOf('any-authenticated-user');
+    if (index !== -1) {
+      roles.splice(index, 1);
+    }
+    this.accessGroupsAvail = roles;
     this.filteredAccessGroups = this.accessGroupsCtrl.valueChanges.pipe(startWith(null), map((accessGroup: string | null) => accessGroup ? this._filter(accessGroup) : this.accessGroupsAvail.slice()));
     this.filteredOwnerGroups = this.optionsFormGroup.get('ownerGroup').valueChanges.pipe(startWith(null), map((accessGroup: string | null) => accessGroup ? this._filter(accessGroup) : this.accessGroupsAvail.slice()));
     this.optionsFormGroup.get('ownerGroup').setValidators([ownerGroupMemberValidator(this.accessGroupsAvail)]);
@@ -160,9 +165,9 @@ export class AddLogbookComponent implements OnInit {
 
   }
 
-  async getLocations(){
+  async getLocations() {
     let data = await this.logbookDataService.getLocations();
-    if (data.length > 0){
+    if (data.length > 0) {
       this.availLocations = data[0].subsnippets;
     }
   }
@@ -196,9 +201,9 @@ export class AddLogbookComponent implements OnInit {
     if (this.optionsFormGroup.invalid) {
       console.log("form invalid")
       for (const key in this.optionsFormGroup.controls) {
-          if (this.optionsFormGroup.get(key).invalid){
-            this.optionsFormGroup.get(key).setErrors({'required': true});
-          }
+        if (this.optionsFormGroup.get(key).invalid) {
+          this.optionsFormGroup.get(key).setErrors({ 'required': true });
+        }
       }
       return;
     }
@@ -217,14 +222,14 @@ export class AddLogbookComponent implements OnInit {
       description: this.optionsFormGroup.get('description').value
     }
 
-    let fileData: {id: string};
+    let fileData: { id: string };
     // now that we have the id, let's upload the image
     if (this.uploadThumbnailFile != null) {
       // upload selected file
       let formData = new FormData();
       let filenameStorage: string = this.logbook.id + "." + this.uploadThumbnailFile.name.split('.').pop();
       if (this.logbook.ownerGroup)
-        formData.append('fields', JSON.stringify({accessGroups: [this.logbook.ownerGroup]}))
+        formData.append('fields', JSON.stringify({ accessGroups: [this.logbook.ownerGroup] }))
       formData.append('file', this.uploadThumbnailFile);
       fileData = await this.logbookDataService.uploadLogbookThumbnail(formData);
     }

@@ -6,17 +6,17 @@ import {
   repository,
   Where,
 } from '@loopback/repository';
-import {post, param, get, patch, del, requestBody} from '@loopback/rest';
-import {Location} from '../models';
-import {LocationRepository} from '../repositories';
+import { post, param, get, patch, del, requestBody } from '@loopback/rest';
+import { Location } from '../models';
+import { LocationRepository } from '../repositories';
 
-import {authenticate} from '@loopback/authentication';
-import {authorize} from '@loopback/authorization';
-import {basicAuthorization} from '../services/basic.authorizor';
-import {OPERATION_SECURITY_SPEC} from '../utils/security-spec';
-import {SecurityBindings, UserProfile} from '@loopback/security';
-import {inject} from '@loopback/core';
-import {getModelSchemaRef} from '../utils/misc';
+import { authenticate } from '@loopback/authentication';
+import { authorize } from '@loopback/authorization';
+import { basicAuthorization } from '../services/basic.authorizor';
+import { OPERATION_SECURITY_SPEC } from '../utils/security-spec';
+import { SecurityBindings, UserProfile } from '@loopback/security';
+import { inject } from '@loopback/core';
+import { getModelSchemaRef } from '../utils/misc';
 
 @authenticate('jwt')
 @authorize({
@@ -28,14 +28,14 @@ export class LocationController {
     @inject(SecurityBindings.USER) private user: UserProfile,
     @repository(LocationRepository)
     public locationRepository: LocationRepository,
-  ) {}
+  ) { }
 
   @post('/locations', {
     security: OPERATION_SECURITY_SPEC,
     responses: {
       '200': {
         description: 'Location model instance',
-        content: {'application/json': {schema: getModelSchemaRef(Location)}},
+        content: { 'application/json': { schema: getModelSchemaRef(Location) } },
       },
     },
   })
@@ -52,7 +52,7 @@ export class LocationController {
     })
     location: Omit<Location, 'id'>,
   ): Promise<Location> {
-    return this.locationRepository.create(location, {currentUser: this.user});
+    return this.locationRepository.authorizedCreate(location, { currentUser: this.user });
   }
 
   @get('/locations/count', {
@@ -60,12 +60,12 @@ export class LocationController {
     responses: {
       '200': {
         description: 'Location model count',
-        content: {'application/json': {schema: CountSchema}},
+        content: { 'application/json': { schema: CountSchema } },
       },
     },
   })
   async count(@param.where(Location) where?: Where<Location>): Promise<Count> {
-    return this.locationRepository.count(where, {currentUser: this.user});
+    return this.locationRepository.count(where, { currentUser: this.user });
   }
 
   @get('/locations/search={search}', {
@@ -77,7 +77,7 @@ export class LocationController {
           'application/json': {
             schema: {
               type: 'array',
-              items: getModelSchemaRef(Location, {includeRelations: true}),
+              items: getModelSchemaRef(Location, { includeRelations: true }),
             },
           },
         },
@@ -104,7 +104,7 @@ export class LocationController {
           'Find the index (i.e position) of a location within a query.',
         content: {
           'application/json': {
-            schema: {type: 'number'},
+            schema: { type: 'number' },
           },
         },
       },
@@ -126,7 +126,7 @@ export class LocationController {
           'application/json': {
             schema: {
               type: 'array',
-              items: getModelSchemaRef(Location, {includeRelations: true}),
+              items: getModelSchemaRef(Location, { includeRelations: true }),
             },
           },
         },
@@ -136,7 +136,7 @@ export class LocationController {
   async find(
     @param.filter(Location) filter?: Filter<Location>,
   ): Promise<Location[]> {
-    return this.locationRepository.find(filter, {currentUser: this.user});
+    return this.locationRepository.find(filter, { currentUser: this.user });
   }
 
   @patch('/locations', {
@@ -144,7 +144,7 @@ export class LocationController {
     responses: {
       '200': {
         description: 'Location PATCH success count',
-        content: {'application/json': {schema: CountSchema}},
+        content: { 'application/json': { schema: CountSchema } },
       },
     },
   })
@@ -152,7 +152,7 @@ export class LocationController {
     @requestBody({
       content: {
         'application/json': {
-          schema: getModelSchemaRef(Location, {partial: true}),
+          schema: getModelSchemaRef(Location, { partial: true }),
         },
       },
     })
@@ -171,7 +171,7 @@ export class LocationController {
         description: 'Location model instance',
         content: {
           'application/json': {
-            schema: getModelSchemaRef(Location, {includeRelations: true}),
+            schema: getModelSchemaRef(Location, { includeRelations: true }),
           },
         },
       },
@@ -179,7 +179,7 @@ export class LocationController {
   })
   async findById(
     @param.path.string('id') id: string,
-    @param.filter(Location, {exclude: 'where'})
+    @param.filter(Location, { exclude: 'where' })
     filter?: FilterExcludingWhere<Location>,
   ): Promise<Location> {
     return this.locationRepository.findById(id, filter, {
@@ -200,7 +200,7 @@ export class LocationController {
     @requestBody({
       content: {
         'application/json': {
-          schema: getModelSchemaRef(Location, {partial: true}),
+          schema: getModelSchemaRef(Location, { partial: true }),
         },
       },
     })

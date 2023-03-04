@@ -15,12 +15,12 @@ import {
   del,
   requestBody,
 } from '@loopback/rest';
-import {UserPreference} from '../models';
-import {UserPreferenceRepository} from '../repositories';
-import {authenticate} from '@loopback/authentication';
-import {authorize} from '@loopback/authorization';
-import {basicAuthorization} from '../services/basic.authorizor';
-import {OPERATION_SECURITY_SPEC} from '../utils/security-spec';
+import { UserPreference } from '../models';
+import { UserPreferenceRepository } from '../repositories';
+import { authenticate } from '@loopback/authentication';
+import { authorize } from '@loopback/authorization';
+import { basicAuthorization } from '../services/basic.authorizor';
+import { OPERATION_SECURITY_SPEC } from '../utils/security-spec';
 @authenticate('jwt')
 @authorize({
   allowedRoles: ['any-authenticated-user'],
@@ -30,7 +30,7 @@ export class UserPreferenceController {
   constructor(
     @repository(UserPreferenceRepository)
     public userPreferenceRepository: UserPreferenceRepository,
-  ) {}
+  ) { }
 
   @post('/user-preferences', {
     security: OPERATION_SECURITY_SPEC,
@@ -38,7 +38,7 @@ export class UserPreferenceController {
       '200': {
         description: 'UserPreference model instance',
         content: {
-          'application/json': {schema: getModelSchemaRef(UserPreference)},
+          'application/json': { schema: getModelSchemaRef(UserPreference) },
         },
       },
     },
@@ -64,7 +64,7 @@ export class UserPreferenceController {
     responses: {
       '200': {
         description: 'UserPreference model count',
-        content: {'application/json': {schema: CountSchema}},
+        content: { 'application/json': { schema: CountSchema } },
       },
     },
   })
@@ -103,7 +103,7 @@ export class UserPreferenceController {
     responses: {
       '200': {
         description: 'UserPreference PATCH success count',
-        content: {'application/json': {schema: CountSchema}},
+        content: { 'application/json': { schema: CountSchema } },
       },
     },
   })
@@ -111,7 +111,7 @@ export class UserPreferenceController {
     @requestBody({
       content: {
         'application/json': {
-          schema: getModelSchemaRef(UserPreference, {partial: true}),
+          schema: getModelSchemaRef(UserPreference, { partial: true }),
         },
       },
     })
@@ -128,7 +128,7 @@ export class UserPreferenceController {
         description: 'UserPreference model instance',
         content: {
           'application/json': {
-            schema: getModelSchemaRef(UserPreference, {includeRelations: true}),
+            schema: getModelSchemaRef(UserPreference, { includeRelations: true }),
           },
         },
       },
@@ -136,7 +136,7 @@ export class UserPreferenceController {
   })
   async findById(
     @param.path.string('id') id: string,
-    @param.filter(UserPreference, {exclude: 'where'})
+    @param.filter(UserPreference, { exclude: 'where' })
     filter?: FilterExcludingWhere<UserPreference>,
   ): Promise<UserPreference> {
     return this.userPreferenceRepository.findById(id, filter);
@@ -155,7 +155,7 @@ export class UserPreferenceController {
     @requestBody({
       content: {
         'application/json': {
-          schema: getModelSchemaRef(UserPreference, {partial: true}),
+          schema: getModelSchemaRef(UserPreference, { partial: true }),
         },
       },
     })

@@ -6,17 +6,17 @@ import {
   repository,
   Where,
 } from '@loopback/repository';
-import {post, param, get, patch, del, requestBody} from '@loopback/rest';
-import {Paragraph} from '../models';
-import {ParagraphRepository} from '../repositories';
+import { post, param, get, patch, del, requestBody } from '@loopback/rest';
+import { Paragraph } from '../models';
+import { ParagraphRepository } from '../repositories';
 
-import {authenticate} from '@loopback/authentication';
-import {authorize} from '@loopback/authorization';
-import {basicAuthorization} from '../services/basic.authorizor';
-import {OPERATION_SECURITY_SPEC} from '../utils/security-spec';
-import {SecurityBindings, UserProfile} from '@loopback/security';
-import {inject} from '@loopback/core';
-import {getModelSchemaRef} from '../utils/misc';
+import { authenticate } from '@loopback/authentication';
+import { authorize } from '@loopback/authorization';
+import { basicAuthorization } from '../services/basic.authorizor';
+import { OPERATION_SECURITY_SPEC } from '../utils/security-spec';
+import { SecurityBindings, UserProfile } from '@loopback/security';
+import { inject } from '@loopback/core';
+import { getModelSchemaRef } from '../utils/misc';
 
 @authenticate('jwt')
 @authorize({
@@ -28,14 +28,14 @@ export class ParagraphController {
     @inject(SecurityBindings.USER) private user: UserProfile,
     @repository(ParagraphRepository)
     public paragraphRepository: ParagraphRepository,
-  ) {}
+  ) { }
 
   @post('/paragraphs', {
     security: OPERATION_SECURITY_SPEC,
     responses: {
       '200': {
         description: 'Paragraph model instance',
-        content: {'application/json': {schema: getModelSchemaRef(Paragraph)}},
+        content: { 'application/json': { schema: getModelSchemaRef(Paragraph) } },
       },
     },
   })
@@ -52,7 +52,7 @@ export class ParagraphController {
     })
     paragraph: Omit<Paragraph, 'id'>,
   ): Promise<Paragraph> {
-    return this.paragraphRepository.create(paragraph, {currentUser: this.user});
+    return this.paragraphRepository.authorizedCreate(paragraph, { currentUser: this.user });
   }
 
   @get('/paragraphs/count', {
@@ -60,14 +60,14 @@ export class ParagraphController {
     responses: {
       '200': {
         description: 'Paragraph model count',
-        content: {'application/json': {schema: CountSchema}},
+        content: { 'application/json': { schema: CountSchema } },
       },
     },
   })
   async count(
     @param.where(Paragraph) where?: Where<Paragraph>,
   ): Promise<Count> {
-    return this.paragraphRepository.count(where, {currentUser: this.user});
+    return this.paragraphRepository.count(where, { currentUser: this.user });
   }
 
   @get('/paragraphs/search={search}', {
@@ -79,7 +79,7 @@ export class ParagraphController {
           'application/json': {
             schema: {
               type: 'array',
-              items: getModelSchemaRef(Paragraph, {includeRelations: true}),
+              items: getModelSchemaRef(Paragraph, { includeRelations: true }),
             },
           },
         },
@@ -106,7 +106,7 @@ export class ParagraphController {
           'Find the index (i.e position) of a paragraph within a query.',
         content: {
           'application/json': {
-            schema: {type: 'number'},
+            schema: { type: 'number' },
           },
         },
       },
@@ -128,7 +128,7 @@ export class ParagraphController {
           'application/json': {
             schema: {
               type: 'array',
-              items: getModelSchemaRef(Paragraph, {includeRelations: true}),
+              items: getModelSchemaRef(Paragraph, { includeRelations: true }),
             },
           },
         },
@@ -138,7 +138,7 @@ export class ParagraphController {
   async find(
     @param.filter(Paragraph) filter?: Filter<Paragraph>,
   ): Promise<Paragraph[]> {
-    return this.paragraphRepository.find(filter, {currentUser: this.user});
+    return this.paragraphRepository.find(filter, { currentUser: this.user });
   }
 
   @patch('/paragraphs', {
@@ -146,7 +146,7 @@ export class ParagraphController {
     responses: {
       '200': {
         description: 'Paragraph PATCH success count',
-        content: {'application/json': {schema: CountSchema}},
+        content: { 'application/json': { schema: CountSchema } },
       },
     },
   })
@@ -154,7 +154,7 @@ export class ParagraphController {
     @requestBody({
       content: {
         'application/json': {
-          schema: getModelSchemaRef(Paragraph, {partial: true}),
+          schema: getModelSchemaRef(Paragraph, { partial: true }),
         },
       },
     })
@@ -173,7 +173,7 @@ export class ParagraphController {
         description: 'Paragraph model instance',
         content: {
           'application/json': {
-            schema: getModelSchemaRef(Paragraph, {includeRelations: true}),
+            schema: getModelSchemaRef(Paragraph, { includeRelations: true }),
           },
         },
       },
@@ -181,7 +181,7 @@ export class ParagraphController {
   })
   async findById(
     @param.path.string('id') id: string,
-    @param.filter(Paragraph, {exclude: 'where'})
+    @param.filter(Paragraph, { exclude: 'where' })
     filter?: FilterExcludingWhere<Paragraph>,
   ): Promise<Paragraph> {
     return this.paragraphRepository.findById(id, filter, {
@@ -202,7 +202,7 @@ export class ParagraphController {
     @requestBody({
       content: {
         'application/json': {
-          schema: getModelSchemaRef(Paragraph, {partial: true}),
+          schema: getModelSchemaRef(Paragraph, { partial: true }),
         },
       },
     })
