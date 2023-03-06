@@ -23,6 +23,7 @@ services:
     volumes:
       - ./sci-log-db:/home/node/app
       - ./config/be/oidc.json:/home/node/app/oidc.json
+      - ./config/be/datasource.json:/home/node/app/datasource.json
       # - ./config/be/roles.js:/home/node/app/dist/authentication-strategies/roles.js
       - ./sci-log-db/functionalAccounts-example.json:/home/node/app/functionalAccounts.json
       - /home/node/app/node_modules
