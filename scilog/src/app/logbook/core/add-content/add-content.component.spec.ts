@@ -116,6 +116,12 @@ describe('AddContentComponent', () => {
     expect(component.addButtonLabel).toBe("Done");
   });
 
+  it('should get data from editor before sending', () => {
+    component.setupComponent();
+    component.editor = jasmine.createSpyObj("component.editor", ["getData"])
+    component.addContent("");
+    expect(component.editor.getData).toHaveBeenCalled();
+  })
 
   it('should prepare quote', () => {
     let quoted_snippet = {
