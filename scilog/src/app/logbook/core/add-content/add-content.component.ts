@@ -47,6 +47,7 @@ export class AddContentComponent implements OnInit {
   initialized: boolean = false;
   prel_fileStorage: any[] = [];
   config: any = [];
+  editor: any;
 
   constructor(
     private dataService: AddContentService,
@@ -128,24 +129,30 @@ export class AddContentComponent implements OnInit {
     return;
   }
 
-  onEditorReady($event: any) {
-    console.log(Array.from($event.ui.componentFactory.names()));
-    $event.ui.getEditableElement().parentElement.insertBefore(
-      $event.ui.view.toolbar.element,
-      $event.ui.getEditableElement()
+  onEditorReady(editor: any) {
+    console.log(Array.from(editor.ui.componentFactory.names()));
+    editor.ui.getEditableElement().parentElement.insertBefore(
+      editor.ui.view.toolbar.element,
+      editor.ui.getEditableElement()
     );
-    $event.plugins.get('FileRepository').createUploadAdapter = (loader) => {
+    editor.plugins.get('FileRepository').createUploadAdapter = (loader) => {
       return new CK5ImageUploadAdapter(loader, this.httpClient);
     };
-    $event.editing.view.focus();
+    editor.editing.view.focus();
+    this.editor = editor;
   };
 
   addContent($event: any) {
     console.log("adding new content");
-    if (!this.liveFeedback) {
-      this.prepareMessage(this.data);
-      this.sendMessage();
+    if (this.liveFeedback) {
+      return;
     }
+
+    if (this.editor != undefined) {
+      this.data = this.editor.getData();
+    }
+    this.prepareMessage(this.data);
+    this.sendMessage();
   };
 
   onChange({ editor }: ChangeEvent) {
