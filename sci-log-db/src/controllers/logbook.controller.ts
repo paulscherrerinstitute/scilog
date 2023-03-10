@@ -1,6 +1,6 @@
-import {authenticate} from '@loopback/authentication';
-import {authorize} from '@loopback/authorization';
-import {inject} from '@loopback/core';
+import { authenticate } from '@loopback/authentication';
+import { authorize } from '@loopback/authorization';
+import { inject } from '@loopback/core';
 import {
   Count,
   CountSchema,
@@ -9,13 +9,13 @@ import {
   repository,
   Where,
 } from '@loopback/repository';
-import {del, get, param, patch, post, requestBody} from '@loopback/rest';
-import {SecurityBindings, UserProfile} from '@loopback/security';
-import {Logbook} from '../models';
-import {LogbookRepository} from '../repositories';
-import {basicAuthorization} from '../services/basic.authorizor';
-import {getModelSchemaRef} from '../utils/misc';
-import {OPERATION_SECURITY_SPEC} from '../utils/security-spec';
+import { del, get, param, patch, post, requestBody } from '@loopback/rest';
+import { SecurityBindings, UserProfile } from '@loopback/security';
+import { Logbook } from '../models';
+import { LogbookRepository } from '../repositories';
+import { basicAuthorization } from '../services/basic.authorizor';
+import { getModelSchemaRef } from '../utils/misc';
+import { OPERATION_SECURITY_SPEC } from '../utils/security-spec';
 
 @authenticate('jwt')
 @authorize({
@@ -27,14 +27,14 @@ export class LogbookController {
     @inject(SecurityBindings.USER) private user: UserProfile,
     @repository(LogbookRepository)
     public logbookRepository: LogbookRepository,
-  ) {}
+  ) { }
 
   @post('/logbooks', {
     security: OPERATION_SECURITY_SPEC,
     responses: {
       '200': {
         description: 'Logbook model instance',
-        content: {'application/json': {schema: getModelSchemaRef(Logbook)}},
+        content: { 'application/json': { schema: getModelSchemaRef(Logbook) } },
       },
     },
   })
@@ -51,7 +51,7 @@ export class LogbookController {
     })
     logbook: Omit<Logbook, 'id'>,
   ): Promise<Logbook> {
-    return this.logbookRepository.create(logbook, {currentUser: this.user});
+    return this.logbookRepository.authorizedCreate(logbook, { currentUser: this.user });
   }
 
   @get('/logbooks/count', {
@@ -59,12 +59,12 @@ export class LogbookController {
     responses: {
       '200': {
         description: 'Logbook model count',
-        content: {'application/json': {schema: CountSchema}},
+        content: { 'application/json': { schema: CountSchema } },
       },
     },
   })
   async count(@param.where(Logbook) where?: Where<Logbook>): Promise<Count> {
-    return this.logbookRepository.count(where, {currentUser: this.user});
+    return this.logbookRepository.count(where, { currentUser: this.user });
   }
   @get('/logbooks/search={search}', {
     security: OPERATION_SECURITY_SPEC,
@@ -75,7 +75,7 @@ export class LogbookController {
           'application/json': {
             schema: {
               type: 'array',
-              items: getModelSchemaRef(Logbook, {includeRelations: true}),
+              items: getModelSchemaRef(Logbook, { includeRelations: true }),
             },
           },
         },
@@ -102,7 +102,7 @@ export class LogbookController {
           'Find the index (i.e position) of a logbook within a query.',
         content: {
           'application/json': {
-            schema: {type: 'number'},
+            schema: { type: 'number' },
           },
         },
       },
@@ -124,7 +124,7 @@ export class LogbookController {
           'application/json': {
             schema: {
               type: 'array',
-              items: getModelSchemaRef(Logbook, {includeRelations: true}),
+              items: getModelSchemaRef(Logbook, { includeRelations: true }),
             },
           },
         },
@@ -134,7 +134,7 @@ export class LogbookController {
   async find(
     @param.filter(Logbook) filter?: Filter<Logbook>,
   ): Promise<Logbook[]> {
-    return this.logbookRepository.find(filter, {currentUser: this.user});
+    return this.logbookRepository.find(filter, { currentUser: this.user });
   }
 
   @patch('/logbooks', {
@@ -142,7 +142,7 @@ export class LogbookController {
     responses: {
       '200': {
         description: 'Logbook PATCH success count',
-        content: {'application/json': {schema: CountSchema}},
+        content: { 'application/json': { schema: CountSchema } },
       },
     },
   })
@@ -150,7 +150,7 @@ export class LogbookController {
     @requestBody({
       content: {
         'application/json': {
-          schema: getModelSchemaRef(Logbook, {partial: true}),
+          schema: getModelSchemaRef(Logbook, { partial: true }),
         },
       },
     })
@@ -169,7 +169,7 @@ export class LogbookController {
         description: 'Logbook model instance',
         content: {
           'application/json': {
-            schema: getModelSchemaRef(Logbook, {includeRelations: true}),
+            schema: getModelSchemaRef(Logbook, { includeRelations: true }),
           },
         },
       },
@@ -177,7 +177,7 @@ export class LogbookController {
   })
   async findById(
     @param.path.string('id') id: string,
-    @param.filter(Logbook, {exclude: 'where'})
+    @param.filter(Logbook, { exclude: 'where' })
     filter?: FilterExcludingWhere<Logbook>,
   ): Promise<Logbook> {
     return this.logbookRepository.findById(id, filter, {
@@ -198,7 +198,7 @@ export class LogbookController {
     @requestBody({
       content: {
         'application/json': {
-          schema: getModelSchemaRef(Logbook, {partial: true}),
+          schema: getModelSchemaRef(Logbook, { partial: true }),
         },
       },
     })

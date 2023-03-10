@@ -1,7 +1,7 @@
-import {Client, expect} from '@loopback/testlab';
-import {Suite} from 'mocha';
-import {SciLogDbApplication} from '../..';
-import {clearDatabase, createUserToken, setupApplication} from './test-helper';
+import { Client, expect } from '@loopback/testlab';
+import { Suite } from 'mocha';
+import { SciLogDbApplication } from '../..';
+import { clearDatabase, createUserToken, setupApplication } from './test-helper';
 
 describe('TaskRepositorySnippet', function (this: Suite) {
   this.timeout(5000);
@@ -15,7 +15,7 @@ describe('TaskRepositorySnippet', function (this: Suite) {
     readACL: ['taskAcceptance'],
     updateACL: ['taskAcceptance'],
     deleteACL: ['taskAcceptance'],
-    adminACL: ['admin'],
+    adminACL: ['taskAcceptance'],
     shareACL: ['taskAcceptance'],
     isPrivate: true,
     defaultOrder: 0,
@@ -26,7 +26,7 @@ describe('TaskRepositorySnippet', function (this: Suite) {
   };
 
   before('setupApplication', async () => {
-    ({app, client} = await setupApplication());
+    ({ app, client } = await setupApplication());
     await clearDatabase(app);
     token = await createUserToken(app, client, ['taskAcceptance']);
   });
@@ -57,6 +57,30 @@ describe('TaskRepositorySnippet', function (this: Suite) {
       .catch(err => {
         throw err;
       });
+  });
+
+  it('post a task with authentication should return 403 if taskSnippets permission are invalid', async () => {
+    const taskSnippetInvalid = {
+      ownerGroup: 'taskAcceptance',
+      createACL: ['taskAcceptance'],
+      readACL: ['taskAcceptance'],
+      updateACL: ['taskAcceptance'],
+      deleteACL: ['taskAcceptance'],
+      adminACL: ['admin'],
+      shareACL: ['taskAcceptance'],
+      isPrivate: true,
+      defaultOrder: 0,
+      expiresAt: '2055-10-10T14:04:19.522Z',
+      tags: ['aSearchableTag'],
+      dashboardName: 'string',
+      versionable: true,
+    };
+    await client
+      .post('/tasks')
+      .set('Authorization', 'Bearer ' + token)
+      .set('Content-Type', 'application/json')
+      .send(taskSnippetInvalid)
+      .expect(403);
   });
 
   it('count snippet without token should return 401', async () => {
@@ -125,7 +149,7 @@ describe('TaskRepositorySnippet', function (this: Suite) {
     await client
       .patch('/tasks/')
       .set('Content-Type', 'application/json')
-      .send({dashboardName: 'aNewName'})
+      .send({ dashboardName: 'aNewName' })
       .expect(401);
   });
 
@@ -134,7 +158,7 @@ describe('TaskRepositorySnippet', function (this: Suite) {
       .patch('/tasks')
       .set('Authorization', 'Bearer ' + token)
       .set('Content-Type', 'application/json')
-      .send({dashboardName: 'aNewName'})
+      .send({ dashboardName: 'aNewName' })
       .expect(200)
       .then(result => expect(result.body.count).to.be.eql(1))
       .catch(err => {
@@ -162,7 +186,7 @@ describe('TaskRepositorySnippet', function (this: Suite) {
   });
 
   it('Search index with token should return 200 and matching body.tags', async () => {
-    const includeTags = {fields: {tags: true}, include: ['subsnippets']};
+    const includeTags = { fields: { tags: true }, include: ['subsnippets'] };
     await client
       .get(`/tasks/search=aSearchabletag?filter=${JSON.stringify(includeTags)}`)
       .set('Authorization', 'Bearer ' + token)
@@ -205,7 +229,7 @@ describe('TaskRepositorySnippet', function (this: Suite) {
   });
 
   it('Search index with token should return 200 and empty result', async () => {
-    const includeTags = {fields: {tags: true}};
+    const includeTags = { fields: { tags: true } };
     await client
       .get(`/tasks/search=aSearchabletag?filter=${JSON.stringify(includeTags)}`)
       .set('Authorization', 'Bearer ' + token)

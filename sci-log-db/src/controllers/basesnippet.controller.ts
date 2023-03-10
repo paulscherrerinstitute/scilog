@@ -1,6 +1,6 @@
-import {authenticate} from '@loopback/authentication';
-import {authorize} from '@loopback/authorization';
-import {inject} from '@loopback/core';
+import { authenticate } from '@loopback/authentication';
+import { authorize } from '@loopback/authorization';
+import { inject } from '@loopback/core';
 import {
   Count,
   CountSchema,
@@ -19,12 +19,12 @@ import {
   Response,
   RestBindings,
 } from '@loopback/rest';
-import {SecurityBindings, UserProfile} from '@loopback/security';
-import {Basesnippet} from '../models';
-import {BasesnippetRepository} from '../repositories';
-import {basicAuthorization} from '../services/basic.authorizor';
-import {getModelSchemaRef} from '../utils/misc';
-import {OPERATION_SECURITY_SPEC} from '../utils/security-spec';
+import { SecurityBindings, UserProfile } from '@loopback/security';
+import { Basesnippet } from '../models';
+import { BasesnippetRepository } from '../repositories';
+import { basicAuthorization } from '../services/basic.authorizor';
+import { getModelSchemaRef } from '../utils/misc';
+import { OPERATION_SECURITY_SPEC } from '../utils/security-spec';
 
 @authenticate('jwt')
 @authorize({
@@ -38,14 +38,14 @@ export class BasesnippetController {
     @inject(SecurityBindings.USER) private user: UserProfile,
     @repository(BasesnippetRepository)
     public basesnippetRepository: BasesnippetRepository,
-  ) {}
+  ) { }
 
   @post('/basesnippets', {
     security: OPERATION_SECURITY_SPEC,
     responses: {
       '200': {
         description: 'Basesnippet model instance',
-        content: {'application/json': {schema: getModelSchemaRef(Basesnippet)}},
+        content: { 'application/json': { schema: getModelSchemaRef(Basesnippet) } },
       },
     },
   })
@@ -62,7 +62,7 @@ export class BasesnippetController {
     })
     basesnippet: Omit<Basesnippet, 'id'>,
   ): Promise<Basesnippet> {
-    return this.basesnippetRepository.create(basesnippet, {
+    return this.basesnippetRepository.authorizedCreate(basesnippet, {
       currentUser: this.user,
     });
   }
@@ -72,14 +72,14 @@ export class BasesnippetController {
     responses: {
       '200': {
         description: 'Basesnippet model count',
-        content: {'application/json': {schema: CountSchema}},
+        content: { 'application/json': { schema: CountSchema } },
       },
     },
   })
   async count(
     @param.where(Basesnippet) where?: Where<Basesnippet>,
   ): Promise<Count> {
-    return this.basesnippetRepository.count(where, {currentUser: this.user});
+    return this.basesnippetRepository.count(where, { currentUser: this.user });
   }
 
   @get('/basesnippets', {
@@ -91,7 +91,7 @@ export class BasesnippetController {
           'application/json': {
             schema: {
               type: 'array',
-              items: getModelSchemaRef(Basesnippet, {includeRelations: true}),
+              items: getModelSchemaRef(Basesnippet, { includeRelations: true }),
             },
           },
         },
@@ -101,7 +101,7 @@ export class BasesnippetController {
   async find(
     @param.filter(Basesnippet) filter?: Filter<Basesnippet>,
   ): Promise<Basesnippet[]> {
-    return this.basesnippetRepository.find(filter, {currentUser: this.user});
+    return this.basesnippetRepository.find(filter, { currentUser: this.user });
   }
 
   @get('/basesnippets/export={exportType}', {
@@ -113,7 +113,7 @@ export class BasesnippetController {
           'application/json': {
             schema: {
               type: 'array',
-              items: getModelSchemaRef(Basesnippet, {includeRelations: true}),
+              items: getModelSchemaRef(Basesnippet, { includeRelations: true }),
             },
           },
         },
@@ -143,7 +143,7 @@ export class BasesnippetController {
           'Find the index (i.e position) of a basesnippet within a query.',
         content: {
           'application/json': {
-            schema: {type: 'number'},
+            schema: { type: 'number' },
           },
         },
       },
@@ -165,7 +165,7 @@ export class BasesnippetController {
           'application/json': {
             schema: {
               type: 'array',
-              items: getModelSchemaRef(Basesnippet, {includeRelations: true}),
+              items: getModelSchemaRef(Basesnippet, { includeRelations: true }),
             },
           },
         },
@@ -189,7 +189,7 @@ export class BasesnippetController {
     responses: {
       '200': {
         description: 'Basesnippet PATCH success count',
-        content: {'application/json': {schema: CountSchema}},
+        content: { 'application/json': { schema: CountSchema } },
       },
     },
   })
@@ -197,7 +197,7 @@ export class BasesnippetController {
     @requestBody({
       content: {
         'application/json': {
-          schema: getModelSchemaRef(Basesnippet, {partial: true}),
+          schema: getModelSchemaRef(Basesnippet, { partial: true }),
         },
       },
     })
@@ -216,7 +216,7 @@ export class BasesnippetController {
         description: 'Basesnippet model instance',
         content: {
           'application/json': {
-            schema: getModelSchemaRef(Basesnippet, {includeRelations: true}),
+            schema: getModelSchemaRef(Basesnippet, { includeRelations: true }),
           },
         },
       },
@@ -224,7 +224,7 @@ export class BasesnippetController {
   })
   async findById(
     @param.path.string('id') id: string,
-    @param.filter(Basesnippet, {exclude: 'where'})
+    @param.filter(Basesnippet, { exclude: 'where' })
     filter?: FilterExcludingWhere<Basesnippet>,
   ): Promise<Basesnippet> {
     return this.basesnippetRepository.findById(id, filter, {
@@ -245,7 +245,7 @@ export class BasesnippetController {
     @requestBody({
       content: {
         'application/json': {
-          schema: getModelSchemaRef(Basesnippet, {partial: true}),
+          schema: getModelSchemaRef(Basesnippet, { partial: true }),
         },
       },
     })

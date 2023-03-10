@@ -1,6 +1,6 @@
-import {authenticate} from '@loopback/authentication';
-import {authorize} from '@loopback/authorization';
-import {inject} from '@loopback/core';
+import { authenticate } from '@loopback/authentication';
+import { authorize } from '@loopback/authorization';
+import { inject } from '@loopback/core';
 import {
   Count,
   CountSchema,
@@ -22,20 +22,20 @@ import {
   Response,
   RestBindings,
 } from '@loopback/rest';
-import {SecurityBindings, UserProfile} from '@loopback/security';
+import { SecurityBindings, UserProfile } from '@loopback/security';
 import formidable from 'formidable';
 import fs from 'fs';
 import _ from 'lodash';
-import {STORAGE_DIRECTORY} from '../keys';
-import {Filesnippet} from '../models/file.model';
-import {FileRepository} from '../repositories/file.repository';
-import {basicAuthorization} from '../services/basic.authorizor';
+import { STORAGE_DIRECTORY } from '../keys';
+import { Filesnippet } from '../models/file.model';
+import { FileRepository } from '../repositories/file.repository';
+import { basicAuthorization } from '../services/basic.authorizor';
 import {
   addOwnerGroupAccessGroups,
   getModelSchemaRefWithStrict,
   validateFieldsVSModel,
 } from '../utils/misc';
-import {OPERATION_SECURITY_SPEC} from '../utils/security-spec';
+import { OPERATION_SECURITY_SPEC } from '../utils/security-spec';
 
 const Mongo = require('mongodb');
 const crypto = require('crypto');
@@ -82,14 +82,14 @@ export class FileController {
     @repository(FileRepository)
     public fileRepository: FileRepository,
     @inject(STORAGE_DIRECTORY) private storageDirectory: string,
-  ) {}
+  ) { }
 
   @post('/filesnippet', {
     security: OPERATION_SECURITY_SPEC,
     responses: {
       '200': {
         description: 'Filesnippet model instance',
-        content: {'application/json': {schema: getModelSchemaRef(Filesnippet)}},
+        content: { 'application/json': { schema: getModelSchemaRef(Filesnippet) } },
       },
     },
   })
@@ -106,7 +106,7 @@ export class FileController {
     })
     file: Omit<Filesnippet, 'id'>,
   ): Promise<Filesnippet> {
-    return this.fileRepository.create(file, {currentUser: this.user});
+    return this.fileRepository.authorizedCreate(file, { currentUser: this.user });
   }
 
   @post('/filesnippet/files', {
@@ -155,13 +155,13 @@ export class FileController {
           ownerGroupAccessGroupsFilesnippetModel,
           reject,
         );
-        resolve({fields: parsedFields, files: files});
+        resolve({ fields: parsedFields, files: files });
       });
     });
     return this.uploadToGridfs(formData, async (fm, resolve, reject) => {
       fm.fields['accessHash'] = crypto.randomBytes(64).toString('hex');
       return this.fileRepository
-        .create(_.omit(fm.fields, ['id']), {currentUser: this.user})
+        .create(_.omit(fm.fields, ['id']), { currentUser: this.user })
         .then((file: Filesnippet) => {
           resolve(file);
         })
@@ -176,14 +176,14 @@ export class FileController {
     responses: {
       '200': {
         description: 'Filesnippet model count',
-        content: {'application/json': {schema: CountSchema}},
+        content: { 'application/json': { schema: CountSchema } },
       },
     },
   })
   async count(
     @param.where(Filesnippet) where?: Where<Filesnippet>,
   ): Promise<Count> {
-    return this.fileRepository.count(where, {currentUser: this.user});
+    return this.fileRepository.count(where, { currentUser: this.user });
   }
 
   @get('/filesnippet/index={id}', {
@@ -193,7 +193,7 @@ export class FileController {
         description: 'Filesnippet model instance',
         content: {
           'application/json': {
-            schema: getModelSchemaRef(Filesnippet, {includeRelations: true}),
+            schema: getModelSchemaRef(Filesnippet, { includeRelations: true }),
           },
         },
       },
@@ -201,7 +201,7 @@ export class FileController {
   })
   async findIndexInBuffer(
     @param.path.string('id') id: string,
-    @param.filter(Filesnippet, {exclude: 'where'})
+    @param.filter(Filesnippet, { exclude: 'where' })
     filter?: FilterExcludingWhere<Filesnippet>,
   ): Promise<Filesnippet> {
     return this.fileRepository.findIndexInBuffer(id, this.user, filter);
@@ -216,7 +216,7 @@ export class FileController {
           'application/json': {
             schema: {
               type: 'array',
-              items: getModelSchemaRef(Filesnippet, {includeRelations: true}),
+              items: getModelSchemaRef(Filesnippet, { includeRelations: true }),
             },
           },
         },
@@ -244,7 +244,7 @@ export class FileController {
           'application/json': {
             schema: {
               type: 'array',
-              items: getModelSchemaRef(Filesnippet, {includeRelations: true}),
+              items: getModelSchemaRef(Filesnippet, { includeRelations: true }),
             },
           },
         },
@@ -254,7 +254,7 @@ export class FileController {
   async find(
     @param.filter(Filesnippet) filter?: Filter<Filesnippet>,
   ): Promise<Filesnippet[]> {
-    return this.fileRepository.find(filter, {currentUser: this.user});
+    return this.fileRepository.find(filter, { currentUser: this.user });
   }
 
   @patch('/filesnippet', {
@@ -262,7 +262,7 @@ export class FileController {
     responses: {
       '200': {
         description: 'File PATCH success count',
-        content: {'application/json': {schema: CountSchema}},
+        content: { 'application/json': { schema: CountSchema } },
       },
     },
   })
@@ -270,14 +270,14 @@ export class FileController {
     @requestBody({
       content: {
         'application/json': {
-          schema: getModelSchemaRef(Filesnippet, {partial: true}),
+          schema: getModelSchemaRef(Filesnippet, { partial: true }),
         },
       },
     })
     file: Filesnippet,
     @param.where(Filesnippet) where?: Where<Filesnippet>,
   ): Promise<Count> {
-    return this.fileRepository.updateAll(file, where, {currentUser: this.user});
+    return this.fileRepository.updateAll(file, where, { currentUser: this.user });
   }
 
   @get('/filesnippet/{id}', {
@@ -287,7 +287,7 @@ export class FileController {
         description: 'Filesnippet model instance',
         content: {
           'application/json': {
-            schema: getModelSchemaRef(Filesnippet, {includeRelations: true}),
+            schema: getModelSchemaRef(Filesnippet, { includeRelations: true }),
           },
         },
       },
@@ -295,10 +295,10 @@ export class FileController {
   })
   async findById(
     @param.path.string('id') id: string,
-    @param.filter(Filesnippet, {exclude: 'where'})
+    @param.filter(Filesnippet, { exclude: 'where' })
     filter?: FilterExcludingWhere<Filesnippet>,
   ): Promise<Filesnippet> {
-    return this.fileRepository.findById(id, filter, {currentUser: this.user});
+    return this.fileRepository.findById(id, filter, { currentUser: this.user });
   }
 
   @get('/filesnippet/{id}/files', {
@@ -313,7 +313,7 @@ export class FileController {
   async downloadFile(
     @param.path.string('id') id: string,
     @inject(RestBindings.Http.RESPONSE) response: Response,
-    @param.filter(Filesnippet, {exclude: 'where'})
+    @param.filter(Filesnippet, { exclude: 'where' })
     filter?: FilterExcludingWhere<Filesnippet>,
   ) {
     const data = await this.fileRepository.findById(id, filter, {
@@ -378,7 +378,7 @@ export class FileController {
           ownerGroupAccessGroupsFilesnippetModel,
           reject,
         );
-        resolve({fields: parsedFields, files: files});
+        resolve({ fields: parsedFields, files: files });
       });
     });
     return this.uploadToGridfs(formData, async (fm, resolve, reject) => {
@@ -408,7 +408,7 @@ export class FileController {
     @requestBody({
       content: {
         'application/json': {
-          schema: getModelSchemaRef(Filesnippet, {partial: true}),
+          schema: getModelSchemaRef(Filesnippet, { partial: true }),
         },
       },
     })
@@ -471,7 +471,7 @@ export class FileController {
         // eslint-disable-next-line  @typescript-eslint/no-explicit-any
         .on('error', (error: any) => {
           console.log(error);
-          reject({error: error});
+          reject({ error: error });
         })
         .on('finish', async () => {
           formData.fields['_fileId'] = id;
