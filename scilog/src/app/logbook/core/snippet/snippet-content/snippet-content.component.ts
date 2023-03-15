@@ -65,6 +65,15 @@ export class SnippetContentComponent implements OnInit {
       this.setImageUrl(img, imageId);
       this.setImageStyle(img, file.style);
     });
+
+
+    const fileLinks = this.span.querySelectorAll(".fileLink");
+    fileLinks.forEach(fileRef => {
+      let file = this.snippet.files.find(file => { return (file['fileHash'] == fileRef['pathname'].substring(1)) });
+      if (typeof file != 'undefined') {
+        fileRef['href'] = fileRef['baseURI'] + 'download/' + file.fileId;
+      }
+    });
     this.content = this.span.innerHTML;
   }
 
