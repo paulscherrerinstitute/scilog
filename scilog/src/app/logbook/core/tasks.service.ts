@@ -5,7 +5,7 @@ import { Logbooks } from '@model/logbooks';
 import { Tasks } from '@model/tasks';
 import { ChangeStreamNotification } from './changestreamnotification.model';
 import { LogbookInfoService } from '@shared/logbook-info.service';
-import { TaskDataService } from '@shared/remote-data.service';
+import { TaskDataService, RemoteDataService } from '@shared/remote-data.service';
 
 @Injectable({
   providedIn: 'root'
@@ -19,6 +19,7 @@ export class TasksService {
 
   constructor(
     private dataService: TaskDataService,
+    private remotedataService: RemoteDataService,
     private logbookInfo: LogbookInfoService) {
     this.currentTasks.pipe(shareReplay());
     // get tasks from server
@@ -37,6 +38,8 @@ export class TasksService {
 
   async addTask(task: Tasks) {
     console.log(task)
+    // TODO remove again
+    await this.remotedataService.getDatacatalogData();
     await this.dataService.addTask(task);
   }
 

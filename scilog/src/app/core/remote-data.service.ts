@@ -48,7 +48,44 @@ export class RemoteDataService {
   }
 
   protected getSnippets<T>(snippetPath: string, options: Object) {
+    console.log("Options passed within getSnippets:",options)
     return this.httpClient.get<T>(this.serverSettings.getServerAddress() + snippetPath, options);
+  }
+
+  // TODO protected/public
+  public getDatacatalogData(){
+      // just for testing make calls to scicat here
+      let headers = new HttpHeaders()
+      headers=headers.append('accept', 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8')
+      //headers=headers.append('Origin','http://localhost:4200/')
+      //headers=headers.append('Access-Control-Allow-Origin','http://localhost:4200')
+      //headers=headers.append('Access-Control-Allow-Credentials', 'true')
+      // headers=headers.append('AMP-Access-Control-Allow-Source-Origin', 'http://localhost:4200/*')
+      //headers=headers.append('Access-Control-Expose-Headers', 'AMP-Access-Control-Allow-Source-Origin');
+      // headers=headers.append('Upgrade-Insecure-Requests', '1')
+      // headers=headers.append('Sec-Fetch-Dest' , 'document')
+      // headers=headers.append('Sec-Fetch-Mode' , 'navigate')
+      // headers=headers.append('Sec-Fetch-Site', 'same-site')
+      // headers=headers.append('Sec-Fetch-User', '?1')
+      
+      // this.httpClient.get("https://dacat-qa.psi.ch/api/v3/Datasets/", { observe: 'response' ,'headers':headers})
+      // .subscribe(resp => {
+      //   // display its headers
+      //   const keys = resp.headers.keys();
+      //   const headers = keys.map(key =>
+      //     `${key}: ${resp.headers.get(key)}`);
+      //   console.log("Headers:",headers)  
+
+      // });;
+      this.httpClient.get("https://dacat-development.psi.ch/auth/keycloak", { observe: 'response' ,'headers':headers})
+      .subscribe(resp => {
+        // display its headers
+        const keys = resp.headers.keys();
+        const headers = keys.map(key =>
+          `${key}: ${resp.headers.get(key)}`);
+        console.log("Headers:",headers)  
+
+      });;
   }
 
   protected async postImage(payloadImage: Images) {
