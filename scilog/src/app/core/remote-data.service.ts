@@ -57,11 +57,11 @@ export class RemoteDataService {
       // just for testing make calls to scicat here
       let headers = new HttpHeaders()
       // headers=headers.append('accept', 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8')
-      //headers=headers.append('Origin','http://localhost:4200/')
-      headers=headers.append('Access-Control-Allow-Origin','*')
-      headers=headers.append('Access-Control-Allow-Credentials', 'true')
-      headers=headers.append('AMP-Access-Control-Allow-Source-Origin', '*')
-      headers=headers.append('Access-Control-Expose-Headers', 'AMP-Access-Control-Allow-Source-Origin');
+      headers=headers.append('Origin','https://scilog.development.psi.ch/')
+      // headers=headers.append('Access-Control-Allow-Origin','*')
+      // headers=headers.append('Access-Control-Allow-Credentials', 'true')
+      // headers=headers.append('AMP-Access-Control-Allow-Source-Origin', '*')
+      // headers=headers.append('Access-Control-Expose-Headers', 'AMP-Access-Control-Allow-Source-Origin');
       // headers=headers.append('Upgrade-Insecure-Requests', '1')
       // headers=headers.append('Sec-Fetch-Dest' , 'document')
       // headers=headers.append('Sec-Fetch-Mode' , 'navigate')
