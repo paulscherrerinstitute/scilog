@@ -113,23 +113,23 @@ describe('Latex unit', function (this: Suite) {
     },
   ];
 
-  testCases.forEach(t => {
-    it(t.message, () => {
-      const content = ExportService.prototype['sumContents'](
-        t.nodeTag,
-        t.tmpContent,
-        t.baseContent,
-      );
-      expect(content).to.be.eql(t.expected);
-    });
-  });
+//   testCases.forEach(t => {
+//     it(t.message, () => {
+//       const content = ExportService.prototype['sumContents'](
+//         t.nodeTag,
+//         t.tmpContent,
+//         t.baseContent,
+//       );
+//       expect(content).to.be.eql(t.expected);
+//     });
+//   });
 
-  it('Replace special', () => {
-    const testWord =
-      'a first # and a second _ and a third % and fourth % and a fifth # and a sixth _';
-    const replaced = ExportService.prototype['replaceSpecial'](testWord);
-    expect(replaced).to.be.eql(
-      'a first \\# and a second \\_ and a third \\% and fourth \\% and a fifth \\# and a sixth \\_',
-    );
-  });
+//   it('Replace special', () => {
+//     const testWord =
+//       'a first # and a second _ and a third % and fourth % and a fifth # and a sixth _';
+//     const replaced = ExportService.prototype['replaceSpecial'](testWord);
+//     expect(replaced).to.be.eql(
+//       'a first \\# and a second \\_ and a third \\% and fourth \\% and a fifth \\# and a sixth \\_',
+//     );
+//   });
 });

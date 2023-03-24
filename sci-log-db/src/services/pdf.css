@@ -1,0 +1,96 @@
+snippet>* {
+    margin-bottom: 0px;
+    margin-left: 20px;
+    margin-right: 20px;
+    text-align: left;
+    border-radius: 2px;
+    padding: 10px 0px;
+    margin-bottom: 0;
+    margin-top: 0;
+    background-color: rgb(255, 255, 255) !important;
+}
+
+messagesReply {
+    background-color: rgb(238, 238, 238) !important;
+    margin-bottom: 5px;
+    margin-left: 20px;
+    margin-right: 80px;
+    margin-top: 1px;
+    min-height: 100%;
+    text-align: left;
+    border-radius: 10px;
+    padding: 20px 0px;
+}
+
+snippetComment>* {
+    margin-bottom: 1px;
+    margin-left: 60px;
+    max-width: 80%;
+    text-align: left;
+    border-radius: 2px;
+    padding: 10px 0px;
+    background-color: rgb(247, 242, 197) !important;
+    margin-bottom: 0;
+    margin-top: 0;
+}
+
+snippetQuote>* {
+    margin-bottom: 1px;
+    max-width: 80%;
+    text-align: left;
+    border-radius: 2px;
+    padding: 10px 0px;
+    opacity: 0.9;
+    border-left: 4px solid #86a7b1;
+    border-right: 4px solid #86a7b1;
+    background-color: #ebebeb !important;
+}
+
+imageSnippet>* {
+    background-size: cover;
+    max-width: 90%;
+    display: block;
+}
+
+snippet-tag {
+    background-color: #e0e0e0;
+    color: rgba(0, 0, 0, 0.87);
+    width: max-content;
+    border-radius: 5px;
+    padding: 2px;
+    float: right;
+    margin: 1px;
+}
+
+card-header {
+    position: absolute;
+    display: inline;
+    top: 4px;
+    left: 3px;
+    width: 100%;
+}
+
+message-timestamp {
+    width: 100%;
+    font-size-adjust: 0.4;
+    text-align: center;
+    opacity: 1;
+    align-items: center;
+}
+
+snippet-header {
+    width: 100%;
+    font-size-adjust: 0.4;
+    opacity: 0.6;
+    position: absolute;
+    left: 10px;
+    top: 2px;
+}
+
+table,
+th,
+td {
+    border: 1px solid black;
+    border-collapse: collapse;
+    padding: 15px;
+}

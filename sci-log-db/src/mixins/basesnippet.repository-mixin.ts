@@ -11,12 +11,13 @@ import {
   Condition,
   OrClause,
 } from '@loopback/repository';
-import {Basesnippet} from '../models';
+import {Basesnippet, Paragraph} from '../models';
 import {UserProfile} from '@loopback/security';
 import {HttpErrors, Response} from '@loopback/rest';
 import _ from 'lodash';
 import {EXPORT_SERVICE} from '../keys';
 import {ExportService} from '../services/export-snippets.service';
+const fs = require('fs');
 
 function UpdateAndDeleteRepositoryMixin<
   M extends Entity & {
@@ -310,9 +311,11 @@ function ExportRepositoryMixin<
   R extends MixinTarget<DefaultCrudRepository<M, ID, Relations>>,
 >(superClass: R) {
   class Mixed extends superClass {
-    exportDir: string;
     @inject.getter(EXPORT_SERVICE)
     readonly exportServiceGetter: Getter<ExportService>;
+
+    private exportFile = 'export.pd'
+    private basePath = 'tmp'
 
     async prepareExport(
       exportType: string,
@@ -320,19 +323,34 @@ function ExportRepositoryMixin<
       user: UserProfile,
       filter?: Filter<M>,
     ): Promise<Response> {
-      const createPDF = exportType === 'pdf';
 
       const snippets = await this.find(filter, {
         currentUser: user,
       });
-      // console.log(filter);
+      const jobEntity = await this.createExportJob(snippets, filter, user);
+      const { exportFile, exportDir } = this.createPathsFromJob(jobEntity);
+      const exportService = await this.exportServiceGetter();
+      await exportService.exportToPdf(
+        snippets as unknown as Paragraph[],
+        exportFile
+      );
+      response.download(exportFile, (err, path = exportDir) => {
+        console.log('file transferred successfully', err);
+        if (path.includes(this.basePath)) {
+          fs.rmdirSync(path, {recursive: true});
+        }
+      });
+      return response;
+    }
+
+    private async createExportJob(snippets: (M & Relations)[], filter: Filter<M> | undefined, user: UserProfile) {
       let job: Object = {};
       if (snippets.length > 0) {
         if (snippets[0]?.parentId) {
           const parent = await this.findById(
             snippets[0].parentId as unknown as ID,
             filter,
-            {currentUser: user},
+            { currentUser: user }
           );
           job = {
             ownerGroup: parent.ownerGroup,
@@ -356,34 +374,16 @@ function ExportRepositoryMixin<
       const jobEntity = await this.create(job, {
         currentUser: user,
       });
-      const basePath = '/tmp/';
-      const fs = require('fs');
-      this.exportDir = basePath + jobEntity.id;
-      if (!fs.existsSync(this.exportDir)) {
-        fs.mkdirSync(this.exportDir, {recursive: true});
-      }
+      return jobEntity;
+    }
 
-      const exportService = await this.exportServiceGetter();
-      await exportService.prepareLateXSourceFile(
-        snippets,
-        this.exportDir,
-        user,
-      );
-      await exportService.compilePDF();
-      let downloadFile = '';
-      if (createPDF) {
-        downloadFile = this.exportDir + '/export.pdf';
-      } else {
-        downloadFile = await exportService.createZipFile();
+    private createPathsFromJob(jobEntity: M) {
+      const exportDir = this.basePath + jobEntity.id;
+      if (!fs.existsSync(exportDir)) {
+        fs.mkdirSync(exportDir, { recursive: true });
       }
-
-      response.download(downloadFile, (err, path = this.exportDir) => {
-        console.log('file transferred successfully', err);
-        if (path.includes(basePath)) {
-          fs.rmdirSync(path, {recursive: true});
-        }
-      });
-      return response;
+      const exportFile = `${exportDir}/${this.exportFile}`;
+      return { exportFile, exportDir };
     }
   }
   return Mixed;

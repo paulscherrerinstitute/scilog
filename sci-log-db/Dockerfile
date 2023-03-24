@@ -1,9 +1,13 @@
 # Check out https://hub.docker.com/_/node to select a new base image
-FROM node:14-slim
+FROM node:18-slim
 
 # Install extra packages
 RUN apt-get update && apt-get install -y zip \
- texlive-latex-extra
+ texlive-latex-extra && \
+ apt-get install -y chromium \
+ fonts-ipafont-gothic fonts-wqy-zenhei fonts-thai-tlwg fonts-kacst fonts-freefont-ttf libxss1 \
+ --no-install-recommends
+
 
 # Set to a non-root built-in user `node`
 USER node
