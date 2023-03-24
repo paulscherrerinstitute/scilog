@@ -18,27 +18,34 @@ export class ExportService {
     this.body = this.document.querySelector('body') as HTMLBodyElement;
   }
 
-  private comment = (snippet: Paragraph, element: Element, parentElement: Element) => {
+  private comment = (snippet: Paragraph, element: Element) => {
     if (snippet.linkType === 'comment') {
       const snippetCommentElement = this.document.createElement('snippetComment');
       snippetCommentElement.append(element);
-      this.appendSnippet(parentElement);
       this.body.append(snippetCommentElement)
     }
   }
 
-  private appendSnippet = (element: Element) => {
+  private appendSnippet = (element: Element, dataAttributes: {[key: string]: string}={}) => {
     const snippetElement = this.document.createElement('snippet');
+    if (dataAttributes) {
+      Object.entries(dataAttributes).map(([k, v]) => element.setAttribute(k, v))
+    }
     snippetElement.append(element);
     this.body.append(snippetElement);
   }
 
-  private quote = (snippet: Paragraph, element: Element, parentElement: Element) => {
+  private quote = (snippet: Paragraph, element: Element) => {
     if (snippet.linkType === 'quote') {
       const snippetCommentElement = this.document.createElement('snippetQuote');
       snippetCommentElement.append(element);
+      const lastElement = this.body.children[this.body.children.length - 1];
+      if (
+        lastElement.getAttribute('data-quote') !== 'keep'
+      )
+        lastElement.remove();
       this.body.append(snippetCommentElement);
-      this.appendSnippet(parentElement);
+      this.appendSnippet(lastElement, {'data-quote': 'keep'});
     }
   }
 
@@ -70,8 +77,17 @@ export class ExportService {
     return this.document.createElement('div')
   }
 
+  private tags = (snippet: Paragraph, element: Element): Element => {
+    snippet.tags?.map(t => {
+      const tagElement = this.document.createElement('snippet-tag');
+      tagElement.innerHTML = t;
+      element.insertAdjacentElement("beforeend", tagElement)
+    })
+    return element
+  }
+
   private deep = (snippet: Paragraph): Element => {
-    return [this.textContentToHTML, this.figure].reduce(
+    return [this.textContentToHTML, this.figure, this.tags].reduce(
       (result, currentFunction) => currentFunction(snippet, result), 
       this.createDivEmptyElement())
   }
@@ -82,13 +98,12 @@ export class ExportService {
 
   private paragraphToHTML = (snippet: Paragraph) => {
     const element = this.deep(snippet);
+    this.appendSnippet(element, {'data-quote': 'remove-if-last'});
     if (snippet.subsnippets?.length && snippet.subsnippets?.length > 0){
       snippet.subsnippets.map(s => {
         const subElement = this.deep(s);
         this.wide(s, subElement, element);
       })
-    } else {
-      this.appendSnippet(element);
     }
   }
 

@@ -50,6 +50,7 @@ imageSnippet>* {
     background-size: cover;
     max-width: 90%;
     display: block;
+    background-color: inherit;
 }
 
 snippet-tag {
