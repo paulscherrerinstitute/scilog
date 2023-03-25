@@ -1,10 +1,10 @@
 snippet>* {
-    margin-bottom: 0px;
     margin-left: 20px;
     margin-right: 20px;
     text-align: left;
+    max-width: 80%;
     border-radius: 2px;
-    padding: 10px 0px;
+    padding: 10px 0px 25px 0px;
     margin-bottom: 0;
     margin-top: 0;
     background-color: rgb(255, 255, 255) !important;
@@ -23,7 +23,6 @@ messagesReply {
 }
 
 snippetComment>* {
-    margin-bottom: 1px;
     margin-left: 60px;
     max-width: 80%;
     text-align: left;
@@ -32,21 +31,24 @@ snippetComment>* {
     background-color: rgb(247, 242, 197) !important;
     margin-bottom: 0;
     margin-top: 0;
+    padding: 10px 0px 25px 0px;
 }
 
 snippetQuote>* {
     margin-bottom: 1px;
     max-width: 80%;
+    margin-left: 20px;
     text-align: left;
     border-radius: 2px;
-    padding: 10px 0px;
+    margin-top: 15px;
+    padding: 5px 0px;
     opacity: 0.9;
     border-left: 4px solid #86a7b1;
     border-right: 4px solid #86a7b1;
     background-color: #ebebeb !important;
 }
 
-imageSnippet>* {
+imageSnippet {
     background-size: cover;
     max-width: 90%;
     display: block;
@@ -56,11 +58,12 @@ imageSnippet>* {
 snippet-tag {
     background-color: #e0e0e0;
     color: rgba(0, 0, 0, 0.87);
-    width: max-content;
+    max-width: 80%;
     border-radius: 5px;
     padding: 2px;
     float: right;
     margin: 1px;
+    mix-blend-mode: luminosity;
 }
 
 card-header {
