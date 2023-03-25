@@ -28,9 +28,7 @@ export class ExportService {
 
   private appendSnippet = (element: Element, dataAttributes: {[key: string]: string}={}) => {
     const snippetElement = this.document.createElement('snippet');
-    if (dataAttributes) {
-      Object.entries(dataAttributes).map(([k, v]) => element.setAttribute(k, v))
-    }
+    Object.entries(dataAttributes).map(([k, v]) => element.setAttribute(k, v));
     snippetElement.append(element);
     this.body.append(snippetElement);
   }
@@ -86,8 +84,16 @@ export class ExportService {
     return element
   }
 
+  private dateAndAuthor = (snippet: Paragraph, element: Element): Element => {
+    const tagElement = this.document.createElement('snippet-header');
+    const dateOptions = { year: 'numeric', month: 'short', day: 'numeric' } as const;
+    tagElement.innerHTML = `${snippet.updatedAt.toLocaleDateString("en-GB", dateOptions)} / ${snippet.updatedBy}`;
+    element.insertAdjacentElement("afterbegin", tagElement)
+    return element
+  }
+
   private deep = (snippet: Paragraph): Element => {
-    return [this.textContentToHTML, this.figure, this.tags].reduce(
+    return [this.textContentToHTML, this.figure, this.tags, this.dateAndAuthor].reduce(
       (result, currentFunction) => currentFunction(snippet, result), 
       this.createDivEmptyElement())
   }

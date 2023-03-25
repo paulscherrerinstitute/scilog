@@ -83,7 +83,6 @@ snippet-header {
     width: 100%;
     font-size-adjust: 0.4;
     opacity: 0.6;
-    position: absolute;
     left: 10px;
     top: 2px;
 }
