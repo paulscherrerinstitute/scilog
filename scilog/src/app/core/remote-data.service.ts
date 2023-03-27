@@ -56,8 +56,10 @@ export class RemoteDataService {
   public getDatacatalogData(){
       // just for testing make calls to scicat here
       let headers = new HttpHeaders()
+      // special headers require to enable "Pre-flight" cors on the backend side
+      // therefore for now try to avoid special headers
       // headers=headers.append('accept', 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8')
-      headers=headers.append('Origin','https://scilog.development.psi.ch/')
+      // headers=headers.append('Origin','https://scilog.development.psi.ch/')
       // headers=headers.append('Access-Control-Allow-Origin','*')
       // headers=headers.append('Access-Control-Allow-Credentials', 'true')
       // headers=headers.append('AMP-Access-Control-Allow-Source-Origin', '*')
@@ -77,7 +79,8 @@ export class RemoteDataService {
       //   console.log("Headers:",headers)  
 
       // });;
-      this.httpClient.get("https://dacat-development.psi.ch/auth/keycloak", { observe: 'response' ,'headers':headers})
+      //, { observe: 'response' ,'headers':headers})
+      this.httpClient.get("https://dacat-development.psi.ch/auth/keycloak") 
       .subscribe(resp => {
         // display its headers
         const keys = resp.headers.keys();
