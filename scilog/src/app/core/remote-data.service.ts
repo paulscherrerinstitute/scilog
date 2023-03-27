@@ -80,10 +80,15 @@ export class RemoteDataService {
 
       // });;
       //, { observe: 'response' ,'headers':headers})
-      this.httpClient.get("https://dacat-development.psi.ch/auth/keycloak") 
+      this.httpClient.get("https://dacat-development.psi.ch/api/v3/Users/null") 
       .subscribe(resp => {
-        console.log("Resp:",resp)  
+        console.log("Users Resp:",resp)  
+        this.httpClient.get("https://dacat-development.psi.ch/auth/keycloak") 
+        .subscribe(resp2 => {
+          console.log("Resp:",resp2)  
+        });;
       });;
+
   }
 
   protected async postImage(payloadImage: Images) {
