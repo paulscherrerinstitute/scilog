@@ -82,12 +82,7 @@ export class RemoteDataService {
       //, { observe: 'response' ,'headers':headers})
       this.httpClient.get("https://dacat-development.psi.ch/auth/keycloak") 
       .subscribe(resp => {
-        // display its headers
-        const keys = resp.headers.keys();
-        const headers = keys.map(key =>
-          `${key}: ${resp.headers.get(key)}`);
-        console.log("Headers:",headers)  
-
+        console.log("Resp:",resp)  
       });;
   }
 
