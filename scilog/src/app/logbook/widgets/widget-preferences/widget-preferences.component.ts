@@ -6,12 +6,12 @@ import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { Tags } from '@model/metadata'
 import { Observable, Subscription } from 'rxjs';
 import { Basesnippets } from '@model/basesnippets';
-import {map, startWith, take} from 'rxjs/operators';
+import { map, startWith, take } from 'rxjs/operators';
 import { LogbookInfoService } from '@shared/logbook-info.service';
-import {ownerGroupMemberValidator} from '@shared/settings/view-settings/view-settings.component';
+import { ownerGroupMemberValidator } from '@shared/settings/view-settings/view-settings.component';
 import { UserPreferencesService } from '@shared/user-preferences.service';
 import { Logbooks } from '@model/logbooks';
-import {CdkTextareaAutosize} from '@angular/cdk/text-field';
+import { CdkTextareaAutosize } from '@angular/cdk/text-field';
 import { WidgetPreferencesDataService } from '@shared/remote-data.service';
 import { WidgetItemConfig } from '@model/config';
 
@@ -34,6 +34,7 @@ export class WidgetPreferencesComponent implements OnInit {
   descendingOrder = new UntypedFormControl(false);
   floatLabelControl = new UntypedFormControl('auto');
   tag: Tags[] = [];
+  excludeTag: Tags[] = [];
   additionalLogbooks: Logbooks[] = [];
   title = new UntypedFormControl('');
   widgetType = new UntypedFormControl('');
@@ -57,7 +58,7 @@ export class WidgetPreferencesComponent implements OnInit {
   filteredOwnerGroups: Observable<string[]>;
   logbookUpdate: Observable<Logbooks[]>;
   ownerGroupsAvail: string[] = [];
-  
+
   @ViewChild('autosize') autosize: CdkTextareaAutosize;
   @ViewChild('logbookInput') logbookInput: ElementRef<HTMLInputElement>;
 
@@ -92,7 +93,13 @@ export class WidgetPreferencesComponent implements OnInit {
     if (this.data.filter.tags && this.data.filter.tags.length > 0) {
       this.data.filter.tags.forEach((tag: string) => {
         console.log(tag);
-        this.tag.push({name: tag});
+        this.tag.push({ name: tag });
+      })
+    }
+    if (this.data.filter.excludeTags && this.data.filter.excludeTags.length > 0) {
+      this.data.filter.excludeTags.forEach((tag: string) => {
+        console.log(tag);
+        this.excludeTag.push({ name: tag });
       })
     }
     if (typeof this.data.view.hideMetadata != "undefined") {
@@ -100,8 +107,8 @@ export class WidgetPreferencesComponent implements OnInit {
     }
     if (typeof this.data.view.showSnippetHeader != "undefined") {
       this.showSnippetHeader.setValue(this.data.view.showSnippetHeader);
-    }  
-    if (typeof this.data.general.readonly != "undefined"){
+    }
+    if (typeof this.data.general.readonly != "undefined") {
       this.readOnlyLogbook.setValue(this.data.general.readonly);
     }
     if (typeof this.data.view.order != "undefined") {
@@ -109,18 +116,18 @@ export class WidgetPreferencesComponent implements OnInit {
       console.log(this.data.view.order)
       console.log(orderTag)
       this.descendingOrder.setValue(this.orderTagToBoolean(orderTag));
-    }   
+    }
     this.getSnippetViewerOptions();
 
     this.getFilterOptionsPlot();
 
     // basic filter forms
-    
+
     this.setupLogbookSelection();
 
     // target logbook description
     this.subscriptions.push(this.filterBasics.get('logbook').valueChanges.subscribe(logbook => {
-      if (logbook && logbook.description){
+      if (logbook && logbook.description) {
         this.filterBasics.get('description').setValue(logbook.description);
       } else {
         this.filterBasics.get('description').setValue("");
@@ -137,31 +144,31 @@ export class WidgetPreferencesComponent implements OnInit {
     // } 
   }
 
-  async getSnippetViewerOptions(){
+  async getSnippetViewerOptions() {
     let data = await this.dataService.getSnippetsForLogbook(this.logbookInfo.logbookInfo.id);
     // TODO this should be done in the backend, not here!
     this.snippetViewerOptions = [];
-    data.forEach(snippet=>{
-      if (snippet?.dashboardName){
+    data.forEach(snippet => {
+      if (snippet?.dashboardName) {
         this.snippetViewerOptions.push(snippet)
       }
     })
     this.filteredOptions = this.snippetViewerControl.valueChanges.pipe(
       startWith(''),
       map(value => typeof value === 'string' ? value : value.name),
-      map(name => name ? this._filter(name): this.snippetViewerOptions.slice())
+      map(name => name ? this._filter(name) : this.snippetViewerOptions.slice())
     );
     console.log(this.snippetViewerOptions)
   }
 
-  async getFilterOptionsPlot(){
+  async getFilterOptionsPlot() {
     let data = await this.dataService.getPlotSnippets(this.logbookInfo.logbookInfo.id);
     console.log(data)
     this.plotOptions = data;
     this.filteredOptionsPlot = this.plotControl.valueChanges.pipe(
       startWith(''),
       map(value => typeof value === 'string' ? value : value.name),
-      map(name => name ? this._filter(name): this.plotOptions.slice())
+      map(name => name ? this._filter(name) : this.plotOptions.slice())
     );
   }
 
@@ -182,8 +189,8 @@ export class WidgetPreferencesComponent implements OnInit {
 
     // set up additional logbooks
     this.logbookInfo.availLogbooks.forEach(log => {
-      this.data.filter.additionalLogbooks?.forEach(selLog=>{
-        if (selLog == log.id){
+      this.data.filter.additionalLogbooks?.forEach(selLog => {
+        if (selLog == log.id) {
           this.additionalLogbooks.push(log);
         }
       })
@@ -209,33 +216,46 @@ export class WidgetPreferencesComponent implements OnInit {
     }
   }
 
-  _getAvailAdditionalLogbooks(){
+  addExcludeTag(event: MatChipInputEvent): void {
+    const input = event.input;
+    const value = event.value;
+
+    if ((value || '').trim()) {
+      this.excludeTag.push({ name: value.trim() });
+    }
+
+    if (input) {
+      input.value = '';
+    }
+  }
+
+  _getAvailAdditionalLogbooks() {
     let availLogbooks = this.logbookInfo.availLogbooks;
-    if (this.filterBasics.get('logbook').value.id){
-      availLogbooks = availLogbooks.filter((log)=>{
+    if (this.filterBasics.get('logbook').value.id) {
+      availLogbooks = availLogbooks.filter((log) => {
         return log.id != this.filterBasics.get('logbook').value.id
       })
     }
-    if (this.additionalLogbooks.length>0){
-        availLogbooks = availLogbooks.filter((log)=>{
-          return this.additionalLogbooks.indexOf(log)<0;
-        })
+    if (this.additionalLogbooks.length > 0) {
+      availLogbooks = availLogbooks.filter((log) => {
+        return this.additionalLogbooks.indexOf(log) < 0;
+      })
     }
-    if ((this.additionalLogbooksCtrl.value != null) && (this.additionalLogbooksCtrl.value?.id)){
-      availLogbooks = availLogbooks.filter(log=>{
+    if ((this.additionalLogbooksCtrl.value != null) && (this.additionalLogbooksCtrl.value?.id)) {
+      availLogbooks = availLogbooks.filter(log => {
         return log.id != this.additionalLogbooksCtrl.value.id;
       })
     }
     return availLogbooks;
   }
 
-  addLogbook($event:any): void {
+  addLogbook($event: any): void {
     const input = $event.input;
     const value = $event.value;
 
     // if ((value || '').trim()) {
-      console.log($event);
-      this.additionalLogbooks.push($event.option.value);
+    console.log($event);
+    this.additionalLogbooks.push($event.option.value);
     // }
 
     this.logbookInput.nativeElement.value = "";
@@ -263,6 +283,15 @@ export class WidgetPreferencesComponent implements OnInit {
       this.tag.splice(index, 1);
     }
   }
+
+  removeExcludeTag(tag: Tags): void {
+    const index = this.excludeTag.indexOf(tag);
+
+    if (index >= 0) {
+      this.excludeTag.splice(index, 1);
+    }
+  }
+
   removeLogbook(logbook: Logbooks): void {
     const index = this.additionalLogbooks.indexOf(logbook);
 
@@ -278,7 +307,7 @@ export class WidgetPreferencesComponent implements OnInit {
     const filterValue = value.toLowerCase();
     return this.snippetViewerOptions.filter(option => option?.dashboardName && option.dashboardName.toLowerCase().indexOf(filterValue) === 0);
   }
-  
+
   private _filterOwnerGroups(value: string): string[] {
     console.log(value)
     const filterValue = value.toLowerCase();
@@ -289,17 +318,17 @@ export class WidgetPreferencesComponent implements OnInit {
   private _filterAdditionalLogbooks(value: string): Logbooks[] {
     console.log(value);
     let additionalLogbooks = this._getAvailAdditionalLogbooks();
-    
+
     return additionalLogbooks.filter(log => {
-      if (typeof value == 'string'){
+      if (typeof value == 'string') {
         if (log?.name) {
-          return (log?.name.toLowerCase().includes(value.toLowerCase())|| (log?.description.toLowerCase().includes(value.toLowerCase()))||(log?.ownerGroup.toLowerCase().includes(value.toLowerCase())));
+          return (log?.name.toLowerCase().includes(value.toLowerCase()) || (log?.description.toLowerCase().includes(value.toLowerCase())) || (log?.ownerGroup.toLowerCase().includes(value.toLowerCase())));
         }
         return false;
       } else {
         return true;
       }
-      }
+    }
     );
   }
 
@@ -329,18 +358,18 @@ export class WidgetPreferencesComponent implements OnInit {
   triggerResize() {
     // Wait for changes to be applied, then trigger textarea resize.
     this._ngZone.onStable.pipe(take(1))
-        .subscribe(() => this.autosize.resizeToFitContent(true));
+      .subscribe(() => this.autosize.resizeToFitContent(true));
   }
 
   applyChanges($event) {
     this.data.general.title = this.title.value;
     this.data.general.type = this.widgetType.value;
-    
-    
+
+
     switch (this.data.general.type) {
       case 'logbook':
         this.data.filter.targetId = this.filterBasics.get('logbook').value.id;
-        this.data.filter.additionalLogbooks = this.additionalLogbooks.map(log=>log.id);
+        this.data.filter.additionalLogbooks = this.additionalLogbooks.map(log => log.id);
         break;
       case 'snippetViewer':
         this.data.filter.targetId = this.snippetViewerControl.value?.id;
@@ -352,7 +381,8 @@ export class WidgetPreferencesComponent implements OnInit {
         break;
     }
     // this.data.filter.targetId = this.filterBasics.get('logbook').value.id;
-    this.data.filter.tags = this.tag.map(tag=>tag.name);
+    this.data.filter.tags = this.tag.map(tag => tag.name);
+    this.data.filter.excludeTags = this.excludeTag.map(tag => tag.name);
     this.data.view.hideMetadata = this.hideMetadata.value;
     this.data.view.showSnippetHeader = this.showSnippetHeader.value;
     this.data.general.readonly = this.readOnlyLogbook.value;
@@ -361,18 +391,18 @@ export class WidgetPreferencesComponent implements OnInit {
     this.dialogRef.close(this.data);
   }
 
-  booleanToOrderTag(descending:boolean):string{
-    return descending? "DESC" : "ASC"
+  booleanToOrderTag(descending: boolean): string {
+    return descending ? "DESC" : "ASC"
   }
 
-  orderTagToBoolean(orderTag:string){
-    return orderTag=="DESC"? true:false;
+  orderTagToBoolean(orderTag: string) {
+    return orderTag == "DESC" ? true : false;
   }
 
   ngOnDestroy(): void {
     //Called once, before the instance is destroyed.
     //Add 'implements OnDestroy' to the class.
-    this.subscriptions.forEach(sub=>{
+    this.subscriptions.forEach(sub => {
       sub.unsubscribe();
     })
   }

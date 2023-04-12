@@ -33,46 +33,40 @@
         </div>
         <ng-container *ngIf='!readOnlyLogbook.value'>
           <header class="subHeader">
-            <span matTooltip="New entries will be appended to this logbook.">Target logbook</span> 
+            <span matTooltip="New entries will be appended to this logbook.">Target logbook</span>
           </header>
-            <div>
-              <mat-form-field appearance="standard" style="width: 45%;">
-                <mat-label>Logbook</mat-label>
-                <textarea matInput placeholder="Logbook" [matAutocomplete]="autoLogbook"
-                  [formControl]="filterBasics.get('logbook')"
-                  cdkTextareaAutosize
-              #autosize="cdkTextareaAutosize"
-              cdkAutosizeMinRows="1"
-              cdkAutosizeMaxRows="5"></textarea>
-                <mat-autocomplete #autoLogbook="matAutocomplete" [displayWith]="displayFnLogbookSelection">
-                  <mat-option *ngFor="let logbook of filteredLogbooks | async" [value]="logbook">
-                    {{logbook.name}}
-                  </mat-option>
-                </mat-autocomplete>
-              </mat-form-field>
-              <mat-form-field appearance="standard" >
-                <mat-label>ownerGroup</mat-label>
-                <input matInput placeholder="ownerGroup" [matAutocomplete]="autoOwnerGroup"
-                  [formControl]="filterBasics.get('ownerGroup')">
-                <mat-autocomplete #autoOwnerGroup="matAutocomplete">
-                  <mat-option *ngFor="let group of filteredOwnerGroups | async" [value]="group">
-                    {{group}}
-                  </mat-option>
-                </mat-autocomplete>
-              </mat-form-field>
-            </div>
-            <div style="width: 100%;">
-              <mat-form-field appearance="fill" style="width: 100%;">
-                <mat-label>Logbook description</mat-label>
-                <textarea matInput [formControl]="filterBasics.get('description')"   
-                cdkTextareaAutosize
-                #autosize="cdkTextareaAutosize"
-                cdkAutosizeMinRows="1"
-                cdkAutosizeMaxRows="5"></textarea>
-              </mat-form-field>
-            </div>
+          <div>
+            <mat-form-field appearance="standard" style="width: 45%;">
+              <mat-label>Logbook</mat-label>
+              <textarea matInput placeholder="Logbook" [matAutocomplete]="autoLogbook"
+                [formControl]="filterBasics.get('logbook')" cdkTextareaAutosize #autosize="cdkTextareaAutosize"
+                cdkAutosizeMinRows="1" cdkAutosizeMaxRows="5"></textarea>
+              <mat-autocomplete #autoLogbook="matAutocomplete" [displayWith]="displayFnLogbookSelection">
+                <mat-option *ngFor="let logbook of filteredLogbooks | async" [value]="logbook">
+                  {{logbook.name}}
+                </mat-option>
+              </mat-autocomplete>
+            </mat-form-field>
+            <mat-form-field appearance="standard">
+              <mat-label>ownerGroup</mat-label>
+              <input matInput placeholder="ownerGroup" [matAutocomplete]="autoOwnerGroup"
+                [formControl]="filterBasics.get('ownerGroup')">
+              <mat-autocomplete #autoOwnerGroup="matAutocomplete">
+                <mat-option *ngFor="let group of filteredOwnerGroups | async" [value]="group">
+                  {{group}}
+                </mat-option>
+              </mat-autocomplete>
+            </mat-form-field>
+          </div>
+          <div style="width: 100%;">
+            <mat-form-field appearance="fill" style="width: 100%;">
+              <mat-label>Logbook description</mat-label>
+              <textarea matInput [formControl]="filterBasics.get('description')" cdkTextareaAutosize
+                #autosize="cdkTextareaAutosize" cdkAutosizeMinRows="1" cdkAutosizeMaxRows="5"></textarea>
+            </mat-form-field>
+          </div>
         </ng-container>
-        
+
         <mat-divider></mat-divider>
         <header class="subHeader">
           Filter settings
@@ -83,15 +77,19 @@
         <mat-form-field [floatLabel]="'never'" class="chipList">
           <mat-chip-list #chipListLogbook aria-label="Logbook selection">
             <mat-chip *ngFor="let logbookItem of additionalLogbooks" [selectable]="selectable" [removable]="removable"
-              (removed)="removeLogbook(logbookItem)" [value]="logbookItem" [matTooltip]="'Group: ' + logbookItem.ownerGroup + '; Description: ' + logbookItem.description">
+              (removed)="removeLogbook(logbookItem)" [value]="logbookItem"
+              [matTooltip]="'Group: ' + logbookItem.ownerGroup + '; Description: ' + logbookItem.description">
               {{ logbookItem.name }}
               <mat-icon matChipRemove *ngIf="removable">cancel</mat-icon>
             </mat-chip>
-            <input #logbookInput placeholder="Add logbooks" [matChipInputFor]="chipListLogbook" [matAutocomplete]="autoLogbookChip"
-              [matChipInputSeparatorKeyCodes]="separatorKeysCodes" [matChipInputAddOnBlur]="addOnBlur" [formControl]="additionalLogbooksCtrl">
+            <input #logbookInput placeholder="Add logbooks" [matChipInputFor]="chipListLogbook"
+              [matAutocomplete]="autoLogbookChip" [matChipInputSeparatorKeyCodes]="separatorKeysCodes"
+              [matChipInputAddOnBlur]="addOnBlur" [formControl]="additionalLogbooksCtrl">
           </mat-chip-list>
-          <mat-autocomplete #autoLogbookChip="matAutocomplete" [displayWith]="displayFnLogbookSelection" (optionSelected)="addLogbook($event)">
-            <mat-option *ngFor="let logbook of filteredAdditionalLogbooks | async" [value]="logbook" [matTooltip]="'Group: ' + logbook.ownerGroup + '; Description: ' + logbook.description">
+          <mat-autocomplete #autoLogbookChip="matAutocomplete" [displayWith]="displayFnLogbookSelection"
+            (optionSelected)="addLogbook($event)">
+            <mat-option *ngFor="let logbook of filteredAdditionalLogbooks | async" [value]="logbook"
+              [matTooltip]="'Group: ' + logbook.ownerGroup + '; Description: ' + logbook.description">
               {{logbook.name}} ({{logbook.ownerGroup}})
             </mat-option>
           </mat-autocomplete>
@@ -110,6 +108,21 @@
             <input placeholder="Add tags" [matChipInputFor]="chipList"
               [matChipInputSeparatorKeyCodes]="separatorKeysCodes" [matChipInputAddOnBlur]="addOnBlur"
               (matChipInputTokenEnd)="addTag($event)">
+          </mat-chip-list>
+        </div>
+        <header class="subSubHeader">
+          Data must NOT include the following tags
+        </header>
+        <div class="chips">
+          <mat-chip-list #chipList aria-label="Tag selection">
+            <mat-chip *ngFor="let tagItem of excludeTag" [selectable]="selectable" [removable]="removable"
+              (removed)="removeExcludeTag(tagItem)">
+              {{ tagItem.name }}
+              <mat-icon matChipRemove *ngIf="removable">cancel</mat-icon>
+            </mat-chip>
+            <input placeholder="Add tags" [matChipInputFor]="chipList"
+              [matChipInputSeparatorKeyCodes]="separatorKeysCodes" [matChipInputAddOnBlur]="addOnBlur"
+              (matChipInputTokenEnd)="addExcludeTag($event)">
           </mat-chip-list>
         </div>
         <mat-divider></mat-divider>
@@ -132,8 +145,8 @@
       </div>
       <div *ngSwitchCase="'graph'">
         <mat-form-field class="example-full-width">
-          <input type="text" placeholder="Select plot" aria-label="Name" matInput
-            [formControl]="plotControl" [matAutocomplete]="auto">
+          <input type="text" placeholder="Select plot" aria-label="Name" matInput [formControl]="plotControl"
+            [matAutocomplete]="auto">
           <mat-autocomplete autoActiveFirstOption #auto="matAutocomplete" [displayWith]="displayFnSnippetSelectionPlot">
             <mat-option *ngFor="let plot of filteredOptionsPlot | async" [value]="plot">
               {{plot["name"]}}

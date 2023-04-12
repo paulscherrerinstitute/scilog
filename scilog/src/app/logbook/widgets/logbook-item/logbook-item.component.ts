@@ -523,6 +523,11 @@ export class LogbookItemComponent implements OnInit {
           return false;
         }
       })
+      this.config.filter.excludeTags.forEach((tag) => {
+        if (snippet.tags.includes(tag)) {
+          return false;
+        }
+      })
       if (typeof this.config.filter.targetId != 'undefined') {
         let logbookIds = [this.config.filter.targetId, ...this.config.filter.additionalLogbooks];
         return logbookIds.includes(snippet.parentId);

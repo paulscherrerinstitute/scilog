@@ -119,7 +119,11 @@ export class LogbookItemDataService extends RemoteDataService {
       config.filter.tags.forEach(tag => {
         whereFilter.push({ "tags": tag })
       })
-
+    }
+    if ((config.filter.excludeTags) && (config.filter.excludeTags.length > 0)) {
+      config.filter.excludeTags.forEach(tag => {
+        whereFilter.push({ "tags": { "neq": tag } })
+      })
     }
     httpFilter["where"] = { "and": whereFilter };
 
@@ -354,7 +358,7 @@ export class LogbookDataService extends RemoteDataService {
     if (index > 0) {
       httpFilter["skip"] = index;
     }
-    
+
     if (this._searchString.length > 0) {
       httpFilter["include"] = [{ "relation": "subsnippets" }];
     }
