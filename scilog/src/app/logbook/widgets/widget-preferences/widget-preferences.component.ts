@@ -90,13 +90,13 @@ export class WidgetPreferencesComponent implements OnInit {
     this.title.setValue(this.data.general.title);
     this.widgetType.setValue(this.data.general.type);
 
-    if (this.data.filter.tags && this.data.filter.tags.length > 0) {
+    if (this.data.filter.tags?.length > 0) {
       this.data.filter.tags.forEach((tag: string) => {
         console.log(tag);
         this.tag.push({ name: tag });
       })
     }
-    if (this.data.filter.excludeTags && this.data.filter.excludeTags.length > 0) {
+    if (this.data.filter.excludeTags?.length > 0) {
       this.data.filter.excludeTags.forEach((tag: string) => {
         console.log(tag);
         this.excludeTag.push({ name: tag });
