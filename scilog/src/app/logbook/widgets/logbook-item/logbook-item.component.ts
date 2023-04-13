@@ -518,16 +518,21 @@ export class LogbookItemComponent implements OnInit {
       if ((snippet.linkType) && ((snippet.linkType == "comment") || (snippet.linkType == "quote"))) {
         return includeSnippet;
       }
-      this.config.filter.tags.forEach((tag) => {
-        if (!snippet.tags.includes(tag)) {
-          return false;
-        }
-      })
-      this.config.filter.excludeTags.forEach((tag) => {
-        if (snippet.tags.includes(tag)) {
-          return false;
-        }
-      })
+      if (this.config.filter.tags?.length > 0) {
+        this.config.filter.tags.forEach((tag) => {
+          if (!snippet.tags.includes(tag)) {
+            return false;
+          }
+        })
+      }
+      if (this.config.filter.excludeTags?.length > 0) {
+        this.config.filter.excludeTags.forEach((tag) => {
+          if (snippet.tags.includes(tag)) {
+            return false;
+          }
+        })
+      }
+
       if (typeof this.config.filter.targetId != 'undefined') {
         let logbookIds = [this.config.filter.targetId, ...this.config.filter.additionalLogbooks];
         return logbookIds.includes(snippet.parentId);
