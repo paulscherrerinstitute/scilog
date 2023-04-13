@@ -32,7 +32,7 @@ class AddContentServiceMock {
 }
 
 class LogbookInfoServiceMock {
-  getLogbookInfo(id:string){
+  getLogbookInfo(id: string) {
     return;
   }
   logbookInfo = {
@@ -47,14 +47,14 @@ const getConfig = () => ({});
 export class ViewsServiceMock {
   widgetConfigs: WidgetConfig[] = [];
   private widgetConfigSource = new BehaviorSubject(this.widgetConfigs);
-  public currentWidgetConfigs:Observable<WidgetConfig[]>;
+  public currentWidgetConfigs: Observable<WidgetConfig[]>;
   public views: Views[] = [];
   private _currentView: Views = null;
   personalViewIndex: number = null;
   private currentLogbook: Logbooks = null;
 
   defaultConfig: WidgetConfig[];
-  constructor(){
+  constructor() {
     console.log("using mocking class");
 
     this.defaultConfig = [{
@@ -108,52 +108,52 @@ class DatasourceMock {
   adapter: any;
   get: any;
   settings: any;
-  constructor(){
+  constructor() {
     this.adapter = new DatasourceAdapterMock();
   }
-  
+
 
 }
 
-class DatasourceAdapterMock{
-  bof:boolean;
-  eof:boolean;
-  constructor(){};
-  check(){}
-  append(){}
-  
+class DatasourceAdapterMock {
+  bof: boolean;
+  eof: boolean;
+  constructor() { };
+  check() { }
+  append() { }
+
 }
 
 class ChildSnippetsMock {
   // constructor(){}
-  toArray(){
+  toArray() {
     return [
-      {snippet: {subsnippets: []}}
+      { snippet: { subsnippets: [] } }
     ]
   }
 }
 
 export class QueryParams implements ParamMap {
 
-   readonly keys: string[] = [];
-   private params = new Map();
+  readonly keys: string[] = [];
+  private params = new Map();
 
-   set(name: string, value: string) {
-      this.keys.push(name);
-      this.params.set(name, value);
-   }
+  set(name: string, value: string) {
+    this.keys.push(name);
+    this.params.set(name, value);
+  }
 
-   get(name: string): string | null {
-      return this.has(name) ? this.params.get(name) : null;
-   }
+  get(name: string): string | null {
+    return this.has(name) ? this.params.get(name) : null;
+  }
 
-   has(name: string): boolean {
-      return this.params.has(name);
-   }
+  has(name: string): boolean {
+    return this.params.has(name);
+  }
 
-   getAll(name: string): string[] {
-      return this.params.has(name) ? [this.params.get(name)] : [];
-   }
+  getAll(name: string): string[] {
+    return this.params.has(name) ? [this.params.get(name)] : [];
+  }
 }
 
 describe('LogbookItemComponent', () => {
@@ -162,9 +162,9 @@ describe('LogbookItemComponent', () => {
   let fixture: ComponentFixture<LogbookItemComponent>;
   const queryParams = new QueryParams();
   queryParams.set('type', '?');
-  let viewsSpy:any;
+  let viewsSpy: any;
   let logbookItemDataServiceSpy: any;
-  let scrollServiceSpy:any;
+  let scrollServiceSpy: any;
   let defaultConfig: WidgetConfig[] = [{
     cols: 1,
     rows: 4,
@@ -200,11 +200,11 @@ describe('LogbookItemComponent', () => {
       }
     }
   }];
-  
+
 
   const activatedRouteMock = {
-     parent: { url: of(queryParams) },
-     snapshot: { queryParams: {id: '1234'}}
+    parent: { url: of(queryParams) },
+    snapshot: { queryParams: { id: '1234' } }
   };
   beforeEach(waitForAsync(() => {
 
@@ -230,9 +230,9 @@ describe('LogbookItemComponent', () => {
         { provide: ViewsService, useValue: viewsSpy },
         { provide: SnackbarService, useClass: SnackbarServiceMock },
         { provide: ActivatedRoute, useValue: activatedRouteMock },
-        { provide: Datasource, useClass: DatasourceMock},
-        { provide: LogbookDataService, useValue: logbookItemDataServiceSpy},
-        { provide: LogbookScrollService, useValue: scrollServiceSpy},
+        { provide: Datasource, useClass: DatasourceMock },
+        { provide: LogbookDataService, useValue: logbookItemDataServiceSpy },
+        { provide: LogbookScrollService, useValue: scrollServiceSpy },
         { provide: AppConfigService, useValue: { getConfig } },
       ],
       declarations: [LogbookItemComponent]
@@ -262,10 +262,10 @@ describe('LogbookItemComponent', () => {
   });
 
   // PARSENOTIFICATION
-  it('should parse new update notification', ()=>{
+  it('should parse new update notification', () => {
     spyOn(component["logbookScrollService"], "updateViewportEstimate");
-    let notificationMock:ChangeStreamNotification[] = [
-      {operationType: "update", content: {id: "123"}}
+    let notificationMock: ChangeStreamNotification[] = [
+      { operationType: "update", content: { id: "123" } }
     ];
     component.parseNotification(notificationMock[0]);
     expect(component["logbookScrollService"].updateViewportEstimate).toHaveBeenCalledTimes(1);
@@ -281,51 +281,51 @@ describe('LogbookItemComponent', () => {
   //   expect(component.datasource.adapter.check).toHaveBeenCalledTimes(1);
 
   // })
-  it('should parse new paragraph insert notification', ()=>{
+  it('should parse new paragraph insert notification', () => {
     spyOn(component["logbookScrollService"], "appendToEOF");
-    let notificationMock:ChangeStreamNotification[] = [
-      {operationType: "insert", content: {id: "123", parentId: "12345parentID", snippetType: "paragraph", textcontent:"dummy text", linkType:"paragraph"}}
+    let notificationMock: ChangeStreamNotification[] = [
+      { operationType: "insert", content: { id: "123", parentId: "12345parentID", snippetType: "paragraph", textcontent: "dummy text", linkType: "paragraph" } }
     ];
     component.parseNotification(notificationMock[0]);
     expect(component["logbookScrollService"].appendToEOF).toHaveBeenCalledTimes(1);
   })
 
-  it('should not append paragraph if parentID does not match', ()=>{
+  it('should not append paragraph if parentID does not match', () => {
     spyOn(component["logbookScrollService"], "appendToEOF");
-    let notificationMock:ChangeStreamNotification[] = [
-      {operationType: "insert", content: {id: "123", parentId: "wrongparentID", snippetType: "paragraph", textcontent:"dummy text", linkType:"paragraph"}}
+    let notificationMock: ChangeStreamNotification[] = [
+      { operationType: "insert", content: { id: "123", parentId: "wrongparentID", snippetType: "paragraph", textcontent: "dummy text", linkType: "paragraph" } }
     ];
     component.parseNotification(notificationMock[0]);
     expect(component["logbookScrollService"].appendToEOF).toHaveBeenCalledTimes(0);
   })
 
-  it('should append paragraph with tags', ()=>{
+  it('should append paragraph with tags', () => {
     spyOn(component["logbookScrollService"], "appendToEOF");
     spyOn(component["tagService"], "addTags");
-    let notificationMock:ChangeStreamNotification[] = [
-      {operationType: "insert", content: {id: "123", parentId: "12345parentID", snippetType: "paragraph", textcontent:"dummy text", tags:["alignment"], linkType:"paragraph"}}
+    let notificationMock: ChangeStreamNotification[] = [
+      { operationType: "insert", content: { id: "123", parentId: "12345parentID", snippetType: "paragraph", textcontent: "dummy text", tags: ["alignment"], linkType: "paragraph" } }
     ];
     component.parseNotification(notificationMock[0]);
     // expect(component["tagService"].addTags).toHaveBeenCalledTimes(1);
     expect(component["logbookScrollService"].appendToEOF).toHaveBeenCalledTimes(1);
   })
 
-  it('should not append paragraph without content', ()=>{
+  it('should not append paragraph without content', () => {
     spyOn(component["logbookScrollService"], "appendToEOF");
     spyOn(component["logbookScrollService"], "prependToBOF");
-    let notificationMock:ChangeStreamNotification[] = [
-      {operationType: "insert", content: {}}
+    let notificationMock: ChangeStreamNotification[] = [
+      { operationType: "insert", content: {} }
     ];
     component.parseNotification(notificationMock[0]);
     expect(component["logbookScrollService"].appendToEOF).toHaveBeenCalledTimes(0);
     expect(component["logbookScrollService"].prependToBOF).toHaveBeenCalledTimes(0);
   })
 
-  it('should parse new image insert notification', ()=>{
+  it('should parse new image insert notification', () => {
     spyOn(component["logbookScrollService"], "appendToEOF");
 
-    let notificationMock:ChangeStreamNotification[] = [
-      {operationType: "insert", content: {id: "123", snippetType: "image", tags:[], linkType:"paragraph"}}
+    let notificationMock: ChangeStreamNotification[] = [
+      { operationType: "insert", content: { id: "123", snippetType: "image", tags: [], linkType: "paragraph" } }
     ];
 
     component.parseNotification(notificationMock[0]);
@@ -333,53 +333,156 @@ describe('LogbookItemComponent', () => {
   })
 
   // FILTER
-  it('should not filter comments', ()=>{
-    let notificationMock:ChangeStreamNotification[] = [
-      {operationType: "insert", content: {id: "123", parentId:"wrongID", snippetType: "image", tags:[], linkType:"comment"}}
+  it('should not filter comments', () => {
+    let notificationMock: ChangeStreamNotification[] = [
+      { operationType: "insert", content: { id: "123", parentId: "wrongID", snippetType: "image", tags: [], linkType: "comment" } }
     ];
     expect(component.applyFilters([notificationMock[0].content]).length).toBe(1);
   })
 
-  it('should not filter quotes', ()=>{
-    let notificationMock:ChangeStreamNotification[] = [
-      {operationType: "insert", content: {id: "123", parentId:"wrongID", snippetType: "image", tags:[], linkType:"quote"}}
+  it('should not filter quotes', () => {
+    let notificationMock: ChangeStreamNotification[] = [
+      { operationType: "insert", content: { id: "123", parentId: "wrongID", snippetType: "image", tags: [], linkType: "quote" } }
     ];
     expect(component.applyFilters([notificationMock[0].content]).length).toBe(1);
   })
 
-  it('should filter paragraphs', ()=>{
-    let notificationMock:ChangeStreamNotification[] = [
-      {operationType: "insert", content: {id: "123", parentId:"wrongID", snippetType: "image", tags:[], linkType:"paragraphs"}}
+
+  it('should not filter out snippets that have the required tag', () => {
+    let configWithTags = {
+      general: {
+        type: 'logbook',
+        title: 'Logbook view',
+      },
+      filter: {
+        targetId: "12345parentID",
+        additionalLogbooks: [],
+        tags: ["includeTag"]
+      },
+      view: {
+        order: ['defaultOrder ASC'],
+        hideMetadata: false,
+        showSnippetHeader: false
+      }
+    }
+    component.config = configWithTags;
+
+    let notificationMock: ChangeStreamNotification[] = [
+      { operationType: "insert", content: { id: "123", parentId: "12345parentID", snippetType: "paragraph", tags: ["includeTag"], linkType: "paragraphs" } }
+    ];
+    expect(component.applyFilters([notificationMock[0].content]).length).toBe(1);
+  })
+
+  it('should filter out snippets that dont have the required tag', () => {
+    let configWithTags = {
+      general: {
+        type: 'logbook',
+        title: 'Logbook view',
+      },
+      filter: {
+        targetId: "12345parentID",
+        additionalLogbooks: [],
+        tags: ["includeTag"]
+      },
+      view: {
+        order: ['defaultOrder ASC'],
+        hideMetadata: false,
+        showSnippetHeader: false
+      }
+    }
+    component.config = configWithTags;
+
+    let notificationMock: ChangeStreamNotification[] = [
+      { operationType: "insert", content: { id: "123", parentId: "12345parentID", snippetType: "paragraph", tags: [], linkType: "paragraphs" } }
     ];
     expect(component.applyFilters([notificationMock[0].content]).length).toBe(0);
   })
 
-  it('should submit PATCH message', ()=>{
+  it('should filter out snippets that have the excluded tag', () => {
+    let configWithTags = {
+      general: {
+        type: 'logbook',
+        title: 'Logbook view',
+      },
+      filter: {
+        targetId: "12345parentID",
+        additionalLogbooks: [],
+        tags: ["includeTag"],
+        excludeTags: ["notWanted"]
+      },
+      view: {
+        order: ['defaultOrder ASC'],
+        hideMetadata: false,
+        showSnippetHeader: false
+      }
+    }
+    component.config = configWithTags;
+
+    let notificationMock: ChangeStreamNotification[] = [
+      { operationType: "insert", content: { id: "123", parentId: "12345parentID", snippetType: "paragraph", tags: ["notWanted"], linkType: "paragraphs" } }
+    ];
+    expect(component.applyFilters([notificationMock[0].content]).length).toBe(0);
+  })
+
+  it('should not filter out snippets that dont have the excluded tag', () => {
+    let configWithTags = {
+      general: {
+        type: 'logbook',
+        title: 'Logbook view',
+      },
+      filter: {
+        targetId: "12345parentID",
+        additionalLogbooks: [],
+        tags: ["includeTag"],
+        excludeTags: ["notWanted"]
+      },
+      view: {
+        order: ['defaultOrder ASC'],
+        hideMetadata: false,
+        showSnippetHeader: false
+      }
+    }
+    component.config = configWithTags;
+
+    let notificationMock: ChangeStreamNotification[] = [
+      { operationType: "insert", content: { id: "123", parentId: "12345parentID", snippetType: "paragraph", tags: ["includeTag"], linkType: "paragraphs" } }
+    ];
+    expect(component.applyFilters([notificationMock[0].content]).length).toBe(1);
+  })
+
+  it('should filter paragraphs', () => {
+    let notificationMock: ChangeStreamNotification[] = [
+      { operationType: "insert", content: { id: "123", parentId: "wrongID", snippetType: "image", tags: [], linkType: "paragraphs" } }
+    ];
+    expect(component.applyFilters([notificationMock[0].content]).length).toBe(0);
+  })
+
+  it('should submit PATCH message', () => {
     spyOn(component["logbookItemDataService"], "uploadParagraph");
     spyOn(component, "_preparePatchPayload").and.returnValue(jasmine.any(Object));
 
-    let notificationMock:ChangeStreamNotification = {id: "123", parentId:"wrongID", snippetType: "image", tags:[], linkType:"paragraphs"};
-    component["logbookInfo"].logbookInfo = {ownerGroup: "p17301", accessGroups: ["any-authenticated-user", "slscsaxs"], isPrivate: false, tags: []}
+    let notificationMock: ChangeStreamNotification = { id: "123", parentId: "wrongID", snippetType: "image", tags: [], linkType: "paragraphs" };
+    component["logbookInfo"].logbookInfo = { ownerGroup: "p17301", accessGroups: ["any-authenticated-user", "slscsaxs"], isPrivate: false, tags: [] }
     component.submitContent(notificationMock);
     expect(component._preparePatchPayload).toHaveBeenCalledWith(jasmine.any(Object), jasmine.any(Object));
     expect(component["logbookItemDataService"].uploadParagraph).toHaveBeenCalledWith(jasmine.any(Object), jasmine.any(String));
   })
 
-  it('should submit POST message', ()=>{
+  it('should submit POST message', () => {
     spyOn(component["logbookItemDataService"], "uploadParagraph");
     spyOn(component, "_preparePostPayload").and.returnValue(jasmine.any(Object));
 
-    let notificationMock:ChangeStreamNotification= {parentId:"123546", snippetType: "image", tags:[], linkType:"paragraphs"};
-    component["logbookInfo"].logbookInfo = {ownerGroup: "p17301", accessGroups: ["any-authenticated-user", "slscsaxs"], isPrivate: false, tags: []}
+    let notificationMock: ChangeStreamNotification = { parentId: "123546", snippetType: "image", tags: [], linkType: "paragraphs" };
+    component["logbookInfo"].logbookInfo = { ownerGroup: "p17301", accessGroups: ["any-authenticated-user", "slscsaxs"], isPrivate: false, tags: [] }
     component.submitContent(notificationMock);
 
     expect(component._preparePostPayload).toHaveBeenCalledWith(jasmine.any(Object), jasmine.any(Object));
     expect(component["logbookItemDataService"].uploadParagraph).toHaveBeenCalledWith(jasmine.any(Object));
   })
 
-  it('should prepare payload with correct parameters', ()=>{
-    let referenceEntry = {ownerGroup: "p17301", accessGroups: ["slscsaxs", "any-authenticated-user"], isPrivate: false, tags: ["alignment"]}
-    let msg = {tags: ["alignment"], textcontent: "my new snippet text", files: [], isMessage: false, linkType: "paragraph"}
+  it('should prepare payload with correct parameters', () => {
+    let referenceEntry = { ownerGroup: "p17301", accessGroups: ["slscsaxs", "any-authenticated-user"], isPrivate: false, tags: ["alignment"] }
+    let msg = { tags: ["alignment"], textcontent: "my new snippet text", files: [], isMessage: false, linkType: "paragraph" }
 
     let res = component._preparePatchPayload(referenceEntry, msg);
     // I guess it should only take these variables if they are not defined in the msg...
@@ -403,24 +506,24 @@ describe('LogbookItemComponent', () => {
     expect(res.textcontent).toEqual(msg.textcontent);
     expect(res.parentId).not.toBeDefined();
 
-    let msgWithParentId = {tags: ["alignment"], textcontent: "my new snippet text", files: [], isMessage: false, linkType: "paragraph", parentId: "123ParentId"}
+    let msgWithParentId = { tags: ["alignment"], textcontent: "my new snippet text", files: [], isMessage: false, linkType: "paragraph", parentId: "123ParentId" }
     res = component._preparePostPayload(referenceEntry, msgWithParentId);
     expect(res.textcontent).toEqual(msgWithParentId.textcontent);
     expect(res.parentId).toEqual(msgWithParentId.parentId);
   })
 
-  it('Should add to index', ()=>{
+  it('Should add to index', () => {
     expect(component["_indexOrder"](2)).toEqual(3);
   })
 
-  it('Should remove from index', ()=>{
-    component.config = {view: {order: ["defaultOrder DESC"]}, general: {}, filter: {}};
+  it('Should remove from index', () => {
+    component.config = { view: { order: ["defaultOrder DESC"] }, general: {}, filter: {} };
     expect(component["_indexOrder"](2)).toEqual(8);
   })
 
-  it('should delete logbook and update logbook count', ()=>{
+  it('should delete logbook and update logbook count', () => {
     spyOn(component["logbookScrollService"], "remove");
-    let notificationMock: ChangeStreamNotification = {operationType: "update", content: {deleted: true}};
+    let notificationMock: ChangeStreamNotification = { operationType: "update", content: { deleted: true } };
     component.parseNotification(notificationMock);
     expect(component.logbookCount).toEqual(9);
     expect(component["logbookScrollService"].remove).toHaveBeenCalled();
