@@ -207,7 +207,7 @@ export class WidgetPreferencesComponent implements OnInit {
     const input = event.input;
     const value = event.value;
 
-    if ((value || '').trim()) {
+    if ((value ?? "").trim()) {
       this.tag.push({ name: value.trim() });
     }
 
@@ -220,7 +220,7 @@ export class WidgetPreferencesComponent implements OnInit {
     const input = event.input;
     const value = event.value;
 
-    if ((value || '').trim()) {
+    if ((value ?? '').trim()) {
       this.excludeTag.push({ name: value.trim() });
     }
 
