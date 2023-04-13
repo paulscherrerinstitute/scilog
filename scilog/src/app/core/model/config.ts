@@ -1,8 +1,8 @@
 export interface WidgetConfig {
     cols: number,
-    rows: number, 
+    rows: number,
     y: number,
-    x: number, 
+    x: number,
     config: WidgetItemConfig
 }
 
@@ -15,7 +15,8 @@ export interface WidgetItemConfig {
     filter: {
         targetId?: string,
         additionalLogbooks?: string[],
-        tags?: string[]
+        tags?: string[],
+        excludeTags?: string[],
         ownerGroup?: string,
         accessGroups?: string[],
         snippetType?: string[]
