@@ -3,7 +3,7 @@ import {EXPORT_SERVICE} from '../keys';
 import {Filecontainer, Paragraph} from '../models';
 import * as puppeteer from 'puppeteer';
 import {JSDOM} from 'jsdom';
-import {RestBindings} from '@loopback/rest';
+import {RestBindings, Server} from '@loopback/rest';
 
 @bind({
   scope: BindingScope.TRANSIENT,
@@ -18,8 +18,8 @@ export class ExportService {
   };
 
   constructor(
-    @inject(RestBindings.URL)
-    private url: string,
+    @inject(RestBindings.SERVER)
+    private server: Server,
   ) {
     const dom = new JSDOM('<!DOCTYPE html>');
     this.document = dom.window.document;
@@ -71,7 +71,7 @@ export class ExportService {
       const image = imageElement.querySelector(
         `[title="${file.fileHash}"]`,
       ) as HTMLImageElement;
-      image.src = `${this.url}/images/${
+      image.src = `${this.server.url}/images/${
         (file as Filecontainer & {accessHash: string}).accessHash
       }`;
     });

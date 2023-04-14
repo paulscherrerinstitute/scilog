@@ -4,6 +4,7 @@ import {createSandbox, SinonSandbox} from 'sinon';
 
 import {ExportService} from '../../services/export-snippets.service';
 import {LinkType, Paragraph} from '../../models';
+import {Server} from '@loopback/rest';
 
 describe('Export service unit', function (this: Suite) {
   let tests: string[] | string[][];
@@ -42,7 +43,7 @@ describe('Export service unit', function (this: Suite) {
   }
 
   beforeEach(() => {
-    exportService = new ExportService('http://localhost:3000');
+    exportService = new ExportService({url: 'http://localhost:3000'} as Server);
     textElement = emptyElementTextContent(paragraph);
     sandbox = createSandbox();
   });
