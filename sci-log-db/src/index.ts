@@ -13,7 +13,6 @@ export async function main(options: ApplicationConfig = {}) {
   app.restServer.httpServer!.server.keepAliveTimeout = 76000;
   app.restServer.httpServer!.server.headersTimeout = 77000;
   const url = app.restServer.url;
-  process.env.LB_URL = url;
   console.log(`Server is running at ${url}`);
 
   return app;

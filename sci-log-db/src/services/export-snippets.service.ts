@@ -1,8 +1,9 @@
-import {bind, BindingScope, ContextTags} from '@loopback/core';
+import {bind, BindingScope, ContextTags, inject} from '@loopback/core';
 import {EXPORT_SERVICE} from '../keys';
 import {Filecontainer, Paragraph} from '../models';
 import * as puppeteer from 'puppeteer';
 import {JSDOM} from 'jsdom';
+import {RestBindings} from '@loopback/rest';
 
 @bind({
   scope: BindingScope.TRANSIENT,
@@ -16,7 +17,10 @@ export class ExportService {
     options: {year: 'numeric', month: 'short', day: 'numeric'} as const,
   };
 
-  constructor() {
+  constructor(
+    @inject(RestBindings.URL)
+    private url: string,
+  ) {
     const dom = new JSDOM('<!DOCTYPE html>');
     this.document = dom.window.document;
     this.body = this.document.body as HTMLBodyElement;
@@ -67,7 +71,7 @@ export class ExportService {
       const image = imageElement.querySelector(
         `[title="${file.fileHash}"]`,
       ) as HTMLImageElement;
-      image.src = `${process.env.LB_URL}/images/${
+      image.src = `${this.url}/images/${
         (file as Filecontainer & {accessHash: string}).accessHash
       }`;
     });
