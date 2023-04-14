@@ -60,20 +60,18 @@ export class ExportService {
   };
 
   private figure = (snippet: Paragraph, element: Element): Element => {
-    if (snippet.textcontent?.includes('<img')) {
-      const imageElement = this.document.createElement('imageSnippet');
-      imageElement.append(element);
-      snippet.files?.map(file => {
-        const image = imageElement.querySelector(
-          `[title="${file.fileHash}"]`,
-        ) as HTMLImageElement;
-        image.src = `http://localhost:3000/images/${
-          (file as Filecontainer & {accessHash: string}).accessHash
-        }`;
-      });
-      return imageElement;
-    }
-    return element;
+    if (!snippet.textcontent?.includes('<img')) return element;
+    const imageElement = this.document.createElement('imageSnippet');
+    imageElement.append(element);
+    snippet.files?.map(file => {
+      const image = imageElement.querySelector(
+        `[title="${file.fileHash}"]`,
+      ) as HTMLImageElement;
+      image.src = `http://localhost:3000/images/${
+        (file as Filecontainer & {accessHash: string}).accessHash
+      }`;
+    });
+    return imageElement;
   };
 
   private textContentToHTML = (
