@@ -132,9 +132,11 @@ export class ExportService {
     }
   };
 
-  private addTitle = () => {
+  private addTitle = (titleName?: string) => {
     const title = this.document.createElement('h1');
-    title.innerHTML = `SciLog: ${new Date().toLocaleDateString(
+    title.innerHTML = `${
+      titleName ?? 'Scilog'
+    }: ${new Date().toLocaleDateString(
       this.dateOptions.locales,
       this.dateOptions.options,
     )}`;
@@ -144,8 +146,8 @@ export class ExportService {
     this.body.append(hr);
   };
 
-  async exportToPdf(snippets: Paragraph[], exportFile: string) {
-    this.addTitle();
+  async exportToPdf(snippets: Paragraph[], exportFile: string, title?: string) {
+    this.addTitle(title);
     snippets.map((s: Paragraph) => this.paragraphToHTML(s));
     const browser = await puppeteer.launch({
       executablePath: process.env.CHROME_BIN,

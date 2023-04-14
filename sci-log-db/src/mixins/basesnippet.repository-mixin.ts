@@ -11,7 +11,7 @@ import {
   Condition,
   OrClause,
 } from '@loopback/repository';
-import {Basesnippet, Paragraph} from '../models';
+import {Basesnippet, Logbook, Paragraph} from '../models';
 import {UserProfile} from '@loopback/security';
 import {HttpErrors, Response} from '@loopback/rest';
 import _ from 'lodash';
@@ -326,12 +326,14 @@ function ExportRepositoryMixin<
       const snippets = await this.find(filter, {
         currentUser: user,
       });
+      const parentName = await this.getParentName(filter, snippets, user);
       const jobEntity = await this.createExportJob(snippets, filter, user);
       const {exportFile, exportDir} = this.createPathsFromJob(jobEntity);
       const exportService = await this.exportServiceGetter();
       await exportService.exportToPdf(
         snippets as unknown as Paragraph[],
         exportFile,
+        parentName,
       );
       response.download(exportFile, (err, path = exportDir) => {
         console.log('file transferred successfully', err);
@@ -340,6 +342,20 @@ function ExportRepositoryMixin<
         }
       });
       return response;
+    }
+
+    private async getParentName(
+      filter: Filter<M> | undefined,
+      snippets: (M & Relations)[],
+      user: UserProfile,
+    ) {
+      if (!JSON.stringify(filter ?? '').includes('parentId')) return;
+      const parentSnippet = await this.findById(
+        snippets[0].parentId as ID,
+        undefined,
+        {currentUser: user},
+      );
+      return (parentSnippet as unknown as Logbook)?.name;
     }
 
     private async createExportJob(

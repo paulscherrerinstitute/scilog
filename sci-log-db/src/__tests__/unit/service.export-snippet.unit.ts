@@ -137,9 +137,9 @@ describe('Export service unit', function (this: Suite) {
 
   it('addTitle', () => {
     sandbox.stub(Date.prototype, 'toLocaleDateString').returns('13 Apr 2023');
-    exportService['addTitle']();
+    exportService['addTitle']('Some test');
     expect(exportService.body.innerHTML).to.be.eql(
-      '<h1>SciLog: 13 Apr 2023</h1><hr style="border-top: 5px solid;">',
+      '<h1>Some test: 13 Apr 2023</h1><hr style="border-top: 5px solid;">',
     );
   });
 
