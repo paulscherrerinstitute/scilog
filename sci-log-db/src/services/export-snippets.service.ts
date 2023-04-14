@@ -67,7 +67,7 @@ export class ExportService {
       const image = imageElement.querySelector(
         `[title="${file.fileHash}"]`,
       ) as HTMLImageElement;
-      image.src = `http://localhost:3000/images/${
+      image.src = `${process.env.LB_URL}/images/${
         (file as Filecontainer & {accessHash: string}).accessHash
       }`;
     });

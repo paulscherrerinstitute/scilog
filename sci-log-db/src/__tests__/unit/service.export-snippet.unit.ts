@@ -10,6 +10,7 @@ describe('Export service unit', function (this: Suite) {
   let sandbox: SinonSandbox;
   let textElement: Element;
   let exportService: ExportService;
+  const env = Object.assign({}, process.env);
   const textcontent = '<img src="" title="123"><img src="" title="456">';
   const paragraph = new Paragraph({
     textcontent: textcontent,
@@ -42,12 +43,14 @@ describe('Export service unit', function (this: Suite) {
   }
 
   beforeEach(() => {
+    process.env.LB_URL = 'http://localhost:3000';
     exportService = new ExportService();
     textElement = emptyElementTextContent(paragraph);
     sandbox = createSandbox();
   });
 
   afterEach(() => {
+    process.env = env;
     sandbox.restore();
   });
 
