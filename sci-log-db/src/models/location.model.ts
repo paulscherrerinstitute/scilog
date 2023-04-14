@@ -9,9 +9,9 @@ export interface Filecontainer {
     height: string;
   };
   fileId?: string;
-  fileHash?: string,
-  fileExtension?: string,
-  accessHash?: string,
+  fileHash?: string;
+  fileExtension?: string;
+  accessHash?: string;
 }
 
 @model({

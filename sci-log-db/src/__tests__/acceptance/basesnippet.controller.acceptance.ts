@@ -361,29 +361,6 @@ describe('Basesnippet', function (this: Suite) {
       .expect(204);
   });
 
-  it('export snippet without token should return 401', async () => {
-    await client
-      .get(`/basesnippets/export=zip`)
-      .set('Content-Type', 'application/json')
-      .expect(401);
-  });
-
-  it('export snippet with token should return 200 and exported zip', async () => {
-    await client
-      .get(`/basesnippets/export=zip`)
-      .set('Authorization', 'Bearer ' + token)
-      .set('Content-Type', 'application/json')
-      .expect(200)
-      .then(result =>
-        expect(result.headers['content-disposition']).to.be.eql(
-          'attachment; filename="all.zip"',
-        ),
-      )
-      .catch(err => {
-        throw err;
-      });
-  });
-
   it('export snippet with token should return 200 and exported pdf', async () => {
     await client
       .get(`/basesnippets/export=pdf`)

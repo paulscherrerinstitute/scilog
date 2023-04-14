@@ -1,142 +1,168 @@
-import { bind, BindingScope, ContextTags } from '@loopback/core';
-import { EXPORT_SERVICE } from '../keys';
-import { Filecontainer, Paragraph } from '../models';
+import {bind, BindingScope, ContextTags} from '@loopback/core';
+import {EXPORT_SERVICE} from '../keys';
+import {Filecontainer, Paragraph} from '../models';
 import * as puppeteer from 'puppeteer';
-import { JSDOM } from 'jsdom'
+import {JSDOM} from 'jsdom';
 
 @bind({
   scope: BindingScope.TRANSIENT,
-  tags: { [ContextTags.KEY]: EXPORT_SERVICE },
+  tags: {[ContextTags.KEY]: EXPORT_SERVICE},
 })
 export class ExportService {
   document: Document;
   body: HTMLBodyElement;
+  dateOptions = {
+    locales: 'en-GB',
+    options: {year: 'numeric', month: 'short', day: 'numeric'} as const,
+  };
 
-  constructor() { 
+  constructor() {
     const dom = new JSDOM('<!DOCTYPE html>');
     this.document = dom.window.document;
-    this.body = this.document.querySelector('body') as HTMLBodyElement;
+    this.body = this.document.body as HTMLBodyElement;
   }
 
   private comment = (snippet: Paragraph, element: Element) => {
-    if (snippet.linkType === 'comment') {
-      const snippetCommentElement = this.document.createElement('snippetComment');
-      snippetCommentElement.append(element);
-      this.body.append(snippetCommentElement)
-    }
-  }
+    if (snippet.linkType !== 'comment') return;
+    const snippetCommentElement = this.document.createElement('snippetComment');
+    snippetCommentElement.append(element);
+    this.body.append(snippetCommentElement);
+  };
 
-  private appendSnippet = (element: Element, dataAttributes: {[key: string]: string}={}) => {
+  private appendSnippet = (
+    element: Element,
+    dataAttributes: {[key: string]: string} = {},
+  ) => {
     const snippetElement = this.document.createElement('snippet');
-    Object.entries(dataAttributes).map(([k, v]) => element.setAttribute(k, v));
+    Object.entries(dataAttributes).map(([k, v]) =>
+      snippetElement.setAttribute(k, v),
+    );
     snippetElement.append(element);
     this.body.append(snippetElement);
-  }
+  };
 
   private quote = (snippet: Paragraph, element: Element) => {
-    if (snippet.linkType === 'quote') {
-      const snippetCommentElement = this.document.createElement('snippetQuote');
-      snippetCommentElement.append(element);
-      const lastElement = this.body.children[this.body.children.length - 1];
-      if (
-        lastElement.getAttribute('data-quote') !== 'keep'
-      )
-        lastElement.remove();
-      this.body.append(snippetCommentElement);
-      this.appendSnippet(lastElement, {'data-quote': 'keep'});
+    if (snippet.linkType !== 'quote') return;
+    const snippetCommentElement = this.document.createElement('snippetQuote');
+    snippetCommentElement.append(element);
+    const snippets = this.body.querySelectorAll('snippet');
+    const lastSnippet = snippets[snippets.length - 1];
+    if (
+      lastSnippet?.getAttribute('data-quote') === 'remove-if-last' &&
+      (this.body?.lastChild as Element)?.tagName === 'SNIPPET'
+    )
+      lastSnippet.remove();
+    this.body.append(snippetCommentElement);
+    if (lastSnippet) {
+      lastSnippet.setAttribute('data-quote', 'keep');
+      this.body.append(lastSnippet.cloneNode(true));
     }
-  }
-
-  private otherSubnippet = (snippet: Paragraph, element: Element, parentElement: Element) => {
-    if (!['quote', 'comment'].includes(snippet.linkType ?? '')) {
-      this.appendSnippet(parentElement);
-    }
-  }
+  };
 
   private figure = (snippet: Paragraph, element: Element): Element => {
     if (snippet.textcontent?.includes('<img')) {
-      const imageElement = this.document.createElement('imageSnippet')
-      imageElement.append(element)
+      const imageElement = this.document.createElement('imageSnippet');
+      imageElement.append(element);
       snippet.files?.map(file => {
-        const image = imageElement.querySelector(`[title="${file.fileHash}"]`) as HTMLImageElement;
-        image.src = `http://localhost:3000/images/${(file as Filecontainer & {accessHash: string}).accessHash}`;
-      })
+        const image = imageElement.querySelector(
+          `[title="${file.fileHash}"]`,
+        ) as HTMLImageElement;
+        image.src = `http://localhost:3000/images/${
+          (file as Filecontainer & {accessHash: string}).accessHash
+        }`;
+      });
       return imageElement;
     }
     return element;
-  }
+  };
 
-  private textContentToHTML = (snippet: Paragraph, element: Element): Element => {
+  private textContentToHTML = (
+    snippet: Paragraph,
+    element: Element,
+  ): Element => {
     element.innerHTML = snippet.textcontent ?? '';
-    return element
-  }
+    return element;
+  };
 
   private createDivEmptyElement = (): Element => {
-    return this.document.createElement('div')
-  }
+    return this.document.createElement('div');
+  };
 
   private tags = (snippet: Paragraph, element: Element): Element => {
     snippet.tags?.map(t => {
       const tagElement = this.document.createElement('snippet-tag');
       tagElement.innerHTML = t;
-      element.insertAdjacentElement("beforeend", tagElement)
-    })
-    return element
-  }
+      element.insertAdjacentElement('beforeend', tagElement);
+    });
+    return element;
+  };
 
   private dateAndAuthor = (snippet: Paragraph, element: Element): Element => {
     const tagElement = this.document.createElement('snippet-header');
-    const dateOptions = { year: 'numeric', month: 'short', day: 'numeric' } as const;
-    tagElement.innerHTML = `${snippet.updatedAt.toLocaleDateString("en-GB", dateOptions)} / ${snippet.updatedBy}`;
-    element.insertAdjacentElement("afterbegin", tagElement)
-    return element
-  }
+    tagElement.innerHTML = `${snippet.updatedAt.toLocaleDateString(
+      this.dateOptions.locales,
+      this.dateOptions.options,
+    )} / ${snippet.updatedBy}`;
+    element.insertAdjacentElement('afterbegin', tagElement);
+    return element;
+  };
 
   private deep = (snippet: Paragraph): Element => {
-    return [this.textContentToHTML, this.figure, this.tags, this.dateAndAuthor].reduce(
-      (result, currentFunction) => currentFunction(snippet, result), 
-      this.createDivEmptyElement())
-  }
+    return [
+      this.textContentToHTML,
+      this.figure,
+      this.tags,
+      this.dateAndAuthor,
+    ].reduce(
+      (result, currentFunction) => currentFunction(snippet, result),
+      this.createDivEmptyElement(),
+    );
+  };
 
-  private wide = (snippet: Paragraph, element: Element, parentElement: Element) =>  {
-    return [this.otherSubnippet, this.quote, this.comment].map(f => f(snippet, element, parentElement))
-  }
+  private wide = (snippet: Paragraph, element: Element) => {
+    return [this.quote, this.comment].map(f => f(snippet, element));
+  };
 
   private paragraphToHTML = (snippet: Paragraph) => {
     const element = this.deep(snippet);
     this.appendSnippet(element, {'data-quote': 'remove-if-last'});
-    if (snippet.subsnippets?.length && snippet.subsnippets?.length > 0){
+    if (snippet.subsnippets?.length && snippet.subsnippets?.length > 0) {
       snippet.subsnippets.map(s => {
         const subElement = this.deep(s);
-        this.wide(s, subElement, element);
-      })
+        this.wide(s, subElement);
+      });
     }
-  }
+  };
 
-  async exportToPdf(
-    snippets: Paragraph[],
-    exportFile: string,
-  ) {
-    snippets.map((s: Paragraph) => this.paragraphToHTML(s))
+  private addTitle = () => {
+    const title = this.document.createElement('h1');
+    title.innerHTML = `SciLog: ${new Date().toLocaleDateString(
+      this.dateOptions.locales,
+      this.dateOptions.options,
+    )}`;
+    this.body.append(title);
+    const hr = this.document.createElement('hr');
+    hr.setAttribute('style', 'border-top: 5px solid;');
+    this.body.append(hr);
+  };
+
+  async exportToPdf(snippets: Paragraph[], exportFile: string) {
+    this.addTitle();
+    snippets.map((s: Paragraph) => this.paragraphToHTML(s));
     const browser = await puppeteer.launch({
       executablePath: process.env.CHROME_BIN,
-      args: [
-        '--no-sandbox',
-        '--disable-gpu',
-        '--single-process'
-      ],
+      args: ['--no-sandbox', '--disable-gpu', '--single-process'],
     });
     const page = await browser.newPage();
     await page.setContent(this.body.outerHTML);
-    await page.addStyleTag({path: 'src/services/pdf.css'})
+    await page.addStyleTag({path: 'src/services/pdf.css'});
     await page.emulateMediaType('screen');
     await page.pdf({
       path: exportFile,
-      margin: { top: '100px', right: '50px', bottom: '100px', left: '50px' },
+      margin: {top: '100px', right: '50px', bottom: '100px', left: '50px'},
       printBackground: true,
       format: 'A4',
     });
     await browser.close();
   }
-
 }

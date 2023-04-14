@@ -314,8 +314,8 @@ function ExportRepositoryMixin<
     @inject.getter(EXPORT_SERVICE)
     readonly exportServiceGetter: Getter<ExportService>;
 
-    private exportFile = 'export.pd'
-    private basePath = 'tmp'
+    private exportFile = 'export.pdf';
+    private basePath = '/tmp/';
 
     async prepareExport(
       exportType: string,
@@ -323,16 +323,15 @@ function ExportRepositoryMixin<
       user: UserProfile,
       filter?: Filter<M>,
     ): Promise<Response> {
-
       const snippets = await this.find(filter, {
         currentUser: user,
       });
       const jobEntity = await this.createExportJob(snippets, filter, user);
-      const { exportFile, exportDir } = this.createPathsFromJob(jobEntity);
+      const {exportFile, exportDir} = this.createPathsFromJob(jobEntity);
       const exportService = await this.exportServiceGetter();
       await exportService.exportToPdf(
         snippets as unknown as Paragraph[],
-        exportFile
+        exportFile,
       );
       response.download(exportFile, (err, path = exportDir) => {
         console.log('file transferred successfully', err);
@@ -343,14 +342,18 @@ function ExportRepositoryMixin<
       return response;
     }
 
-    private async createExportJob(snippets: (M & Relations)[], filter: Filter<M> | undefined, user: UserProfile) {
+    private async createExportJob(
+      snippets: (M & Relations)[],
+      filter: Filter<M> | undefined,
+      user: UserProfile,
+    ) {
       let job: Object = {};
       if (snippets.length > 0) {
         if (snippets[0]?.parentId) {
           const parent = await this.findById(
             snippets[0].parentId as unknown as ID,
             filter,
-            { currentUser: user }
+            {currentUser: user},
           );
           job = {
             ownerGroup: parent.ownerGroup,
@@ -380,10 +383,10 @@ function ExportRepositoryMixin<
     private createPathsFromJob(jobEntity: M) {
       const exportDir = this.basePath + jobEntity.id;
       if (!fs.existsSync(exportDir)) {
-        fs.mkdirSync(exportDir, { recursive: true });
+        fs.mkdirSync(exportDir, {recursive: true});
       }
       const exportFile = `${exportDir}/${this.exportFile}`;
-      return { exportFile, exportDir };
+      return {exportFile, exportDir};
     }
   }
   return Mixed;
