@@ -65,7 +65,7 @@ describe('ExportDialogComponent', () => {
     component['downloadLink'].nativeElement = new NativeElementMock;
     spyOn(component['downloadLink'].nativeElement, 'click')
 
-    await component.exportData("pdf");
+    await component.exportData();
     expect(mockDialogRef.close).toHaveBeenCalledTimes(1);
     expect(component['downloadLink'].nativeElement.click).toHaveBeenCalledTimes(1);
   })
