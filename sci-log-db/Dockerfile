@@ -1,9 +1,10 @@
 # Check out https://hub.docker.com/_/node to select a new base image
-FROM node:14-slim
+FROM node:18-slim
 
 # Install extra packages
-RUN apt-get update && apt-get install -y zip \
- texlive-latex-extra
+RUN apt-get update && \
+ apt-get install -y chromium \
+ --no-install-recommends
 
 # Set to a non-root built-in user `node`
 USER node
