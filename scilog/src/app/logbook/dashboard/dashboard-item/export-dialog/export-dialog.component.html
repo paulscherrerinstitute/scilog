@@ -2,19 +2,10 @@
   <mat-progress-bar mode="query" [color]="'accent'"></mat-progress-bar>
 </div>
 <div class="exportDialog-container">
-  <h2>Logbook export</h2>
-  <mat-form-field appearance="fill">
-    <!-- <mat-label>Favorite food</mat-label> -->
-    <mat-select [(ngModel)]="selectedExportType">
-      <mat-option *ngFor="let exportType of exportTypes" [value]="exportType.exportType">
-        {{exportType.display}}
-      </mat-option>
-    </mat-select>
-  </mat-form-field>
-
+  <h2>Export to PDF</h2>
   <div class="button">
     <button mat-button (click)="close()">Cancel</button>
-    <button mat-button (click)="exportData(selectedExportType)">Export data</button>
+    <button mat-button (click)="exportData()">Export data</button>
   </div>
 </div>
 <a class="download-link" #downloadLink></a>

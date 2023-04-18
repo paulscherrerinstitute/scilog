@@ -2,11 +2,6 @@ import { Component, ElementRef, Inject, OnInit, ViewChild } from '@angular/core'
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { LogbookItemDataService } from '@shared/remote-data.service';
 
-interface ExportType {
-  exportType: string;
-  display: string;
-}
-
 @Component({
   selector: 'app-export-dialog',
   templateUrl: './export-dialog.component.html',
@@ -15,11 +10,6 @@ interface ExportType {
 export class ExportDialogComponent implements OnInit {
 
   config:any;
-  exportTypes: ExportType[] = [
-    {exportType: "pdf", display: "PDF"},
-    {exportType: "zip", display: "LaTeX zip"}
-  ]
-  selectedExportType = this.exportTypes[0].exportType;
   inProgress = false;
 
   @ViewChild('downloadLink') private downloadLink: ElementRef;
@@ -39,26 +29,16 @@ export class ExportDialogComponent implements OnInit {
     this.dialogRef.close();
   }
 
-  async exportData(exportType: string){
+  async exportData(){
     console.log(this.config)
     this.inProgress = true;
-    console.log(exportType);
-    const blob = await this.logbookItemDataService.exportLogbook(exportType, this.config, 0, Infinity);
+    const blob = await this.logbookItemDataService.exportLogbook('pdf', this.config, 0, Infinity);
     if (typeof blob != "undefined"){
       const url = window.URL.createObjectURL(blob);
   
       const link = this.downloadLink.nativeElement;
       link.href = url;
-      switch (exportType) {
-        case "pdf":
-          link.download = 'export.pdf';
-          break;
-        case "zip":
-          link.download = 'export.zip';
-          break;
-        default:
-          break;
-      }
+      link.download = 'export.pdf';
       link.click();
     
       window.URL.revokeObjectURL(url);
