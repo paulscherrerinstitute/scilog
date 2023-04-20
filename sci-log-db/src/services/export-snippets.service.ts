@@ -71,9 +71,10 @@ export class ExportService {
       const image = imageElement.querySelector(
         `[title="${file.fileHash}"]`,
       ) as HTMLImageElement;
-      image.src = `${this.server.url}/images/${
-        (file as Filecontainer & {accessHash: string}).accessHash
-      }`;
+      if (image)
+        image.src = `${this.server.url}/images/${
+          (file as Filecontainer & {accessHash: string}).accessHash
+        }`;
     });
     return imageElement;
   };
@@ -160,7 +161,7 @@ export class ExportService {
     const page = await browser.newPage();
     await page.setContent(this.body.outerHTML);
     await page.addStyleTag({path: 'src/services/pdf.css'});
-    await page.emulateMediaType('screen');
+    await page.emulateMediaType('print');
     await page.pdf({
       path: exportFile,
       margin: {top: '100px', right: '50px', bottom: '100px', left: '50px'},

@@ -17,6 +17,7 @@ describe('Export service unit', function (this: Suite) {
     files: [
       {fileHash: '123', accessHash: 'abc'},
       {fileHash: '456', accessHash: 'def'},
+      {fileHash: '789', accessHash: 'ghi'},
     ],
     subsnippets: [
       new Paragraph({
