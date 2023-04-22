@@ -24,6 +24,7 @@ export class SnippetContentComponent implements OnInit {
   files: string[] = [];
   defaultFigureWidth = '85%';
   contentWidth = null;
+  _prismed = false;
 
   @ViewChild('contentDiv') contentRef: ElementRef;
 
@@ -45,8 +46,15 @@ export class SnippetContentComponent implements OnInit {
     //Add 'implements AfterViewInit' to the class.
     console.log(this.contentRef.nativeElement.offsetWidth);
     this.contentWidth = this.contentRef.nativeElement.parentElement.offsetWidth;
-    this.prismservice.highlightAll();
+  }
 
+  ngAfterViewChecked(): void {
+    //Called after every check of the component's view. Applies to components only.
+    //Add 'implements AfterViewChecked' to the class.
+    if (!this._prismed) {
+      this.prismservice.highlightAll();
+      this._prismed = true;
+    }
   }
 
   prepareContent() {
@@ -125,6 +133,7 @@ export class SnippetContentComponent implements OnInit {
   set content(value: string) {
     this._content = value;
     this.htmlContent.emit(this._content);
+    this._prismed = false;
   }
 
   get content() {
