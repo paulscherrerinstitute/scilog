@@ -100,6 +100,8 @@ export let CKeditorConfig = {
       { language: 'cpp', label: 'C++' },
       { language: 'css', label: 'CSS' },
       { language: 'html', label: 'HTML' },
+      { language: 'js', label: 'Javascript' },
+      { language: 'typescript', label: 'Typescript' },
       { language: 'c', label: 'C' },
       { language: 'markup', label: 'Markup' },
       { language: 'docker', label: 'Docker' },
