@@ -4,6 +4,7 @@ import {Filecontainer, Paragraph} from '../models';
 import * as puppeteer from 'puppeteer';
 import {JSDOM} from 'jsdom';
 import {RestBindings, Server} from '@loopback/rest';
+import PDFMerger from 'pdf-merger-js';
 
 @bind({
   scope: BindingScope.TRANSIENT,
@@ -16,14 +17,13 @@ export class ExportService {
     locales: 'en-GB',
     options: {year: 'numeric', month: 'short', day: 'numeric'} as const,
   };
+  batchSize = 2000;
 
   constructor(
     @inject(RestBindings.SERVER)
     private server: Server,
   ) {
-    const dom = new JSDOM('<!DOCTYPE html>');
-    this.document = dom.window.document;
-    this.body = this.document.body as HTMLBodyElement;
+    this.createDocumentBody();
   }
 
   private comment = (snippet: Paragraph, element: Element) => {
@@ -151,15 +151,46 @@ export class ExportService {
     this.body.append(hr);
   };
 
+  private createDocumentBody() {
+    const dom = new JSDOM('<!DOCTYPE html>');
+    this.document = dom.window.document;
+    this.body = dom.window.document.body as HTMLBodyElement;
+  }
+
   async exportToPdf(snippets: Paragraph[], exportFile: string, title?: string) {
-    this.addTitle(title);
-    snippets.map((s: Paragraph) => this.paragraphToHTML(s));
     const browser = await puppeteer.launch({
       executablePath: process.env.CHROME_BIN,
-      args: ['--no-sandbox', '--disable-gpu', '--single-process'],
+      args: ['--no-sandbox'],
     });
+    const chunks = Math.ceil(snippets.length / this.batchSize);
+    const pdfs = [...Array(chunks).keys()].map(async c => {
+      this.createDocumentBody();
+      const snippetChunk = snippets.slice(
+        c * this.batchSize,
+        (c + 1) * this.batchSize,
+      );
+      if (c === 0) this.addTitle(title);
+      snippetChunk.map((s: Paragraph) => this.paragraphToHTML(s));
+      await this.htmlToPDF(browser, `${exportFile}.${c}`, this.body.outerHTML);
+    });
+    await Promise.all(pdfs);
+    await browser.close();
+    await this.mergePDFs(chunks, exportFile);
+  }
+
+  private async mergePDFs(chunks: number, exportFile: string) {
+    const merger = new PDFMerger();
+    for (let c = 0; c < chunks; c++) await merger.add(`${exportFile}.${c}`);
+    await merger.save(`${exportFile}`);
+  }
+
+  private async htmlToPDF(
+    browser: puppeteer.Browser,
+    exportFile: string,
+    htmlString: string,
+  ) {
     const page = await browser.newPage();
-    await page.setContent(this.body.outerHTML);
+    await page.setContent(htmlString);
     await page.addStyleTag({path: 'src/services/pdf.css'});
     await page.emulateMediaType('print');
     await page.pdf({
@@ -169,6 +200,5 @@ export class ExportService {
       format: 'A4',
       timeout: 0,
     });
-    await browser.close();
   }
 }
