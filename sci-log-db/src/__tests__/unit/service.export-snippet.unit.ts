@@ -5,6 +5,8 @@ import {createSandbox, SinonSandbox} from 'sinon';
 import {ExportService} from '../../services/export-snippets.service';
 import {LinkType, Paragraph} from '../../models';
 import {Server} from '@loopback/rest';
+import PDFMerger from 'pdf-merger-js';
+import puppeteer from 'puppeteer';
 
 describe('Export service unit', function (this: Suite) {
   let tests: string[] | string[][];
@@ -173,5 +175,44 @@ describe('Export service unit', function (this: Suite) {
     expect(exportService.body.innerHTML).to.be.eql(
       '<snippet data-quote="keep"><imagesnippet><snippet-header>13 Apr 2023 / test</snippet-header><div><img src="http://localhost:3000/images/abc" title="123"><img src="http://localhost:3000/images/def" title="456"></div><snippet-tag>tag1</snippet-tag><snippet-tag>tag2</snippet-tag></imagesnippet></snippet><snippetcomment><div><snippet-header>13 Apr 2023 / test</snippet-header><p>a comment</p></div></snippetcomment><snippetquote><div><snippet-header>13 Apr 2023 / test</snippet-header><p>a quote</p></div></snippetquote><snippet data-quote="keep"><imagesnippet><snippet-header>13 Apr 2023 / test</snippet-header><div><img src="http://localhost:3000/images/abc" title="123"><img src="http://localhost:3000/images/def" title="456"></div><snippet-tag>tag1</snippet-tag><snippet-tag>tag2</snippet-tag></imagesnippet></snippet>',
     );
+  });
+
+  it('mergePDFs', async () => {
+    const pdfAdd = sandbox.stub(PDFMerger.prototype, 'add').resolves();
+    const pdfSave = sandbox.stub(PDFMerger.prototype, 'save');
+    await exportService['mergePDFs'](5, 'aFile');
+    expect(pdfAdd.callCount).to.be.eql(5);
+    expect(pdfAdd.args.map(a => a[0])).to.be.eql([
+      'aFile.0',
+      'aFile.1',
+      'aFile.2',
+      'aFile.3',
+      'aFile.4',
+    ]);
+    expect(pdfSave.args[0]).to.be.eql(['aFile']);
+  });
+
+  const testsExport = [
+    [5, 4],
+    [20, 1],
+  ];
+  testsExport.forEach(([i, o]) => {
+    it(`exportToPdf ${i}`, async () => {
+      exportService.batchSize = i;
+      const paragraphs = Array.from({length: 18}, () => paragraph).flat();
+      sandbox.stub(puppeteer, 'launch');
+      const htmlToPDF = sandbox.stub(
+        exportService,
+        <keyof ExportService>'htmlToPDF',
+      );
+      const addTitle = sandbox.spy(
+        exportService,
+        <keyof ExportService>'addTitle',
+      );
+      sandbox.stub(exportService, <keyof ExportService>'mergePDFs');
+      await exportService['exportToPdf'](paragraphs, 'aFile', 'aTitle');
+      expect(addTitle.callCount).to.be.eql(1);
+      expect(htmlToPDF.callCount).to.be.eql(o);
+    });
   });
 });
