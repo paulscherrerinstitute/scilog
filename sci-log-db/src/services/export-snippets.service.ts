@@ -190,6 +190,7 @@ export class ExportService {
     htmlString: string,
   ) {
     const page = await browser.newPage();
+    page.setDefaultNavigationTimeout(0);
     await page.setContent(htmlString);
     await page.addStyleTag({path: 'src/services/pdf.css'});
     await page.emulateMediaType('print');
