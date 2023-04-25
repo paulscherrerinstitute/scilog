@@ -1,13 +1,16 @@
 import {expect, sinon} from '@loopback/testlab';
 import {SciLogDbApplication} from '../../application';
 import {oidcOptions, setupApplication} from './test-helper';
+import MongoStore from 'connect-mongo';
 
 describe('SetupApp', () => {
   const sandbox = sinon.createSandbox();
   let app: SciLogDbApplication;
+  const env = Object.assign({}, process.env);
 
   afterEach(done => {
     sandbox.restore();
+    process.env = env;
     done();
   });
 
@@ -38,5 +41,24 @@ describe('SetupApp', () => {
     expect(spyBind.args.length).to.be.greaterThan(0);
     // eslint-disable-next-line no-unused-expressions
     expect(spyBind.calledWith('oidcOptions')).to.be.true;
+  });
+
+  const tests = ['', 'true'];
+  tests.forEach((t, i) => {
+    it(`Sets session store to ${t}`, async () => {
+      const client = (await setupApplication({oidcOptions: oidcOptions}))
+        .client;
+      const mongoStub = sandbox.stub(MongoStore, 'create');
+      process.env.SESSION_STORE_BUILDER = t;
+      await client
+        .get('/')
+        .expect(200)
+        .expect('Content-Type', /text\/html/);
+      expect(mongoStub.callCount).to.eql(i);
+      if (t)
+        expect(mongoStub.args[0]).to.eql([
+          {mongoUrl: 'mongodb://mongodb:27017/testdb'},
+        ]);
+    });
   });
 });
