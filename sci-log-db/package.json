@@ -62,6 +62,7 @@
     "@loopback/service-proxy": "^5.0.5",
     "@types/multer": "^1.4.4",
     "ajv": "^7.2.4",
+    "connect-mongo": "^4.6.0",
     "express-session": "^1.17.3",
     "html-to-latex": "^0.8.0",
     "isemail": "^3.2.0",
