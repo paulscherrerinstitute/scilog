@@ -19,7 +19,7 @@ export class ExportService {
   };
   batchSize = 2000;
   paragraphCounter: number;
-  commentCounter: number;
+  subsnippetCounter: number;
 
   constructor(
     @inject(RestBindings.SERVER)
@@ -27,7 +27,7 @@ export class ExportService {
   ) {
     this.createDocumentBody();
     this.paragraphCounter = 0;
-    this.commentCounter = 0;
+    this.subsnippetCounter = 0;
   }
 
   private comment = (snippet: Paragraph, element: Element) => {
@@ -35,6 +35,22 @@ export class ExportService {
     const snippetCommentElement = this.document.createElement('snippetComment');
     snippetCommentElement.append(element);
     this.body.append(snippetCommentElement);
+  };
+
+  private otherSubsnippet = (snippet: Paragraph, element: Element) => {
+    if (['comment', 'quote'].includes(snippet.linkType ?? '')) return;
+    const otherSnippet = this.document.createElement('snippet');
+    otherSnippet.append(element);
+    if (snippet.linkType === 'paragraph') {
+      this.paragraphCounter -= 1;
+      this.subsnippetCounter += 1;
+      const header = element.querySelector('snippet-header');
+      if (header)
+        header.innerHTML = `${this.paragraphCounter}.${
+          this.subsnippetCounter
+        } / ${header.innerHTML.slice(header.innerHTML.indexOf('/') + 1)}`;
+    }
+    this.body.append(otherSnippet);
   };
 
   private appendSnippet = (
@@ -129,11 +145,13 @@ export class ExportService {
   };
 
   private wide = (snippet: Paragraph, element: Element) => {
-    return [this.quote, this.comment].map(f => f(snippet, element));
+    return [this.quote, this.comment, this.otherSubsnippet].map(f =>
+      f(snippet, element),
+    );
   };
 
   private paragraphToHTML = (snippet: Paragraph) => {
-    this.commentCounter = 0;
+    this.subsnippetCounter = 0;
     const element = this.deep(snippet);
     this.appendSnippet(element, {'data-quote': 'remove-if-last'});
     if (snippet.subsnippets?.length && snippet.subsnippets?.length > 0) {
@@ -164,9 +182,9 @@ export class ExportService {
       this.paragraphCounter += 1;
       counter = this.paragraphCounter;
     } else if (linkType === 'quote') counter = this.paragraphCounter;
-    else if (linkType === 'comment') {
-      this.commentCounter += 1;
-      counter = `${this.paragraphCounter}.${this.commentCounter}`;
+    else {
+      this.subsnippetCounter += 1;
+      counter = `${this.paragraphCounter}.${this.subsnippetCounter}`;
     }
     return counter;
   }

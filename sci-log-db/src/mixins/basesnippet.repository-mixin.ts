@@ -10,6 +10,7 @@ import {
   Inclusion,
   Condition,
   OrClause,
+  InclusionFilter,
 } from '@loopback/repository';
 import {Basesnippet, Logbook, Paragraph} from '../models';
 import {UserProfile} from '@loopback/security';
@@ -323,6 +324,7 @@ function ExportRepositoryMixin<
       user: UserProfile,
       filter?: Filter<M>,
     ): Promise<Response> {
+      this.excludeHistorySnippets(filter);
       const snippets = await this.find(filter, {
         currentUser: user,
       });
@@ -338,10 +340,24 @@ function ExportRepositoryMixin<
       response.download(exportFile, (err, path = exportDir) => {
         console.log('file transferred successfully', err);
         if (path.includes(this.basePath)) {
-          fs.rmdirSync(path, {recursive: true});
+          fs.rmSync(path, {recursive: true});
         }
       });
       return response;
+    }
+
+    private excludeHistorySnippets(filter: Filter<M> | undefined) {
+      filter?.include?.map((i: InclusionFilter) => {
+        if (i === 'subsnippets') i = {relation: 'subsnippets'};
+        i = i as Inclusion;
+        if (i.relation === 'subsnippets') {
+          i.relation = 'subsnippets';
+          const sub = {snippetType: {nin: ['history', 'updated']}};
+          if (!i.scope) i.scope = {where: sub};
+          else if (i.scope.where) i.scope.where = {and: [i.scope.where, sub]};
+          else i.scope.where = sub;
+        }
+      });
     }
 
     private async getParentName(
