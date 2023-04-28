@@ -1,6 +1,6 @@
 import {bind, BindingScope, ContextTags, inject} from '@loopback/core';
 import {EXPORT_SERVICE} from '../keys';
-import {Filecontainer, Paragraph} from '../models';
+import {Filecontainer, LinkType, Paragraph} from '../models';
 import * as puppeteer from 'puppeteer';
 import {JSDOM} from 'jsdom';
 import {RestBindings, Server} from '@loopback/rest';
@@ -18,12 +18,16 @@ export class ExportService {
     options: {year: 'numeric', month: 'short', day: 'numeric'} as const,
   };
   batchSize = 2000;
+  paragraphCounter: number;
+  commentCounter: number;
 
   constructor(
     @inject(RestBindings.SERVER)
     private server: Server,
   ) {
     this.createDocumentBody();
+    this.paragraphCounter = 0;
+    this.commentCounter = 0;
   }
 
   private comment = (snippet: Paragraph, element: Element) => {
@@ -59,6 +63,7 @@ export class ExportService {
     this.body.append(snippetCommentElement);
     if (lastSnippet) {
       lastSnippet.setAttribute('data-quote', 'keep');
+      lastSnippet.querySelector('snippet-header')?.remove();
       this.body.append(lastSnippet.cloneNode(true));
     }
   };
@@ -102,7 +107,8 @@ export class ExportService {
 
   private dateAndAuthor = (snippet: Paragraph, element: Element): Element => {
     const tagElement = this.document.createElement('snippet-header');
-    tagElement.innerHTML = `${snippet.updatedAt.toLocaleDateString(
+    const counter: number | string = this.countSnippets(snippet.linkType);
+    tagElement.innerHTML = `${counter} / ${snippet.updatedAt.toLocaleDateString(
       this.dateOptions.locales,
       this.dateOptions.options,
     )} / ${snippet.updatedBy}`;
@@ -127,6 +133,7 @@ export class ExportService {
   };
 
   private paragraphToHTML = (snippet: Paragraph) => {
+    this.commentCounter = 0;
     const element = this.deep(snippet);
     this.appendSnippet(element, {'data-quote': 'remove-if-last'});
     if (snippet.subsnippets?.length && snippet.subsnippets?.length > 0) {
@@ -150,6 +157,19 @@ export class ExportService {
     hr.setAttribute('style', 'border-top: 5px solid;');
     this.body.append(hr);
   };
+
+  private countSnippets(linkType?: LinkType) {
+    let counter: number | string = '';
+    if (linkType === 'paragraph') {
+      this.paragraphCounter += 1;
+      counter = this.paragraphCounter;
+    } else if (linkType === 'quote') counter = this.paragraphCounter;
+    else if (linkType === 'comment') {
+      this.commentCounter += 1;
+      counter = `${this.paragraphCounter}.${this.commentCounter}`;
+    }
+    return counter;
+  }
 
   private createDocumentBody() {
     const dom = new JSDOM('<!DOCTYPE html>');
@@ -190,6 +210,7 @@ export class ExportService {
     htmlString: string,
   ) {
     const page = await browser.newPage();
+    page.setDefaultNavigationTimeout(0);
     await page.setContent(htmlString);
     await page.addStyleTag({path: 'src/services/pdf.css'});
     await page.emulateMediaType('print');

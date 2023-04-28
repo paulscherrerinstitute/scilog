@@ -14,6 +14,20 @@ describe('Export service unit', function (this: Suite) {
   let textElement: Element;
   let exportService: ExportService;
   const textcontent = '<img src="" title="123"><img src="" title="456">';
+  const subsnippets = [
+    new Paragraph({
+      linkType: LinkType.COMMENT,
+      textcontent: '<p>a comment</p>',
+      updatedAt: new Date(2023, 3, 13),
+      updatedBy: 'test',
+    }),
+    new Paragraph({
+      linkType: LinkType.QUOTE,
+      textcontent: '<p>a quote</p>',
+      updatedAt: new Date(2023, 3, 13),
+      updatedBy: 'test',
+    }),
+  ];
   const paragraph = new Paragraph({
     textcontent: textcontent,
     files: [
@@ -21,23 +35,10 @@ describe('Export service unit', function (this: Suite) {
       {fileHash: '456', accessHash: 'def'},
       {fileHash: '789', accessHash: 'ghi'},
     ],
-    subsnippets: [
-      new Paragraph({
-        linkType: LinkType.COMMENT,
-        textcontent: '<p>a comment</p>',
-        updatedAt: new Date(2023, 3, 13),
-        updatedBy: 'test',
-      }),
-      new Paragraph({
-        linkType: LinkType.QUOTE,
-        textcontent: '<p>a quote</p>',
-        updatedAt: new Date(2023, 3, 13),
-        updatedBy: 'test',
-      }),
-    ],
     tags: ['tag1', 'tag2'],
     updatedAt: new Date(2023, 3, 13),
     updatedBy: 'test',
+    linkType: LinkType.PARAGRAPH,
   });
 
   function emptyElementTextContent(p: Paragraph) {
@@ -96,15 +97,15 @@ describe('Export service unit', function (this: Suite) {
       textElement,
     );
     expect(dateAndAuthor.innerHTML).to.be.eql(
-      `<snippet-header>13 Apr 2023 / test</snippet-header>${textcontent}`,
+      `<snippet-header>1 / 13 Apr 2023 / test</snippet-header>${textcontent}`,
     );
     expect(dateAndAuthor.outerHTML).to.be.eql(
-      `<div><snippet-header>13 Apr 2023 / test</snippet-header>${textcontent}</div>`,
+      `<div><snippet-header>1 / 13 Apr 2023 / test</snippet-header>${textcontent}</div>`,
     );
   });
 
   it('comment', () => {
-    const subsnippet = (paragraph.subsnippets as Paragraph[])[0];
+    const subsnippet = subsnippets[0];
     const subTextElement = emptyElementTextContent(subsnippet);
     exportService['comment'](subsnippet, subTextElement);
     expect(exportService.body.innerHTML).to.be.eql(
@@ -132,7 +133,7 @@ describe('Export service unit', function (this: Suite) {
         exportService['appendSnippet'](textElement, {
           'data-quote': 'remove-if-last',
         });
-      const subsnippet = (paragraph.subsnippets as Paragraph[])[1];
+      const subsnippet = subsnippets[1];
       const subTextElement = emptyElementTextContent(subsnippet);
       exportService['quote'](subsnippet, subTextElement);
       expect(exportService.body.innerHTML).to.be.eql(t[0]);
@@ -150,10 +151,10 @@ describe('Export service unit', function (this: Suite) {
   it('deep', () => {
     const deep = exportService['deep'](paragraph);
     expect(deep.innerHTML).to.be.eql(
-      '<snippet-header>13 Apr 2023 / test</snippet-header><div><img src="http://localhost:3000/images/abc" title="123"><img src="http://localhost:3000/images/def" title="456"></div><snippet-tag>tag1</snippet-tag><snippet-tag>tag2</snippet-tag>',
+      '<snippet-header>1 / 13 Apr 2023 / test</snippet-header><div><img src="http://localhost:3000/images/abc" title="123"><img src="http://localhost:3000/images/def" title="456"></div><snippet-tag>tag1</snippet-tag><snippet-tag>tag2</snippet-tag>',
     );
     expect(deep.outerHTML).to.be.eql(
-      '<imagesnippet><snippet-header>13 Apr 2023 / test</snippet-header><div><img src="http://localhost:3000/images/abc" title="123"><img src="http://localhost:3000/images/def" title="456"></div><snippet-tag>tag1</snippet-tag><snippet-tag>tag2</snippet-tag></imagesnippet>',
+      '<imagesnippet><snippet-header>1 / 13 Apr 2023 / test</snippet-header><div><img src="http://localhost:3000/images/abc" title="123"><img src="http://localhost:3000/images/def" title="456"></div><snippet-tag>tag1</snippet-tag><snippet-tag>tag2</snippet-tag></imagesnippet>',
     );
   });
 
@@ -163,18 +164,24 @@ describe('Export service unit', function (this: Suite) {
   ];
   tests.forEach((t, i) => {
     it(`wide ${i}`, () => {
-      const subsnippet = (paragraph.subsnippets as Paragraph[])[i];
+      const subsnippet = subsnippets[i];
       const subTextElement = emptyElementTextContent(subsnippet);
       exportService['wide'](subsnippet, subTextElement);
       expect(exportService.body.innerHTML).to.be.eql(t);
     });
   });
 
-  it('paragraphToHTML', () => {
-    exportService['paragraphToHTML'](paragraph);
-    expect(exportService.body.innerHTML).to.be.eql(
-      '<snippet data-quote="keep"><imagesnippet><snippet-header>13 Apr 2023 / test</snippet-header><div><img src="http://localhost:3000/images/abc" title="123"><img src="http://localhost:3000/images/def" title="456"></div><snippet-tag>tag1</snippet-tag><snippet-tag>tag2</snippet-tag></imagesnippet></snippet><snippetcomment><div><snippet-header>13 Apr 2023 / test</snippet-header><p>a comment</p></div></snippetcomment><snippetquote><div><snippet-header>13 Apr 2023 / test</snippet-header><p>a quote</p></div></snippetquote><snippet data-quote="keep"><imagesnippet><snippet-header>13 Apr 2023 / test</snippet-header><div><img src="http://localhost:3000/images/abc" title="123"><img src="http://localhost:3000/images/def" title="456"></div><snippet-tag>tag1</snippet-tag><snippet-tag>tag2</snippet-tag></imagesnippet></snippet>',
-    );
+  const subsnippetTest = [
+    '<snippet data-quote="remove-if-last"><imagesnippet><snippet-header>1 / 13 Apr 2023 / test</snippet-header><div><img src="http://localhost:3000/images/abc" title="123"><img src="http://localhost:3000/images/def" title="456"></div><snippet-tag>tag1</snippet-tag><snippet-tag>tag2</snippet-tag></imagesnippet></snippet><snippetcomment><div><snippet-header>1.1 / 13 Apr 2023 / test</snippet-header><p>a comment</p></div></snippetcomment>',
+    '<snippetquote><div><snippet-header>1 / 13 Apr 2023 / test</snippet-header><p>a quote</p></div></snippetquote><snippet data-quote="keep"><imagesnippet><div><img src="http://localhost:3000/images/abc" title="123"><img src="http://localhost:3000/images/def" title="456"></div><snippet-tag>tag1</snippet-tag><snippet-tag>tag2</snippet-tag></imagesnippet></snippet>',
+  ];
+  subsnippetTest.forEach((t, i) => {
+    it(`paragraphToHTML ${i}`, () => {
+      const paragraphCopy = Object.assign({}, paragraph);
+      paragraphCopy.subsnippets = [subsnippets[i]];
+      exportService['paragraphToHTML'](paragraphCopy);
+      expect(exportService.body.innerHTML).to.be.eql(t);
+    });
   });
 
   it('mergePDFs', async () => {
@@ -213,6 +220,18 @@ describe('Export service unit', function (this: Suite) {
       await exportService['exportToPdf'](paragraphs, 'aFile', 'aTitle');
       expect(addTitle.callCount).to.be.eql(1);
       expect(htmlToPDF.callCount).to.be.eql(o);
+    });
+  });
+
+  const countTest = [
+    [LinkType.PARAGRAPH, 1],
+    [LinkType.QUOTE, 0],
+    [LinkType.COMMENT, '0.1'],
+  ];
+  countTest.forEach(([t, c]) => {
+    it(`countSnippets ${t}`, () => {
+      const count = exportService['countSnippets'](t as LinkType);
+      expect(count).to.be.eql(c);
     });
   });
 });
