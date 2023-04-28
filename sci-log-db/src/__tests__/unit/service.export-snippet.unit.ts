@@ -27,6 +27,12 @@ describe('Export service unit', function (this: Suite) {
       updatedAt: new Date(2023, 3, 13),
       updatedBy: 'test',
     }),
+    new Paragraph({
+      linkType: LinkType.PARAGRAPH,
+      textcontent: '<p>a paragraph sub</p>',
+      updatedAt: new Date(2023, 3, 13),
+      updatedBy: 'test',
+    }),
   ];
   const paragraph = new Paragraph({
     textcontent: textcontent,
@@ -140,6 +146,15 @@ describe('Export service unit', function (this: Suite) {
     });
   });
 
+  it('otherSubsnippet', () => {
+    const subsnippet = subsnippets[2];
+    const subTextElement = emptyElementTextContent(subsnippet);
+    exportService['otherSubsnippet'](subsnippet, subTextElement);
+    expect(exportService.body.innerHTML).to.be.eql(
+      '<snippet><div><p>a paragraph sub</p></div></snippet>',
+    );
+  });
+
   it('addTitle', () => {
     sandbox.stub(Date.prototype, 'toLocaleDateString').returns('13 Apr 2023');
     exportService['addTitle']('Some test');
@@ -161,6 +176,7 @@ describe('Export service unit', function (this: Suite) {
   tests = [
     '<snippetcomment><div><p>a comment</p></div></snippetcomment>',
     '<snippetquote><div><p>a quote</p></div></snippetquote>',
+    '<snippet><div><p>a paragraph sub</p></div></snippet>',
   ];
   tests.forEach((t, i) => {
     it(`wide ${i}`, () => {
@@ -172,13 +188,14 @@ describe('Export service unit', function (this: Suite) {
   });
 
   const subsnippetTest = [
-    '<snippet data-quote="remove-if-last"><imagesnippet><snippet-header>1 / 13 Apr 2023 / test</snippet-header><div><img src="http://localhost:3000/images/abc" title="123"><img src="http://localhost:3000/images/def" title="456"></div><snippet-tag>tag1</snippet-tag><snippet-tag>tag2</snippet-tag></imagesnippet></snippet><snippetcomment><div><snippet-header>1.1 / 13 Apr 2023 / test</snippet-header><p>a comment</p></div></snippetcomment>',
+    '<snippet data-quote="remove-if-last"><imagesnippet><snippet-header>1 / 13 Apr 2023 / test</snippet-header><div><img src="http://localhost:3000/images/abc" title="123"><img src="http://localhost:3000/images/def" title="456"></div><snippet-tag>tag1</snippet-tag><snippet-tag>tag2</snippet-tag></imagesnippet></snippet><snippetcomment><div><snippet-header>1.1 / 13 Apr 2023 / test</snippet-header><p>a comment</p></div></snippetcomment><snippet><div><snippet-header>1.2 /  13 Apr 2023 / test</snippet-header><p>a paragraph sub</p></div></snippet>',
     '<snippetquote><div><snippet-header>1 / 13 Apr 2023 / test</snippet-header><p>a quote</p></div></snippetquote><snippet data-quote="keep"><imagesnippet><div><img src="http://localhost:3000/images/abc" title="123"><img src="http://localhost:3000/images/def" title="456"></div><snippet-tag>tag1</snippet-tag><snippet-tag>tag2</snippet-tag></imagesnippet></snippet>',
   ];
   subsnippetTest.forEach((t, i) => {
     it(`paragraphToHTML ${i}`, () => {
       const paragraphCopy = Object.assign({}, paragraph);
       paragraphCopy.subsnippets = [subsnippets[i]];
+      if (i === 0) paragraphCopy.subsnippets.push(subsnippets[2]);
       exportService['paragraphToHTML'](paragraphCopy);
       expect(exportService.body.innerHTML).to.be.eql(t);
     });
