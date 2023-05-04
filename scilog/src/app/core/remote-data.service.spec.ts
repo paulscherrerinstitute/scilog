@@ -3,7 +3,8 @@ import { TestBed } from '@angular/core/testing';
 import { RemoteDataService } from '@shared/remote-data.service';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { AppConfigService } from '../app-config.service';
-import { LogbookItemDataService } from './remote-data.service';
+import { LogbookDataService, LogbookItemDataService } from './remote-data.service';
+import { of } from 'rxjs';
 
 const getConfig = () => ({});
 
@@ -167,6 +168,37 @@ describe('LogbookItemDataService', () => {
     let filter = LogbookItemDataService._prepareFilters(config);
     expect(filter["where"].and[2]).toEqual({ "tags": { "inq": config.filter.tags } });
     expect(filter["where"].and[3]).toEqual({ "tags": { "nin": config.filter.excludeTags } });
+  });
+
+});
+
+describe('LogbookDataService', () => {
+  let service: LogbookDataService;
+
+  beforeEach(() => {
+    TestBed.configureTestingModule({
+      imports: [HttpClientTestingModule],
+      providers: [{ provide: AppConfigService, useValue: { getConfig } }],
+    });
+    service = TestBed.inject(LogbookDataService);
+  });
+
+  it('should be created', () => {
+    expect(service).toBeTruthy();
+  });
+
+  it('should call getSnippet with id', () => {
+    const spyGetSnippets = spyOn<LogbookDataService, any>(service, "getSnippets").and.returnValue(of([]));
+    service.getLogbookInfo("1");
+    expect(spyGetSnippets.calls.mostRecent().args[0]).toEqual("logbooks/1");
+  });
+
+
+  it('should call getSnippets with list of ids', () => {
+    const spyGetSnippets = spyOn<LogbookDataService, any>(service, "getSnippets").and.returnValue(of([]));
+    service.getLogbooksInfo(["1", "2", "3"]);
+    expect(spyGetSnippets.calls.mostRecent().args[1]["params"].toString()).
+    toEqual("filter=%7B%22where%22:%7B%22id%22:%7B%22inq%22:%5B%221%22,%222%22,%223%22%5D%7D%7D%7D");
   });
 
 });

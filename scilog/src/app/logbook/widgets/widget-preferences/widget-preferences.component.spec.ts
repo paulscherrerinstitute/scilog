@@ -5,7 +5,7 @@ import { MatDialogModule, MatDialogRef, MAT_DIALOG_DATA } from '@angular/materia
 import { WidgetPreferencesComponent } from './widget-preferences.component';
 import { LogbookInfoService } from '@shared/logbook-info.service';
 import { UserPreferencesService } from '@shared/user-preferences.service';
-import { WidgetPreferencesDataService } from '@shared/remote-data.service';
+import { WidgetPreferencesDataService, LogbookDataService } from '@shared/remote-data.service';
 import { of } from 'rxjs';
 import { CdkTextareaAutosize } from '@angular/cdk/text-field';
 import { MatAutocompleteModule } from '@angular/material/autocomplete';
@@ -22,12 +22,14 @@ describe('WidgetPreferencesComponent', () => {
   let component: WidgetPreferencesComponent;
   let fixture: ComponentFixture<WidgetPreferencesComponent>;
   let logbookSpy: any;
-  let userPreferencesSpy: any;
+  let logbookDataSpy: any;
   let widgetPreferencesSpy: any;
 
 
   logbookSpy = jasmine.createSpyObj("LogbookInfoService", ["logbookInfo", "getAvailLogbooks"]);
   logbookSpy.logbookInfo.and.returnValue([]);
+
+  logbookDataSpy = jasmine.createSpyObj("LogbookDataService", ["getLogbookInfo", "getLogbooksInfo"]);
 
   widgetPreferencesSpy = jasmine.createSpyObj("WidgetPreferencesDataService", ["getSnippetsForLogbook", "getPlotSnippets"]);
   widgetPreferencesSpy.getSnippetsForLogbook.and.returnValue(of({}));
@@ -61,6 +63,7 @@ describe('WidgetPreferencesComponent', () => {
           }
         },
         { provide: LogbookInfoService, useValue: logbookSpy },
+        { provide: LogbookDataService, useValue: logbookDataSpy },
         { provide: UserPreferencesService, useClass: UserPreferencesMock },
         { provide: WidgetPreferencesDataService, useValue: widgetPreferencesSpy },
 

@@ -8,7 +8,7 @@ import { ChangeStreamNotification } from '@shared/changestreamnotification.model
 import { ServerSettingsService } from './config/server-settings.service';
 import { User } from '@model/user';
 import { Tasks } from '@model/tasks';
-import { UserPreferences, WidgetConfig, WidgetItemConfig } from '@model/config';
+import { UserPreferences, WidgetItemConfig } from '@model/config';
 import { UserInfo } from '@model/user-info';
 import { Views } from '@model/views';
 import { Images } from '@model/images';
@@ -324,6 +324,19 @@ export class LogbookDataService extends RemoteDataService {
     let headers = new HttpHeaders();
     headers = headers.set('Content-Type', 'application/json; charset=utf-8');
     return this.getSnippets<Logbooks>('logbooks/' + id, { headers: headers }).toPromise();
+  }
+
+  getLogbookInfo(id: string): Promise<Logbooks> {
+    return this._getLogbookInfo(id);
+  }
+
+  getLogbooksInfo(ids: string[]): Promise<Logbooks[]> {
+    if (ids.length === 0) return Promise.resolve([]);
+    let headers = new HttpHeaders();
+    headers = headers.set('Content-Type', 'application/json; charset=utf-8');
+    let params = new HttpParams();
+    params = params.set('filter', JSON.stringify({where: {id: {inq: ids}}}));
+    return this.getSnippets<Logbooks[]>('logbooks', { headers: headers, params: params }).toPromise();
   }
 
   _getAvailLogbooks(): Promise<Logbooks[]> {
