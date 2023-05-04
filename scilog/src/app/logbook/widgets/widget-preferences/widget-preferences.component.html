@@ -40,7 +40,7 @@
               <mat-label>Logbook</mat-label>
               <textarea matInput placeholder="Logbook" [matAutocomplete]="autoLogbook"
                 [formControl]="filterBasics.get('logbook')" cdkTextareaAutosize #autosize="cdkTextareaAutosize"
-                cdkAutosizeMinRows="1" cdkAutosizeMaxRows="5"></textarea>
+                cdkAutosizeMinRows="1" cdkAutosizeMaxRows="5" required></textarea>
               <mat-autocomplete #autoLogbook="matAutocomplete" [displayWith]="displayFnLogbookSelection">
                 <mat-option *ngFor="let logbook of filteredLogbooks | async" [value]="logbook">
                   {{logbook.name}}
@@ -176,5 +176,5 @@
 </div>
 <mat-dialog-actions align="end">
   <button mat-button (click)="close()">Cancel</button>
-  <button mat-button (click)="applyChanges($event)">Apply</button>
+  <button mat-button (click)="applyChanges($event)" [disabled]="filterBasics.get('logbook').invalid">Apply</button>
 </mat-dialog-actions>

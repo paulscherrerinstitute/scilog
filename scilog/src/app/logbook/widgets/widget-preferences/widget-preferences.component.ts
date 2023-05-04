@@ -1,5 +1,5 @@
-import { Component, OnInit, Input, Inject, ViewChild, NgZone, ElementRef } from '@angular/core';
-import { UntypedFormArray, UntypedFormBuilder, UntypedFormControl, UntypedFormGroup, Validators } from '@angular/forms';
+import { Component, OnInit, Inject, ViewChild, NgZone, ElementRef, ChangeDetectorRef } from '@angular/core';
+import { UntypedFormArray, UntypedFormBuilder, UntypedFormControl, UntypedFormGroup } from '@angular/forms';
 import { MatChipInputEvent } from '@angular/material/chips';
 import { COMMA, ENTER, SPACE } from '@angular/cdk/keycodes';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
@@ -12,7 +12,7 @@ import { ownerGroupMemberValidator } from '@shared/settings/view-settings/view-s
 import { UserPreferencesService } from '@shared/user-preferences.service';
 import { Logbooks } from '@model/logbooks';
 import { CdkTextareaAutosize } from '@angular/cdk/text-field';
-import { WidgetPreferencesDataService } from '@shared/remote-data.service';
+import { WidgetPreferencesDataService, LogbookDataService } from '@shared/remote-data.service';
 import { WidgetItemConfig } from '@model/config';
 
 @Component({
@@ -70,8 +70,10 @@ export class WidgetPreferencesComponent implements OnInit {
     private logbookInfo: LogbookInfoService,
     private userPreferences: UserPreferencesService,
     private dataService: WidgetPreferencesDataService,
+    private logbookDataService: LogbookDataService,
     @Inject(MAT_DIALOG_DATA) data,
-    private _ngZone: NgZone) {
+    private _ngZone: NgZone,
+    protected changeDetectorRef: ChangeDetectorRef) {
     this.data = data.config;
     this.options = fb.group({
       hideRequired: this.hideRequiredControl,
@@ -121,9 +123,11 @@ export class WidgetPreferencesComponent implements OnInit {
 
     this.getFilterOptionsPlot();
 
-    // basic filter forms
+    // set up target logbook
+    this.setUpTargetLogbook();
 
-    this.setupLogbookSelection();
+    // set up additional logbooks
+    this.setUpAdditionalLogbooks();
 
     // target logbook description
     this.subscriptions.push(this.filterBasics.get('logbook').valueChanges.subscribe(logbook => {
@@ -136,14 +140,32 @@ export class WidgetPreferencesComponent implements OnInit {
 
     // ownerGroups
     this.ownerGroupsAvail = this.userPreferences.userInfo?.roles;
-    this.filteredOwnerGroups = this.filterBasics.get('ownerGroup').valueChanges.pipe(startWith(null), map((ownerGroup: string | null) => ownerGroup ? this._filterOwnerGroups(ownerGroup) : this.ownerGroupsAvail.slice()));
+    this.filteredOwnerGroups = this.filterBasics.get('ownerGroup').valueChanges.pipe(
+      startWith(null), 
+      map((ownerGroup: string | null) => ownerGroup ? this._filterOwnerGroups(ownerGroup) : this.ownerGroupsAvail.slice()));
     this.filterBasics.get('ownerGroup').setValidators([ownerGroupMemberValidator(this.ownerGroupsAvail)]);
+    this.changeDetectorRef.detectChanges();
     // let ownerGroupIndex = Object.keys(this.data.filters).find(k => this.data.filters[k].name == 'ownerGroup');
     // if (typeof ownerGroupIndex != 'undefined') {
     //   this.filterBasics.get('ownerGroup').setValue(this.data.filters[ownerGroupIndex].value);
     // } 
   }
 
+  private async setUpAdditionalLogbooks() {
+    const logs = await this.logbookDataService.getLogbooksInfo(this.data.filter.additionalLogbooks);
+    this.additionalLogbooks.push(...logs);
+  }
+
+  private async setUpTargetLogbook() {
+    const log = await this.logbookDataService.getLogbookInfo(this.data.filter.targetId);
+    this.filterBasics.get('logbook').setValue(log);
+  }
+
+  ngAfterViewInit() {
+    // basic filter forms
+    this.setupLogbookSelection();
+  }
+  
   async getSnippetViewerOptions() {
     let data = await this.dataService.getSnippetsForLogbook(this.logbookInfo.logbookInfo.id);
     // TODO this should be done in the backend, not here!
@@ -180,21 +202,6 @@ export class WidgetPreferencesComponent implements OnInit {
       map(value => typeof value === 'string' ? value : value.name),
       map(name => name ? this._filterLogbooks(name) : this.logbookInfo.availLogbooks.slice())
     );
-    // set up target logbook
-    this.logbookInfo.availLogbooks.forEach(log => {
-      if (this.data.filter.targetId == log.id) {
-        this.filterBasics.get('logbook').setValue(log);
-      }
-    });
-
-    // set up additional logbooks
-    this.logbookInfo.availLogbooks.forEach(log => {
-      this.data.filter.additionalLogbooks?.forEach(selLog => {
-        if (selLog == log.id) {
-          this.additionalLogbooks.push(log);
-        }
-      })
-    });
     // additional logbooks
     this.filteredAdditionalLogbooks = this.additionalLogbooksCtrl.valueChanges.pipe(startWith(null), map((logbook: string) => logbook ? this._filterAdditionalLogbooks(logbook) : this._getAvailAdditionalLogbooks()));
   }
