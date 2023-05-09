@@ -18,23 +18,23 @@ table {
   }
 
   ::ng-deep .marker-green {
-    background-color: white;
-    color: green;
+    background-color: green;
+    color: white;
   }
 
   ::ng-deep .marker-yellow {
-    background-color: white;
-    color: yellow;
+    background-color: yellow;
+    color: black;
   }
 
   ::ng-deep .marker-pink {
-    background-color: white;
-    color: pink;
+    background-color: pink;
+    color: black;
   }
 
   ::ng-deep .marker-blue {
-    background-color: white;
-    color: blue;
+    background-color: blue;
+    color: white;
   }
 
   ::ng-deep .snippet-content p {

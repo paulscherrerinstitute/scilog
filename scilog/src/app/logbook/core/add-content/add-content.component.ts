@@ -59,7 +59,7 @@ export class AddContentComponent implements OnInit {
         return this.editorChange(editor);
       },
       waitingTime: 5000
-    }
+    };
     if (data != null) {
       this.message = data.snippet;
       this.config = data.config

@@ -30,7 +30,7 @@ export default class InsertFile extends Plugin {
                     let fnameHash = uuidv4();
                     editor.model.change(writer => {
                         const link = writer.createText(file.name);
-                        
+
                         writer.setAttribute('linkHref', 'file:' + fnameHash, link);
                         console.log(link)
                         this.editor.model.insertContent(link, this.editor.model.document.selection);
@@ -39,7 +39,7 @@ export default class InsertFile extends Plugin {
                     let fileStorage = {
                         file: file,
                         fileHash: fnameHash,
-                        fileExtension: 'file/' + fnameParts[fnameParts.length-1]
+                        fileExtension: 'file/' + fnameParts[fnameParts.length - 1]
                     }
                     this.editor.prel_filestorage = [fileStorage];
                 }
