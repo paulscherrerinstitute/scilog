@@ -5,6 +5,8 @@ import * as puppeteer from 'puppeteer';
 import {JSDOM} from 'jsdom';
 import {RestBindings, Server} from '@loopback/rest';
 import PDFMerger from 'pdf-merger-js';
+import Prism from 'prismjs';
+import LoadLanguages from 'prismjs/components/';
 
 @bind({
   scope: BindingScope.TRANSIENT,
@@ -135,6 +137,7 @@ export class ExportService {
   private deep = (snippet: Paragraph): Element => {
     return [
       this.textContentToHTML,
+      this.code,
       this.figure,
       this.tags,
       this.dateAndAuthor,
@@ -174,6 +177,16 @@ export class ExportService {
     const hr = this.document.createElement('hr');
     hr.setAttribute('style', 'border-top: 5px solid;');
     this.body.append(hr);
+  };
+
+  private code = (snippet: Paragraph, element: Element) => {
+    const codeElements = element.querySelectorAll('[class^=language-]');
+    if (codeElements.length === 0) return element;
+    codeElements.forEach(codeElement => {
+      LoadLanguages(codeElement?.className.replace('language-', ''));
+      Prism.highlightElement(codeElement);
+    });
+    return element;
   };
 
   private countSnippets(linkType?: LinkType) {
@@ -231,6 +244,11 @@ export class ExportService {
     page.setDefaultNavigationTimeout(0);
     await page.setContent(htmlString);
     await page.addStyleTag({path: 'src/services/pdf.css'});
+    await page.addStyleTag({
+      path: `${
+        process.env.NODE_PATH ?? 'node_modules'
+      }/prismjs/themes/prism.css`,
+    });
     await page.emulateMediaType('print');
     await page.pdf({
       path: exportFile,
