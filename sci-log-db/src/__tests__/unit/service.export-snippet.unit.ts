@@ -47,14 +47,14 @@ describe('Export service unit', function (this: Suite) {
     linkType: LinkType.PARAGRAPH,
   });
 
-  function emptyElementTextContent(p: Paragraph) {
+  function textContentToHTML(p: Paragraph) {
     const emptyElement = exportService['createDivEmptyElement']();
     return exportService['textContentToHTML'](p, emptyElement);
   }
 
   beforeEach(() => {
     exportService = new ExportService({url: 'http://localhost:3000'} as Server);
-    textElement = emptyElementTextContent(paragraph);
+    textElement = textContentToHTML(paragraph);
     sandbox = createSandbox();
   });
 
@@ -69,12 +69,9 @@ describe('Export service unit', function (this: Suite) {
 
   it('textContentToHTML', () => {
     const emptyElement = exportService['createDivEmptyElement']();
-    const textContentToHTML = exportService['textContentToHTML'](
-      paragraph,
-      emptyElement,
-    );
-    expect(textContentToHTML.innerHTML).to.be.eql(textcontent);
-    expect(textContentToHTML.outerHTML).to.be.eql(`<div>${textcontent}</div>`);
+    const element = exportService['textContentToHTML'](paragraph, emptyElement);
+    expect(element.innerHTML).to.be.eql(textcontent);
+    expect(element.outerHTML).to.be.eql(`<div>${textcontent}</div>`);
   });
 
   it('figure', () => {
@@ -112,7 +109,7 @@ describe('Export service unit', function (this: Suite) {
 
   it('comment', () => {
     const subsnippet = subsnippets[0];
-    const subTextElement = emptyElementTextContent(subsnippet);
+    const subTextElement = textContentToHTML(subsnippet);
     exportService['comment'](subsnippet, subTextElement);
     expect(exportService.body.innerHTML).to.be.eql(
       '<snippetcomment><div><p>a comment</p></div></snippetcomment>',
@@ -140,7 +137,7 @@ describe('Export service unit', function (this: Suite) {
           'data-quote': 'remove-if-last',
         });
       const subsnippet = subsnippets[1];
-      const subTextElement = emptyElementTextContent(subsnippet);
+      const subTextElement = textContentToHTML(subsnippet);
       exportService['quote'](subsnippet, subTextElement);
       expect(exportService.body.innerHTML).to.be.eql(t[0]);
     });
@@ -148,7 +145,7 @@ describe('Export service unit', function (this: Suite) {
 
   it('otherSubsnippet', () => {
     const subsnippet = subsnippets[2];
-    const subTextElement = emptyElementTextContent(subsnippet);
+    const subTextElement = textContentToHTML(subsnippet);
     exportService['otherSubsnippet'](subsnippet, subTextElement);
     expect(exportService.body.innerHTML).to.be.eql(
       '<snippet><div><p>a paragraph sub</p></div></snippet>',
@@ -181,7 +178,7 @@ describe('Export service unit', function (this: Suite) {
   tests.forEach((t, i) => {
     it(`wide ${i}`, () => {
       const subsnippet = subsnippets[i];
-      const subTextElement = emptyElementTextContent(subsnippet);
+      const subTextElement = textContentToHTML(subsnippet);
       exportService['wide'](subsnippet, subTextElement);
       expect(exportService.body.innerHTML).to.be.eql(t);
     });
@@ -250,5 +247,19 @@ describe('Export service unit', function (this: Suite) {
       const count = exportService['countSnippets'](t as LinkType);
       expect(count).to.be.eql(c);
     });
+  });
+
+  it('code', () => {
+    textElement = textContentToHTML({
+      textcontent: `<pre><code class="language-python">def foo():
+    return 1</code></pre>`,
+    } as Paragraph);
+    const code = exportService['code'](paragraph, textElement);
+    expect(code.innerHTML).to.be
+      .eql(`<pre class="language-python" tabindex="0"><code class="language-python"><span class="token keyword">def</span> <span class="token function">foo</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
+    <span class="token keyword">return</span> <span class="token number">1</span></code></pre>`);
+    expect(code.outerHTML).to.be
+      .eql(`<div><pre class="language-python" tabindex="0"><code class="language-python"><span class="token keyword">def</span> <span class="token function">foo</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
+    <span class="token keyword">return</span> <span class="token number">1</span></code></pre></div>`);
   });
 });
