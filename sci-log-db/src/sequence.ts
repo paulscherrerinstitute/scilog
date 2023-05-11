@@ -1,5 +1,5 @@
 import {AuthenticateFn, AuthenticationBindings} from '@loopback/authentication';
-import {CoreBindings, inject} from '@loopback/core';
+import {inject} from '@loopback/core';
 import {
   ExpressRequestHandler,
   FindRoute,
@@ -12,18 +12,12 @@ import {
   Send,
   SequenceHandler,
 } from '@loopback/rest';
-import session from 'express-session';
-import cors from 'cors';
-import {cookieToToken} from './express-handlers/cookie-to-token';
-import {sessionStoreBuilder} from './session-store';
-import {SciLogDbApplication} from './application';
 
 const SequenceActions = RestBindings.SequenceActions;
 
 export class MySequence implements SequenceHandler {
   @inject(SequenceActions.INVOKE_MIDDLEWARE, {optional: true})
   protected invokeMiddleware: InvokeMiddleware = () => false;
-  middlewareList: ExpressRequestHandler[];
 
   constructor(
     @inject(SequenceActions.FIND_ROUTE) protected findRoute: FindRoute,
@@ -34,22 +28,9 @@ export class MySequence implements SequenceHandler {
     @inject(SequenceActions.REJECT) protected reject: Reject,
     @inject(AuthenticationBindings.AUTH_ACTION)
     protected authenticateRequest: AuthenticateFn,
-    @inject(CoreBindings.APPLICATION_INSTANCE)
-    protected app: SciLogDbApplication,
-  ) {
-    this.middlewareList = [
-      cors(),
-      cookieToToken,
-      session({
-        secret: process.env.SESSION_SECRET ?? 'someSecret',
-        resave: false,
-        saveUninitialized: false,
-        ...(process.env.SESSION_STORE_BUILDER
-          ? {store: sessionStoreBuilder(app)}
-          : {}),
-      }) as ExpressRequestHandler,
-    ];
-  }
+    @inject('middleware.sequence')
+    protected middlewareList: ExpressRequestHandler[],
+  ) {}
 
   async handle(context: RequestContext) {
     try {

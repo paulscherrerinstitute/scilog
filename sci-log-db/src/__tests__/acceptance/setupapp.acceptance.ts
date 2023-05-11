@@ -50,10 +50,12 @@ describe('SetupApp', () => {
         .client;
       const mongoStub = sandbox.stub(MongoStore, 'create');
       process.env.SESSION_STORE_BUILDER = t;
-      await client
-        .get('/')
-        .expect(200)
-        .expect('Content-Type', /text\/html/);
+      // call the endpoint twice to make sure the session is instantiate only once
+      for (let _ = 0; _ < 2; _++)
+        await client
+          .get('/')
+          .expect(200)
+          .expect('Content-Type', /text\/html/);
       expect(mongoStub.callCount).to.eql(i);
       if (t)
         expect(mongoStub.args[0]).to.eql([
