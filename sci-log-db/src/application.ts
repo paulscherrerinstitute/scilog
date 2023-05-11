@@ -16,6 +16,7 @@ import {BootMixin} from '@loopback/boot';
 import {
   ApplicationConfig,
   BindingKey,
+  BindingScope,
   createBindingFromClass,
 } from '@loopback/core';
 import {
@@ -56,6 +57,7 @@ import {OIDCAuthentication} from './authentication-strategies';
 import {UserServiceBindings} from './keys';
 
 import YAML = require('yaml');
+import {ExpressRequestHandlersProvider} from './express-handlers/middleware-sequence';
 
 export {ApplicationConfig};
 
@@ -166,6 +168,9 @@ export class SciLogDbApplication extends BootMixin(
       '../datasource.json',
       'datasources.config.mongo',
     );
+    this.bind('middleware.sequence')
+      .toProvider(ExpressRequestHandlersProvider)
+      .inScope(BindingScope.SINGLETON);
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     passport.serializeUser(function (user: any, done) {
