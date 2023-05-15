@@ -25,6 +25,7 @@ export class SnippetContentComponent implements OnInit {
   defaultFigureWidth = '85%';
   contentWidth = null;
   _prismed = false;
+  _edited = "";
 
   @ViewChild('contentDiv') contentRef: ElementRef;
 
@@ -58,6 +59,7 @@ export class SnippetContentComponent implements OnInit {
   }
 
   prepareContent() {
+    this.setEdited();
     if (!this.snippet.files || (this.snippet.files.length == 0)) {
       this.content = this.snippet?.textcontent;
       return;
@@ -87,6 +89,11 @@ export class SnippetContentComponent implements OnInit {
       }
     });
     this.content = this.span.innerHTML;
+  }
+
+  private setEdited() {
+    if (this.snippet.updatedAt !== this.snippet.createdAt)
+      this._edited = "<span class='snippet-edited'>(edited)</span>";
   }
 
   private setImageUrl(img: HTMLImageElement, id: string) {
@@ -132,12 +139,12 @@ export class SnippetContentComponent implements OnInit {
 
   set content(value: string) {
     this._content = value;
-    this.htmlContent.emit(this._content);
+    this.htmlContent.emit(this.content);
     this._prismed = false;
   }
 
   get content() {
-    return this._content;
+    return `${this._content}${this._edited}`;
   }
 
 }
