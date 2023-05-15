@@ -1,5 +1,6 @@
 import { Component, Inject, OnInit } from '@angular/core';
 import { MAT_DIALOG_DATA } from '@angular/material/dialog';
+import { AppConfigService } from 'src/app/app-config.service';
 
 @Component({
   selector: 'app-hotkeys',
@@ -11,7 +12,14 @@ export class HotkeysComponent implements OnInit {
   hotkeys = Array.from(this.data);
   hotkeysSorted:Object = {};
   hotkeyGroups: string[];
-  constructor(@Inject(MAT_DIALOG_DATA) public data) { }
+  help: string;
+  
+  constructor(
+    @Inject(MAT_DIALOG_DATA) public data,
+    private appConfigService: AppConfigService,
+  ) { 
+    this.help = this.appConfigService.getConfig().help ?? "";
+  }
 
   ngOnInit() { 
     
