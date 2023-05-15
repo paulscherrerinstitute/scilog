@@ -11,6 +11,7 @@ export interface Oauth2Endpoint {
 export interface AppConfig {
   lbBaseURL?: string;
   oAuth2Endpoint?: Oauth2Endpoint;
+  help?: string;
 }
 
 @Injectable()

@@ -2,6 +2,9 @@ import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 
 import { HotkeysComponent } from './hotkeys.component';
 import { MAT_DIALOG_DATA, MatDialog } from '@angular/material/dialog';
+import { AppConfigService } from 'src/app/app-config.service';
+
+const getConfig = () => ({});
 
 describe('HotkeysComponent', () => {
   let component: HotkeysComponent;
@@ -12,6 +15,7 @@ describe('HotkeysComponent', () => {
       providers: [
         { provide: MAT_DIALOG_DATA, useValue: {} },
         { provide: MatDialog, useValue: {} },
+        {provide: AppConfigService, useValue: { getConfig }},
       ],
       declarations: [ HotkeysComponent ]
     })
