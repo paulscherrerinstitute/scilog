@@ -178,4 +178,39 @@ describe('SnippetContentComponent', () => {
     expect(link.href).toEqual(`${base}download/${snippetMock.files[0].fileId}`);
   })
 
+  const editTest = [
+    "" ,
+    "<span class='snippet-edited'>(edited)</span>"
+  ];
+  editTest.forEach((t, i) => {
+    it(`should check if snippet was edited ${i}`, () => {
+      const createdAt = "2021-03-29T11:55:20.128Z";
+      const updatedAt = !t? createdAt: "2021-03-29T12:43:20.630Z";
+      const snippetMock = {
+        "createdAt": createdAt,
+        "updatedAt": updatedAt,
+      };
+      component.snippet = snippetMock;
+      component["setEdited"]();
+      expect(component._edited).toEqual(t);
+    })
+  })
+  
+  editTest.forEach((t, i) => {
+    it(`should add (edited) note ${i}`, () => {
+      const createdAt = "2021-03-29T11:55:20.128Z";
+      const updatedAt = !t? createdAt: "2021-03-29T12:43:20.630Z";
+      const snippetMock = {
+        "createdAt": createdAt,
+        "updatedAt": updatedAt,
+      };
+      const textContent = "<p>some text</p>";
+      component.snippet = snippetMock;
+      component.prepareContent();
+      spyOn(component.htmlContent, 'emit');
+      component.content = textContent;
+      expect(component.htmlContent.emit).toHaveBeenCalledWith(`${textContent}${t}`);
+    });
+  })
+
 });

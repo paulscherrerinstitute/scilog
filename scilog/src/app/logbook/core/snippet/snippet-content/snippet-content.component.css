@@ -39,6 +39,7 @@ table {
 
   ::ng-deep .snippet-content p {
     margin: 5px;
+    display: inline-block;
   }
 
 
@@ -92,4 +93,11 @@ table {
     height: auto;
     width: auto\9; /* ie8 */
     transition: 2s;
+  }
+
+  ::ng-deep .snippet-content .snippet-edited {
+    display: inline-block;
+    font-size-adjust: 0.4;
+    opacity: 0.4;
+    font-size: 90%;  
   }
