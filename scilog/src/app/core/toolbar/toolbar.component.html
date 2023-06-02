@@ -50,9 +50,12 @@
       <mat-icon matTooltip="Help" (click)="openHelp()">help</mat-icon>
     </button>
     <button mat-icon-button [matMenuTriggerFor]="menu">
-      <!-- <img src="https://material.angular.io/assets/img/examples/shiba1.jpg" alt="SciLog" class="avatar-image"/> -->
-      <svg class="avatar-image" [data-jdenticon-value]="avatarHash"></svg>
-      <!-- <mat-icon matTooltip="Profile">account_circle</mat-icon> -->
+      <span class="avatar-block">
+        <!-- <img src="https://material.angular.io/assets/img/examples/shiba1.jpg" alt="SciLog" class="avatar-image"/> -->
+        <svg class="avatar-image" [data-jdenticon-value]="avatarHash"></svg>
+        <!-- <mat-icon matTooltip="Profile">account_circle</mat-icon> -->
+        <div style="margin-top: -30%; font-size: xx-small;">{{username}}</div>
+      </span>
     </button>
     <mat-menu #menu="matMenu">
       <button mat-menu-item (click)="openSettings()">

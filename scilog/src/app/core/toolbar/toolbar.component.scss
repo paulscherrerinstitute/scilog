@@ -110,6 +110,13 @@
   border-radius: 50%;
 }
 
+.avatar-block {
+  display: flex;
+  padding-left: 8px;
+  flex-direction: column; 
+  align-items: center;
+}
+
 .logbook-name-tag {
   /* min-width: 80px; */
   width: 70vw;
