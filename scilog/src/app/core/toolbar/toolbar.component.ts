@@ -1,6 +1,5 @@
 import { Component, EventEmitter, Input, OnInit, Output, OnDestroy, ElementRef, ViewChild } from '@angular/core';
 import { MatDialog, MatDialogConfig } from '@angular/material/dialog';
-import { Router } from '@angular/router';
 import { Subscription } from 'rxjs';
 import { AuthService } from '../auth-services/auth.service';
 import { Hotkeys } from '../hotkeys.service';
@@ -29,6 +28,7 @@ export class ToolbarComponent implements OnInit {
   logbookName: string;
   isLogbookOpen = false;
   avatarHash: string = "UserHash";
+  username: string;
   showVersionInfo = true;
   versionInfo = 'BETA';
   currentView: string = "";
@@ -52,7 +52,6 @@ export class ToolbarComponent implements OnInit {
   appConfig: AppConfig = this.appConfigService.getConfig();
 
   constructor(
-    private router: Router,
     private appConfigService: AppConfigService,
     private authService: AuthService,
     private dialog: MatDialog,
@@ -73,7 +72,8 @@ export class ToolbarComponent implements OnInit {
       }
     }))
     this.subscriptions.push(this.userPreferences.currentUserInfo.subscribe((userInfo:UserInfo)=>{
-      this.avatarHash = userInfo.email;    
+      this.avatarHash = userInfo.email;
+      this.username = userInfo.username;
       console.log(this.avatarHash)
     }));
     this.subscriptions.push(this.viewService.currentWidgetConfigs.subscribe((config:WidgetConfig[])=> {
