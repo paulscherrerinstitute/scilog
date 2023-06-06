@@ -43,6 +43,9 @@
             <mat-error *ngIf="optionsFormGroup.get('ownerGroup').hasError('forbiddenGroup')">You are not a member of
               this group.
             </mat-error>
+            <mat-error *ngIf="optionsFormGroup.get('ownerGroup').hasError('anyAuthGroup')">Please set any-authenticated-user later when editing 
+              the logbook.
+            </mat-error>
             <mat-autocomplete #autoOwnerGroup="matAutocomplete">
               <mat-option *ngFor="let group of filteredOwnerGroups | async" [value]="group">
                 {{group}}
@@ -52,8 +55,8 @@
         </div>
         <div>
           <mat-form-field>
-            <mat-chip-list #chipList aria-label="AccessGroups selection">
-              <mat-chip *ngFor="let group of accessGroupsSelected" [selectable]="selectable" [removable]="removable"
+            <mat-chip-list #chipList aria-label="AccessGroups selection" formControlName="accessGroups">
+              <mat-chip *ngFor="let group of accessGroups.value" [selectable]="selectable" [removable]="removable"
                 (removed)="removeAccessGroup(group)">
                 {{group}}
                 <mat-icon matChipRemove *ngIf="removable">cancel</mat-icon>
@@ -62,6 +65,9 @@
                 [matAutocomplete]="auto" [matChipInputFor]="chipList"
                 [matChipInputSeparatorKeyCodes]="separatorKeysCodes" (matChipInputTokenEnd)="addAccessGroup($event)">
             </mat-chip-list>
+            <mat-error *ngIf="accessGroups.hasError('anyAuthGroup')">Please set any-authenticated-user later when editing 
+              the logbook.
+            </mat-error>
             <mat-autocomplete #auto="matAutocomplete" (optionSelected)="selectedAccessGroup($event)">
               <mat-option *ngFor="let group of filteredAccessGroups | async" [value]="group">
                 {{group}}
