@@ -338,4 +338,19 @@ describe('Logbook', function (this: Suite) {
         throw err;
       });
   });
+
+  it('post a logbook with any-authenticated-user should return 422', async () => {
+    await client
+      .post('/logbooks')
+      .set('Authorization', 'Bearer ' + token)
+      .set('Content-Type', 'application/json')
+      .send({
+        ..._.omit(logbookSnippet, 'readACL'),
+        readACL: ['any-authenticated-user'],
+      })
+      .expect(422)
+      .catch(err => {
+        throw err;
+      });
+  });
 });

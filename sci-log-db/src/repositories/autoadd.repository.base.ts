@@ -18,6 +18,10 @@ import {defaultSequentially} from '../utils/misc';
 import {BasesnippetRepository} from './basesnippet.repository';
 import _ from 'lodash';
 
+class UnprocessableError extends Error {
+  status = 422;
+}
+
 export class AutoAddRepository<
   T extends Entity,
   ID,
@@ -354,6 +358,13 @@ export class AutoAddRepository<
             );
           }
           await this.aclDefaultOnCreation(ctx.instance);
+          if (
+            ctx.instance.snippetType === 'logbook' &&
+            ctx.instance.readACL?.includes('any-authenticated-user')
+          )
+            throw new UnprocessableError(
+              'Cannot create logbook with readACL containing any-authenticated-user',
+            );
         } else {
           // PUT case not supported
           // console.log("PUT case")
