@@ -1,4 +1,4 @@
-import { Component, ElementRef, Inject, Input, OnInit, ViewChild } from '@angular/core';
+import { Component, ElementRef, Inject, OnInit, ViewChild } from '@angular/core';
 import { AbstractControl, UntypedFormBuilder, UntypedFormControl, UntypedFormGroup, ValidatorFn, Validators } from '@angular/forms';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { Observable, Subscription } from 'rxjs';
@@ -12,13 +12,19 @@ import { Logbooks } from '@model/logbooks';
 import { LogbookDataService, LogbookItemDataService } from '@shared/remote-data.service';
 
 
-export function ownerGroupMemberValidator(groups: string[]): ValidatorFn {
-  return (control: AbstractControl): { [key: string]: any } | null => {
-    const forbidden = !groups.includes(control.value);
+function ownerGroupMemberValidator(groups: string[]): ValidatorFn {
+  return (control: AbstractControl): { forbiddenGroup: {value: string} } | null => {
+    const forbidden = control.value && 
+      control.value !== 'any-authenticated-user' &&
+      !groups.includes(control.value);
     return forbidden ? { forbiddenGroup: { value: control.value } } : null;
   };
 }
 
+function groupCreationValidator(control: AbstractControl): { anyAuthGroup: {value: string | string[]} } | null {
+    const forbidden = control.value.includes('any-authenticated-user');
+    return forbidden ? { anyAuthGroup: { value: control.value } } : null;
+}
 
 @Component({
   selector: 'app-add-logbook',
@@ -98,7 +104,6 @@ export class AddLogbookComponent implements OnInit {
   accessGroupsCtrl = new UntypedFormControl();
   filteredAccessGroups: Observable<string[]>;
   filteredOwnerGroups: Observable<string[]>;
-  accessGroupsSelected: string[] = [];
   accessGroupsAvail: string[] = [];
 
 
@@ -120,7 +125,7 @@ export class AddLogbookComponent implements OnInit {
       description: new UntypedFormControl(''),
       location: new UntypedFormControl('', Validators.required),
       ownerGroup: new UntypedFormControl('', Validators.required),
-      accessGroups: new UntypedFormControl(''),
+      accessGroups: new UntypedFormControl([]),
       isPrivate: new UntypedFormControl(false)
     });
     this.logbook = data;
@@ -133,13 +138,18 @@ export class AddLogbookComponent implements OnInit {
     this.setDefaults();
   }
 
+  get accessGroups() {
+    return this.optionsFormGroup.get('accessGroups');
+  }
+
   setDefaults(){
+    this.accessGroupsAvail = this.userPreferences.userInfo?.roles;
     if (this.logbook) {
       this.optionsFormGroup.get('title').setValue(this.logbook.name);
       this.optionsFormGroup.get('description').setValue(this.logbook.description);
       this.optionsFormGroup.get('location').setValue(this.logbook.location);
       this.optionsFormGroup.get('ownerGroup').setValue(this.logbook.ownerGroup);
-      this.optionsFormGroup.get('accessGroups').setValue(this.logbook.accessGroups);
+      this.accessGroups.setValue(this.logbook.accessGroups);
       this.optionsFormGroup.get('isPrivate').setValue(this.logbook.isPrivate);
       this.fileId = this.logbook.thumbnail;
       if (this.fileId) {
@@ -147,17 +157,15 @@ export class AddLogbookComponent implements OnInit {
       }
       console.log("editing existing logbook");
     }
+    else {
+      this.optionsFormGroup.get('ownerGroup').addValidators(groupCreationValidator);
+      this.accessGroups.addValidators(groupCreationValidator);
+      this.accessGroupsAvail = this.accessGroupsAvail.filter((g: string) => g !== 'any-authenticated-user');
+    }
 
-    this.accessGroupsAvail = this.userPreferences.userInfo?.roles;
     this.filteredAccessGroups = this.accessGroupsCtrl.valueChanges.pipe(startWith(null), map((accessGroup: string | null) => accessGroup ? this._filter(accessGroup) : this.accessGroupsAvail.slice()));
     this.filteredOwnerGroups = this.optionsFormGroup.get('ownerGroup').valueChanges.pipe(startWith(null), map((accessGroup: string | null) => accessGroup ? this._filter(accessGroup) : this.accessGroupsAvail.slice()));
-    this.optionsFormGroup.get('ownerGroup').setValidators([ownerGroupMemberValidator(this.accessGroupsAvail)]);
-    // let ownerGroupIndex = Object.keys(this.data.filters).find(k => this.data.filters[k].name == 'ownerGroup');
-    // if (typeof ownerGroupIndex != 'undefined') {
-    //   this.optionsFormGroup.get('ownerGroup').setValue(this.data.filters[ownerGroupIndex].value);
-    // } 
-
-
+    this.optionsFormGroup.get('ownerGroup').addValidators(ownerGroupMemberValidator(this.accessGroupsAvail));
   }
 
   async getLocations(){
@@ -212,7 +220,7 @@ export class AddLogbookComponent implements OnInit {
       name: this.optionsFormGroup.get('title').value,
       location: this.optionsFormGroup.get('location').value,
       ownerGroup: this.optionsFormGroup.get('ownerGroup').value,
-      accessGroups: this.accessGroupsSelected,
+      accessGroups: this.accessGroups.value,
       isPrivate: this.optionsFormGroup.get('isPrivate').value,
       description: this.optionsFormGroup.get('description').value
     }
@@ -222,7 +230,6 @@ export class AddLogbookComponent implements OnInit {
     if (this.uploadThumbnailFile != null) {
       // upload selected file
       let formData = new FormData();
-      let filenameStorage: string = this.logbook.id + "." + this.uploadThumbnailFile.name.split('.').pop();
       if (this.logbook.ownerGroup)
         formData.append('fields', JSON.stringify({accessGroups: [this.logbook.ownerGroup]}))
       formData.append('file', this.uploadThumbnailFile);
@@ -273,7 +280,8 @@ export class AddLogbookComponent implements OnInit {
 
     // Add accessGroup
     if ((value || '').trim()) {
-      this.accessGroupsSelected.push(value.trim());
+      this.accessGroups.value.push(value.trim());
+      this.accessGroups.updateValueAndValidity();
     }
 
     // Reset the input value
@@ -285,15 +293,17 @@ export class AddLogbookComponent implements OnInit {
   }
 
   removeAccessGroup(accessGroup: string): void {
-    const index = this.accessGroupsSelected.indexOf(accessGroup);
+    const index = this.accessGroups.value.indexOf(accessGroup);
 
     if (index >= 0) {
-      this.accessGroupsSelected.splice(index, 1);
+      this.accessGroups.value.splice(index, 1);
+      this.accessGroups.updateValueAndValidity();
     }
   }
 
   selectedAccessGroup(event: MatAutocompleteSelectedEvent): void {
-    this.accessGroupsSelected.push(event.option.viewValue);
+    this.accessGroups.value.push(event.option.viewValue);
+    this.accessGroups.updateValueAndValidity();
     this.accessGroupsInput.nativeElement.value = '';
     this.accessGroupsCtrl.setValue(null);
   }
