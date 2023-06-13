@@ -139,7 +139,7 @@ export class SnippetContentComponent implements OnInit {
 
   set content(value: string) {
     this._content = value;
-    this.htmlContent.emit(this.content);
+    this.htmlContent.emit(this._content);
     this._prismed = false;
   }
 
