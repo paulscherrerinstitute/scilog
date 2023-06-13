@@ -210,7 +210,8 @@ describe('SnippetContentComponent', () => {
       component.prepareContent();
       spyOn(component.htmlContent, 'emit');
       component.content = `<p>${textContent}`;
-      expect(component.htmlContent.emit).toHaveBeenCalledWith(`${openTag}${textContent}${t}`);
+      expect(component.content).toEqual(`${openTag}${textContent}${t}`);
+      expect(component.htmlContent.emit).toHaveBeenCalledWith(`<p>${textContent}`);
     });
   })
 
