@@ -139,12 +139,15 @@ export class SnippetContentComponent implements OnInit {
 
   set content(value: string) {
     this._content = value;
-    this.htmlContent.emit(this.content);
+    this.htmlContent.emit(this._content);
     this._prismed = false;
   }
 
   get content() {
-    return `${this._content}${this._edited}`;
+    let content = this._content ?? '';
+    if (this._edited && content.split('<p>').length - 1 === 1)
+      content = content.replace('<p>', '<p class="snippet-content-edited">');
+    return `${content}${this._edited}`;
   }
 
 }

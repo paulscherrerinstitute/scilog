@@ -204,12 +204,14 @@ describe('SnippetContentComponent', () => {
         "createdAt": createdAt,
         "updatedAt": updatedAt,
       };
-      const textContent = "<p>some text</p>";
+      const openTag = !t? "<p>": '<p class="snippet-content-edited">';
+      const textContent = "some text</p>";
       component.snippet = snippetMock;
       component.prepareContent();
       spyOn(component.htmlContent, 'emit');
-      component.content = textContent;
-      expect(component.htmlContent.emit).toHaveBeenCalledWith(`${textContent}${t}`);
+      component.content = `<p>${textContent}`;
+      expect(component.content).toEqual(`${openTag}${textContent}${t}`);
+      expect(component.htmlContent.emit).toHaveBeenCalledWith(`<p>${textContent}`);
     });
   })
 
