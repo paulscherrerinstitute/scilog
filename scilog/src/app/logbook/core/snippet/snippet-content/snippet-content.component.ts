@@ -144,7 +144,10 @@ export class SnippetContentComponent implements OnInit {
   }
 
   get content() {
-    return `${this._content}${this._edited}`;
+    let content = this._content ?? '';
+    if (this._edited && content.split('<p>').length - 1 === 1)
+      content = content.replace('<p>', '<p class="snippet-content-edited">');
+    return `${content}${this._edited}`;
   }
 
 }

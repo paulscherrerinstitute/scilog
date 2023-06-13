@@ -37,8 +37,11 @@ table {
     color: white;
   }
 
-  ::ng-deep .snippet-content p {
+  ::ng-deep .snippet-content p, .snippet-content-edited {
     margin: 5px;
+  }
+
+  ::ng-deep .snippet-content .snippet-content-edited {
     display: inline-block;
   }
 
