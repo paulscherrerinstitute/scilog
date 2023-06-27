@@ -1,0 +1,33 @@
+# pyproject.toml
+
+[build-system]
+requires      = ["setuptools>=61.0.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "scilog"
+version = "1.0.0"
+description = "Work with data in electronic logbooks created using the SciLog software"
+readme = "README.md"
+authors = [{ name = "Klaus Wakonig", email = "klaus.wakonip@psi.ch" }, 
+          { name = "Stephan Egli", email = "stephan.egli@psi.ch" },
+          { name = "Carlo Minotti", email = "carlo.minotti@psi.ch" }]
+license = { file = "LICENSE" }
+classifiers = [
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python",
+    "Programming Language :: Python :: 3",
+]
+keywords = ["logbook", "sdk", "science"]
+dependencies = [
+]
+requires-python = ">=3.9"
+
+[project.optional-dependencies]
+dev = []
+
+[project.urls]
+Homepage = "https://github.com/paulscherrerinstitute/scilog"
+
+[project.scripts]
+realpython = "reader.__main__:main"
