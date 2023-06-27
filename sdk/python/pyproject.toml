@@ -32,4 +32,4 @@ dev = []
 Homepage = "https://github.com/paulscherrerinstitute/scilog"
 
 [project.scripts]
-realpython = "reader.__main__:main"
+
