@@ -11,7 +11,17 @@ import scilog
 
 log = SciLog("https://scilog.qa.psi.ch/api/v1")
 ```
-Once you have hold of the logbook API handle one of its public methods can be used to find logbooks and to read, create, reply to, edit or delete the snippet data inside the logbooks.
+This call will ask interactively for username and password in order to authenticate. The credentials are cached locally, so at the next call you wont be asked for username and password any more.
+
+Alternatively you can pass your credentials in an options object:
+
+```python
+import scilog
+
+log = SciLog("https://scilog.qa.psi.ch/api/v1",options={"username": "swissfelaramis-bernina@psi.ch","password":"secret"})
+```
+
+Once you have got hold of the logbook API handle all of its public methods can be used to find logbooks and to read, create, reply to, edit or delete the snippet data inside the logbooks.
 
 ## Get and Select existing logbooks
 
