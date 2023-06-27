@@ -7,7 +7,7 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "scilog"
 version = "1.0.0"
-description = "Work with data in electronic logbooks created using the SciLog software"
+description = "Python SDK to work with data in electronic logbooks created using the SciLog software"
 readme = "README.md"
 authors = [{ name = "Klaus Wakonig", email = "klaus.wakonip@psi.ch" }, 
           { name = "Stephan Egli", email = "stephan.egli@psi.ch" },
@@ -20,6 +20,8 @@ classifiers = [
 ]
 keywords = ["logbook", "sdk", "science"]
 dependencies = [
+        "requests >= 2.28.1",
+        "typeguard==2.13.3",
 ]
 requires-python = ">=3.9"
 
