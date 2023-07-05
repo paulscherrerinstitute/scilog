@@ -286,8 +286,29 @@ export class AutoAddRepository<
     accessGroups: string[];
     readACL: string[];
   }) {
-    data.ownerGroup = data.ownerGroup ?? data.readACL?.[0] ?? '';
-    data.accessGroups = data.accessGroups ?? data.readACL ?? [];
+    if (data.readACL?.length > 0) {
+      data.ownerGroup = data.readACL[0];
+      data.accessGroups = data.readACL;
+    } else {
+      data.ownerGroup = data.ownerGroup ?? '';
+      data.accessGroups = data.accessGroups ?? [];
+    }
+  }
+
+  private addReadACLFromOwnerAccessGroups(data: {
+    ownerGroup?: string;
+    accessGroups?: string[];
+    readACL: string[];
+  }) {
+    if (
+      !data.readACL &&
+      data.ownerGroup &&
+      data.accessGroups &&
+      data.accessGroups.length > 0
+    )
+      data.readACL = [...new Set([data.ownerGroup].concat(data.accessGroups))];
+    delete data.ownerGroup;
+    delete data.accessGroups;
   }
 
   definePersistedModel(entityClass: typeof Model) {
@@ -310,6 +331,7 @@ export class AutoAddRepository<
         // console.log("PATCH case")
         ctx.data.updatedAt = new Date();
         ctx.data.updatedBy = currentUser?.email ?? 'unknown@domain.org';
+        this.addReadACLFromOwnerAccessGroups(ctx.data);
         // remove all auto generated fields
         delete ctx.data.createdAt;
         delete ctx.data.createdBy;

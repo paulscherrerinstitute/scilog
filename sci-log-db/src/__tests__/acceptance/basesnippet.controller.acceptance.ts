@@ -596,4 +596,72 @@ describe('Basesnippet', function (this: Suite) {
         throw err;
       });
   });
+
+  [
+    {
+      input: {
+        ownerGroup: 'basesnippetAcceptance',
+        accessGroups: ['someNew'],
+      },
+      expected: 204,
+    },
+    {
+      input: {readACL: ['basesnippetAcceptance', 'someNew']},
+      expected: 204,
+    },
+    {
+      input: {
+        readACL: ['basesnippetAcceptance', 'someNew'],
+        accessGroups: ['someAccessGroups'],
+        ownerGroup: 'someOwnerGroup',
+      },
+      expected: 204,
+    },
+    {
+      input: {name: 'aName'},
+      expected: 403,
+    },
+  ].forEach((t, i) => {
+    it(`patch accessGroups of snippet by id with token ${i}`, async () => {
+      const snippet = await client
+        .post('/basesnippets')
+        .set('Authorization', 'Bearer ' + token)
+        .set('Content-Type', 'application/json')
+        .send({
+          ..._.omit(baseSnippet, ['expiresAt', 'adminACL']),
+          adminACL: ['basesnippetAcceptance'],
+          expiresAt: '1970-01-01T00:00:00.000Z',
+        });
+
+      await client
+        .patch(`/basesnippets/${snippet.body.id}`)
+        .set('Authorization', 'Bearer ' + token)
+        .set('Content-Type', 'application/json')
+        .send(t.input)
+        .expect(t.expected);
+
+      if (t.expected === 204)
+        await client
+          .get(`/basesnippets/${snippet.body.id}`)
+          .set('Authorization', 'Bearer ' + token)
+          .set('Content-Type', 'application/json')
+          .expect(200)
+          .then(
+            result => (
+              expect(result.body.ownerGroup).to.be.eql('basesnippetAcceptance'),
+              expect(result.body.accessGroups).to.be.eql([
+                'basesnippetAcceptance',
+                'someNew',
+              ]),
+              expect(result.body.readACL).to.be.eql([
+                'basesnippetAcceptance',
+                'someNew',
+              ])
+            ),
+          )
+          .catch(err => {
+            throw err;
+          });
+    });
+  });
 });
