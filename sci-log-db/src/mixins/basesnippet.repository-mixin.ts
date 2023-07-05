@@ -47,9 +47,10 @@ function UpdateAndDeleteRepositoryMixin<
       ) {
         const snippet = await this.findById(id, {}, options);
         if (
-          (typeof snippet?.expiresAt != 'undefined' &&
+          !this.isSharing(basesnippet, snippet) &&
+          ((typeof snippet?.expiresAt != 'undefined' &&
             snippet.expiresAt.getTime() < Date.now()) ||
-          typeof snippet?.expiresAt == 'undefined'
+            typeof snippet?.expiresAt == 'undefined')
         ) {
           throw new HttpErrors.Forbidden('Cannot modify expired data snippet.');
         }
@@ -58,6 +59,23 @@ function UpdateAndDeleteRepositoryMixin<
           await this.addToHistory(snippet, options?.currentUser);
         }
       } else await this.updateById(id, basesnippet, options);
+    }
+
+    private getPatchedKeys(basesnippet: Basesnippet, snippet: M & Relations) {
+      return Object.entries(basesnippet).reduce(
+        (previousValue: string[], currentValue) =>
+          // eslint-disable-next-line eqeqeq
+          snippet[currentValue[0] as keyof M] != currentValue[1]
+            ? previousValue.concat(currentValue[0])
+            : previousValue,
+        [],
+      );
+    }
+
+    private isSharing(basesnippet: Basesnippet, snippet: M & Relations) {
+      const difference = this.getPatchedKeys(basesnippet, snippet);
+      const allowed = ['ownerGroup', 'accessGroups', 'readACL'];
+      return difference.every(d => allowed.includes(d));
     }
 
     private async addToHistory(snippet: M, user: UserProfile): Promise<void> {
