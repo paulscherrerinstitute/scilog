@@ -300,6 +300,8 @@ describe('Basesnippet', function (this: Suite) {
         description: 'aSearchExcludedDescription',
         textcontent:
           '<p>aSearchExcludedTextContent</p><p>&aSearchableTextContent</p>',
+        ownerGroup: 'basesnippetAcceptance',
+        accessGroups: ['basesnippetAcceptance'],
       })
       .expect(204);
   });
@@ -662,6 +664,47 @@ describe('Basesnippet', function (this: Suite) {
           .catch(err => {
             throw err;
           });
+    });
+  });
+
+  [
+    {
+      input: {
+        ownerGroup: 'basesnippetAcceptance',
+        accessGroups: ['someNew'],
+      },
+      expected: 404,
+    },
+    {
+      input: {
+        accessGroups: ['someNew'],
+      },
+      expected: 403,
+    },
+  ].forEach((t, i) => {
+    it(`patch snippet by id changing ownerGroup should return error ${i}`, async () => {
+      await client
+        .patch(`/basesnippets/${baseSnippetId}`)
+        .set('Authorization', 'Bearer ' + token)
+        .set('Content-Type', 'application/json')
+        .send({
+          tags: ['aSearchExcludedTag'],
+          name: 'aSearchExcludedName',
+          description: 'aSearchExcludedDescription',
+          textcontent:
+            '<p>aSearchExcludedTextContent</p><p>&aSearchableTextContent</p>',
+          ...t.input,
+        })
+        .expect(t.expected)
+        .then(result => {
+          if (t.expected === 403)
+            expect(result.body.error.message).to.be.eql(
+              'Cannot modify data snippet. Please provide both ownerGroup and accessGroup',
+            );
+        })
+        .catch(err => {
+          throw err;
+        });
     });
   });
 });

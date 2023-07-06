@@ -14,7 +14,10 @@ import {
 } from '@loopback/repository';
 import {Location, Logbook} from '../models';
 import {Basesnippet} from '../models/basesnippet.model';
-import {defaultSequentially} from '../utils/misc';
+import {
+  addReadACLFromOwnerAccessGroups,
+  defaultSequentially,
+} from '../utils/misc';
 import {BasesnippetRepository} from './basesnippet.repository';
 import _ from 'lodash';
 
@@ -295,22 +298,6 @@ export class AutoAddRepository<
     }
   }
 
-  private addReadACLFromOwnerAccessGroups(data: {
-    ownerGroup?: string;
-    accessGroups?: string[];
-    readACL: string[];
-  }) {
-    if (
-      !data.readACL &&
-      data.ownerGroup &&
-      data.accessGroups &&
-      data.accessGroups.length > 0
-    )
-      data.readACL = [...new Set([data.ownerGroup].concat(data.accessGroups))];
-    delete data.ownerGroup;
-    delete data.accessGroups;
-  }
-
   definePersistedModel(entityClass: typeof Model) {
     const modelClass = super.definePersistedModel(entityClass);
     modelClass.observe('before save', async ctx => {
@@ -331,6 +318,7 @@ export class AutoAddRepository<
         // console.log("PATCH case")
         ctx.data.updatedAt = new Date();
         ctx.data.updatedBy = currentUser?.email ?? 'unknown@domain.org';
+        addReadACLFromOwnerAccessGroups(ctx.data);
         // remove all auto generated fields
         delete ctx.data.createdAt;
         delete ctx.data.createdBy;
@@ -346,7 +334,6 @@ export class AutoAddRepository<
           };
           ctx.where = this.addACLToFilter(ctx.where, adminCondition);
         }
-        this.addReadACLFromOwnerAccessGroups(ctx.data);
       } else {
         if (ctx.isNewInstance) {
           // POST case

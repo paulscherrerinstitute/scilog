@@ -6,6 +6,7 @@ import {
 } from '@loopback/repository';
 import {JsonSchemaOptions} from '@loopback/repository-json-schema';
 import {
+  HttpErrors,
   getModelSchemaRef as loobpackGetModelSchemaRef,
   SchemaObject,
 } from '@loopback/rest';
@@ -140,4 +141,25 @@ export function defaultSequentially(...args: any[]) {
     else if (previousValue) return previousValue;
     else return currentValue;
   }, undefined);
+}
+
+export function addReadACLFromOwnerAccessGroups(data: {
+  ownerGroup?: string;
+  accessGroups?: string[];
+  readACL?: string[];
+}) {
+  const groups: Partial<keyof typeof data>[] = ['ownerGroup', 'accessGroups'];
+  if (!data.readACL && groups.some(g => data[g])) {
+    if (!groups.every(g => data[g]))
+      throw new HttpErrors.Forbidden(
+        'Cannot modify data snippet. Please provide both ownerGroup and accessGroup',
+      );
+    data.readACL = [
+      ...new Set(
+        [data.ownerGroup as string].concat(data.accessGroups as string[]),
+      ),
+    ];
+  }
+  delete data.ownerGroup;
+  delete data.accessGroups;
 }
