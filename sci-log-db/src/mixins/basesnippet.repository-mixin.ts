@@ -18,6 +18,7 @@ import {HttpErrors, Response} from '@loopback/rest';
 import _ from 'lodash';
 import {EXPORT_SERVICE} from '../keys';
 import {ExportService} from '../services/export-snippets.service';
+import {addReadACLFromOwnerAccessGroups} from '../utils/misc';
 const fs = require('fs');
 
 function UpdateAndDeleteRepositoryMixin<
@@ -38,44 +39,44 @@ function UpdateAndDeleteRepositoryMixin<
 
     async updateByIdWithHistory(
       id: ID,
-      basesnippet: Basesnippet,
+      basesnippet: Basesnippet & {ownerGroup: string; accessGroups: string[]},
       options?: Options,
     ): Promise<void> {
+      const snippet = await this.findById(id, {}, options);
+      const patches = this.getChanged(basesnippet, snippet);
       if (
         typeof basesnippet.deleted == 'undefined' ||
         basesnippet.deleted === false
       ) {
-        const snippet = await this.findById(id, {}, options);
         if (
-          !this.isSharing(basesnippet, snippet) &&
+          !this.isSharing(patches) &&
           ((typeof snippet?.expiresAt != 'undefined' &&
             snippet.expiresAt.getTime() < Date.now()) ||
             typeof snippet?.expiresAt == 'undefined')
         ) {
           throw new HttpErrors.Forbidden('Cannot modify expired data snippet.');
         }
-        await this.updateById(id, basesnippet, options);
+        await this.updateById(id, patches, options);
         if (snippet?.versionable) {
           await this.addToHistory(snippet, options?.currentUser);
         }
-      } else await this.updateById(id, basesnippet, options);
+      } else await this.updateById(id, patches, options);
     }
 
-    private getPatchedKeys(basesnippet: Basesnippet, snippet: M & Relations) {
-      return Object.entries(basesnippet).reduce(
-        (previousValue: string[], currentValue) =>
-          // eslint-disable-next-line eqeqeq
-          snippet[currentValue[0] as keyof M] != currentValue[1]
-            ? previousValue.concat(currentValue[0])
-            : previousValue,
-        [],
+    private getChanged(
+      basesnippet: Basesnippet & {ownerGroup?: string; accessGroups?: string[]},
+      snippet: M & Relations,
+    ) {
+      addReadACLFromOwnerAccessGroups(basesnippet);
+      return _.pickBy(
+        basesnippet,
+        (v, k: keyof M) => JSON.stringify(snippet[k]) !== JSON.stringify(v),
       );
     }
 
-    private isSharing(basesnippet: Basesnippet, snippet: M & Relations) {
-      const difference = this.getPatchedKeys(basesnippet, snippet);
+    private isSharing(patches: Partial<Basesnippet>) {
       const allowed = ['ownerGroup', 'accessGroups', 'readACL'];
-      return difference.every(d => allowed.includes(d));
+      return Object.keys(patches).every(d => allowed.includes(d));
     }
 
     private async addToHistory(snippet: M, user: UserProfile): Promise<void> {
