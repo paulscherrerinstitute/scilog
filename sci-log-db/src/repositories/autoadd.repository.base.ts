@@ -331,7 +331,6 @@ export class AutoAddRepository<
         // console.log("PATCH case")
         ctx.data.updatedAt = new Date();
         ctx.data.updatedBy = currentUser?.email ?? 'unknown@domain.org';
-        this.addReadACLFromOwnerAccessGroups(ctx.data);
         // remove all auto generated fields
         delete ctx.data.createdAt;
         delete ctx.data.createdBy;
@@ -347,6 +346,7 @@ export class AutoAddRepository<
           };
           ctx.where = this.addACLToFilter(ctx.where, adminCondition);
         }
+        this.addReadACLFromOwnerAccessGroups(ctx.data);
       } else {
         if (ctx.isNewInstance) {
           // POST case
