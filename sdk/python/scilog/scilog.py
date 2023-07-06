@@ -397,6 +397,5 @@ class SciLog:
     def post_location(self, **kwargs):
         return self.core.post_location(**kwargs)
 
-
 class SciLogAuthError(AuthError):
     pass
