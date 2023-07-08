@@ -152,11 +152,17 @@ export class WidgetPreferencesComponent implements OnInit {
   }
 
   private async setUpAdditionalLogbooks() {
+    if (!this.data.filter.additionalLogbooks) {
+      return;
+    }
     const logs = await this.logbookDataService.getLogbooksInfo(this.data.filter.additionalLogbooks);
     this.additionalLogbooks.push(...logs);
   }
 
   private async setUpTargetLogbook() {
+    if (!this.data.filter.targetId) {
+      return;
+    }
     const log = await this.logbookDataService.getLogbookInfo(this.data.filter.targetId);
     this.filterBasics.get('logbook').setValue(log);
   }
