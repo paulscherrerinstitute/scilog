@@ -46,6 +46,10 @@ describe('SnippetViewerComponent', () => {
     fixture.detectChanges();
   });
 
+  it('should get data from dataService', () => {
+    expect(snippetViewerDataSpy.getSnippetViewerData).toHaveBeenCalledWith(component.config.filter.targetId);
+  });
+
   it('should create', () => {
     expect(component).toBeTruthy();
   });

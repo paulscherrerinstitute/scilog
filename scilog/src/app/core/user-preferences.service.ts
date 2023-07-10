@@ -79,7 +79,7 @@ export class UserPreferencesService {
 
   private async postUserPreferences() {
     let data = await this.dataService.postUserPreferences(this.userPreferences);
-    this.userPreferences[0].id = data.id;
+    this.userPreferences.id = data.id;
     console.log(this.userPreferences);
   }
 
@@ -94,7 +94,7 @@ export class UserPreferencesService {
         description: "All logbooks",
         filter: ''
       }]
-    }
+    };
   }
 
   ngOnDestroy(): void {

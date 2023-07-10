@@ -70,7 +70,7 @@ export class SnippetViewerComponent implements OnInit {
     if ((config != null) && (typeof this.configIndex != "undefined") && (this.configIndex < config.length)) {
       console.log(config)
       this.snippetId = config[this.configIndex].config.filter.targetId;
-      // this.snippetData = await this.dataService.getSnippetViewerData(this.snippetId);
+      this.snippetData = await this.dataService.getSnippetViewerData(this.snippetId);
     }
   }
 
