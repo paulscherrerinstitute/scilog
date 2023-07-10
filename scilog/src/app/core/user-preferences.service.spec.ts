@@ -11,6 +11,7 @@ describe('UserPreferencesService', () => {
   dataServiceSpy = jasmine.createSpyObj("UserPreferencesDataService", 
   ["getUserPreferences", "getUserInfo", "postUserPreferences"]);
   dataServiceSpy.getUserPreferences.and.returnValue(of({}));
+  dataServiceSpy.postUserPreferences.and.returnValue(Promise.resolve({id: "1"}));
 
   beforeEach(() => {
     TestBed.configureTestingModule({
