@@ -393,6 +393,10 @@ class SciLog:
     def post_snippet(self, **kwargs):
         return self.core.post_snippet(**kwargs)
 
+    # TODO: review and potentially move the whole core logic here
+    def post_location(self, **kwargs):
+        return self.core.post_location(**kwargs)
+
 
 class SciLogAuthError(AuthError):
     pass
