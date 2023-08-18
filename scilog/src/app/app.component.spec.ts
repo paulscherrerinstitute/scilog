@@ -1,12 +1,19 @@
 import { TestBed, waitForAsync } from '@angular/core/testing';
 import { RouterTestingModule } from '@angular/router/testing';
 import { AppComponent } from './app.component';
+import { LogbookInfoService } from './core/logbook-info.service';
 
 describe('AppComponent', () => {
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       imports: [
         RouterTestingModule
+      ],
+      providers: [
+        {
+          provide: LogbookInfoService, 
+          useValue: { logbookInfo: {id: 'id'} }
+        }
       ],
       declarations: [
         AppComponent
@@ -26,10 +33,16 @@ describe('AppComponent', () => {
   //   expect(app.title).toEqual('SciLog');
   // });
 
-  // it('should render title', () => {
-  //   const fixture = TestBed.createComponent(AppComponent);
-  //   fixture.detectChanges();
-  //   const compiled = fixture.nativeElement;
-  //   expect(compiled.querySelector('.content span').textContent).toContain('scilog app is running!');
-  // });
+  it('should unset the logbook', () => {
+    const fixture = TestBed.createComponent(AppComponent);
+    const app = fixture.componentInstance;
+    const popStateEvent = new PopStateEvent('popstate');
+    Object.defineProperty(
+      popStateEvent, 
+      'target', 
+      {writable: false, value: {location: {pathname: '/overview'}}}
+    );
+    window.dispatchEvent(popStateEvent);
+    expect(app['logbookInfo'].logbookInfo).toBeNull();
+  });
 });
