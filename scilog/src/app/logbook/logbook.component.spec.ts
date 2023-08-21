@@ -30,4 +30,16 @@ describe('LogbookComponent', () => {
   it('should create', () => {
     expect(component).toBeTruthy();
   });
+
+  it('should unset the logbook', () => {
+    const popStateEvent = new PopStateEvent('popstate');
+    Object.defineProperty(
+      popStateEvent, 
+      'target', 
+      {writable: false, value: {location: {pathname: '/overview'}}}
+    );
+    window.dispatchEvent(popStateEvent);
+    expect(component['logbookInfo'].logbookInfo).toBeNull();
+  });
+
 });

@@ -33,16 +33,4 @@ describe('AppComponent', () => {
   //   expect(app.title).toEqual('SciLog');
   // });
 
-  it('should unset the logbook', () => {
-    const fixture = TestBed.createComponent(AppComponent);
-    const app = fixture.componentInstance;
-    const popStateEvent = new PopStateEvent('popstate');
-    Object.defineProperty(
-      popStateEvent, 
-      'target', 
-      {writable: false, value: {location: {pathname: '/overview'}}}
-    );
-    window.dispatchEvent(popStateEvent);
-    expect(app['logbookInfo'].logbookInfo).toBeNull();
-  });
 });
