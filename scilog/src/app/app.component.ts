@@ -1,5 +1,4 @@
-import { Component, HostListener, OnInit } from '@angular/core';
-import { LogbookInfoService } from './core/logbook-info.service';
+import { Component, OnInit } from '@angular/core';
 
 
 @Component({
@@ -12,8 +11,7 @@ export class AppComponent implements OnInit {
   light_mode = true;
   disable_log = false;
 
-  constructor(private logbookInfo: LogbookInfoService) {
-  }
+  constructor() {}
 
   ngOnInit(): void {
     
@@ -29,12 +27,6 @@ export class AppComponent implements OnInit {
     if (this.disable_log){
       console.log = function (){};
     }
-  }
-
-  @HostListener('window:popstate', ['$event'])
-  onPopState(event: Event & {target: Window}) {
-    if (event.target.location.pathname === '/overview')
-      this.logbookInfo.logbookInfo = null;
   }
 
 }

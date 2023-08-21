@@ -1,7 +1,7 @@
-import { Component, OnInit, ComponentFactoryResolver } from '@angular/core';
+import { Component, OnInit, HostListener } from '@angular/core';
 import { ChangeStreamService } from '@shared/change-stream.service';
 import { ChangeStreamNotification } from '@shared/changestreamnotification.model'
-import { MediaObserver, MediaChange } from '@angular/flex-layout';
+import { MediaObserver } from '@angular/flex-layout';
 import { Subscription } from 'rxjs';
 import { ActivatedRoute, Router } from '@angular/router';
 import { LogbookInfoService } from '@shared/logbook-info.service';
@@ -149,5 +149,10 @@ export class LogbookComponent implements OnInit {
       (subscription) => subscription.unsubscribe());
   }
 
+  @HostListener('window:popstate', ['$event'])
+  onPopState(event: Event & {target: Window}) {
+    if (event.target.location.pathname === '/overview')
+      this.logbookInfo.logbookInfo = null;
+  }
 
 }
