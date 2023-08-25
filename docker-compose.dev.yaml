@@ -1,21 +1,37 @@
+version: "3.9"
 services:
   mongodb:
     image: mongo:4.2
     volumes:
       - mongodb_data:/data/db
       - ./config/mongo/rs-init.sh:/rs-init.sh:ro
-    command: ["--replSet", "rs0", "--bind_ip_all"]
+    command: [ "--replSet", "rs0", "--bind_ip_all" ]
     healthcheck:
       test: ./rs-init.sh
       interval: 5s
-    profiles: 
+    profiles:
       - be
-      - bf
-      - bfp
-      - bp
+
+  mongodb_seed:
+    image: mongo:4.2
+    volumes:
+      - "./config/seed_db/seed:/seed"
+      - "./config/seed_db/mongo_import.sh:/mnt/mongo_import.sh"
+    command:
+      - "sh"
+      - "-c"
+      - "chmod u+x /mnt/mongo_import.sh && /mnt/mongo_import.sh"
+    user: "0:0"
+    depends_on:
+      - mongodb
+    environment:
+      - DATABASE=scilog
+    restart: on-failure
+    profiles:
+      - be
 
   backend:
-    build: 
+    build:
       context: ./sci-log-db/.
     depends_on:
       mongodb:
@@ -25,7 +41,7 @@ services:
       - ./config/be/oidc.json:/home/node/app/oidc.json
       - ./config/be/datasource.json:/home/node/app/datasource.json
       # - ./config/be/roles.js:/home/node/app/dist/authentication-strategies/roles.js
-      - ./sci-log-db/functionalAccounts-example.json:/home/node/app/functionalAccounts.json
+      - ./config/be/functionalAccounts.json:/home/node/app/functionalAccounts.json
       - /home/node/app/node_modules
       - /home/node/app/dist
     environment:
@@ -33,14 +49,13 @@ services:
       CHROME_BIN: /usr/bin/chromium
       CHROME_PATH: /usr/lib/chromium/
     command: /bin/sh -c "while true; do sleep 600; done"
-    profiles: 
+    profiles:
       - be
-      - bf
-      - bfp
-      - bp
+    ports:
+      - 3000:3000
 
   frontend:
-    build: 
+    build:
       context: ./scilog/.
       target: builder
     environment:
@@ -52,26 +67,21 @@ services:
       - /frontend/node_modules
       - /frontend/dist
     command: /bin/sh -c "apk add --no-cache chromium && while true; do sleep 600; done"
-    profiles: 
+    profiles:
       - fe
-      - bf
-      - fp
-      - bfp
+    ports:
+      - 4200:4200
 
-  python: 
+  python:
     build:
       context: ./importTools
     volumes:
-        - ./importTools:/usr/src/app
-        - ./sdk/python/scilog:/usr/local/lib/python3.10/site-packages/scilog
+      - ./importTools:/usr/src/app
+      - ./sdk/python/scilog:/usr/local/lib/python3.10/site-packages/scilog
     # infinite loop to keep the container running
     command: /bin/sh -c "while sleep 1000; do :; done"
-    profiles: 
+    profiles:
       - py
-      - bp
-      - fp
-      - bfp
-
 
 volumes:
   mongodb_data:
