@@ -10,6 +10,7 @@ import { WidgetConfig } from '@model/config';
 import { TasksService } from '@shared/tasks.service'
 import { ViewsService } from '@shared/views.service';
 import { TagService } from '@shared/tag.service';
+import { ComponentCanDeactivate } from './core/navigation-guard-service';
 
 @Component({
   selector: 'logbook',
@@ -19,7 +20,7 @@ import { TagService } from '@shared/tag.service';
 
 })
 
-export class LogbookComponent implements OnInit {
+export class LogbookComponent implements OnInit, ComponentCanDeactivate {
   logbookId: string;
 
   showLoadingCircle = true;
@@ -149,10 +150,10 @@ export class LogbookComponent implements OnInit {
       (subscription) => subscription.unsubscribe());
   }
 
-  @HostListener('window:popstate', ['$event'])
-  onPopState(event: Event & {target: Window}) {
-    if (event.target.location.pathname === '/overview')
-      this.logbookInfo.logbookInfo = null;
+  @HostListener('window:beforeunload')
+  canDeactivate(): boolean {
+    if (false) return true;
+    return false;
   }
 
 }
