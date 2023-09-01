@@ -20,17 +20,14 @@ describe('CanDeactivateGuard', () => {
     expect(service).toBeTruthy();
   });
 
-  it('should unset the logbook', () => {
+  it('should return true on back', () => {
     spyOn(window, 'confirm').and.returnValue(true);
-    service.canDeactivate({canDeactivate: () => true});
-    expect(service['logbookInfo'].logbookInfo).toBeNull();
+    expect(service.canDeactivate({canDeactivate: () => false})).toBeTrue();
   });
 
-  it('should not unset the logbook', () => {
+  it('should return false on back', () => {
     spyOn(window, 'confirm').and.returnValue(false);
-    service.canDeactivate({canDeactivate: () => true});
-    expect(service['logbookInfo'].logbookInfo).toEqual({ id: 'id' });
+    expect(service.canDeactivate({canDeactivate: () => false})).toBeFalse();
   });
-
 
 });

@@ -1,4 +1,4 @@
-import { Component, OnInit, HostListener } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { ChangeStreamService } from '@shared/change-stream.service';
 import { ChangeStreamNotification } from '@shared/changestreamnotification.model'
 import { MediaObserver } from '@angular/flex-layout';
@@ -10,7 +10,6 @@ import { WidgetConfig } from '@model/config';
 import { TasksService } from '@shared/tasks.service'
 import { ViewsService } from '@shared/views.service';
 import { TagService } from '@shared/tag.service';
-import { ComponentCanDeactivate } from './core/navigation-guard-service';
 
 @Component({
   selector: 'logbook',
@@ -20,7 +19,7 @@ import { ComponentCanDeactivate } from './core/navigation-guard-service';
 
 })
 
-export class LogbookComponent implements OnInit, ComponentCanDeactivate {
+export class LogbookComponent implements OnInit {
   logbookId: string;
 
   showLoadingCircle = true;
@@ -148,12 +147,6 @@ export class LogbookComponent implements OnInit, ComponentCanDeactivate {
   ngOnDestroy(): void {
     this.subscriptions.forEach(
       (subscription) => subscription.unsubscribe());
-  }
-
-  @HostListener('window:beforeunload')
-  canDeactivate(): boolean {
-    if (false) return true;
-    return false;
   }
 
 }

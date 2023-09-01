@@ -1,19 +1,19 @@
-import { Component, OnInit } from '@angular/core';
-import { CompactType, DisplayGrid, GridsterConfig, GridsterItem, GridsterItemComponent, GridsterPush, GridType } from 'angular-gridster2';
-import { MatOptionSelectionChange } from '@angular/material/core';
+import { Component, HostListener, OnInit } from '@angular/core';
+import { CompactType, DisplayGrid, GridsterConfig, GridsterItemComponent, GridType } from 'angular-gridster2';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Subscription } from 'rxjs';
 import { ViewsService } from '@shared/views.service';
 import { WidgetConfig } from '@model/config';
 import { MediaObserver } from '@angular/flex-layout';
 import { Hotkeys } from '@shared/hotkeys.service';
+import { ComponentCanDeactivate } from '../core/navigation-guard-service';
 
 @Component({
   selector: 'dashboard',
   templateUrl: './dashboard.component.html',
   styleUrls: ['./dashboard.component.scss']
 })
-export class DashboardComponent implements OnInit {
+export class DashboardComponent implements OnInit, ComponentCanDeactivate {
 
 
   urlPath: object;
@@ -226,5 +226,10 @@ export class DashboardComponent implements OnInit {
       (subscription) => subscription.unsubscribe());
   }
 
+  @HostListener('window:beforeunload')
+  canDeactivate(): boolean {
+    if (false) return true;
+    return false;
+  }
 
 }
