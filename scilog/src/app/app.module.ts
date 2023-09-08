@@ -82,6 +82,7 @@ import { DownloadComponent } from '@shared/download/download.component';
 import { SearchComponent } from '@shared/search/search.component';
 import { SearchWindowComponent } from '@shared/search-window/search-window.component';
 import { AppConfigService } from "./app-config.service";
+import { NavigationGuardService } from './logbook/core/navigation-guard-service';
 
 const appConfigInitializerFn = (appConfig: AppConfigService) => {
   return () => appConfig.loadAppConfig();
@@ -171,6 +172,7 @@ const appConfigInitializerFn = (appConfig: AppConfigService) => {
     ],
     providers: [
         AppConfigService,
+        NavigationGuardService,
         {
             provide: APP_INITIALIZER,
             useFactory: appConfigInitializerFn,

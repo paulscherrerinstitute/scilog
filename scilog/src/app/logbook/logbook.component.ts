@@ -1,4 +1,4 @@
-import { Component, OnInit, HostListener } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { ChangeStreamService } from '@shared/change-stream.service';
 import { ChangeStreamNotification } from '@shared/changestreamnotification.model'
 import { MediaObserver } from '@angular/flex-layout';
@@ -147,12 +147,6 @@ export class LogbookComponent implements OnInit {
   ngOnDestroy(): void {
     this.subscriptions.forEach(
       (subscription) => subscription.unsubscribe());
-  }
-
-  @HostListener('window:popstate', ['$event'])
-  onPopState(event: Event & {target: Window}) {
-    if (event.target.location.pathname === '/overview')
-      this.logbookInfo.logbookInfo = null;
   }
 
 }

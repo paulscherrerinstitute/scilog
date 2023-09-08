@@ -1,21 +1,20 @@
-import { Component, OnInit, Input, Output, EventEmitter, ViewChild, ElementRef } from '@angular/core';
+import { Component, OnInit, Input, Output, EventEmitter, ViewChild, HostListener } from '@angular/core';
 import { MatDialogConfig, MatDialog } from '@angular/material/dialog';
 import { WidgetPreferencesComponent } from '../../widgets/widget-preferences/widget-preferences.component';
 import { LogbookItemComponent } from '../../widgets/logbook-item/logbook-item.component';
 import { ActivatedRoute } from '@angular/router';
 import { ViewsService } from '@shared/views.service';
-import { take } from 'rxjs/operators';
 import { Subscription } from 'rxjs';
-import { LogbookItemDataService } from '@shared/remote-data.service';
 import { ExportDialogComponent } from './export-dialog/export-dialog.component';
 import { WidgetItemConfig } from '@model/config';
+import { ComponentCanDeactivate } from '../../core/navigation-guard-service';
 
 @Component({
   selector: 'dashboard-item',
   templateUrl: './dashboard-item.component.html',
   styleUrls: ['./dashboard-item.component.scss']
 })
-export class DashboardItemComponent implements OnInit {
+export class DashboardItemComponent implements OnInit, ComponentCanDeactivate {
 
   @Input()
   configIndex: number;
@@ -102,4 +101,11 @@ export class DashboardItemComponent implements OnInit {
     this.subscriptions.forEach(
       (subscription) => subscription.unsubscribe());
   }
+
+  @HostListener('window:beforeunload')
+  canDeactivate(): boolean {
+    if (false) return true;
+    return false;
+  }
+
 }

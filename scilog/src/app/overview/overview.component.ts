@@ -8,7 +8,6 @@ import { AddCollectionComponent } from './add-collection/add-collection.componen
 import { AddLogbookComponent } from './add-logbook/add-logbook.component';
 import { LogbookInfoService } from '@shared/logbook-info.service';
 import { CookiesService } from '@shared/cookies.service';
-import { Router } from '@angular/router';
 import { LogbookDataService } from '@shared/remote-data.service';
 import { LogbookIconScrollService } from './logbook-icon-scroll-service.service';
 import { debounceTime } from 'rxjs/operators';
@@ -47,12 +46,12 @@ export class OverviewComponent implements OnInit {
     public dialog: MatDialog,
     private logbookInfo: LogbookInfoService,
     private cookie: CookiesService,
-    private router: Router,
     private dataService: LogbookDataService) {
 
   }
 
   ngOnInit(): void {
+    this.logbookInfo.logbookInfo = null;
     console.log(this.logbookInfo.logbookInfo);
     this.subscriptions.push(this.userPreferences.currentCollectionsConfig.subscribe(data => {
       console.log("collections:", data);
