@@ -20,10 +20,7 @@ import {
 } from '../utils/misc';
 import {BasesnippetRepository} from './basesnippet.repository';
 import _ from 'lodash';
-
-class UnprocessableError extends Error {
-  status = 422;
-}
+import {HttpErrors} from '@loopback/rest';
 
 export class AutoAddRepository<
   T extends Entity,
@@ -371,7 +368,7 @@ export class AutoAddRepository<
             ctx.instance.snippetType === 'logbook' &&
             ctx.instance.readACL?.includes('any-authenticated-user')
           )
-            throw new UnprocessableError(
+            throw new HttpErrors.UnprocessableEntity(
               'Cannot create logbook with readACL containing any-authenticated-user',
             );
         } else {
