@@ -12,6 +12,7 @@ import { SnippetInfoComponent } from './snippet-info/snippet-info.component';
 import { LogbookItemDataService } from '@shared/remote-data.service';
 import { trigger, state, style, transition, animate } from '@angular/animations';
 import { WidgetItemConfig } from '@model/config';
+import { Edits } from 'src/app/core/model/edits';
 
 
 @Component({
@@ -142,6 +143,7 @@ export class SnippetComponent implements OnInit {
     }
     // enable edit for snippet
     this.enableEdit = true;
+    this.setLocked();
   }
 
 
@@ -242,19 +244,19 @@ export class SnippetComponent implements OnInit {
     }
   }
 
-  lockEditUntilTimeout(updateBy: string) {
+  lockEditUntilTimeout(updateBy: string, timeOut?: number) {
     this.avatarHash = updateBy;
     this.lockEdit();
-    this.setEditTimeout();
+    this.setEditTimeout(timeOut ?? this._timeoutMilliseconds);
     console.log(typeof this.timerId);
   }
 
-  setEditTimeout() {
+  setEditTimeout(timeOut: number) {
     this.timerId = setTimeout(async () => {
       console.log("unlocking");
       await this.releaseLock();
       this._editDialog.close();
-    }, this._timeoutMilliseconds);
+    }, timeOut);
   }
 
   async releaseLock() {
@@ -339,6 +341,36 @@ export class SnippetComponent implements OnInit {
 
     dialogConfig.data = this.snippet;
     const dialogRef = this.dialog.open(SnippetInfoComponent, dialogConfig);
+  }
+
+  getLastEditedSnippet(subSnippets: Edits[]) {
+    let out: Edits;
+    let maxCreatedAt = 0;
+    for (let i = 0; i < subSnippets?.length; i++) {
+      if (subSnippets[i].snippetType !== 'edit')
+        continue
+      if (subSnippets[i].toDelete) {
+        out = subSnippets[i];
+        break
+      }
+      const createdAt = Date.parse(subSnippets[i].createdAt);
+      if (createdAt > maxCreatedAt) {
+        maxCreatedAt = createdAt;
+        out = subSnippets[i];
+      }
+    }
+    return out
+  }
+
+  setLocked() {
+    const lastEdited = this.getLastEditedSnippet(this.snippet.subsnippets);
+    if (!lastEdited) return
+    const timeFromLock = new Date().getTime() - Date.parse(lastEdited.createdAt);
+    if (!lastEdited.toDelete && timeFromLock < this._timeoutMilliseconds) {
+      this.lockEditUntilTimeout(lastEdited.updatedBy, this._timeoutMilliseconds - timeFromLock);
+      return;
+    }
+    this.releaseLock();
   }
 
   ngOnDestroy(): void {

@@ -238,9 +238,11 @@ describe('SnippetComponent', () => {
   })
 
   it('should set the editing timeout', () => {
+    spyOn(window, "setTimeout");
     component.timerId = null;
-    component.setEditTimeout();
+    component.setEditTimeout(123);
     expect(component.timerId).not.toEqual(null);
+    expect(window.setTimeout).toHaveBeenCalledOnceWith(jasmine.any(Function), 123);
   })
 
   it('should lock the edit timeout and set by', () => {
@@ -251,6 +253,43 @@ describe('SnippetComponent', () => {
     expect(component.avatarHash).toEqual(avatarForUser);
     expect(component.lockEdit).toHaveBeenCalledTimes(1);
     expect(component.setEditTimeout).toHaveBeenCalledTimes(1);
+  })
+
+  it('should set locked', () => {
+    spyOn(component, "getLastEditedSnippet").and.returnValue({createdAt: "2023-01-01", updatedBy: "aUser"});
+    spyOn(Date.prototype, "getTime").and.returnValue(1672531200001);
+    spyOn(component, "lockEditUntilTimeout");
+    component.setLocked();
+    expect(component.lockEditUntilTimeout).toHaveBeenCalledOnceWith("aUser", component._timeoutMilliseconds - 1);
+  })
+
+  it('should release old lock', () => {
+    spyOn(component, "getLastEditedSnippet").and.returnValue({createdAt: "2023-01-01", updatedBy: "aUser"});
+    spyOn(Date.prototype, "getTime").and.returnValue(16725312000000);
+    spyOn(component, "releaseLock");
+    component.setLocked();
+    expect(component.releaseLock).toHaveBeenCalledTimes(1);
+  })
+
+  it('should get undefined from last edited snippet', () => {
+    const subs = [{snippetType: 'paragraph'}, {snippetType: 'paragraph'}];
+    expect(component.getLastEditedSnippet(subs)).toEqual(undefined);
+  })
+
+  it('should get first toDelete from last edited snippet', () => {
+    const subs = [
+      { snippetType: "edit", toDelete: true, id: "1" }, 
+      { snippetType: "edit", toDelete: true, id: "2" }
+    ];
+    expect(component.getLastEditedSnippet(subs)).toEqual(subs[0]);
+  })
+
+  it('should get last snippet from last edited snippet', () => {
+    const subs = [
+      {snippetType: "edit", createdAt: "2023-01-02"}, 
+      {snippetType: "edit", createdAt: "2023-01-01"}, 
+    ];
+    expect(component.getLastEditedSnippet(subs)).toEqual(subs[0]);
   })
 
 });
