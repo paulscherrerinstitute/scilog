@@ -110,10 +110,14 @@ describe('AddContentComponent', () => {
       "files": [],
       "id": "6061d9a13587f37b851694d6"
     };
+    spyOn(component, 'sendMessage');
     component.setupComponent();
     expect(component.notification.linkType).toEqual(LinkType.PARAGRAPH);
-    expect(component.liveFeedback).toBe(true);
+    expect(component.notification.snippetType).toEqual("edit");
+    expect(component.notification.toDelete).toEqual(false);
+    expect(component.liveFeedback).toBe(false);
     expect(component.addButtonLabel).toBe("Done");
+    expect(component.sendMessage).toHaveBeenCalledTimes(1);
   });
 
   it('should get data from editor before sending', () => {
@@ -121,6 +125,16 @@ describe('AddContentComponent', () => {
     component.editor = jasmine.createSpyObj("component.editor", ["getData"])
     component.addContent("");
     expect(component.editor.getData).toHaveBeenCalled();
+  })
+
+  it('should get edit data from editor before sending', () => {
+    component.setupComponent();
+    component.editor = jasmine.createSpyObj("component.editor", ["getData"])
+    component.notification.snippetType = 'edit';
+    component.contentChanged = true;
+    component.addContent("");
+    expect(component.editor.getData).toHaveBeenCalled();
+    expect(component.notification.snippetType).toEqual('paragraph');
   })
 
   it('should prepare quote', () => {
@@ -279,21 +293,44 @@ describe('AddContentComponent', () => {
 
   })
 
-  it('should send a message during liveFeedback', () => {
+  it('should send a message if notification is edit', () => {
     spyOn(component, 'sendMessage');
-    component.liveFeedback = true;
-    component.message = notificationMock;
-    component.changeChain(notificationMock)
+    component.notification.snippetType = 'edit';
+    component.changeChain(notificationMock);
     expect(component.sendMessage).toHaveBeenCalledTimes(1);
-
-
   })
 
-  it('should not send messages if liveFeedback is disabled', () => {
+  it('should not send messages if notification is not edit', () => {
     spyOn(component, 'sendMessage');
-    component.liveFeedback = false;
-    component.changeChain(notificationMock)
+    component.changeChain(notificationMock);
     expect(component.sendMessage).toHaveBeenCalledTimes(0);
+  })
+
+  it('should mark for deletion and send message', () => {
+    spyOn(component, 'sendMessage');
+    component.notification.snippetType = 'edit';
+    component['sendEditDelitionMessage']();
+    expect(component.sendMessage).toHaveBeenCalledTimes(1);
+    expect(component.notification.toDelete).toEqual(true);
+  })
+
+  it('should not mark for deletion and send message', () => {
+    spyOn(component, 'sendMessage');
+    component.sendEditDelitionMessage();
+    expect(component.sendMessage).toHaveBeenCalledTimes(0);
+  })
+
+  it('should unset the logbook on unload', () => {
+    spyOn(component, 'sendEditDelitionMessage');
+    const unloadEvent = new Event('unload');
+    window.dispatchEvent(unloadEvent);
+    expect(component.sendEditDelitionMessage).toHaveBeenCalledTimes(1);
+  })
+
+  it('should unset the logbook on destroy', () => {
+    spyOn(component, 'sendEditDelitionMessage');
+    component.ngOnDestroy();
+    expect(component.sendEditDelitionMessage).toHaveBeenCalledTimes(1);
   })
 
   function combineHtmlFigureHash(figureMock: string[], hash: string) {

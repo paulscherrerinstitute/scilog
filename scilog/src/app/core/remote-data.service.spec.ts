@@ -170,6 +170,12 @@ describe('LogbookItemDataService', () => {
     expect(filter["where"].and[3]).toEqual({ "tags": { "nin": config.filter.excludeTags } });
   });
 
+  it('should delete all edit snippets', () => {
+    const spyDeleteSnippet = spyOn<LogbookItemDataService, any>(service, "deleteSnippet").and.returnValue(of([]));
+    service.deleteAllInProgressEditing("1");
+    expect(spyDeleteSnippet.calls.mostRecent().args).toEqual(["edits/paragraphs-to-delete", "1"]);
+  });
+
 });
 
 describe('LogbookDataService', () => {

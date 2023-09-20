@@ -179,38 +179,38 @@ describe('SnippetContentComponent', () => {
   })
 
   const editTest = [
-    "" ,
-    "<span class='snippet-edited'>(edited)</span>"
+    ["2021-03-29T11:55:20.128Z", ''],
+    ["2021-03-29T12:43:20.630Z", '<span class="snippet-edited">(edited)</span>'],
+    ["2021-03-29T12:43:20.630Z", ''],
   ];
   editTest.forEach((t, i) => {
     it(`should check if snippet was edited ${i}`, () => {
       const createdAt = "2021-03-29T11:55:20.128Z";
-      const updatedAt = !t? createdAt: "2021-03-29T12:43:20.630Z";
       const snippetMock = {
         "createdAt": createdAt,
-        "updatedAt": updatedAt,
+        "updatedAt": t[0],
+        "id_session": t[1]
       };
       component.snippet = snippetMock;
-      component["setEdited"]();
-      expect(component._edited).toEqual(t);
+      expect(component["setEdited"]("")).toEqual(t[1]);
     })
   })
   
   editTest.forEach((t, i) => {
     it(`should add (edited) note ${i}`, () => {
       const createdAt = "2021-03-29T11:55:20.128Z";
-      const updatedAt = !t? createdAt: "2021-03-29T12:43:20.630Z";
       const snippetMock = {
         "createdAt": createdAt,
-        "updatedAt": updatedAt,
+        "updatedAt": t[0],
+        "id_session": t[1]
       };
-      const openTag = !t? "<p>": '<p class="snippet-content-edited">';
+      const openTag = !t[1]? "<p>": '<p class="snippet-content-edited">';
       const textContent = "some text</p>";
       component.snippet = snippetMock;
       component.prepareContent();
       spyOn(component.htmlContent, 'emit');
       component.content = `<p>${textContent}`;
-      expect(component.content).toEqual(`${openTag}${textContent}${t}`);
+      expect(component.content).toEqual(`${openTag}${textContent}${t[1]}`);
       expect(component.htmlContent.emit).toHaveBeenCalledWith(`<p>${textContent}`);
     });
   })

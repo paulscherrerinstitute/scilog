@@ -267,6 +267,10 @@ export class LogbookItemDataService extends RemoteDataService {
     }
   }
 
+  deleteAllInProgressEditing(editId: string): void {
+    this.deleteSnippet("edits/paragraphs-to-delete", editId).toPromise();
+  }
+
   exportLogbook(exportType: string, config: any, skip: number, limit: number): Promise<Blob> {
     let headers = new HttpHeaders();
     headers = headers.set('Content-Type', 'application/json');
@@ -380,6 +384,7 @@ export class LogbookDataService extends RemoteDataService {
       return this.getSnippets<any[]>('basesnippets/search=' + this._searchString, { headers: headers, params: params }).toPromise();
     }
   }
+
 }
 
 @Injectable({

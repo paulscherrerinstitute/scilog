@@ -1,11 +1,11 @@
-import { Component, OnInit, Inject } from '@angular/core';
+import { Component, OnInit, Inject, HostListener } from '@angular/core';
 import { MAT_DIALOG_DATA } from '@angular/material/dialog';
 import * as ClassicEditor from '../ckeditor/ckeditor5/build/ckeditor';
-import { ChangeEvent, CKEditorComponent } from '../ckeditor/ckeditor5/build/ckeditor';
+import { ChangeEvent } from '../ckeditor/ckeditor5/build/ckeditor';
 import { AddContentService } from "../add-content.service";
 import { ChangeStreamNotification } from "../changestreamnotification.model";
 import { LinkType } from '@model/paragraphs';
-import { Subscription, merge } from 'rxjs';
+import { Subscription } from 'rxjs';
 import { LogbookInfoService } from '@shared/logbook-info.service';
 import { HttpClient } from '@angular/common/http';
 import { CK5ImageUploadAdapter } from '../ckeditor/ck5-image-upload-adapter';
@@ -102,11 +102,12 @@ export class AddContentComponent implements OnInit {
 
     if (this.message.id) {
       this.notification = this.message;
-      this.liveFeedback = true;
+      this.notification.snippetType = 'edit';
+      this.notification.toDelete = false;
+      this.liveFeedback = false;
       this.addButtonLabel = "Done";
       this.dialogTitle = "Modify data snippet";
-      this.notification.linkType = LinkType.PARAGRAPH;
-      return;
+      return this.sendMessage();
     }
     if (this.message.parentId) {
       this.data = '';
@@ -151,6 +152,8 @@ export class AddContentComponent implements OnInit {
     if (this.editor != undefined) {
       this.data = this.editor.getData();
     }
+    if (this.notification.snippetType === 'edit' && this.contentChanged)
+      this.notification.snippetType = 'paragraph';
     this.prepareMessage(this.data);
     this.sendMessage();
   };
@@ -172,22 +175,11 @@ export class AddContentComponent implements OnInit {
   }
 
   changeChain(data: any = null) {
-    if (data != null) {
-      if (this.liveFeedback) {
-        console.log("changing content");
-        this.prepareMessage(data);
-        this.data = data;
-        // this.notification.textcontent = data;
+    if (data)
+      this.data = data;
+    if (this.notification.snippetType === 'edit')
         this.sendMessage();
-      } else {
-        this.data = data;
-      }
-    } else {
-      if (this.liveFeedback) {
-        this.sendMessage();
-      }
     }
-  }
 
   prepareSubsnippetsQuoteContainer() {
     console.log(this.notification.subsnippets)
@@ -258,11 +250,23 @@ export class AddContentComponent implements OnInit {
   }
 
   ngOnDestroy(): void {
+    this.sendEditDelitionMessage();
     console.log("deleting add-content subscriptions")
     this.subscriptions.forEach(
       (subscription) => subscription.unsubscribe());
   }
 
+  sendEditDelitionMessage() {
+    if (this.notification.snippetType === 'edit') {
+      this.notification.toDelete = true;
+      this.sendMessage();
+    }
+  }
+
+  @HostListener('window:unload')
+  onUnload() {
+    this.sendEditDelitionMessage();
+  }
 
 }
 

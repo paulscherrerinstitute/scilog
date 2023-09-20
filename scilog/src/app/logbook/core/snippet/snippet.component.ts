@@ -1,7 +1,7 @@
 import { Component, OnInit, Input, SecurityContext, ElementRef, ViewChild, Output, EventEmitter } from '@angular/core';
 import { ChangeStreamNotification } from '../changestreamnotification.model';
 import { DomSanitizer } from '@angular/platform-browser';
-import { MatDialogConfig, MatDialog } from '@angular/material/dialog';
+import { MatDialogConfig, MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { AddContentComponent } from '../add-content/add-content.component';
 import { Paragraphs, LinkType } from '@model/paragraphs';
 import { Subscription } from 'rxjs';
@@ -86,6 +86,8 @@ export class SnippetComponent implements OnInit {
 
   figures: any;
   subscriptions: Subscription[] = [];
+  _timeoutMilliseconds = 300000;
+  _editDialog: MatDialogRef<AddContentComponent, any>
 
   @ViewChild('snippetContainer', { read: ElementRef }) snippetContainerRef: ElementRef;
   @ViewChild('snippetContent') snippetContentRef: SnippetContentComponent;
@@ -219,6 +221,7 @@ export class SnippetComponent implements OnInit {
     dialogConfig.autoFocus = true;
     dialogConfig.data = { "snippet": this.snippet, "content": this.content, "defaultTags": this.snippet.tags, "config": this.config };
     const dialogRef = this.dialog.open(AddContentComponent, dialogConfig);
+    this._editDialog = dialogRef;
     this.subscriptions.push(dialogRef.afterClosed().subscribe(result => {
       console.log(`Dialog result: ${result}`);
     }));
@@ -239,24 +242,29 @@ export class SnippetComponent implements OnInit {
     }
   }
 
-  startTimeout(updateBy: string) {
+  lockEditUntilTimeout(updateBy: string) {
     this.avatarHash = updateBy;
-    console.log(this.avatarHash)
-    if (this.timerId != null) {
-      clearTimeout(this.timerId);
-    }
     this.lockEdit();
-    var self = this;
-    this.timerId = setTimeout(function () {
-      console.log("unlocking");
-      self.enableEdit = true;
-      self.snippetIsAccessedByAnotherUser = false;
-      self.timerId = null;
-    }, 10000);
+    this.setEditTimeout();
     console.log(typeof this.timerId);
   }
 
+  setEditTimeout() {
+    this.timerId = setTimeout(async () => {
+      console.log("unlocking");
+      await this.releaseLock();
+      this._editDialog.close();
+    }, this._timeoutMilliseconds);
+  }
+
+  async releaseLock() {
+    this.enableEdit = true;
+    this.snippetIsAccessedByAnotherUser = false;
+    await this.logbookItemDataService.deleteAllInProgressEditing(this.snippet.id);
+  }
+
   lockEdit() {
+    clearTimeout(this.timerId);
     console.log("locking");
     this.snippetIsAccessedByAnotherUser = true;
     this.enableEdit = false;

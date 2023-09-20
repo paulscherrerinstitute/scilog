@@ -59,7 +59,6 @@ export class SnippetContentComponent implements OnInit {
   }
 
   prepareContent() {
-    this.setEdited();
     if (!this.snippet.files || (this.snippet.files.length == 0)) {
       this.content = this.snippet?.textcontent;
       return;
@@ -91,9 +90,19 @@ export class SnippetContentComponent implements OnInit {
     this.content = this.span.innerHTML;
   }
 
-  private setEdited() {
-    if (this.snippet.updatedAt !== this.snippet.createdAt)
-      this._edited = "<span class='snippet-edited'>(edited)</span>";
+  private setEdited(content: string) {
+    if (this.snippet?.updatedAt === this.snippet?.createdAt || !this.snippet?.id_session) 
+      return content
+    const emptyElement = document.createElement("span");
+    const edited = document.createElement("span");
+    edited.classList.add("snippet-edited");
+    edited.innerHTML = "(edited)";
+    emptyElement.appendChild(edited);
+    if (content) {
+      edited.insertAdjacentHTML('beforebegin', content);
+      emptyElement.firstElementChild.classList.add("snippet-content-edited");
+    }
+    return emptyElement.innerHTML
   }
 
   private setImageUrl(img: HTMLImageElement, id: string) {
@@ -144,10 +153,7 @@ export class SnippetContentComponent implements OnInit {
   }
 
   get content() {
-    let content = this._content ?? '';
-    if (this._edited && content.split('<p>').length - 1 === 1)
-      content = content.replace('<p>', '<p class="snippet-content-edited">');
-    return `${content}${this._edited}`;
+    return this.setEdited(this._content ?? '');
   }
 
 }

@@ -27,7 +27,7 @@ import { MediaObserver } from '@angular/flex-layout';
 import { CK5ImageUploadAdapter } from '@shared/ckeditor/ck5-image-upload-adapter';
 import { extractNotificationMessage } from '@shared/add-content/add-content.component';
 import { UserPreferencesService } from '@shared/user-preferences.service';
-import { debounceTime, throttleTime, take } from 'rxjs/operators';
+import { debounceTime } from 'rxjs/operators';
 import { TagEditorComponent } from '@shared/tag-editor/tag-editor.component';
 import { LogbookItemDataService } from '@shared/remote-data.service';
 import { Hotkeys } from '@shared/hotkeys.service';
@@ -327,12 +327,10 @@ export class LogbookItemComponent implements OnInit {
               }
               // this.array[updatePos] = updateEntry;
               console.log("updated array at pos ", updatePos);
-              console.log(this.childSnippets.toArray());
-              this.childSnippets.toArray()[updatePos].updateContent();
-              if (this.childSnippets.toArray()[updatePos]?.snippet.id_session && (this.childSnippets.toArray()[updatePos].snippet.id_session != localStorage.getItem('id_session'))) {
-                console.log("blocking for 5 seconds");
-                console.log(this.childSnippets.toArray()[updatePos])
-                this.childSnippets.toArray()[updatePos].startTimeout(this.childSnippets.toArray()[updatePos].snippet.updatedBy);
+              console.log(updateEntry);
+              updateEntry.updateContent();
+              if (updateEntry?.snippet.id_session) {
+                await updateEntry.releaseLock();
               }
             }
             this.logbookScrollService.updateViewportEstimate();
@@ -341,6 +339,9 @@ export class LogbookItemComponent implements OnInit {
 
         break;
       case "insert":
+        if (notification.content.snippetType === "edit") {
+          await this.fireEditCondition(notification)
+        }
         if ((notification.content.snippetType == "paragraph") || (notification.content.snippetType == "image")) {
           // first check if the incoming message satisfies the current filters
           let snippetsFiltered = this.applyFilters([notification.content]);
@@ -451,12 +452,14 @@ export class LogbookItemComponent implements OnInit {
     // } else {
     //   referenceEntry = this.childSnippets.toArray()[this.childSnippets.toArray().length - 1].snippet;
     // }
-
+    if (msg.snippetType === "edit") {
+    // POST -- EDIT SNIPPET
+    let payload: ChangeStreamNotification = this._prepareEditPostPayload(referenceEntry, msg);
+    this.logbookItemDataService.uploadParagraph(payload)
+    } else if ((typeof msg.id != "undefined") && (msg.id != '')) {
     // PATCH -- UPDATE SNIPPET
-    if ((typeof msg.id != "undefined") && (msg.id != '')) {
       let payload = this._preparePatchPayload(referenceEntry, msg);
       this.logbookItemDataService.uploadParagraph(payload, msg.id);
-
     } else {
       // POST -- NEW SNIPPET
       let payload = this._preparePostPayload(referenceEntry, msg);
@@ -464,6 +467,16 @@ export class LogbookItemComponent implements OnInit {
     }
 
     this.modifiedMetadata = false;
+  }
+
+  _prepareEditPostPayload(referenceEntry: ChangeStreamNotification, msg: ChangeStreamNotification): ChangeStreamNotification {
+    return {
+      ownerGroup: referenceEntry.ownerGroup,
+      accessGroups: referenceEntry.accessGroups,
+      snippetType: msg.snippetType,
+      parentId: msg.id,
+      toDelete: msg.toDelete,
+    };
   }
 
   _preparePatchPayload(referenceEntry: ChangeStreamNotification, msg: ChangeStreamNotification): ChangeStreamNotification {
@@ -510,6 +523,14 @@ export class LogbookItemComponent implements OnInit {
     console.log(payload);
 
     return payload;
+  }
+
+  async fireEditCondition(notification: ChangeStreamNotification) {
+    const pos = this.findPos(notification.content, "id", "parentId")[0];
+    const posChild = this.childSnippets.toArray()[pos];
+    if (!notification.content.toDelete)
+      return posChild.lockEditUntilTimeout(posChild.snippet.updatedBy);
+    await posChild.releaseLock();
   }
 
   applyFilters(snippets: Basesnippets[]) {

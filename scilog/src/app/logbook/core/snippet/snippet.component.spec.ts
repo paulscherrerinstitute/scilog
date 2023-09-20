@@ -10,20 +10,16 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { WidgetItemConfig } from '@model/config';
 
 
-class UserPreferencesMock {
-  userInfo = {
-    roles: ["roles"]
-
-  }
-}
-
 describe('SnippetComponent', () => {
   let component: SnippetComponent;
   let fixture: ComponentFixture<SnippetComponent>;
   let logbookItemDataServiceSpy: any;
   let userPreferencesServiceSpy: any;
 
-  logbookItemDataServiceSpy = jasmine.createSpyObj("LogbookItemDataService", ["deleteLogbookItem", "getBasesnippet"]);
+  logbookItemDataServiceSpy = jasmine.createSpyObj(
+    "LogbookItemDataService", 
+    ["deleteLogbookItem", "getBasesnippet", "deleteAllInProgressEditing"]
+  );
   logbookItemDataServiceSpy.deleteLogbookItem.and.returnValue(of({}));
   logbookItemDataServiceSpy.getBasesnippet.and.returnValue({ "parentId": "602d438ddaa91a637da2181a" });
 
@@ -217,5 +213,44 @@ describe('SnippetComponent', () => {
     })
 
   }));
+
+  it('should release the lock', async () => {
+    spyOn(component, 'allowEdit').and.returnValue(true);
+    component._enableEdit = false;
+    component.snippetIsAccessedByAnotherUser = true;
+    await component.releaseLock();
+    expect(component.enableEdit).toEqual(true);
+    expect(component.snippetIsAccessedByAnotherUser).toEqual(false);
+    expect(component['logbookItemDataService'].deleteAllInProgressEditing)
+      .toHaveBeenCalledOnceWith(snippetMock.id);
+  })
+
+  it('should add the lock', () => {
+    spyOn(component, 'releaseLock');
+    spyOn(window, 'clearTimeout');
+    component.snippetIsAccessedByAnotherUser = false;
+    component.timerId = 123;
+    component._enableEdit = true;
+    component.lockEdit();
+    expect(component.enableEdit).toEqual(false);
+    expect(component.snippetIsAccessedByAnotherUser).toEqual(true);
+    expect(window.clearTimeout).toHaveBeenCalledOnceWith(123);
+  })
+
+  it('should set the editing timeout', () => {
+    component.timerId = null;
+    component.setEditTimeout();
+    expect(component.timerId).not.toEqual(null);
+  })
+
+  it('should lock the edit timeout and set by', () => {
+    const avatarForUser = "aTestUserForlockEditUntilTimeout";
+    spyOn(component, 'lockEdit');
+    spyOn(component, 'setEditTimeout');
+    component.lockEditUntilTimeout(avatarForUser);
+    expect(component.avatarHash).toEqual(avatarForUser);
+    expect(component.lockEdit).toHaveBeenCalledTimes(1);
+    expect(component.setEditTimeout).toHaveBeenCalledTimes(1);
+  })
 
 });
