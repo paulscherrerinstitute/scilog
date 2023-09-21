@@ -14,23 +14,24 @@ describe('Export service unit', function (this: Suite) {
   let textElement: Element;
   let exportService: ExportService;
   const textcontent = '<img src="" title="123"><img src="" title="456">';
+  const date = new Date(2023, 3, 13, 11, 13, 15);
   const subsnippets = [
     new Paragraph({
       linkType: LinkType.COMMENT,
       textcontent: '<p>a comment</p>',
-      updatedAt: new Date(2023, 3, 13),
+      updatedAt: date,
       updatedBy: 'test',
     }),
     new Paragraph({
       linkType: LinkType.QUOTE,
       textcontent: '<p>a quote</p>',
-      updatedAt: new Date(2023, 3, 13),
+      updatedAt: date,
       updatedBy: 'test',
     }),
     new Paragraph({
       linkType: LinkType.PARAGRAPH,
       textcontent: '<p>a paragraph sub</p>',
-      updatedAt: new Date(2023, 3, 13),
+      updatedAt: date,
       updatedBy: 'test',
     }),
   ];
@@ -42,7 +43,7 @@ describe('Export service unit', function (this: Suite) {
       {fileHash: '789', accessHash: 'ghi'},
     ],
     tags: ['tag1', 'tag2'],
-    updatedAt: new Date(2023, 3, 13),
+    updatedAt: date,
     updatedBy: 'test',
     linkType: LinkType.PARAGRAPH,
   });
@@ -100,10 +101,10 @@ describe('Export service unit', function (this: Suite) {
       textElement,
     );
     expect(dateAndAuthor.innerHTML).to.be.eql(
-      `<snippet-header>1 / 13 Apr 2023 / test</snippet-header>${textcontent}`,
+      `<snippet-header>1 / 13 Apr 2023, 11:13:15 / test</snippet-header>${textcontent}`,
     );
     expect(dateAndAuthor.outerHTML).to.be.eql(
-      `<div><snippet-header>1 / 13 Apr 2023 / test</snippet-header>${textcontent}</div>`,
+      `<div><snippet-header>1 / 13 Apr 2023, 11:13:15 / test</snippet-header>${textcontent}</div>`,
     );
   });
 
@@ -153,20 +154,22 @@ describe('Export service unit', function (this: Suite) {
   });
 
   it('addTitle', () => {
-    sandbox.stub(Date.prototype, 'toLocaleDateString').returns('13 Apr 2023');
+    sandbox
+      .stub(Date.prototype, 'toLocaleDateString')
+      .returns('13 Apr 2023, 11:13:15');
     exportService['addTitle']('Some test');
     expect(exportService.body.innerHTML).to.be.eql(
-      '<h1>Some test: 13 Apr 2023</h1><hr style="border-top: 5px solid;">',
+      '<h1>Some test: 13 Apr 2023, 11:13:15</h1><hr style="border-top: 5px solid;">',
     );
   });
 
   it('deep', () => {
     const deep = exportService['deep'](paragraph);
     expect(deep.innerHTML).to.be.eql(
-      '<snippet-header>1 / 13 Apr 2023 / test</snippet-header><div><img src="http://localhost:3000/images/abc" title="123"><img src="http://localhost:3000/images/def" title="456"></div><snippet-tag>tag1</snippet-tag><snippet-tag>tag2</snippet-tag>',
+      '<snippet-header>1 / 13 Apr 2023, 11:13:15 / test</snippet-header><div><img src="http://localhost:3000/images/abc" title="123"><img src="http://localhost:3000/images/def" title="456"></div><snippet-tag>tag1</snippet-tag><snippet-tag>tag2</snippet-tag>',
     );
     expect(deep.outerHTML).to.be.eql(
-      '<imagesnippet><snippet-header>1 / 13 Apr 2023 / test</snippet-header><div><img src="http://localhost:3000/images/abc" title="123"><img src="http://localhost:3000/images/def" title="456"></div><snippet-tag>tag1</snippet-tag><snippet-tag>tag2</snippet-tag></imagesnippet>',
+      '<imagesnippet><snippet-header>1 / 13 Apr 2023, 11:13:15 / test</snippet-header><div><img src="http://localhost:3000/images/abc" title="123"><img src="http://localhost:3000/images/def" title="456"></div><snippet-tag>tag1</snippet-tag><snippet-tag>tag2</snippet-tag></imagesnippet>',
     );
   });
 
@@ -185,8 +188,8 @@ describe('Export service unit', function (this: Suite) {
   });
 
   const subsnippetTest = [
-    '<snippet data-quote="remove-if-last"><imagesnippet><snippet-header>1 / 13 Apr 2023 / test</snippet-header><div><img src="http://localhost:3000/images/abc" title="123"><img src="http://localhost:3000/images/def" title="456"></div><snippet-tag>tag1</snippet-tag><snippet-tag>tag2</snippet-tag></imagesnippet></snippet><snippetcomment><div><snippet-header>1.1 / 13 Apr 2023 / test</snippet-header><p>a comment</p></div></snippetcomment><snippet><div><snippet-header>1.2 /  13 Apr 2023 / test</snippet-header><p>a paragraph sub</p></div></snippet>',
-    '<snippetquote><div><snippet-header>1 / 13 Apr 2023 / test</snippet-header><p>a quote</p></div></snippetquote><snippet data-quote="keep"><imagesnippet><div><img src="http://localhost:3000/images/abc" title="123"><img src="http://localhost:3000/images/def" title="456"></div><snippet-tag>tag1</snippet-tag><snippet-tag>tag2</snippet-tag></imagesnippet></snippet>',
+    '<snippet data-quote="remove-if-last"><imagesnippet><snippet-header>1 / 13 Apr 2023, 11:13:15 / test</snippet-header><div><img src="http://localhost:3000/images/abc" title="123"><img src="http://localhost:3000/images/def" title="456"></div><snippet-tag>tag1</snippet-tag><snippet-tag>tag2</snippet-tag></imagesnippet></snippet><snippetcomment><div><snippet-header>1.1 / 13 Apr 2023, 11:13:15 / test</snippet-header><p>a comment</p></div></snippetcomment><snippet><div><snippet-header>1.2 /  13 Apr 2023, 11:13:15 / test</snippet-header><p>a paragraph sub</p></div></snippet>',
+    '<snippetquote><div><snippet-header>1 / 13 Apr 2023, 11:13:15 / test</snippet-header><p>a quote</p></div></snippetquote><snippet data-quote="keep"><imagesnippet><div><img src="http://localhost:3000/images/abc" title="123"><img src="http://localhost:3000/images/def" title="456"></div><snippet-tag>tag1</snippet-tag><snippet-tag>tag2</snippet-tag></imagesnippet></snippet>',
   ];
   subsnippetTest.forEach((t, i) => {
     it(`paragraphToHTML ${i}`, () => {
