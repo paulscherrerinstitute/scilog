@@ -7,6 +7,7 @@ import {RestBindings, Server} from '@loopback/rest';
 import PDFMerger from 'pdf-merger-js';
 import Prism from 'prismjs';
 import LoadLanguages from 'prismjs/components/';
+import {omit} from 'lodash';
 
 @bind({
   scope: BindingScope.TRANSIENT,
@@ -17,7 +18,14 @@ export class ExportService {
   body: HTMLBodyElement;
   dateOptions = {
     locales: 'en-GB',
-    options: {year: 'numeric', month: 'short', day: 'numeric'} as const,
+    options: {
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit',
+      second: '2-digit',
+    } as const,
   };
   batchSize = 2000;
   paragraphCounter: number;
@@ -171,7 +179,7 @@ export class ExportService {
       titleName ?? 'Scilog'
     }: ${new Date().toLocaleDateString(
       this.dateOptions.locales,
-      this.dateOptions.options,
+      omit(this.dateOptions.options, 'hour', 'minute', 'second'),
     )}`;
     this.body.append(title);
     const hr = this.document.createElement('hr');
