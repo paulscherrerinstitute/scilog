@@ -36,6 +36,7 @@ import { TagService } from '@shared/tag.service';
 import { CKeditorConfig } from '@shared/ckeditor/ckeditor-config';
 import { LogbookScrollService } from '@shared/logbook-scroll.service';
 import { ScrollToElementService } from '@shared/scroll-to-element.service';
+import { LinkType } from 'src/app/core/model/paragraphs';
 
 
 @Component({
@@ -319,19 +320,19 @@ export class LogbookItemComponent implements OnInit {
           } else {
             // true update
             // we only need to update already rendered elements. The data is anyway already up to date in the backend
+            if (subPos?.length === 2) {
+              const snippetPos = this.childSnippets.toArray()[subPos[0]].snippet;
+              const subSnippet = snippetPos.subsnippets[subPos[1]];
+              this.updateSnippetValues(notification.content, subSnippet);
+              snippetPos.subsnippets = [subSnippet];
+            }
             if (updatePos < this.childSnippets.toArray().length) {
               let updateEntry = this.childSnippets.toArray()[updatePos];
               console.log(updatePos);
-              for (const key in notification.content) {
-                updateEntry.snippet[key] = notification.content[key];
-              }
-              // this.array[updatePos] = updateEntry;
+              this.updateSnippetValues(notification.content, updateEntry.snippet);
               console.log("updated array at pos ", updatePos);
               console.log(updateEntry);
               updateEntry.updateContent();
-              if (updateEntry?.snippet.id_session) {
-                await updateEntry.releaseLock();
-              }
             }
             this.logbookScrollService.updateViewportEstimate();
           }
@@ -340,7 +341,7 @@ export class LogbookItemComponent implements OnInit {
         break;
       case "insert":
         if (notification.content.snippetType === "edit") {
-          await this.fireEditCondition(notification)
+          return await this.fireEditCondition(notification)
         }
         if ((notification.content.snippetType == "paragraph") || (notification.content.snippetType == "image")) {
           // first check if the incoming message satisfies the current filters
@@ -441,6 +442,18 @@ export class LogbookItemComponent implements OnInit {
     }
   }
 
+  private updateSnippetValues(content: Basesnippets, snippet: Basesnippets) {
+    for (const key in content) {
+      snippet[key] = content[key];
+    }
+  }
+
+  // private updateSnippetValues(notification: ChangeStreamNotification, subSnippet: any) {
+  //   for (const key in notification.content) {
+  //     subSnippet[key] = notification.content[key];
+  //   }
+  // }
+
   submitContent(msg: ChangeStreamNotification) {
     // in the future, this should be extended to support inserting snippets below/above other snippets
     // for now, I just take the last array entry
@@ -454,8 +467,8 @@ export class LogbookItemComponent implements OnInit {
     // }
     if (msg.snippetType === "edit") {
     // POST -- EDIT SNIPPET
-    let payload: ChangeStreamNotification = this._prepareEditPostPayload(referenceEntry, msg);
-    this.logbookItemDataService.uploadParagraph(payload)
+      let payload: ChangeStreamNotification = this._prepareEditPostPayload(referenceEntry, msg);
+      this.logbookItemDataService.uploadParagraph(payload);
     } else if ((typeof msg.id != "undefined") && (msg.id != '')) {
     // PATCH -- UPDATE SNIPPET
       let payload = this._preparePatchPayload(referenceEntry, msg);
@@ -476,6 +489,7 @@ export class LogbookItemComponent implements OnInit {
       snippetType: msg.snippetType,
       parentId: msg.id,
       toDelete: msg.toDelete,
+      linkType: msg.linkType,
     };
   }
 
@@ -526,11 +540,13 @@ export class LogbookItemComponent implements OnInit {
   }
 
   async fireEditCondition(notification: ChangeStreamNotification) {
-    const pos = this.findPos(notification.content, "id", "parentId")[0];
-    const posChild = this.childSnippets.toArray()[pos];
-    if (!notification.content.toDelete)
-      return posChild.lockEditUntilTimeout(posChild.snippet.updatedBy);
-    await posChild.releaseLock();
+    const pos = this.findPos(notification.content, "id", "parentId", notification.content.linkType === LinkType.COMMENT);
+    let posChild: (SnippetComponent | Basesnippets) = this.childSnippets.toArray()[pos[0]];
+    if (pos.length === 2) {
+      posChild = (posChild as SnippetComponent).snippet.subsnippets[pos[1]] as Basesnippets;
+      posChild.snippetType = 'paragraph';
+    }
+    posChild.subsnippets = [...(posChild.subsnippets?? []).filter(s => s.snippetType !== 'edit') , notification.content];
   }
 
   applyFilters(snippets: Basesnippets[]) {

@@ -543,6 +543,7 @@ describe('LogbookItemComponent', () => {
       snippetType: notificationMock.snippetType,
       parentId: notificationMock.id,
       toDelete: notificationMock.toDelete,
+      linkType: notificationMock.linkType,
     });
   })
 
@@ -553,28 +554,29 @@ describe('LogbookItemComponent', () => {
     expect(component.findPos(notificationMock, "id", "parentId")[0]).toEqual(0);
   })
 
-  it('should not fire delete edits', async () => {
+  it('should append subsnippets', async () => {
     const snippetMock = jasmine.createSpyObj(
       "SnippetComponent", 
-      ["lockEditUntilTimeout"], 
+      {}, 
       {snippet: {id: "123", updatedBy: "aFiringUser"}}
     );
     spyOn(component["childSnippets"], "toArray").and.returnValue([snippetMock]);
-    const notificationMock: ChangeStreamNotification = {content: { parentId: "123" }};
+    const notificationMock: ChangeStreamNotification = {content: { parentId: "123", snippetType: "edit" }};
     await component.fireEditCondition(notificationMock);
-    expect(snippetMock.lockEditUntilTimeout).toHaveBeenCalledOnceWith("aFiringUser");
+    expect(snippetMock.subsnippets).toEqual([notificationMock.content]);
   })
 
-  it('should fire edit condition', async () => {
+  it('should append grand subsnippets', async () => {
     const snippetMock = jasmine.createSpyObj(
       "SnippetComponent", 
-      ["releaseLock"], 
-      {snippet: {id: "123", updatedBy: "aFiringUser"}}
+      {}, 
+      {snippet: {subsnippets: [{}]}}
     );
+    spyOn(component, "findPos").and.returnValue([0, 0]);
     spyOn(component["childSnippets"], "toArray").and.returnValue([snippetMock]);
-    const notificationMock: ChangeStreamNotification = {content: { parentId: "123", toDelete: true }};
+    const notificationMock: ChangeStreamNotification = {content: { parentId: "123", snippetType: "edit" }};
     await component.fireEditCondition(notificationMock);
-    expect(snippetMock.releaseLock).toHaveBeenCalledTimes(1);
+    expect(snippetMock.snippet.subsnippets[0].subsnippets).toEqual([notificationMock.content]);
   })
 
   it('should parse new edit notification', () => {
@@ -587,20 +589,12 @@ describe('LogbookItemComponent', () => {
     expect(component.fireEditCondition).toHaveBeenCalledTimes(1);
   })
 
-  it('should unlock on update notification', async () => {
-    const notificationMock: ChangeStreamNotification = { 
-      operationType: "update", 
-      id: "123",
-      content: { updatedBy: "aFiringUser", id_session: "456" }
-    };
-    const snippetMock = jasmine.createSpyObj(
-      "SnippetComponent", 
-      ["releaseLock", "updateContent"], 
-      {snippet: { id: "123" }}
-    );
-    spyOn(component["childSnippets"], "toArray").and.returnValue([snippetMock]);
-    await component.parseNotification(notificationMock);
-    expect(snippetMock.releaseLock).toHaveBeenCalledTimes(1);
+  it('should update snippet values', () => {
+    const content = { dashboardName: "new" };
+    const snippet = { dashboardName: "old", parentId: "123" };
+    component["updateSnippetValues"](content, snippet);
+    expect(snippet.dashboardName).toEqual(content.dashboardName);
+    expect(snippet.parentId).toEqual(snippet.parentId);
   })
 
 });

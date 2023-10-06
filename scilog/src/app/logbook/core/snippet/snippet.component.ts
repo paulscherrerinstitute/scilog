@@ -1,10 +1,10 @@
-import { Component, OnInit, Input, SecurityContext, ElementRef, ViewChild, Output, EventEmitter } from '@angular/core';
+import { Component, OnInit, Input, SecurityContext, ElementRef, ViewChild, Output, EventEmitter, ChangeDetectorRef, SimpleChange, SimpleChanges } from '@angular/core';
 import { ChangeStreamNotification } from '../changestreamnotification.model';
 import { DomSanitizer } from '@angular/platform-browser';
 import { MatDialogConfig, MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { AddContentComponent } from '../add-content/add-content.component';
 import { Paragraphs, LinkType } from '@model/paragraphs';
-import { Subscription } from 'rxjs';
+import { BehaviorSubject, Subscription } from 'rxjs';
 import { SnippetContentComponent } from './snippet-content/snippet-content.component';
 import { UserPreferencesService } from '@shared/user-preferences.service';
 import { SnippetDashboardNameComponent } from './snippet-dashboard-name/snippet-dashboard-name.component';
@@ -13,6 +13,7 @@ import { LogbookItemDataService } from '@shared/remote-data.service';
 import { trigger, state, style, transition, animate } from '@angular/animations';
 import { WidgetItemConfig } from '@model/config';
 import { Edits } from 'src/app/core/model/edits';
+import { Basesnippets } from 'src/app/core/model/basesnippets';
 
 
 @Component({
@@ -55,7 +56,6 @@ export class SnippetComponent implements OnInit {
   @Input()
   showEditButtonsMenu: boolean = true;
 
-
   @Input()
   linkType: LinkType = LinkType.PARAGRAPH;
 
@@ -92,6 +92,8 @@ export class SnippetComponent implements OnInit {
 
   @ViewChild('snippetContainer', { read: ElementRef }) snippetContainerRef: ElementRef;
   @ViewChild('snippetContent') snippetContentRef: SnippetContentComponent;
+
+  _subsnippets: BehaviorSubject<Basesnippets[]>;
 
   constructor(
     private sanitizer: DomSanitizer,
@@ -143,7 +145,22 @@ export class SnippetComponent implements OnInit {
     }
     // enable edit for snippet
     this.enableEdit = true;
-    this.setLocked();
+    this._subsnippets = new BehaviorSubject(this.snippet.subsnippets);
+  }
+
+  @Input('subsnippets') 
+  set subsnippets(subsnippets: Basesnippets[]) {
+      this._subsnippets?.next(subsnippets ?? []);
+  }
+ 
+  get subsnippets() {
+      return this._subsnippets.value;
+  }
+
+  ngAfterContentInit() {
+      this._subsnippets.subscribe(() => {
+        this.setLocked()
+      });
   }
 
 
@@ -255,7 +272,7 @@ export class SnippetComponent implements OnInit {
     this.timerId = setTimeout(async () => {
       console.log("unlocking");
       await this.releaseLock();
-      this._editDialog.close();
+      this._editDialog?.close();
     }, timeOut);
   }
 
@@ -363,7 +380,7 @@ export class SnippetComponent implements OnInit {
   }
 
   setLocked() {
-    const lastEdited = this.getLastEditedSnippet(this.snippet.subsnippets);
+    const lastEdited = this.getLastEditedSnippet(this.subsnippets);
     if (!lastEdited) return
     const timeFromLock = new Date().getTime() - Date.parse(lastEdited.createdAt);
     if (!lastEdited.toDelete && timeFromLock < this._timeoutMilliseconds) {
@@ -377,4 +394,5 @@ export class SnippetComponent implements OnInit {
     this.subscriptions.forEach(
       (subscription) => subscription.unsubscribe());
   }
+
 }

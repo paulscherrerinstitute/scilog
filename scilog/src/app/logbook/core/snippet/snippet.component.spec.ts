@@ -292,4 +292,10 @@ describe('SnippetComponent', () => {
     expect(component.getLastEditedSnippet(subs)).toEqual(subs[0]);
   })
 
+  it('should call setLocked after subsnippets change', () => {
+    spyOn(component, "setLocked");
+    component.subsnippets = [{parentId: "123"}];
+    expect(component.setLocked).toHaveBeenCalledTimes(1);
+  })
+
 });

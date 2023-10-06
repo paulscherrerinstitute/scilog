@@ -308,7 +308,7 @@ describe('AddContentComponent', () => {
 
   it('should mark for deletion and send message', () => {
     spyOn(component, 'sendMessage');
-    component.notification.snippetType = 'edit';
+    component.dialogTitle = 'Modify data snippet';
     component['sendEditDelitionMessage']();
     expect(component.sendMessage).toHaveBeenCalledTimes(1);
     expect(component.notification.toDelete).toEqual(true);

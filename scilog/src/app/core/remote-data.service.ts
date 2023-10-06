@@ -131,7 +131,7 @@ export class LogbookItemDataService extends RemoteDataService {
     }
     // console.log(httpFilter);
     // console.log(tagContainer);
-    httpFilter["include"] = [{ "relation": "subsnippets" }];
+    httpFilter["include"] = [{ "relation": "subsnippets", "scope": {include: [{"relation": "subsnippets", scope: {where: {snippetType: 'edit'}}}]} }];
     return httpFilter;
   }
 

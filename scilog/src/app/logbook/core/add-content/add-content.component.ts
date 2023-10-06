@@ -257,7 +257,8 @@ export class AddContentComponent implements OnInit {
   }
 
   sendEditDelitionMessage() {
-    if (this.notification.snippetType === 'edit') {
+    if (this.dialogTitle === 'Modify data snippet') {
+      this.notification.snippetType = 'edit';
       this.notification.toDelete = true;
       this.sendMessage();
     }
