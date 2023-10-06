@@ -192,6 +192,7 @@ export async function startWebsocket(app: SciLogDbApplication) {
             const doc = await collection.findOne({
               _id: Mongo.ObjectId(change.documentKey._id),
             });
+            if (!doc) return;
             // console.log(websocketMap[id])
             if (typeof websocketMap[id] != 'undefined') {
               // eslint-disable-next-line  @typescript-eslint/no-explicit-any
