@@ -10,20 +10,16 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { WidgetItemConfig } from '@model/config';
 
 
-class UserPreferencesMock {
-  userInfo = {
-    roles: ["roles"]
-
-  }
-}
-
 describe('SnippetComponent', () => {
   let component: SnippetComponent;
   let fixture: ComponentFixture<SnippetComponent>;
   let logbookItemDataServiceSpy: any;
   let userPreferencesServiceSpy: any;
 
-  logbookItemDataServiceSpy = jasmine.createSpyObj("LogbookItemDataService", ["deleteLogbookItem", "getBasesnippet"]);
+  logbookItemDataServiceSpy = jasmine.createSpyObj(
+    "LogbookItemDataService", 
+    ["deleteLogbookItem", "getBasesnippet", "deleteAllInProgressEditing"]
+  );
   logbookItemDataServiceSpy.deleteLogbookItem.and.returnValue(of({}));
   logbookItemDataServiceSpy.getBasesnippet.and.returnValue({ "parentId": "602d438ddaa91a637da2181a" });
 
@@ -217,5 +213,89 @@ describe('SnippetComponent', () => {
     })
 
   }));
+
+  it('should release the lock', async () => {
+    spyOn(component, 'allowEdit').and.returnValue(true);
+    component._enableEdit = false;
+    component.snippetIsAccessedByAnotherUser = true;
+    await component.releaseLock();
+    expect(component.enableEdit).toEqual(true);
+    expect(component.snippetIsAccessedByAnotherUser).toEqual(false);
+    expect(component['logbookItemDataService'].deleteAllInProgressEditing)
+      .toHaveBeenCalledOnceWith(snippetMock.id);
+  })
+
+  it('should add the lock', () => {
+    spyOn(component, 'releaseLock');
+    spyOn(window, 'clearTimeout');
+    component.snippetIsAccessedByAnotherUser = false;
+    component.timerId = 123;
+    component._enableEdit = true;
+    component.lockEdit();
+    expect(component.enableEdit).toEqual(false);
+    expect(component.snippetIsAccessedByAnotherUser).toEqual(true);
+    expect(window.clearTimeout).toHaveBeenCalledOnceWith(123);
+  })
+
+  it('should set the editing timeout', () => {
+    spyOn(window, "setTimeout");
+    component.timerId = null;
+    component.setEditTimeout(123);
+    expect(component.timerId).not.toEqual(null);
+    expect(window.setTimeout).toHaveBeenCalledOnceWith(jasmine.any(Function), 123);
+  })
+
+  it('should lock the edit timeout and set by', () => {
+    const avatarForUser = "aTestUserForlockEditUntilTimeout";
+    spyOn(component, 'lockEdit');
+    spyOn(component, 'setEditTimeout');
+    component.lockEditUntilTimeout(avatarForUser);
+    expect(component.avatarHash).toEqual(avatarForUser);
+    expect(component.lockEdit).toHaveBeenCalledTimes(1);
+    expect(component.setEditTimeout).toHaveBeenCalledTimes(1);
+  })
+
+  it('should set locked', () => {
+    spyOn(component, "getLastEditedSnippet").and.returnValue({createdAt: "2023-01-01", updatedBy: "aUser"});
+    spyOn(Date.prototype, "getTime").and.returnValue(1672531200001);
+    spyOn(component, "lockEditUntilTimeout");
+    component.setLocked();
+    expect(component.lockEditUntilTimeout).toHaveBeenCalledOnceWith("aUser", component._timeoutMilliseconds - 1);
+  })
+
+  it('should release old lock', () => {
+    spyOn(component, "getLastEditedSnippet").and.returnValue({createdAt: "2023-01-01", updatedBy: "aUser"});
+    spyOn(Date.prototype, "getTime").and.returnValue(16725312000000);
+    spyOn(component, "releaseLock");
+    component.setLocked();
+    expect(component.releaseLock).toHaveBeenCalledTimes(1);
+  })
+
+  it('should get undefined from last edited snippet', () => {
+    const subs = [{snippetType: 'paragraph'}, {snippetType: 'paragraph'}];
+    expect(component.getLastEditedSnippet(subs)).toEqual(undefined);
+  })
+
+  it('should get first toDelete from last edited snippet', () => {
+    const subs = [
+      { snippetType: "edit", toDelete: true, id: "1" }, 
+      { snippetType: "edit", toDelete: true, id: "2" }
+    ];
+    expect(component.getLastEditedSnippet(subs)).toEqual(subs[0]);
+  })
+
+  it('should get last snippet from last edited snippet', () => {
+    const subs = [
+      {snippetType: "edit", createdAt: "2023-01-02"}, 
+      {snippetType: "edit", createdAt: "2023-01-01"}, 
+    ];
+    expect(component.getLastEditedSnippet(subs)).toEqual(subs[0]);
+  })
+
+  it('should call setLocked after subsnippets change', () => {
+    spyOn(component, "setLocked");
+    component.subsnippets = [{parentId: "123"}];
+    expect(component.setLocked).toHaveBeenCalledTimes(1);
+  })
 
 });

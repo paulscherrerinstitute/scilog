@@ -1,10 +1,10 @@
-import { Component, OnInit, Input, SecurityContext, ElementRef, ViewChild, Output, EventEmitter } from '@angular/core';
+import { Component, OnInit, Input, SecurityContext, ElementRef, ViewChild, Output, EventEmitter, ChangeDetectorRef, SimpleChange, SimpleChanges } from '@angular/core';
 import { ChangeStreamNotification } from '../changestreamnotification.model';
 import { DomSanitizer } from '@angular/platform-browser';
-import { MatDialogConfig, MatDialog } from '@angular/material/dialog';
+import { MatDialogConfig, MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { AddContentComponent } from '../add-content/add-content.component';
 import { Paragraphs, LinkType } from '@model/paragraphs';
-import { Subscription } from 'rxjs';
+import { BehaviorSubject, Subscription } from 'rxjs';
 import { SnippetContentComponent } from './snippet-content/snippet-content.component';
 import { UserPreferencesService } from '@shared/user-preferences.service';
 import { SnippetDashboardNameComponent } from './snippet-dashboard-name/snippet-dashboard-name.component';
@@ -12,6 +12,8 @@ import { SnippetInfoComponent } from './snippet-info/snippet-info.component';
 import { LogbookItemDataService } from '@shared/remote-data.service';
 import { trigger, state, style, transition, animate } from '@angular/animations';
 import { WidgetItemConfig } from '@model/config';
+import { Edits } from 'src/app/core/model/edits';
+import { Basesnippets } from 'src/app/core/model/basesnippets';
 
 
 @Component({
@@ -54,7 +56,6 @@ export class SnippetComponent implements OnInit {
   @Input()
   showEditButtonsMenu: boolean = true;
 
-
   @Input()
   linkType: LinkType = LinkType.PARAGRAPH;
 
@@ -86,9 +87,13 @@ export class SnippetComponent implements OnInit {
 
   figures: any;
   subscriptions: Subscription[] = [];
+  _timeoutMilliseconds = 300000;
+  _editDialog: MatDialogRef<AddContentComponent, any>
 
   @ViewChild('snippetContainer', { read: ElementRef }) snippetContainerRef: ElementRef;
   @ViewChild('snippetContent') snippetContentRef: SnippetContentComponent;
+
+  _subsnippets: BehaviorSubject<Basesnippets[]>;
 
   constructor(
     private sanitizer: DomSanitizer,
@@ -140,6 +145,22 @@ export class SnippetComponent implements OnInit {
     }
     // enable edit for snippet
     this.enableEdit = true;
+    this._subsnippets = new BehaviorSubject(this.snippet.subsnippets);
+  }
+
+  @Input('subsnippets') 
+  set subsnippets(subsnippets: Basesnippets[]) {
+      this._subsnippets?.next(subsnippets ?? []);
+  }
+ 
+  get subsnippets() {
+      return this._subsnippets.value;
+  }
+
+  ngAfterContentInit() {
+      this._subsnippets.subscribe(() => {
+        this.setLocked()
+      });
   }
 
 
@@ -219,6 +240,7 @@ export class SnippetComponent implements OnInit {
     dialogConfig.autoFocus = true;
     dialogConfig.data = { "snippet": this.snippet, "content": this.content, "defaultTags": this.snippet.tags, "config": this.config };
     const dialogRef = this.dialog.open(AddContentComponent, dialogConfig);
+    this._editDialog = dialogRef;
     this.subscriptions.push(dialogRef.afterClosed().subscribe(result => {
       console.log(`Dialog result: ${result}`);
     }));
@@ -239,24 +261,29 @@ export class SnippetComponent implements OnInit {
     }
   }
 
-  startTimeout(updateBy: string) {
+  lockEditUntilTimeout(updateBy: string, timeOut?: number) {
     this.avatarHash = updateBy;
-    console.log(this.avatarHash)
-    if (this.timerId != null) {
-      clearTimeout(this.timerId);
-    }
     this.lockEdit();
-    var self = this;
-    this.timerId = setTimeout(function () {
-      console.log("unlocking");
-      self.enableEdit = true;
-      self.snippetIsAccessedByAnotherUser = false;
-      self.timerId = null;
-    }, 10000);
+    this.setEditTimeout(timeOut ?? this._timeoutMilliseconds);
     console.log(typeof this.timerId);
   }
 
+  setEditTimeout(timeOut: number) {
+    this.timerId = setTimeout(async () => {
+      console.log("unlocking");
+      await this.releaseLock();
+      this._editDialog?.close();
+    }, timeOut);
+  }
+
+  async releaseLock() {
+    this.enableEdit = true;
+    this.snippetIsAccessedByAnotherUser = false;
+    await this.logbookItemDataService.deleteAllInProgressEditing(this.snippet.id);
+  }
+
   lockEdit() {
+    clearTimeout(this.timerId);
     console.log("locking");
     this.snippetIsAccessedByAnotherUser = true;
     this.enableEdit = false;
@@ -333,8 +360,39 @@ export class SnippetComponent implements OnInit {
     const dialogRef = this.dialog.open(SnippetInfoComponent, dialogConfig);
   }
 
+  getLastEditedSnippet(subSnippets: Edits[]) {
+    let out: Edits;
+    let maxCreatedAt = 0;
+    for (let i = 0; i < subSnippets?.length; i++) {
+      if (subSnippets[i].snippetType !== 'edit')
+        continue
+      if (subSnippets[i].toDelete) {
+        out = subSnippets[i];
+        break
+      }
+      const createdAt = Date.parse(subSnippets[i].createdAt);
+      if (createdAt > maxCreatedAt) {
+        maxCreatedAt = createdAt;
+        out = subSnippets[i];
+      }
+    }
+    return out
+  }
+
+  setLocked() {
+    const lastEdited = this.getLastEditedSnippet(this.subsnippets);
+    if (!lastEdited) return
+    const timeFromLock = new Date().getTime() - Date.parse(lastEdited.createdAt);
+    if (!lastEdited.toDelete && timeFromLock < this._timeoutMilliseconds) {
+      this.lockEditUntilTimeout(lastEdited.updatedBy, this._timeoutMilliseconds - timeFromLock);
+      return;
+    }
+    this.releaseLock();
+  }
+
   ngOnDestroy(): void {
     this.subscriptions.forEach(
       (subscription) => subscription.unsubscribe());
   }
+
 }

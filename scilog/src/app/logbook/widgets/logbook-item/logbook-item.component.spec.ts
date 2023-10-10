@@ -1,5 +1,5 @@
 import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
-import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
+import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { MatDialogModule, MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { LogbookItemComponent } from './logbook-item.component';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
@@ -9,7 +9,7 @@ import { ViewsService } from '@shared/views.service';
 import { LogbookInfoService } from '@shared/logbook-info.service';
 import { MatSnackBarModule } from '@angular/material/snack-bar';
 import { SnackbarService } from '@shared/snackbar.service';
-import { ActivatedRoute, UrlSegment } from '@angular/router';
+import { ActivatedRoute } from '@angular/router';
 import { Observable, BehaviorSubject } from 'rxjs';
 import { of } from 'rxjs';
 import { ParamMap } from '@angular/router';
@@ -122,15 +122,6 @@ class DatasourceAdapterMock {
   check() { }
   append() { }
 
-}
-
-class ChildSnippetsMock {
-  // constructor(){}
-  toArray() {
-    return [
-      { snippet: { subsnippets: [] } }
-    ]
-  }
 }
 
 export class QueryParams implements ParamMap {
@@ -529,5 +520,81 @@ describe('LogbookItemComponent', () => {
     expect(component["logbookScrollService"].remove).toHaveBeenCalled();
   })
 
+  it('should prepare POST edit message', () => {
+    const referenceEntry = { ownerGroup: "p17301", accessGroups: ["slscsaxs", "any-authenticated-user"] };
+    const msg = { id: "123", parentId: "456", snippetType: "edit", toDelete: false };
+    const res = component._prepareEditPostPayload(referenceEntry, msg);
+    expect(res.accessGroups).toEqual(referenceEntry.accessGroups);
+    expect(res.ownerGroup).toEqual(referenceEntry.ownerGroup);
+    expect(res.snippetType).toEqual(msg.snippetType);
+    expect(res.parentId).toEqual(msg.id);
+    expect(res.toDelete).toEqual(msg.toDelete);
+  })
+
+  it('should submit POST edit message', () => {
+    spyOn(component["logbookItemDataService"], "uploadParagraph");
+    const notificationMock: ChangeStreamNotification = { id: "123", parentId: "456", snippetType: "edit" };
+    const referenceEntry = { ownerGroup: "p17301", accessGroups: ["any-authenticated-user", "slscsaxs"] };
+    component["logbookInfo"].logbookInfo = referenceEntry;
+    component.submitContent(notificationMock);
+    expect(component["logbookItemDataService"].uploadParagraph).toHaveBeenCalledWith({
+      ownerGroup: referenceEntry.ownerGroup,
+      accessGroups: referenceEntry.accessGroups,
+      snippetType: notificationMock.snippetType,
+      parentId: notificationMock.id,
+      toDelete: notificationMock.toDelete,
+      linkType: notificationMock.linkType,
+    });
+  })
+
+  it('should find the postion', async () => {
+    const snippetMock = jasmine.createSpyObj("SnippetComponent", {}, {snippet: {id: "123"}});
+    spyOn(component["childSnippets"], "toArray").and.returnValue([snippetMock]);
+    const notificationMock: ChangeStreamNotification = { parentId: "123" };
+    expect(component.findPos(notificationMock, "id", "parentId")[0]).toEqual(0);
+  })
+
+  it('should append subsnippets', async () => {
+    const snippetMock = jasmine.createSpyObj(
+      "SnippetComponent", 
+      {}, 
+      {snippet: {id: "123", updatedBy: "aFiringUser"}}
+    );
+    spyOn(component["childSnippets"], "toArray").and.returnValue([snippetMock]);
+    const notificationMock: ChangeStreamNotification = {content: { parentId: "123", snippetType: "edit" }};
+    await component.fireEditCondition(notificationMock);
+    expect(snippetMock.subsnippets).toEqual([notificationMock.content]);
+  })
+
+  it('should append grand subsnippets', async () => {
+    const snippetMock = jasmine.createSpyObj(
+      "SnippetComponent", 
+      {}, 
+      {snippet: {subsnippets: [{}]}}
+    );
+    spyOn(component, "findPos").and.returnValue([0, 0]);
+    spyOn(component["childSnippets"], "toArray").and.returnValue([snippetMock]);
+    const notificationMock: ChangeStreamNotification = {content: { parentId: "123", snippetType: "edit" }};
+    await component.fireEditCondition(notificationMock);
+    expect(snippetMock.snippet.subsnippets[0].subsnippets).toEqual([notificationMock.content]);
+  })
+
+  it('should parse new edit notification', () => {
+    spyOn(component, "fireEditCondition");
+    const notificationMock: ChangeStreamNotification = {
+      operationType: "insert", 
+      content: { snippetType: "edit" } 
+    };
+    component.parseNotification(notificationMock);
+    expect(component.fireEditCondition).toHaveBeenCalledTimes(1);
+  })
+
+  it('should update snippet values', () => {
+    const content = { dashboardName: "new" };
+    const snippet = { dashboardName: "old", parentId: "123" };
+    component["updateSnippetValues"](content, snippet);
+    expect(snippet.dashboardName).toEqual(content.dashboardName);
+    expect(snippet.parentId).toEqual(snippet.parentId);
+  })
 
 });

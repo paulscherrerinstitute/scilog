@@ -1,6 +1,6 @@
 <h2 mat-dialog-title>{{ dialogTitle }}</h2>
 <mat-dialog-content class="mat-dialog-content">
-  <ckeditor #contentEditor [config]="editorConfig" [editor]="Editor" [data]=data (ready)="onEditorReady($event)"  (change)="onChange($event)"></ckeditor>
+  <ckeditor #contentEditor [config]="editorConfig" [editor]="Editor" [data]=data (ready)="onEditorReady($event)" (change)="onChange($event)"></ckeditor>
   <!-- apparently, this can also be achieved by using [(ngModel)]="postData.content" debounce="300" -->
   <tag-editor [tagIn]="tag" (tagsUpdate)="updateTags($event)" [config]="config" [syncAtStart]="false"></tag-editor>
 </mat-dialog-content>

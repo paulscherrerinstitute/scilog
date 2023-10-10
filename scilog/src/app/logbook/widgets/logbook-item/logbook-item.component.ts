@@ -27,7 +27,7 @@ import { MediaObserver } from '@angular/flex-layout';
 import { CK5ImageUploadAdapter } from '@shared/ckeditor/ck5-image-upload-adapter';
 import { extractNotificationMessage } from '@shared/add-content/add-content.component';
 import { UserPreferencesService } from '@shared/user-preferences.service';
-import { debounceTime, throttleTime, take } from 'rxjs/operators';
+import { debounceTime } from 'rxjs/operators';
 import { TagEditorComponent } from '@shared/tag-editor/tag-editor.component';
 import { LogbookItemDataService } from '@shared/remote-data.service';
 import { Hotkeys } from '@shared/hotkeys.service';
@@ -36,6 +36,7 @@ import { TagService } from '@shared/tag.service';
 import { CKeditorConfig } from '@shared/ckeditor/ckeditor-config';
 import { LogbookScrollService } from '@shared/logbook-scroll.service';
 import { ScrollToElementService } from '@shared/scroll-to-element.service';
+import { LinkType } from 'src/app/core/model/paragraphs';
 
 
 @Component({
@@ -319,21 +320,19 @@ export class LogbookItemComponent implements OnInit {
           } else {
             // true update
             // we only need to update already rendered elements. The data is anyway already up to date in the backend
+            if (subPos?.length === 2) {
+              const snippetPos = this.childSnippets.toArray()[subPos[0]].snippet;
+              const subSnippet = snippetPos.subsnippets[subPos[1]];
+              this.updateSnippetValues(notification.content, subSnippet);
+              snippetPos.subsnippets = [subSnippet];
+            }
             if (updatePos < this.childSnippets.toArray().length) {
               let updateEntry = this.childSnippets.toArray()[updatePos];
               console.log(updatePos);
-              for (const key in notification.content) {
-                updateEntry.snippet[key] = notification.content[key];
-              }
-              // this.array[updatePos] = updateEntry;
+              this.updateSnippetValues(notification.content, updateEntry.snippet);
               console.log("updated array at pos ", updatePos);
-              console.log(this.childSnippets.toArray());
-              this.childSnippets.toArray()[updatePos].updateContent();
-              if (this.childSnippets.toArray()[updatePos]?.snippet.id_session && (this.childSnippets.toArray()[updatePos].snippet.id_session != localStorage.getItem('id_session'))) {
-                console.log("blocking for 5 seconds");
-                console.log(this.childSnippets.toArray()[updatePos])
-                this.childSnippets.toArray()[updatePos].startTimeout(this.childSnippets.toArray()[updatePos].snippet.updatedBy);
-              }
+              console.log(updateEntry);
+              updateEntry.updateContent();
             }
             this.logbookScrollService.updateViewportEstimate();
           }
@@ -341,6 +340,9 @@ export class LogbookItemComponent implements OnInit {
 
         break;
       case "insert":
+        if (notification.content.snippetType === "edit") {
+          return await this.fireEditCondition(notification)
+        }
         if ((notification.content.snippetType == "paragraph") || (notification.content.snippetType == "image")) {
           // first check if the incoming message satisfies the current filters
           let snippetsFiltered = this.applyFilters([notification.content]);
@@ -440,6 +442,18 @@ export class LogbookItemComponent implements OnInit {
     }
   }
 
+  private updateSnippetValues(content: Basesnippets, snippet: Basesnippets) {
+    for (const key in content) {
+      snippet[key] = content[key];
+    }
+  }
+
+  // private updateSnippetValues(notification: ChangeStreamNotification, subSnippet: any) {
+  //   for (const key in notification.content) {
+  //     subSnippet[key] = notification.content[key];
+  //   }
+  // }
+
   submitContent(msg: ChangeStreamNotification) {
     // in the future, this should be extended to support inserting snippets below/above other snippets
     // for now, I just take the last array entry
@@ -451,12 +465,14 @@ export class LogbookItemComponent implements OnInit {
     // } else {
     //   referenceEntry = this.childSnippets.toArray()[this.childSnippets.toArray().length - 1].snippet;
     // }
-
+    if (msg.snippetType === "edit") {
+    // POST -- EDIT SNIPPET
+      let payload: ChangeStreamNotification = this._prepareEditPostPayload(referenceEntry, msg);
+      this.logbookItemDataService.uploadParagraph(payload);
+    } else if ((typeof msg.id != "undefined") && (msg.id != '')) {
     // PATCH -- UPDATE SNIPPET
-    if ((typeof msg.id != "undefined") && (msg.id != '')) {
       let payload = this._preparePatchPayload(referenceEntry, msg);
       this.logbookItemDataService.uploadParagraph(payload, msg.id);
-
     } else {
       // POST -- NEW SNIPPET
       let payload = this._preparePostPayload(referenceEntry, msg);
@@ -464,6 +480,17 @@ export class LogbookItemComponent implements OnInit {
     }
 
     this.modifiedMetadata = false;
+  }
+
+  _prepareEditPostPayload(referenceEntry: ChangeStreamNotification, msg: ChangeStreamNotification): ChangeStreamNotification {
+    return {
+      ownerGroup: referenceEntry.ownerGroup,
+      accessGroups: referenceEntry.accessGroups,
+      snippetType: msg.snippetType,
+      parentId: msg.id,
+      toDelete: msg.toDelete,
+      linkType: msg.linkType,
+    };
   }
 
   _preparePatchPayload(referenceEntry: ChangeStreamNotification, msg: ChangeStreamNotification): ChangeStreamNotification {
@@ -510,6 +537,16 @@ export class LogbookItemComponent implements OnInit {
     console.log(payload);
 
     return payload;
+  }
+
+  async fireEditCondition(notification: ChangeStreamNotification) {
+    const pos = this.findPos(notification.content, "id", "parentId", notification.content.linkType === LinkType.COMMENT);
+    let posChild: (SnippetComponent | Basesnippets) = this.childSnippets.toArray()[pos[0]];
+    if (pos.length === 2) {
+      posChild = (posChild as SnippetComponent).snippet.subsnippets[pos[1]] as Basesnippets;
+      posChild.snippetType = 'paragraph';
+    }
+    posChild.subsnippets = [...(posChild.subsnippets?? []).filter(s => s.snippetType !== 'edit') , notification.content];
   }
 
   applyFilters(snippets: Basesnippets[]) {
