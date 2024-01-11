@@ -242,6 +242,7 @@ export class AddContentComponent implements OnInit {
 
   updateTags(tags: string[]) {
     this.tag = tags;
+    this.contentChanged = true;
     this.changeChain();
   }
 

@@ -194,6 +194,7 @@ describe('AddContentComponent', () => {
     spyOn(component, 'changeChain')
     let defaultTags = ['tag1', 'tag2'];
     component.updateTags(defaultTags);
+    expect(component.contentChanged).toBe(true);
     expect(component.tag).toEqual(defaultTags);
     expect(component.changeChain).toHaveBeenCalledTimes(1);
   })
