@@ -1,4 +1,4 @@
-*{
+* {
     max-width: 100%;
 }
 
@@ -11,8 +11,7 @@ snippet>* {
     margin-bottom: 0;
     margin-top: 0;
     background-color: rgb(255, 255, 255) !important;
-    overflow: hidden;
-    text-overflow: ellipsis; 
+    text-overflow: ellipsis;
     word-wrap: break-word;
 }
 
@@ -102,15 +101,24 @@ h1 {
     text-align: center;
 }
 
+@page landscape {
+    size: A4 landscape;
+    margin-right: -50px;
+    margin-left: -50px;
+    margin-top: 0;
+    margin-bottom: 0;
+}
+
 table,
 th,
 td {
-    table-layout:fixed;
+    table-layout: fixed;
+    font-size: 10px;
     width: 100%;
-    border-spacing:0;
+    border-spacing: 0;
     border-collapse: collapse;
     border: 1px solid black;
-    padding: 15px;
+    page: landscape;
 }
 
 img {

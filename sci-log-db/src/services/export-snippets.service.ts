@@ -1,7 +1,7 @@
 import {bind, BindingScope, ContextTags, inject} from '@loopback/core';
 import {EXPORT_SERVICE} from '../keys';
 import {Filecontainer, LinkType, Paragraph} from '../models';
-import * as puppeteer from 'puppeteer';
+import {Browser, launch as puppeteerLaunc} from 'puppeteer';
 import {JSDOM} from 'jsdom';
 import {RestBindings, Server} from '@loopback/rest';
 import PDFMerger from 'pdf-merger-js';
@@ -217,7 +217,7 @@ export class ExportService {
   }
 
   async exportToPdf(snippets: Paragraph[], exportFile: string, title?: string) {
-    const browser = await puppeteer.launch({
+    const browser = await puppeteerLaunc({
       executablePath: process.env.CHROME_BIN,
       args: ['--no-sandbox'],
     });
@@ -244,7 +244,7 @@ export class ExportService {
   }
 
   private async htmlToPDF(
-    browser: puppeteer.Browser,
+    browser: Browser,
     exportFile: string,
     htmlString: string,
   ) {
