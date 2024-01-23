@@ -423,6 +423,15 @@ describe('Basesnippet', function (this: Suite) {
       .expect(204);
   });
 
+  it('patch snippet by id with ownergroup and token should return 404', async () => {
+    await client
+      .patch(`/basesnippets/${baseSnippetId}`)
+      .set('Authorization', 'Bearer ' + token)
+      .set('Content-Type', 'application/json')
+      .send({createACL: ['aNonAllowedACL']})
+      .expect(404);
+  });
+
   it('post a basesnippet with authentication and parentId from existing snippet should return 200 and have ownergroup with priority on parent ACLS', async () => {
     await client
       .post('/basesnippets')
@@ -673,7 +682,22 @@ describe('Basesnippet', function (this: Suite) {
         ownerGroup: 'basesnippetAcceptance',
         accessGroups: ['someNew'],
       },
+      expected: 204,
+    },
+    {
+      input: {deleteACL: ['basesnippetAcceptance', 'someNew']},
       expected: 404,
+    },
+    {
+      input: {
+        deleteACL: ['basesnippetAcceptance', 'someNew'],
+        token: 'adminToken',
+      },
+      expected: 204,
+    },
+    {
+      input: {readACL: ['basesnippetAcceptance', 'someNew']},
+      expected: 204,
     },
     {
       input: {
@@ -682,10 +706,11 @@ describe('Basesnippet', function (this: Suite) {
       expected: 403,
     },
   ].forEach((t, i) => {
-    it(`patch snippet by id changing ownerGroup should return error ${i}`, async () => {
+    it(`patch snippet by id changing ownerGroup should return ${i}`, async () => {
+      const blockToken = t.input.token === 'adminToken' ? adminToken : token;
       await client
         .patch(`/basesnippets/${baseSnippetId}`)
-        .set('Authorization', 'Bearer ' + token)
+        .set('Authorization', 'Bearer ' + blockToken)
         .set('Content-Type', 'application/json')
         .send({
           tags: ['aSearchExcludedTag'],
@@ -706,5 +731,25 @@ describe('Basesnippet', function (this: Suite) {
           throw err;
         });
     });
+  });
+
+  it(`patch snippet by id with non-authorised user should return 404`, async () => {
+    const bs = await client
+      .post('/basesnippets')
+      .set('Authorization', 'Bearer ' + token)
+      .set('Content-Type', 'application/json')
+      .send({
+        ..._.omit(baseSnippet, 'updateACL'),
+        updateACL: ['nonAuthorised'],
+      });
+    await client
+      .patch(`/basesnippets/${bs.body.id}`)
+      .set('Authorization', 'Bearer ' + token)
+      .set('Content-Type', 'application/json')
+      .send({name: 'something'})
+      .expect(404)
+      .catch(err => {
+        throw err;
+      });
   });
 });

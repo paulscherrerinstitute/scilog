@@ -12,12 +12,9 @@ import {
   repository,
   Where,
 } from '@loopback/repository';
-import {Location, Logbook} from '../models';
+import {Location, Logbook, User} from '../models';
 import {Basesnippet} from '../models/basesnippet.model';
-import {
-  addReadACLFromOwnerAccessGroups,
-  defaultSequentially,
-} from '../utils/misc';
+import {defaultSequentially} from '../utils/misc';
 import {BasesnippetRepository} from './basesnippet.repository';
 import _ from 'lodash';
 import {HttpErrors} from '@loopback/rest';
@@ -32,15 +29,14 @@ export class AutoAddRepository<
 
   public readonly subsnippets: HasManyRepositoryFactory<T, string>;
 
-  private readonly acls = [
+  readonly acls = [
     'createACL',
     'readACL',
     'shareACL',
     'updateACL',
     'deleteACL',
-    'shareACL',
     'adminACL',
-  ];
+  ] as const;
 
   @repository('UserRepository')
   readonly userRepository: UserRepository;
@@ -83,7 +79,7 @@ export class AutoAddRepository<
   private async aclDefaultOnCreation(
     data: (Basesnippet | Logbook) & {
       ownerGroup?: string;
-      unsetAttribute: Function;
+      accessGroups?: string[];
     },
   ) {
     const emptyAcls = this.acls.filter(acl => !data[acl as keyof Basesnippet]);
@@ -111,8 +107,8 @@ export class AutoAddRepository<
           _.partial(this.defaultAllButLocationLogbookACL.bind(this), parent),
         );
     }
-    data.unsetAttribute('ownerGroup');
-    data.unsetAttribute('accessGroups');
+    delete data.ownerGroup;
+    delete data.accessGroups;
   }
 
   private async addToACLIfNotEmpty(
@@ -135,7 +131,7 @@ export class AutoAddRepository<
   private async getParent(
     data: (Basesnippet | Logbook) & {
       ownerGroup?: string | undefined;
-      unsetAttribute: Function;
+      accessGroups?: string[];
     },
   ) {
     const parentId =
@@ -315,20 +311,21 @@ export class AutoAddRepository<
         // console.log("PATCH case")
         ctx.data.updatedAt = new Date();
         ctx.data.updatedBy = currentUser?.email ?? 'unknown@domain.org';
-        addReadACLFromOwnerAccessGroups(ctx.data);
         // remove all auto generated fields
         delete ctx.data.createdAt;
         delete ctx.data.createdBy;
         delete ctx.data.expiresAt;
-        if (this.acls.some(acl => ctx.data[acl])) {
-          const adminCondition = {
-            adminACL: {
-              inq: [
-                ...(ctx?.options?.currentUser?.roles ?? []),
-                ctx?.options?.currentUser?.email,
-              ],
-            },
-          };
+        if (currentUser?.roles?.includes('admin')) return;
+        const updateCondition = this.updateACLCondition(
+          currentUser,
+          'updateACL',
+        );
+        ctx.where = this.addACLToFilter(ctx.where, updateCondition);
+        if (this.acls.some(acl => acl !== 'readACL' && ctx.data[acl])) {
+          const adminCondition = this.updateACLCondition(
+            currentUser,
+            'adminACL',
+          );
           ctx.where = this.addACLToFilter(ctx.where, adminCondition);
         }
       } else {
@@ -452,6 +449,14 @@ export class AutoAddRepository<
     });
 
     return modelClass;
+  }
+
+  private updateACLCondition(currentUser: User, acl: string) {
+    return {
+      [acl]: {
+        inq: [...(currentUser?.roles ?? []), currentUser?.email],
+      },
+    };
   }
 
   // eslint-disable-next-line  @typescript-eslint/no-explicit-any
