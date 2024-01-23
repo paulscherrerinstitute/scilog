@@ -137,7 +137,7 @@ export async function startWebsocket(app: SciLogDbApplication) {
         .findOne({_id: Mongo.ObjectId(parentId)});
       // eslint-disable-next-line  @typescript-eslint/no-explicit-any
       return parentDoc.then((document: any) => {
-        if (document.snippetType === 'logbook') {
+        if (document?.snippetType === 'logbook') {
           sendSocketMessage(document._id);
           return document._id;
         } else if (document.parentId) {
