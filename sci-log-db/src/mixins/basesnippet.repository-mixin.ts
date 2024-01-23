@@ -18,8 +18,14 @@ import {HttpErrors, Response} from '@loopback/rest';
 import _ from 'lodash';
 import {EXPORT_SERVICE} from '../keys';
 import {ExportService} from '../services/export-snippets.service';
-import {addReadACLFromOwnerAccessGroups} from '../utils/misc';
+import {concatOwnerAccessGroups} from '../utils/misc';
+import {AutoAddRepository} from '../repositories/autoadd.repository.base';
 const fs = require('fs');
+
+type ExpandedBasesnippet = Basesnippet & {
+  ownerGroup: string;
+  accessGroups: string[];
+};
 
 function UpdateAndDeleteRepositoryMixin<
   M extends Entity & {
@@ -37,46 +43,117 @@ function UpdateAndDeleteRepositoryMixin<
   class Mixed extends superClass {
     readonly baseSnippetRepository: Function;
 
+    get baseACLS() {
+      const self = this as unknown as AutoAddRepository<M, ID, Relations>;
+      return self.acls;
+    }
+
+    get expandedACLS() {
+      return [...this.baseACLS, 'ownerGroup', 'accessGroups'] as const;
+    }
+
     async updateByIdWithHistory(
       id: ID,
-      basesnippet: Basesnippet & {ownerGroup: string; accessGroups: string[]},
+      basesnippet: ExpandedBasesnippet,
       options?: Options,
     ): Promise<void> {
-      const snippet = await this.findById(id, {}, options);
-      const patches = this.getChanged(basesnippet, snippet);
-      if (
-        typeof basesnippet.deleted == 'undefined' ||
-        basesnippet.deleted === false
-      ) {
+      const baseSnippetRepository = await this.baseSnippetRepository();
+      const snippet = await baseSnippetRepository.findById(id, {}, options);
+      const patches = await this.applyFromOwnerAccessAndGetChanged(
+        basesnippet,
+        snippet,
+      );
+      if (!basesnippet.deleted) {
         if (
           !this.isSharing(patches) &&
-          ((typeof snippet?.expiresAt != 'undefined' &&
-            snippet.expiresAt.getTime() < Date.now()) ||
-            typeof snippet?.expiresAt == 'undefined')
+          (snippet.expiresAt?.getTime() < Date.now() || !snippet?.expiresAt)
         ) {
           throw new HttpErrors.Forbidden('Cannot modify expired data snippet.');
         }
-        await this.updateById(id, patches, options);
+        await baseSnippetRepository.updateById(id, patches, options);
         if (snippet?.versionable) {
           await this.addToHistory(snippet, options?.currentUser);
         }
-      } else await this.updateById(id, patches, options);
+        if (this.isSharing(patches))
+          await this.applyACLSToChildren(
+            {
+              ...patches,
+              id: snippet.id,
+              snippetType: snippet.snippetType,
+            } as Basesnippet,
+            options?.currentUser,
+          );
+      } else await baseSnippetRepository.updateById(id, patches, options);
     }
 
-    private getChanged(
-      basesnippet: Basesnippet & {ownerGroup?: string; accessGroups?: string[]},
+    private async applyACLSToChildren(
+      basesnippet: Basesnippet,
+      user: UserProfile,
+    ) {
+      if (
+        !basesnippet ||
+        basesnippet?.snippetType === 'location' ||
+        !basesnippet.id
+      )
+        return;
+      const currentUser = {currentUser: user};
+      const baseSnippetRepository = await this.baseSnippetRepository();
+      const children = await baseSnippetRepository.find(
+        {where: {parentId: basesnippet.id, snippetType: 'paragraph'}},
+        currentUser,
+      );
+      for (const child of children) {
+        await this.applyACLSToChild(basesnippet, child, currentUser);
+      }
+    }
+
+    private async applyACLSToChild(
+      basesnippet: Basesnippet,
+      child: Basesnippet,
+      currentUser: {currentUser: UserProfile},
+    ) {
+      const updateAcls = this.baseACLS.reduce((currentValue, previousValue) => {
+        if (basesnippet[previousValue])
+          currentValue[previousValue] = [
+            ...new Set([
+              ...basesnippet[previousValue].concat(child[previousValue] ?? []),
+            ]),
+          ];
+        return currentValue;
+      }, {} as ExpandedBasesnippet);
+      await this.updateByIdWithHistory(child.id as ID, updateAcls, currentUser);
+    }
+
+    private async applyFromOwnerAccessAndGetChanged(
+      basesnippet: ExpandedBasesnippet,
       snippet: M & Relations,
     ) {
-      addReadACLFromOwnerAccessGroups(basesnippet);
+      const self = this as unknown as AutoAddRepository<M, ID, Relations>;
+      const merge: typeof basesnippet = {
+        ..._.omit(snippet, this.expandedACLS),
+        ...basesnippet,
+      };
+      concatOwnerAccessGroups(merge);
+      if (
+        ['ownerGroup', 'accessGroups'].some(
+          acl => basesnippet[acl as keyof typeof basesnippet],
+        )
+      )
+        await self['aclDefaultOnCreation'](merge);
+      return this.getChanged(merge, snippet);
+    }
+
+    private getChanged(merge: ExpandedBasesnippet, snippet: M & Relations) {
       return _.pickBy(
-        basesnippet,
+        merge,
         (v, k: keyof M) => JSON.stringify(snippet[k]) !== JSON.stringify(v),
       );
     }
 
     private isSharing(patches: Partial<Basesnippet>) {
-      const allowed = ['ownerGroup', 'accessGroups', 'readACL'];
-      return Object.keys(patches).every(d => allowed.includes(d));
+      return Object.keys(patches).every(d =>
+        this.expandedACLS.includes(d as typeof this.expandedACLS[number]),
+      );
     }
 
     private async addToHistory(snippet: M, user: UserProfile): Promise<void> {

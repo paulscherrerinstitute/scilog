@@ -143,7 +143,7 @@ export function defaultSequentially(...args: any[]) {
   }, undefined);
 }
 
-export function addReadACLFromOwnerAccessGroups(data: {
+export function concatOwnerAccessGroups(data: {
   ownerGroup?: string;
   accessGroups?: string[];
   readACL?: string[];
@@ -154,12 +154,11 @@ export function addReadACLFromOwnerAccessGroups(data: {
       throw new HttpErrors.Forbidden(
         'Cannot modify data snippet. Please provide both ownerGroup and accessGroup',
       );
-    data.readACL = [
-      ...new Set(
-        [data.ownerGroup as string].concat(data.accessGroups as string[]),
-      ),
+    data.accessGroups = [
+      ...new Set([
+        ...(data.ownerGroup ? [data.ownerGroup] : []),
+        ...(data.accessGroups ?? []),
+      ]),
     ];
   }
-  delete data.ownerGroup;
-  delete data.accessGroups;
 }
