@@ -367,7 +367,7 @@ describe('File controller services', function (this: Suite) {
       .post('/filesnippet/files')
       .set('Authorization', 'Bearer ' + token)
       .type('form')
-      .field('fields', '{"readACL": ["any-authenticated-user"]}')
+      .field('fields', '{"updateACL": ["any-authenticated-user"]}')
       .attach('file', __filename)
       .then()
       .catch(err => {
@@ -379,8 +379,8 @@ describe('File controller services', function (this: Suite) {
       .set('Authorization', 'Bearer ' + token)
       .field('fields', '{"description": "something"}')
       .attach('file', __filename)
-      .expect(204)
-      .then()
+      .expect(404)
+      .then(result => result)
       .catch(err => {
         throw err;
       });

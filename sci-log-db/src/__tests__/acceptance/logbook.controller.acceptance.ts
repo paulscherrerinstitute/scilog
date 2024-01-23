@@ -15,6 +15,7 @@ describe('Logbook', function (this: Suite) {
   let app: SciLogDbApplication;
   let client: Client;
   let token: string;
+  let adminToken: string;
   let logbookSnippetId: string;
   const logbookSnippet = {
     ownerGroup: 'logbookAcceptance',
@@ -31,7 +32,7 @@ describe('Logbook', function (this: Suite) {
   before('setupApplication', async () => {
     ({app, client} = await setupApplication());
     await clearDatabase(app);
-    await createAdminToken(app, client);
+    adminToken = await createAdminToken(app, client);
     token = await createUserToken(app, client, ['logbookAcceptance']);
   });
 
@@ -239,6 +240,146 @@ describe('Logbook', function (this: Suite) {
       .catch(err => {
         throw err;
       });
+  });
+
+  [
+    {
+      input: {
+        readACL: ['logbookAcceptance', 'toPropagate'],
+      },
+      output: [
+        ['logbookAcceptance', 'toPropagate'],
+        ['logbookAcceptance', 'toPropagate'],
+      ],
+    },
+    {
+      input: {
+        ownerGroup: 'logbookAcceptance',
+        accessGroups: ['accessGroupPropagated'],
+      },
+      output: [
+        ['logbookAcceptance', 'accessGroupPropagated'],
+        ['logbookAcceptance', 'accessGroupPropagated', 'toPropagate'],
+      ],
+    },
+  ].forEach(t =>
+    it(`patch logbook with children and grand children by id should modify all with ${t.output[1]}`, async () => {
+      const child = await client
+        .post(`/paragraphs`)
+        .set('Authorization', 'Bearer ' + token)
+        .set('Content-Type', 'application/json')
+        .send({
+          ..._.omit(logbookSnippet, 'location'),
+          parentId: logbookSnippetId,
+        });
+
+      const grandChild = await client
+        .post(`/paragraphs`)
+        .set('Authorization', 'Bearer ' + token)
+        .set('Content-Type', 'application/json')
+        .send({
+          ..._.omit(logbookSnippet, 'location'),
+          parentId: child.body.id,
+        });
+
+      await client
+        .patch(`/logbooks/${logbookSnippetId}`)
+        .set('Authorization', 'Bearer ' + token)
+        .set('Content-Type', 'application/json')
+        .send(t.input)
+        .expect(204);
+
+      const filter = {
+        where: {
+          id: {inq: [logbookSnippetId, child.body.id, grandChild.body.id]},
+        },
+      };
+      await client
+        .get(`/basesnippets?filter=${JSON.stringify(filter)}`)
+        .set('Authorization', 'Bearer ' + token)
+        .set('Content-Type', 'application/json')
+        .then(result =>
+          result.body.map((r: {readACL: string[]}, i: number) => {
+            if (i === 0) expect(r.readACL).to.be.eql(t.output[0]);
+            else expect(r.readACL).to.be.eql(t.output[1]);
+          }),
+        );
+    }),
+  );
+
+  [
+    {
+      input: {
+        ownerGroup: 'logbookAcceptance',
+        accessGroups: ['someNew'],
+      },
+      expected: 204,
+    },
+    {
+      input: {
+        ownerGroup: 'notAllowedForNonAdmin',
+        accessGroups: ['someNew'],
+      },
+      expected: 404,
+    },
+    {
+      input: {readACL: ['logbookAcceptance', 'someNew1']},
+      expected: 204,
+    },
+    {
+      input: {
+        ownerGroup: 'notAllowedForNonAdmin',
+        accessGroups: ['someNew', 'logbookAcceptance'],
+        token: 'adminToken',
+      },
+      expected: 204,
+    },
+    {
+      input: {
+        ownerGroup: 'logbookAcceptance',
+        accessGroups: ['someNew', 'logbookAcceptance'],
+        token: 'adminToken',
+      },
+      expected: 204,
+    },
+    {
+      input: {
+        deleteACL: ['notAllowedForNonAdmin', 'someNew'],
+        token: 'adminToken',
+      },
+      expected: 204,
+    },
+    {
+      input: {deleteACL: ['someOtherNotAllowedForNonAdmin', 'someNew']},
+      expected: 404,
+    },
+    {
+      input: {
+        accessGroups: ['someNew'],
+      },
+      expected: 403,
+    },
+  ].forEach((t, i) => {
+    it(`patch logbook by id changing ownerGroup should return ${i}`, async () => {
+      const blockToken = t.input.token === 'adminToken' ? adminToken : token;
+      await client
+        .patch(`/logbooks/${logbookSnippetId}`)
+        .set('Authorization', 'Bearer ' + blockToken)
+        .set('Content-Type', 'application/json')
+        .send({
+          ...t.input,
+        })
+        .expect(t.expected)
+        .then(result => {
+          if (t.expected === 403)
+            expect(result.body.error.message).to.be.eql(
+              'Cannot modify data snippet. Please provide both ownerGroup and accessGroup',
+            );
+        })
+        .catch(err => {
+          throw err;
+        });
+    });
   });
 
   it('delete snippet by id without token should return 401', async () => {

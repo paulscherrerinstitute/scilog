@@ -7,7 +7,7 @@ import {
   getModelSchemaRef,
   validateFieldsVSModel,
   defaultSequentially,
-  addReadACLFromOwnerAccessGroups,
+  concatOwnerAccessGroups,
 } from '../../utils/misc';
 
 describe('Utils unit tests', function (this: Suite) {
@@ -98,7 +98,7 @@ describe('Utils unit tests', function (this: Suite) {
         ownerGroup: 'a',
         accessGroups: ['b'],
       },
-      expected: {readACL: ['a', 'b']},
+      expected: {ownerGroup: 'a', accessGroups: ['a', 'b']},
     },
     {
       input: {},
@@ -110,7 +110,7 @@ describe('Utils unit tests', function (this: Suite) {
     },
     {
       input: {readACL: ['a'], ownerGroup: 'b'},
-      expected: {readACL: ['a']},
+      expected: {readACL: ['a'], ownerGroup: 'b'},
     },
     {
       input: {ownerGroup: 'b'},
@@ -121,15 +121,15 @@ describe('Utils unit tests', function (this: Suite) {
       expected: 'error',
     },
   ].forEach((t, i) => {
-    it(`Should test addReadACLFromOwnerAccessGroups ${i}`, () => {
+    it(`Should test concatOwnerAccessGroups ${i}`, () => {
       if (t.expected === 'error')
         try {
-          addReadACLFromOwnerAccessGroups(t.input);
+          concatOwnerAccessGroups(t.input);
         } catch (err) {
           expect(err.name).to.be.eql('ForbiddenError');
         }
       else {
-        addReadACLFromOwnerAccessGroups(t.input);
+        concatOwnerAccessGroups(t.input);
         expect(t.input).to.be.eql(t.expected);
       }
     });
