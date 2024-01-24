@@ -14,7 +14,7 @@ import {
 } from '@loopback/repository';
 import {Location, Logbook, User} from '../models';
 import {Basesnippet} from '../models/basesnippet.model';
-import {defaultSequentially} from '../utils/misc';
+import {arrayOfUniqueFrom, defaultSequentially} from '../utils/misc';
 import {BasesnippetRepository} from './basesnippet.repository';
 import _ from 'lodash';
 import {HttpErrors} from '@loopback/rest';
@@ -160,7 +160,7 @@ export class AutoAddRepository<
     if (aclType === 'readACL') return ['any-authenticated-user'];
     if (aclType === 'updateACL') {
       const users = await this.getUnxGroupsEmail(data.location);
-      return [...new Set([...(users.unxGroup ?? []), ...(users.email ?? [])])];
+      return arrayOfUniqueFrom(users.unxGroup, users.email);
     }
     if (aclType === 'deleteACL') return ['admin'];
     if (aclType === 'adminACL') return ['admin'];
@@ -172,11 +172,9 @@ export class AutoAddRepository<
     data: {accessGroups?: string[]},
   ) {
     if (aclType === 'shareACL')
-      return [...new Set((parent.shareACL ?? []).concat(parent.readACL ?? []))];
+      return arrayOfUniqueFrom(parent.shareACL, parent.readACL);
     if (aclType === 'readACL')
-      return [
-        ...new Set((parent.readACL ?? []).concat(data.accessGroups ?? [])),
-      ];
+      return arrayOfUniqueFrom(parent.readACL, data.accessGroups);
     return parent[aclType as keyof Basesnippet];
   }
 
@@ -197,14 +195,12 @@ export class AutoAddRepository<
     },
     users: {unxGroup: string[]; email: string[]},
   ) {
-    return [
-      ...new Set([
-        ...(data.ownerGroup ? [data.ownerGroup] : []),
-        ...(data.accessGroups ?? []),
-        ...(users.email ?? []),
-        ...(users.unxGroup ?? []),
-      ]),
-    ];
+    return arrayOfUniqueFrom(
+      data.ownerGroup,
+      data.accessGroups,
+      users.email,
+      users.unxGroup,
+    );
   }
 
   private deleteACL(
@@ -213,13 +209,7 @@ export class AutoAddRepository<
     },
     users: {unxGroup: string[]; email: string[]},
   ) {
-    return [
-      ...new Set([
-        'admin',
-        ...(data.ownerGroup ? [data.ownerGroup] : []),
-        ...(users.unxGroup ?? []),
-      ]),
-    ];
+    return arrayOfUniqueFrom('admin', data.ownerGroup, users.unxGroup);
   }
 
   private createACL(
@@ -228,13 +218,7 @@ export class AutoAddRepository<
     },
     users: {unxGroup: string[]; email: string[]},
   ) {
-    return [
-      ...new Set([
-        ...(data.ownerGroup ? [data.ownerGroup] : []),
-        ...(users.email ?? []),
-        ...(users.unxGroup ?? []),
-      ]),
-    ];
+    return arrayOfUniqueFrom(data.ownerGroup, users.email, users.unxGroup);
   }
 
   private updateACL(
@@ -243,21 +227,15 @@ export class AutoAddRepository<
     },
     users: {unxGroup: string[]; email: string[]},
   ) {
-    return [
-      ...new Set([
-        ...(data.ownerGroup ? [data.ownerGroup] : []),
-        ...(users.email ?? []),
-        ...(users.unxGroup ?? []),
-      ]),
-    ];
+    return arrayOfUniqueFrom(data.ownerGroup, users.email, users.unxGroup);
   }
 
   private shareACL(data: {}, users: {unxGroup: string[]; email: string[]}) {
-    return [...new Set([...(users.email ?? []), ...(users.unxGroup ?? [])])];
+    return arrayOfUniqueFrom(users.email, users.unxGroup);
   }
 
   private adminACL(data: {}, users: {unxGroup: string[]; email: string[]}) {
-    return [...new Set(['admin', ...(users.unxGroup ?? [])])];
+    return arrayOfUniqueFrom('admin', users.unxGroup);
   }
 
   private async getUnxGroupsEmail(location: string) {

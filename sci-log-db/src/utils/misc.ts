@@ -143,6 +143,25 @@ export function defaultSequentially(...args: any[]) {
   }, undefined);
 }
 
+// eslint-disable-next-line  @typescript-eslint/no-explicit-any
+function setFrom(...args: any[]) {
+  return args.reduce(
+    (previousValue, currentValue) => (
+      (Array.isArray(currentValue)
+        ? currentValue
+        : [].concat(currentValue ?? [])
+      ).forEach(v => previousValue.add(v)),
+      previousValue
+    ),
+    new Set(),
+  );
+}
+
+// eslint-disable-next-line  @typescript-eslint/no-explicit-any
+export function arrayOfUniqueFrom(...args: any[]) {
+  return [...setFrom(...args)];
+}
+
 export function concatOwnerAccessGroups(data: {
   ownerGroup?: string;
   accessGroups?: string[];
@@ -154,11 +173,6 @@ export function concatOwnerAccessGroups(data: {
       throw new HttpErrors.Forbidden(
         'Cannot modify data snippet. Please provide both ownerGroup and accessGroup',
       );
-    data.accessGroups = [
-      ...new Set([
-        ...(data.ownerGroup ? [data.ownerGroup] : []),
-        ...(data.accessGroups ?? []),
-      ]),
-    ];
+    data.accessGroups = arrayOfUniqueFrom(data.ownerGroup, data.accessGroups);
   }
 }

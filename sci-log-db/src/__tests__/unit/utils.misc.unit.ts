@@ -8,6 +8,7 @@ import {
   validateFieldsVSModel,
   defaultSequentially,
   concatOwnerAccessGroups,
+  arrayOfUniqueFrom,
 } from '../../utils/misc';
 
 describe('Utils unit tests', function (this: Suite) {
@@ -132,6 +133,29 @@ describe('Utils unit tests', function (this: Suite) {
         concatOwnerAccessGroups(t.input);
         expect(t.input).to.be.eql(t.expected);
       }
+    });
+  });
+
+  [
+    {
+      input: ['a', null, 'b', undefined, 'a'],
+      expected: ['a', 'b'],
+    },
+    {
+      input: [null, undefined],
+      expected: [],
+    },
+    {
+      input: ['a', null, 'b', undefined, 'a', [1], [2], [2]],
+      expected: ['a', 'b', 1, 2],
+    },
+    {
+      input: [[1], [2], [2], 'a', null, 'b', undefined, 'a', [2]],
+      expected: [1, 2, 'a', 'b'],
+    },
+  ].forEach((t, i) => {
+    it(`Should test arrayOfUniqueFrom ${i}`, () => {
+      expect(arrayOfUniqueFrom(...t.input)).to.be.eql(t.expected);
     });
   });
 });

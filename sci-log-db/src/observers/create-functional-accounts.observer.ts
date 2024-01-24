@@ -9,6 +9,7 @@ import _ from 'lodash';
 import {PasswordHasherBindings} from '../keys';
 import {UserRepository} from '../repositories/user.repository';
 import {PasswordHasher} from '../services/hash.password.bcryptjs';
+import {arrayOfUniqueFrom} from '../utils/misc';
 
 /**
  * This class will be bound to the application as a `LifeCycleObserver` during
@@ -60,7 +61,7 @@ export class CreateFunctionalAccountsObserver implements LifeCycleObserver {
       if (accountExists != null) {
         await this.userRepository.updateById(accountExists.id, {
           ..._.omit(account, ['password', 'roles']),
-          roles: [...new Set([...account.roles, account.email])],
+          roles: arrayOfUniqueFrom(account.roles, account.email),
         });
       } else {
         const password = await this.passwordHasher.hashPassword(
@@ -70,7 +71,7 @@ export class CreateFunctionalAccountsObserver implements LifeCycleObserver {
         // create the new user
         const savedUser = await this.userRepository.create({
           ..._.omit(account, ['password', 'roles']),
-          roles: [...new Set([...account.roles, account.email])],
+          roles: arrayOfUniqueFrom(account.roles, account.email),
         });
 
         // set the password
