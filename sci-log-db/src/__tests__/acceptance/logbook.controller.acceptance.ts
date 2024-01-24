@@ -389,12 +389,12 @@ describe('Logbook', function (this: Suite) {
       .expect(401);
   });
 
-  it('delete snippet by id with token should return 204', async () => {
+  it('delete snippet by id with token should return 404', async () => {
     await client
       .delete(`/logbooks/${logbookSnippetId}`)
       .set('Authorization', 'Bearer ' + token)
       .set('Content-Type', 'application/json')
-      .expect(204);
+      .expect(404);
   });
 
   it('restore snippet by id without token should return 401', async () => {

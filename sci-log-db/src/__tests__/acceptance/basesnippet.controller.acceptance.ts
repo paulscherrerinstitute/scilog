@@ -690,7 +690,7 @@ describe('Basesnippet', function (this: Suite) {
     },
     {
       input: {
-        deleteACL: ['basesnippetAcceptance', 'someNew'],
+        deleteACL: ['restrict', 'someNew'],
         token: 'adminToken',
       },
       expected: 204,
@@ -751,5 +751,15 @@ describe('Basesnippet', function (this: Suite) {
       .catch(err => {
         throw err;
       });
+  });
+
+  [404, 204].forEach(t => {
+    it(`delete snippet should return ${t}`, async () => {
+      await client
+        .delete(`/basesnippets/${baseSnippetId}`)
+        .set('Authorization', `Bearer ${t === 404 ? token : adminToken}`)
+        .set('Content-Type', 'application/json')
+        .expect(t);
+    });
   });
 });
