@@ -18,7 +18,7 @@ import {HttpErrors, Response} from '@loopback/rest';
 import _ from 'lodash';
 import {EXPORT_SERVICE} from '../keys';
 import {ExportService} from '../services/export-snippets.service';
-import {concatOwnerAccessGroups} from '../utils/misc';
+import {arrayOfUniqueFrom, concatOwnerAccessGroups} from '../utils/misc';
 import {AutoAddRepository} from '../repositories/autoadd.repository.base';
 const fs = require('fs');
 
@@ -114,11 +114,10 @@ function UpdateAndDeleteRepositoryMixin<
     ) {
       const updateAcls = this.baseACLS.reduce((currentValue, previousValue) => {
         if (basesnippet[previousValue])
-          currentValue[previousValue] = [
-            ...new Set([
-              ...basesnippet[previousValue].concat(child[previousValue] ?? []),
-            ]),
-          ];
+          currentValue[previousValue] = arrayOfUniqueFrom(
+            basesnippet[previousValue],
+            child[previousValue],
+          );
         return currentValue;
       }, {} as ExpandedBasesnippet);
       await this.updateByIdWithHistory(child.id as ID, updateAcls, currentUser);
