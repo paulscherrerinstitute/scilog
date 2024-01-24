@@ -316,11 +316,11 @@ export class AutoAddRepository<
         delete ctx.data.createdBy;
         delete ctx.data.expiresAt;
         if (currentUser?.roles?.includes('admin')) return;
-        const updateCondition = this.updateACLCondition(
-          currentUser,
-          'updateACL',
-        );
-        ctx.where = this.addACLToFilter(ctx.where, updateCondition);
+        let editCondition: Where<Basesnippet>;
+        if (ctx.data.deleted)
+          editCondition = this.updateACLCondition(currentUser, 'deleteACL');
+        else editCondition = this.updateACLCondition(currentUser, 'updateACL');
+        ctx.where = this.addACLToFilter(ctx.where, editCondition);
         if (this.acls.some(acl => acl !== 'readACL' && ctx.data[acl])) {
           const adminCondition = this.updateACLCondition(
             currentUser,
@@ -376,6 +376,15 @@ export class AutoAddRepository<
         }
       }
       console.log('going to save:' + JSON.stringify(ctx, null, 3));
+    });
+
+    modelClass.observe('before delete', async ctx => {
+      const currentUser = ctx.options.currentUser;
+      if (currentUser?.roles?.includes('admin')) return;
+      ctx.where = this.addACLToFilter(
+        ctx.where,
+        this.updateACLCondition(currentUser, 'deleteACL'),
+      );
     });
 
     modelClass.observe('access', async ctx => {
