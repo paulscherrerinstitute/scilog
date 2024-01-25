@@ -397,6 +397,14 @@ describe('Logbook', function (this: Suite) {
       .expect(404);
   });
 
+  it('delete snippet by id with token should return 204', async () => {
+    await client
+      .delete(`/logbooks/${logbookSnippetId}`)
+      .set('Authorization', 'Bearer ' + adminToken)
+      .set('Content-Type', 'application/json')
+      .expect(204);
+  });
+
   it('restore snippet by id without token should return 401', async () => {
     await client
       .patch(`/logbooks/${logbookSnippetId}/restore`)
@@ -410,6 +418,15 @@ describe('Logbook', function (this: Suite) {
       .set('Authorization', 'Bearer ' + token)
       .set('Content-Type', 'application/json')
       .expect(204);
+    await client
+      .get(`/logbooks/${logbookSnippetId}`)
+      .set('Authorization', 'Bearer ' + token)
+      .set('Content-Type', 'application/json')
+      .expect(200)
+      .then(result => expect(result.body.id).to.eql(logbookSnippetId))
+      .catch(err => {
+        throw err;
+      });
   });
 
   it('post a logbook with authentication and should create default ACLS from parent', async () => {

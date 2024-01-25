@@ -218,7 +218,7 @@ export class LogbookController {
     },
   })
   async deleteById(@param.path.string('id') id: string): Promise<void> {
-    await this.logbookRepository.deleteById(id, {
+    await this.logbookRepository.deleteByIdWithHistory(id, {
       currentUser: this.user,
     });
   }
