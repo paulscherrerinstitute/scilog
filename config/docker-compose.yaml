@@ -1,0 +1,64 @@
+version: "3.9"
+services:
+  mongodb:
+    image: mongo:4.2
+    volumes:
+      - mongodb_data:/data/db
+      - ./mongo/rs-init.sh:/rs-init.sh:ro
+    command: [ "--replSet", "rs0", "--bind_ip_all" ]
+    healthcheck:
+      test: ./rs-init.sh
+      interval: 5s
+    profiles:
+      - be
+
+  mongodb_seed:
+    image: mongo:4.2
+    volumes:
+      - ./seed_db/seed:/seed
+      - ./seed_db/mongo_import.sh:/mnt/mongo_import.sh
+    command:
+      - "sh"
+      - "-c"
+      - "chmod u+x /mnt/mongo_import.sh && /mnt/mongo_import.sh"
+    user: "0:0"
+    depends_on:
+      - mongodb
+    environment:
+      - DATABASE=scilog
+    restart: on-failure
+    profiles:
+      - be
+
+  backend:
+    image: ghcr.io/paulscherrerinstitute/scilog/be
+    depends_on:
+      mongodb:
+        condition: service_healthy
+    volumes:
+      # uncomment and edit the ./be/oidc.json to enable oidc
+      # - ./be/oidc.json:/home/node/app/oidc.json
+      - ./be/datasource.json:/home/node/app/datasource.json
+      - ./be/functionalAccounts.json:/home/node/app/functionalAccounts.json
+    environment:
+      JWT_SECRET: jwt_secret
+      CHROME_BIN: /usr/bin/chromium
+      CHROME_PATH: /usr/lib/chromium/
+    profiles:
+      - be
+    ports:
+      - 3000:3000
+
+  frontend:
+    image: ghcr.io/paulscherrerinstitute/scilog/fe
+    # volumes:
+    #   uncomment to enable the oidc form
+    #   - ./fe/config.json:/frontend/src/assets/config.json
+    profiles:
+      - fe
+    ports:
+      - 80:80
+
+volumes:
+  mongodb_data:
+    driver: local
