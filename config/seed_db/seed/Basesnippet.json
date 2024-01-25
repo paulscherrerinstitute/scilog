@@ -35,6 +35,9 @@
 			"$oid": "64e898e65b05b2003e22c2e4"
 		},
 		"name": "test",
-		"location": "test"
+		"location": "test",
+		"_id": {
+			"$oid": "64e898e65b05b2003e22c2e5"
+		}
 	}
 ]
