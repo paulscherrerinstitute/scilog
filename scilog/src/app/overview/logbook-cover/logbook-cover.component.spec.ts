@@ -1,5 +1,4 @@
 import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
-import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
 import { LogbookWidgetComponent } from './logbook-cover.component';
 import { LogbookItemDataService } from '@shared/remote-data.service';
 import { UserPreferencesService } from '@shared/user-preferences.service';
@@ -38,7 +37,8 @@ describe('LogbookWidgetComponent', () => {
     "tags" : [ ],
     "versionable" : true,
     "deleted" : false,
-  
+    "updateACL": ["updateRole"],
+    "deleteACL": ["deleteRole"],
 }
 
   logbookSpy = jasmine.createSpyObj("LogbookInfoService", ["logbookInfo"]);
@@ -70,5 +70,27 @@ describe('LogbookWidgetComponent', () => {
 
   it('should create', () => {
     expect(component).toBeTruthy();
+  });
+
+
+  [
+    {input: ['roles'], output: ['updateRole']},
+    {input: ['updateRole'], output: []},
+    {input: ['admin'], output: []}
+  ].forEach((t, i) => {
+    it(`should test enable members ${i}`, () => {
+      component['userPreferences'].userInfo.roles = t.input;
+      const groups = component['enabledMembers']('update');
+      expect(groups).toEqual(t.output);
+      if (t.output.length > 0)
+        expect(component.tooltips.update).toEqual(`Enabled for members of '${t.output.concat('admin')}'`);
+    });
+  });
+
+  it('should test enableActions', () => {
+    component['enableActions']();
+    expect(component.tooltips.update).toEqual(`Enabled for members of 'updateRole,admin'`);
+    expect(component.tooltips.delete).toEqual(`Enabled for members of 'deleteRole,admin'`);
+    expect(component.tooltips.edit).toEqual(`Enabled for members of 'updateRole,deleteRole,admin'`);
   });
 });

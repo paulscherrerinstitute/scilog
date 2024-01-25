@@ -6,4 +6,8 @@ export interface Logbooks extends Basesnippets {
     thumbnail?: string;
     location?: string;
     readACL?: string[];
+    updateACL?: string[];
+    deleteACL?: string[];
+    adminACL?: string[];
+    expiresAt?: string;
 }

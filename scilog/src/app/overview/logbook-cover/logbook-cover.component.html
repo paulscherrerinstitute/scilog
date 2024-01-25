@@ -3,18 +3,22 @@
     <mat-card-title #cardHeader style="font-size: 18px;">{{ logbook?.name }}</mat-card-title>
     <mat-card-subtitle>{{ logbook?.ownerGroup }}</mat-card-subtitle>
     <button mat-icon-button [matMenuTriggerFor]="menu" aria-label="Example icon-button with a menu"
-      class="mat-fab-top-right" *ngIf='enableEdit'>
+      class="mat-fab-top-right"  [disabled]="tooltips.edit" matTooltip="{{ tooltips.edit }}">
       <mat-icon>more_vert</mat-icon>
     </button>
     <mat-menu #menu="matMenu">
-      <button mat-menu-item (click)="editLogbook()" [disabled]="!enableEdit? 'disabled' : null">
-        <mat-icon>edit</mat-icon>
-        <span>Edit</span>
-      </button>
-      <button mat-menu-item (click)="deleteLogbook()" [disabled]="!enableEdit? 'disabled' : null">
-        <mat-icon>delete</mat-icon>
-        <span>Delete</span>
-      </button>
+      <span [matTooltip]="tooltips.update">
+        <button mat-menu-item (click)="editLogbook()" [disabled]="tooltips.update">
+          <mat-icon>edit</mat-icon>
+          <span>Edit</span>
+        </button>
+      </span>
+      <span [matTooltip]="tooltips.delete">
+        <button mat-menu-item (click)="deleteLogbook()" [disabled]="tooltips.delete">
+          <mat-icon>delete</mat-icon>
+          <span>Delete</span>
+        </button>
+      </span>
     </mat-menu>
   </mat-card-header>
   <div class="image-container">

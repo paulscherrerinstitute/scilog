@@ -22,7 +22,7 @@ export class LogbookWidgetComponent implements OnInit {
 
   imageToShow: any;
   isImageLoading: boolean;
-  enableEdit = false;
+  tooltips: {edit?: string, update?: string, delete?: string} = {};
 
   constructor(
     private logbookItemDataService: LogbookItemDataService,
@@ -33,12 +33,26 @@ export class LogbookWidgetComponent implements OnInit {
     if (this.logbook?.thumbnail) {
       this.getImageFromService();
     }
-    if (this.userPreferences.userInfo?.roles.some(entry => {
-      return this.logbook?.readACL?.includes?.(entry)
-    })) {
-      this.enableEdit = true;
-    }
+    this.enableActions();
+  }
 
+  private enabledMembers(action: string): string[] {
+    const aclMembers = this.logbook?.[`${action}ACL`];
+    if (this.userPreferences.userInfo?.roles.some((entry: string) =>
+      aclMembers?.includes?.(entry) || entry === 'admin'
+    ))
+      return [];
+    this.tooltips[action] = `Enabled for members of '${aclMembers.filter((m: string) => m != 'admin').concat('admin')}'`;
+    return aclMembers;
+  }
+
+  private enableActions() {
+    const groups = ['update', 'delete'].reduce((previousValue, currentValue) => 
+      previousValue.concat(this.enabledMembers(currentValue)),
+      []
+    )
+    if (groups.length > 0)
+      this.tooltips.edit = `Enabled for members of '${[...new Set(groups.concat('admin'))]}'`;
   }
 
   ngAfterViewInit() {

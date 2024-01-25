@@ -361,7 +361,7 @@ export class LogbookDataService extends RemoteDataService {
     httpFilter["order"] = ["defaultOrder DESC"];
 
     let whereFilter: Object[] = [];
-    whereFilter.push({ "snippetType": "logbook" });
+    whereFilter.push({ "snippetType": "logbook", deleted: false });
 
     httpFilter["where"] = { "and": whereFilter };
 
