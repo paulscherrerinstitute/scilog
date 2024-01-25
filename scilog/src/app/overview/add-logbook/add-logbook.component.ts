@@ -10,7 +10,7 @@ import { map, startWith } from 'rxjs/operators';
 import { UserPreferencesService } from '@shared/user-preferences.service';
 import { Logbooks } from '@model/logbooks';
 import { LogbookDataService, LogbookItemDataService } from '@shared/remote-data.service';
-
+import { SnackbarService } from 'src/app/core/snackbar.service';
 
 function ownerGroupMemberValidator(groups: string[]): ValidatorFn {
   return (control: AbstractControl): { forbiddenGroup: {value: string} } | null => {
@@ -22,7 +22,7 @@ function ownerGroupMemberValidator(groups: string[]): ValidatorFn {
 }
 
 function groupCreationValidator(control: AbstractControl): { anyAuthGroup: {value: string | string[]} } | null {
-    const forbidden = control.value.includes('any-authenticated-user');
+    const forbidden = control.value?.includes('any-authenticated-user');
     return forbidden ? { anyAuthGroup: { value: control.value } } : null;
 }
 
@@ -105,6 +105,7 @@ export class AddLogbookComponent implements OnInit {
   filteredAccessGroups: Observable<string[]>;
   filteredOwnerGroups: Observable<string[]>;
   accessGroupsAvail: string[] = [];
+  tooltips: {ownerGroup?: string, expired?: string} = {};
 
 
   @ViewChild('accessGroupsInput') accessGroupsInput: ElementRef<HTMLInputElement>;
@@ -117,6 +118,7 @@ export class AddLogbookComponent implements OnInit {
     private logbookItemDataService: LogbookItemDataService,
     private userPreferences: UserPreferencesService,
     private logbookDataService: LogbookDataService,
+    private snackBar: SnackbarService,
     @Inject(MAT_DIALOG_DATA) data) {
     this.optionsFormGroup = fb.group({
       hideRequired: new UntypedFormControl(false),
@@ -138,19 +140,56 @@ export class AddLogbookComponent implements OnInit {
     this.setDefaults();
   }
 
+  private getForm(value: string) {
+    return this.optionsFormGroup.get(value);
+  }
+
+  private setForm(toKey: string, fromKey?: string) {
+    this.getForm(toKey).setValue(this.logbook[fromKey ?? toKey]);
+  }
+
   get accessGroups() {
-    return this.optionsFormGroup.get('accessGroups');
+    return this.getForm('accessGroups');
+  }
+
+  private setOwnerGroupWithEditability() {
+    this.setForm('ownerGroup');
+    if (!this.logbook.ownerGroup || this.isAdmin()) 
+      return
+    this.getForm('ownerGroup').disable();
+    this.tooltips.ownerGroup = `Only members of '${this.logbook.adminACL}' can change the ownerGroup`;
+  }
+
+  private isAdmin() {
+    return this.accessGroupsAvail.some(group => this.logbook?.adminACL?.includes(group));
+  }
+
+  private setExpiredTooltip() {
+    const expiresAt =  new Date(this.logbook.expiresAt);
+    if (!expiresAt || expiresAt > new Date()) return;
+    const expiresString = expiresAt.toLocaleDateString(
+      'en-GB', 
+      {year: '2-digit', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit'}
+    );
+    this.tooltips.expired = `Editing time (${expiresString}) has passed`;
+  }
+
+  private setWithEditability(toKey: string) {
+    let fromKey: string;
+    if (toKey === 'title') fromKey = 'name';
+    this.setForm(toKey, fromKey ?? toKey);
+    if (this.tooltips.expired) this.getForm(toKey).disable();
   }
 
   setDefaults(){
     this.accessGroupsAvail = this.userPreferences.userInfo?.roles;
+    if (!this.isAdmin())
+      this.getForm('ownerGroup').addValidators(ownerGroupMemberValidator(this.accessGroupsAvail));
     if (this.logbook) {
-      this.optionsFormGroup.get('title').setValue(this.logbook.name);
-      this.optionsFormGroup.get('description').setValue(this.logbook.description);
-      this.optionsFormGroup.get('location').setValue(this.logbook.location);
-      this.optionsFormGroup.get('ownerGroup').setValue(this.logbook.ownerGroup);
+      this.setExpiredTooltip();
+      ['title', 'description', 'location', 'isPrivate'].map(field => this.setWithEditability(field));
+      this.setOwnerGroupWithEditability();
       this.accessGroups.setValue(this.logbook.accessGroups);
-      this.optionsFormGroup.get('isPrivate').setValue(this.logbook.isPrivate);
       this.fileId = this.logbook.thumbnail;
       if (this.fileId) {
         this.getImageFromService();
@@ -158,14 +197,12 @@ export class AddLogbookComponent implements OnInit {
       console.log("editing existing logbook");
     }
     else {
-      this.optionsFormGroup.get('ownerGroup').addValidators(groupCreationValidator);
       this.accessGroups.addValidators(groupCreationValidator);
+      this.getForm('ownerGroup').addValidators(groupCreationValidator);
       this.accessGroupsAvail = this.accessGroupsAvail.filter((g: string) => g !== 'any-authenticated-user');
     }
-
     this.filteredAccessGroups = this.accessGroupsCtrl.valueChanges.pipe(startWith(null), map((accessGroup: string | null) => accessGroup ? this._filter(accessGroup) : this.accessGroupsAvail.slice()));
-    this.filteredOwnerGroups = this.optionsFormGroup.get('ownerGroup').valueChanges.pipe(startWith(null), map((accessGroup: string | null) => accessGroup ? this._filter(accessGroup) : this.accessGroupsAvail.slice()));
-    this.optionsFormGroup.get('ownerGroup').addValidators(ownerGroupMemberValidator(this.accessGroupsAvail));
+    this.filteredOwnerGroups = this.getForm('ownerGroup').valueChanges.pipe(startWith(null), map((accessGroup: string | null) => accessGroup ? this._filter(accessGroup) : this.accessGroupsAvail.slice()));
   }
 
   async getLocations(){
@@ -203,11 +240,14 @@ export class AddLogbookComponent implements OnInit {
 
     if (this.optionsFormGroup.invalid) {
       console.log("form invalid")
+      const invalidKeys = [];
       for (const key in this.optionsFormGroup.controls) {
-          if (this.optionsFormGroup.get(key).invalid){
-            this.optionsFormGroup.get(key).setErrors({'required': true});
+          if (this.getForm(key).invalid){
+            invalidKeys.push(key);
+            this.getForm(key).setErrors({'required': true});
           }
       }
+      this.showSnackbarMessage(`Invalid keys: '${invalidKeys}'`, 'warning');
       return;
     }
 
@@ -217,12 +257,12 @@ export class AddLogbookComponent implements OnInit {
       logbookId = this.logbook.id;
     }
     this.logbook = {
-      name: this.optionsFormGroup.get('title').value,
-      location: this.optionsFormGroup.get('location').value,
-      ownerGroup: this.optionsFormGroup.get('ownerGroup').value,
+      name: this.getForm('title').value,
+      location: this.getForm('location').value,
+      ownerGroup: this.getForm('ownerGroup').value,
       accessGroups: this.accessGroups.value,
-      isPrivate: this.optionsFormGroup.get('isPrivate').value,
-      description: this.optionsFormGroup.get('description').value
+      isPrivate: this.getForm('isPrivate').value,
+      description: this.getForm('description').value
     }
 
     let fileData: {id: string};
@@ -240,15 +280,43 @@ export class AddLogbookComponent implements OnInit {
 
     if (logbookId != null) {
       // update logbook
-      await this.logbookDataService.patchLogbook(logbookId, this.logbook);
-      this.logbook.id = logbookId;
+      try {
+        await this.logbookDataService.patchLogbook(logbookId, this.logbook);
+      } catch (error) {
+        console.log(error);
+        this.showSnackbarMessage('Error while updating the logbook. If the error persists contact an administrator', 'warning');
+        return;
+      }
+      finally {
+        this.logbook.id = logbookId;
+      }
+      this.showSnackbarMessage('Edit successful', 'resolved')
     } else {
       // create new logbook
-      let data = await this.logbookDataService.postLogbook(this.logbook);
-      this.logbook.id = data.id;
+      try {
+        let data = await this.logbookDataService.postLogbook(this.logbook);
+        this.logbook.id = data.id;
+      } catch (error) {
+        console.log(error);
+        this.showSnackbarMessage('Error while creating the logbook. If the error persists contact an administrator', 'warning');
+        return;
+      }
+      this.showSnackbarMessage('Creation successful', 'resolved');
     }
-
     this.dialogRef.close(this.logbook);
+  }
+
+  private showSnackbarMessage(message: string, messageClass: 'warning' | 'resolved') {
+    return this.snackBar._showMessage({
+      message: message,
+      panelClass: [`${messageClass}-snackbar`], 
+      action: 'Dismiss',
+      show: true,
+      duration: 4000,
+      type: 'serverMessage',
+      horizontalPosition: 'center',
+      verticalPosition: 'top',
+    })
   }
 
   selectLocation(id: any) {
@@ -259,7 +327,7 @@ export class AddLogbookComponent implements OnInit {
         console.log(this.selectedLocation);
         if (!this.customImageLoaded) {
           console.log(this.selectedLocation)
-          if (this.selectedLocation?.files[0]) {
+          if (this.selectedLocation?.files?.[0]) {
             this.fileId = this.selectedLocation?.files[0].fileId;
             this.getImageFromService();
           } else {
