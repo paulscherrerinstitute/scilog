@@ -48,6 +48,8 @@ export class AddContentComponent implements OnInit {
   prel_fileStorage: any[] = [];
   config: any = [];
   editor: any;
+  editStorageKey: string;
+  lastEdit: string;
 
   constructor(
     private dataService: AddContentService,
@@ -102,6 +104,7 @@ export class AddContentComponent implements OnInit {
 
     if (this.message.id) {
       this.notification = this.message;
+      this.setLocalStorage();
       this.notification.snippetType = 'edit';
       this.notification.toDelete = false;
       this.liveFeedback = false;
@@ -130,6 +133,11 @@ export class AddContentComponent implements OnInit {
     return;
   }
 
+  private setLocalStorage() {
+    this.editStorageKey = `${this.message.id}LastEdit`;
+    this.lastEdit = localStorage.getItem(this.editStorageKey);
+  }
+
   onEditorReady(editor: any) {
     console.log(Array.from(editor.ui.componentFactory.names()));
     editor.ui.getEditableElement().parentElement.insertBefore(
@@ -154,11 +162,13 @@ export class AddContentComponent implements OnInit {
     }
     if (this.notification.snippetType === 'edit' && this.contentChanged)
       this.notification.snippetType = 'paragraph';
+    localStorage.removeItem(this.editStorageKey);
     this.prepareMessage(this.data);
     this.sendMessage();
   };
 
   onChange({ editor }: ChangeEvent) {
+    localStorage.setItem(this.editStorageKey, editor.getData());
     // this.editorChange(editor);
     this.contentChanged = true;
   }
@@ -168,7 +178,6 @@ export class AddContentComponent implements OnInit {
       if (typeof editor != "undefined") {
         const data = editor.getData();
         this.prel_fileStorage = editor['prel_fileStorage'];
-        this.contentChanged = false;
         this.changeChain(data);
       }
     }
@@ -240,6 +249,11 @@ export class AddContentComponent implements OnInit {
 
   }
 
+  loadLastUnsavedEdit() {
+    if (this.lastEdit)
+      this.editor.setData(this.lastEdit);
+  }
+
   updateTags(tags: string[]) {
     this.tag = tags;
     this.contentChanged = true;
@@ -248,6 +262,11 @@ export class AddContentComponent implements OnInit {
 
   toggleMetadataPanel() {
     this.metadataPanelExpanded = !this.metadataPanelExpanded;
+  }
+
+  noUnsavedEditTooltip() {
+    if (!this.lastEdit || this.lastEdit === this.data)
+      return 'No unsaved edit in current session';
   }
 
   ngOnDestroy(): void {
@@ -265,6 +284,7 @@ export class AddContentComponent implements OnInit {
     }
   }
 
+  @HostListener('window:beforeunload')
   @HostListener('window:unload')
   onUnload() {
     this.sendEditDelitionMessage();

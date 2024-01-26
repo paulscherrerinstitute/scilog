@@ -4,6 +4,9 @@
   <!-- apparently, this can also be achieved by using [(ngModel)]="postData.content" debounce="300" -->
   <tag-editor [tagIn]="tag" (tagsUpdate)="updateTags($event)" [config]="config" [syncAtStart]="false"></tag-editor>
 </mat-dialog-content>
+<button (click)="loadLastUnsavedEdit()" [disabled]="noUnsavedEditTooltip()" matTooltip="{{ noUnsavedEditTooltip() }}">
+  Load last unsaved edit
+</button>
 <mat-dialog-actions align="end">
   <button mat-button mat-dialog-close *ngIf="!liveFeedback">Cancel</button>
   <button mat-button [mat-dialog-close]="true" (click)="addContent($event)">{{ addButtonLabel }}</button>
