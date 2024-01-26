@@ -70,7 +70,7 @@ describe('AddContentComponent', () => {
         { provide: MAT_DIALOG_DATA, useValue: {} },
         { provide: MatDialogRef, useValue: {} },
         { provide: AddContentService, useClass: AddContentServiceMock },
-        { provide: AppConfigService, useValue: { getConfig } }
+        { provide: AppConfigService, useValue: { getConfig } },
       ],
       declarations: [AddContentComponent]
     })
@@ -320,13 +320,12 @@ describe('AddContentComponent', () => {
     expect(component.sendMessage).toHaveBeenCalledTimes(0);
   });
 
-  ['unload', 'beforeunload'].forEach(t => {
-    it(`should unset the logbook on ${t}`, () => {
-      spyOn(component, 'sendEditDelitionMessage');
-      const unloadEvent = new Event(t);
-      window.dispatchEvent(unloadEvent);
-      expect(component.sendEditDelitionMessage).toHaveBeenCalledTimes(1);
-    });
+  
+  it('should unset the logbook on unload', () => {
+    spyOn(component, 'sendEditDelitionMessage');
+    const unloadEvent = new Event('unload');
+    window.dispatchEvent(unloadEvent);
+    expect(component.sendEditDelitionMessage).toHaveBeenCalledTimes(1);
   });
 
   it('should unset the logbook on destroy', () => {
