@@ -70,7 +70,7 @@ describe('AddContentComponent', () => {
         { provide: MAT_DIALOG_DATA, useValue: {} },
         { provide: MatDialogRef, useValue: {} },
         { provide: AddContentService, useClass: AddContentServiceMock },
-        { provide: AppConfigService, useValue: { getConfig } }
+        { provide: AppConfigService, useValue: { getConfig } },
       ],
       declarations: [AddContentComponent]
     })
@@ -118,14 +118,18 @@ describe('AddContentComponent', () => {
     expect(component.liveFeedback).toBe(false);
     expect(component.addButtonLabel).toBe("Done");
     expect(component.sendMessage).toHaveBeenCalledTimes(1);
+    expect(component.editStorageKey).toEqual('6061d9a13587f37b851694d6LastEdit');
   });
 
   it('should get data from editor before sending', () => {
     component.setupComponent();
     component.editor = jasmine.createSpyObj("component.editor", ["getData"])
+    const localStorageSpy = spyOn(localStorage, 'removeItem');
+    component.editStorageKey = '123LastEdit';
     component.addContent("");
     expect(component.editor.getData).toHaveBeenCalled();
-  })
+    expect(localStorageSpy).toHaveBeenCalledOnceWith('123LastEdit');
+  });
 
   it('should get edit data from editor before sending', () => {
     component.setupComponent();
@@ -135,7 +139,8 @@ describe('AddContentComponent', () => {
     component.addContent("");
     expect(component.editor.getData).toHaveBeenCalled();
     expect(component.notification.snippetType).toEqual('paragraph');
-  })
+    expect(component.editStorageKey).toEqual(undefined);
+  });
 
   it('should prepare quote', () => {
     let quoted_snippet = {
@@ -188,7 +193,7 @@ describe('AddContentComponent', () => {
     expect(component.metadataPanelExpanded).toBe(false);
     component.toggleMetadataPanel();
     expect(component.metadataPanelExpanded).toBe(true);
-  })
+  });
 
   it('should update tags', () => {
     spyOn(component, 'changeChain')
@@ -197,13 +202,13 @@ describe('AddContentComponent', () => {
     expect(component.contentChanged).toBe(true);
     expect(component.tag).toEqual(defaultTags);
     expect(component.changeChain).toHaveBeenCalledTimes(1);
-  })
+  });
 
   it('should send message', () => {
     spyOn(component['dataService'], 'changeMessage');
     component.sendMessage();
     expect(component['dataService'].changeMessage).toHaveBeenCalledWith(component.notification);
-  })
+  });
 
   it('should adjust figure HTML content for ckeditor', () => {
     let figureMockNoSize = '<figure class="image"><img src="source" title="d3cc95ad-45d5-48c4-ba0e-db6fcfd252ce"></figure>';
@@ -223,8 +228,7 @@ describe('AddContentComponent', () => {
     component.data = figureMockSizeBefore;
     component.adjustContentForEditor();
     expect(component.data).toBe(figureMockSizeAfter);
-
-  })
+  });
 
 
   it('should adjust figure HTML content with links for ckeditor ', () => {
@@ -239,8 +243,7 @@ describe('AddContentComponent', () => {
     component.data = figureMockSizeBefore;
     component.adjustContentForEditor();
     expect(component.data).toBe(figureMockSizeAfter);
-
-  })
+  });
 
   it('should extract notification with new files', () => {
     let figureMock = '<figure class="image image_resized" style="width:79%;"><img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAEjgAAA2oCAIAAACtz6bAAAAACXBIWXMAAHsIAAB7CAF"></figure>"';
@@ -254,8 +257,7 @@ describe('AddContentComponent', () => {
     expect(message.files[0].fileHash).toBeTruthy();
     combineHtmlFigureHash(figureMockNoSrc, message.files[0].fileHash)
     expect(message.textcontent).toEqual(combineHtmlFigureHash(figureMockNoSrc, message.files[0].fileHash));
-
-  })
+  });
 
   it('should extract notification without files', () => {
     let figureMock = '<figure class="image image_resized" style="width:79%;"><img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAEjgAAA2oCAIAAACtz6bAAAAACXBIWXMAAHsIAAB7CAF"></figure>"'
@@ -268,18 +270,16 @@ describe('AddContentComponent', () => {
     expect(message.files[0].fileHash).toBeTruthy();
     combineHtmlFigureHash(figureMockNoSrc, message.files[0].fileHash)
     expect(message.textcontent).toEqual(combineHtmlFigureHash(figureMockNoSrc, message.files[0].fileHash));
-
-  })
+  });
 
   it('should extract links', () => {
     let linkMock = '<p><a class="fileLink" href="file:myHash">myFile.pdf</a></p>'
     let linkStorageMock = [{ fileHash: "myHash" }];
     let message = extractNotificationMessage(linkMock, linkStorageMock);
     expect(message.files[0].fileHash).toEqual("myHash")
-  })
+  });
 
   it('should prepare subsnippets container for quotes', () => {
-
     component.notification = notificationMock;
     component.prepareSubsnippetsQuoteContainer();
     expect(component.notification.subsnippets[0].id).toBeFalsy();
@@ -291,21 +291,20 @@ describe('AddContentComponent', () => {
     expect(component.notification.subsnippets[0].defaultOrder).toBeFalsy();
     expect(component.notification.subsnippets[0].subsnippets).toBeFalsy();
     expect(component.notification.subsnippets[0].linkType).toBe(LinkType.QUOTE);
-
-  })
+  });
 
   it('should send a message if notification is edit', () => {
     spyOn(component, 'sendMessage');
     component.notification.snippetType = 'edit';
     component.changeChain(notificationMock);
     expect(component.sendMessage).toHaveBeenCalledTimes(1);
-  })
+  });
 
   it('should not send messages if notification is not edit', () => {
     spyOn(component, 'sendMessage');
     component.changeChain(notificationMock);
     expect(component.sendMessage).toHaveBeenCalledTimes(0);
-  })
+  });
 
   it('should mark for deletion and send message', () => {
     spyOn(component, 'sendMessage');
@@ -313,26 +312,65 @@ describe('AddContentComponent', () => {
     component['sendEditDelitionMessage']();
     expect(component.sendMessage).toHaveBeenCalledTimes(1);
     expect(component.notification.toDelete).toEqual(true);
-  })
+  });
 
   it('should not mark for deletion and send message', () => {
     spyOn(component, 'sendMessage');
     component.sendEditDelitionMessage();
     expect(component.sendMessage).toHaveBeenCalledTimes(0);
-  })
+  });
 
+  
   it('should unset the logbook on unload', () => {
     spyOn(component, 'sendEditDelitionMessage');
     const unloadEvent = new Event('unload');
     window.dispatchEvent(unloadEvent);
     expect(component.sendEditDelitionMessage).toHaveBeenCalledTimes(1);
-  })
+  });
 
   it('should unset the logbook on destroy', () => {
     spyOn(component, 'sendEditDelitionMessage');
     component.ngOnDestroy();
     expect(component.sendEditDelitionMessage).toHaveBeenCalledTimes(1);
-  })
+  });
+
+  [
+    {input: undefined, output: 'No unsaved edit in current session'},
+    {input: 'sameData', output: 'No unsaved edit in current session'},
+    {input: 'edit', output: undefined},
+  ].forEach((t, i) => {
+    it(`should test noUnsavedEditTooltip ${i}`, () => {
+      component.lastEdit = t.input;
+      if (t.input === 'sameData') component.data = t.input;
+      expect(component.noUnsavedEditTooltip()).toEqual(t.output);
+    });
+  });
+
+  it('should test setLocalStorage', () => {
+    component.message = {id: 123};
+    const localStorageSpy = spyOn(localStorage, 'getItem');
+    component['setLocalStorage']();
+    expect(localStorageSpy).toHaveBeenCalledOnceWith('123LastEdit');
+  });
+
+  [undefined, 'edit'].forEach((t, i) => {
+    it(`should test loadLastUnsavedEdit ${i}`, () => {
+      component.lastEdit = t;
+      component.editor = jasmine.createSpyObj("component.editor", ["setData"]);
+      component.loadLastUnsavedEdit();
+      expect(component.editor.setData).toHaveBeenCalledTimes(t? 1: 0);
+      if (t)
+        expect(component.editor.setData).toHaveBeenCalledOnceWith(t);
+    });
+  });
+
+  it('should test onChange', () => {
+    component.editStorageKey = '123LastEdit';
+    const editor = {getData: () => 'edit'};
+    const localStorageSpy = spyOn(localStorage, 'setItem');
+    component.onChange({editor: editor});
+    expect(localStorageSpy).toHaveBeenCalledOnceWith('123LastEdit', 'edit');
+  });
 
   function combineHtmlFigureHash(figureMock: string[], hash: string) {
     return (figureMock[0] + ' title="' + hash + '"' + figureMock[1]);
