@@ -140,7 +140,7 @@ export async function startWebsocket(app: SciLogDbApplication) {
         if (document?.snippetType === 'logbook') {
           sendSocketMessage(document._id);
           return document._id;
-        } else if (document.parentId) {
+        } else if (document?.parentId) {
           findParentLogbook(db, document.parentId, sendSocketMessage).then(
             // eslint-disable-next-line  @typescript-eslint/no-explicit-any
             (d: any) => {
