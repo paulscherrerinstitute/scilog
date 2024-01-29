@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, OnInit, Output, ViewChild, ElementRef } from '@angular/core';
+import { Component, EventEmitter, Input, OnInit, Output, ViewChild, ElementRef, SimpleChange } from '@angular/core';
 import { MatChipInputEvent } from '@angular/material/chips';
 import { Tags } from '@model/metadata';
 import { COMMA, ENTER, SPACE } from '@angular/cdk/keycodes';
@@ -167,6 +167,9 @@ export class TagEditorComponent implements OnInit {
     this.tag = JSON.parse(JSON.stringify(this.lastTags));
     this.tagsUpdate.emit(this.tagsToStrings(this.tag));
   }
-
+  
+  ngOnChanges(changes: { [key: string]: SimpleChange }) {
+    this.tag = this.stringsToTags(changes.tagIn.currentValue);
+  }
 
 }
