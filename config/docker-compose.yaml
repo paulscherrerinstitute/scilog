@@ -53,7 +53,7 @@ services:
     image: ghcr.io/paulscherrerinstitute/scilog/fe
     # volumes:
     #   uncomment to enable the oidc form
-    #   - ./fe/config.json:/frontend/src/assets/config.json
+    #   - ./fe/config.json:/usr/share/nginx/html/assets/config.json
     profiles:
       - fe
     ports:
