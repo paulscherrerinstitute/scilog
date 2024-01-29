@@ -48,7 +48,7 @@ export class AddContentComponent implements OnInit {
   prel_fileStorage: any[] = [];
   config: any = [];
   editor: any;
-  lastEdit: {message: string, tags: string};
+  lastEdit: {message?: string, tags?: string} = {};
 
   constructor(
     private dataService: AddContentService,
