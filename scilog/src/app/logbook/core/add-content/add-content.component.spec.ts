@@ -111,6 +111,7 @@ describe('AddContentComponent', () => {
       "id": "6061d9a13587f37b851694d6"
     };
     spyOn(component, 'sendMessage');
+    const setFromLocalStorageSpy =  spyOn<any>(component, 'setFromLocalStorage');
     component.setupComponent();
     expect(component.notification.linkType).toEqual(LinkType.PARAGRAPH);
     expect(component.notification.snippetType).toEqual("edit");
@@ -118,17 +119,16 @@ describe('AddContentComponent', () => {
     expect(component.liveFeedback).toBe(false);
     expect(component.addButtonLabel).toBe("Done");
     expect(component.sendMessage).toHaveBeenCalledTimes(1);
-    expect(component.editStorageKey).toEqual('6061d9a13587f37b851694d6LastEdit');
+    expect(setFromLocalStorageSpy).toHaveBeenCalledTimes(1);
   });
 
   it('should get data from editor before sending', () => {
     component.setupComponent();
     component.editor = jasmine.createSpyObj("component.editor", ["getData"])
     const localStorageSpy = spyOn(localStorage, 'removeItem');
-    component.editStorageKey = '123LastEdit';
     component.addContent("");
     expect(component.editor.getData).toHaveBeenCalled();
-    expect(localStorageSpy).toHaveBeenCalledOnceWith('123LastEdit');
+    expect(localStorageSpy).toHaveBeenCalledTimes(2);
   });
 
   it('should get edit data from editor before sending', () => {
@@ -136,10 +136,11 @@ describe('AddContentComponent', () => {
     component.editor = jasmine.createSpyObj("component.editor", ["getData"])
     component.notification.snippetType = 'edit';
     component.contentChanged = true;
+    const setFromLocalStorageSpy = spyOn<any>(component, 'setFromLocalStorage');
     component.addContent("");
     expect(component.editor.getData).toHaveBeenCalled();
     expect(component.notification.snippetType).toEqual('paragraph');
-    expect(component.editStorageKey).toEqual(undefined);
+    expect(setFromLocalStorageSpy).toHaveBeenCalledTimes(0);
   });
 
   it('should prepare quote', () => {
@@ -170,7 +171,6 @@ describe('AddContentComponent', () => {
     expect(component.dialogTitle).toBe("Reply");
     expect(component.notification.subsnippets).not.toBe(snippet.subsnippets);
     expect(component.notification.subsnippets).toEqual(snippet.subsnippets);
-
   });
 
   it('should prepare comment', () => {
@@ -184,7 +184,6 @@ describe('AddContentComponent', () => {
     expect(component.liveFeedback).toBe(false);
     expect(component.addButtonLabel).toBe("Add");
     expect(component.dialogTitle).toBe("Add comment");
-
   });
 
   it('should toggle metadata panel', () => {
@@ -196,12 +195,15 @@ describe('AddContentComponent', () => {
   });
 
   it('should update tags', () => {
+    component.message = {id: 123};
     spyOn(component, 'changeChain')
     let defaultTags = ['tag1', 'tag2'];
+    const setStorageSpy = spyOn(localStorage, 'setItem');
     component.updateTags(defaultTags);
     expect(component.contentChanged).toBe(true);
     expect(component.tag).toEqual(defaultTags);
     expect(component.changeChain).toHaveBeenCalledTimes(1);
+    expect(setStorageSpy).toHaveBeenCalledOnceWith('123_tags', JSON.stringify(defaultTags));
   });
 
   it('should send message', () => {
@@ -243,6 +245,7 @@ describe('AddContentComponent', () => {
     component.data = figureMockSizeBefore;
     component.adjustContentForEditor();
     expect(component.data).toBe(figureMockSizeAfter);
+    
   });
 
   it('should extract notification with new files', () => {
@@ -335,41 +338,47 @@ describe('AddContentComponent', () => {
   });
 
   [
-    {input: undefined, output: 'No unsaved edit in current session'},
-    {input: 'sameData', output: 'No unsaved edit in current session'},
-    {input: 'edit', output: undefined},
+    {input: {message: 'sameData', tags: '["sameData"]'}, output: 'No unsaved edit in current session'},
+    {input: {message: 'edit', tags: '["sameData"]'}, output: undefined},
+    {input: {message: 'sameData', tags: '["edit"]'}, output: undefined},
   ].forEach((t, i) => {
     it(`should test noUnsavedEditTooltip ${i}`, () => {
+      component.data = 'sameData';
+      component.tag = ['sameData'];
       component.lastEdit = t.input;
-      if (t.input === 'sameData') component.data = t.input;
       expect(component.noUnsavedEditTooltip()).toEqual(t.output);
     });
   });
 
-  it('should test setLocalStorage', () => {
+  it('should test setFromLocalStorage', () => {
     component.message = {id: 123};
     const localStorageSpy = spyOn(localStorage, 'getItem');
-    component['setLocalStorage']();
-    expect(localStorageSpy).toHaveBeenCalledOnceWith('123LastEdit');
+    component['setFromLocalStorage']();
+    expect(localStorageSpy).toHaveBeenCalledTimes(2);
   });
 
-  [undefined, 'edit'].forEach((t, i) => {
+  [
+    {input: {message: 'edit', tags: undefined}, output: {message: 'edit', tags: []}},
+    {input: {message: undefined, tags: '["edit"]'}, output: {message: 'old', tags: ['edit']}},
+    {input: {message: 'edit', tags: '["edit"]'}, output: {message: 'edit', tags: ['edit']}},
+    {input: {message: undefined, tags: undefined}, output: {message: 'old', tags: []}},
+  ].forEach((t, i) => {
     it(`should test loadLastUnsavedEdit ${i}`, () => {
-      component.lastEdit = t;
+      component.lastEdit = t.input;
+      component.data = 'old';
       component.editor = jasmine.createSpyObj("component.editor", ["setData"]);
       component.loadLastUnsavedEdit();
-      expect(component.editor.setData).toHaveBeenCalledTimes(t? 1: 0);
-      if (t)
-        expect(component.editor.setData).toHaveBeenCalledOnceWith(t);
+      expect(component.data).toEqual(t.output.message);
+      expect(component.tag).toEqual(t.output.tags);
     });
   });
 
   it('should test onChange', () => {
-    component.editStorageKey = '123LastEdit';
+    component.message = {id: 123};
     const editor = {getData: () => 'edit'};
     const localStorageSpy = spyOn(localStorage, 'setItem');
     component.onChange({editor: editor});
-    expect(localStorageSpy).toHaveBeenCalledOnceWith('123LastEdit', 'edit');
+    expect(localStorageSpy).toHaveBeenCalledOnceWith('123_message', 'edit');
   });
 
   function combineHtmlFigureHash(figureMock: string[], hash: string) {
