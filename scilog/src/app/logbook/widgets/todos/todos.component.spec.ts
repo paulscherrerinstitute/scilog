@@ -8,6 +8,7 @@ import { ChangeStreamService } from '@shared/change-stream.service';
 import { AppConfigService } from 'src/app/app-config.service';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { ViewsService } from '@shared/views.service';
+import { IsAllowedService } from 'src/app/overview/is-allowed.service';
 
 class ChangeStreamServiceMock {
   getNotification(id:string){
@@ -38,9 +39,11 @@ const getConfig = () => ({});
 describe('TodosComponent', () => {
   let component: TodosComponent;
   let fixture: ComponentFixture<TodosComponent>;
-
-
+  let isActionAllowedServiceSpy
+ 
   beforeEach(waitForAsync(() => {
+    isActionAllowedServiceSpy = jasmine.createSpyObj("IsAllowedService", ["canUpdate", "canDelete"]);
+    isActionAllowedServiceSpy.tooltips = {update: '', delete: ''};  
     TestBed.configureTestingModule({
       providers:[
         {provide: LogbookInfoService, useClass: LogbookInfoMock},
@@ -48,6 +51,7 @@ describe('TodosComponent', () => {
         { provide: ChangeStreamService, useClass: ChangeStreamServiceMock },
         { provide: AppConfigService, useValue: { getConfig } },
         { provide: ViewsService, useClass: ViewsServiceMock },
+        { provide: IsAllowedService, useValue: isActionAllowedServiceSpy },
       ],
       imports: [HttpClientTestingModule],
       declarations: [ TodosComponent ]
@@ -65,4 +69,13 @@ describe('TodosComponent', () => {
   it('should create', () => {
     expect(component).toBeTruthy();
   });
+
+  it('should test isAllowed', () => {
+    isActionAllowedServiceSpy.canUpdate.calls.reset();
+    isActionAllowedServiceSpy.canDelete.calls.reset();
+    component.isAllowed(0);
+    expect(isActionAllowedServiceSpy.canUpdate).toHaveBeenCalledTimes(1);
+    expect(isActionAllowedServiceSpy.canDelete).toHaveBeenCalledTimes(1);
+  });
+
 });

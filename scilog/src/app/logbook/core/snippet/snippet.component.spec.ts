@@ -8,6 +8,7 @@ import { of } from 'rxjs';
 import { UserPreferencesService } from '@shared/user-preferences.service';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { WidgetItemConfig } from '@model/config';
+import { IsAllowedService } from 'src/app/overview/is-allowed.service';
 
 
 describe('SnippetComponent', () => {
@@ -15,6 +16,7 @@ describe('SnippetComponent', () => {
   let fixture: ComponentFixture<SnippetComponent>;
   let logbookItemDataServiceSpy: any;
   let userPreferencesServiceSpy: any;
+  let isActionAllowedService: IsAllowedService;
 
   logbookItemDataServiceSpy = jasmine.createSpyObj(
     "LogbookItemDataService", 
@@ -58,6 +60,7 @@ describe('SnippetComponent', () => {
         { provide: MatDialogRef, useValue: {} },
         { provide: LogbookItemDataService, useValue: logbookItemDataServiceSpy },
         { provide: UserPreferencesService, useValue: userPreferencesServiceSpy },
+        { provide: IsAllowedService, useClass: isActionAllowedService },
       ],
       declarations: [SnippetComponent]
     })
@@ -215,27 +218,29 @@ describe('SnippetComponent', () => {
   }));
 
   it('should release the lock', async () => {
-    spyOn(component, 'allowEdit').and.returnValue(true);
-    component._enableEdit = false;
+    component._enableEdit = {update: false, delete: false};
     component.snippetIsAccessedByAnotherUser = true;
+    spyOn(component['isActionAllowed'], 'canUpdate').and.returnValue(true);
+    spyOn(component['isActionAllowed'], 'canDelete').and.returnValue(true);
+    spyOn(component['isActionAllowed'], 'isNotExpired').and.returnValue(true);
     await component.releaseLock();
-    expect(component.enableEdit).toEqual(true);
+    expect(component.enableEdit).toEqual({update: true, delete: true});
     expect(component.snippetIsAccessedByAnotherUser).toEqual(false);
     expect(component['logbookItemDataService'].deleteAllInProgressEditing)
       .toHaveBeenCalledOnceWith(snippetMock.id);
-  })
+  });
 
   it('should add the lock', () => {
     spyOn(component, 'releaseLock');
     spyOn(window, 'clearTimeout');
     component.snippetIsAccessedByAnotherUser = false;
     component.timerId = 123;
-    component._enableEdit = true;
+    component._enableEdit = {update: true, delete: true};
     component.lockEdit();
-    expect(component.enableEdit).toEqual(false);
+    expect(component.enableEdit).toEqual({update: false, delete: false});
     expect(component.snippetIsAccessedByAnotherUser).toEqual(true);
     expect(window.clearTimeout).toHaveBeenCalledOnceWith(123);
-  })
+  });
 
   it('should set the editing timeout', () => {
     spyOn(window, "setTimeout");
@@ -243,7 +248,7 @@ describe('SnippetComponent', () => {
     component.setEditTimeout(123);
     expect(component.timerId).not.toEqual(null);
     expect(window.setTimeout).toHaveBeenCalledOnceWith(jasmine.any(Function), 123);
-  })
+  });
 
   it('should lock the edit timeout and set by', () => {
     const avatarForUser = "aTestUserForlockEditUntilTimeout";
@@ -253,7 +258,7 @@ describe('SnippetComponent', () => {
     expect(component.avatarHash).toEqual(avatarForUser);
     expect(component.lockEdit).toHaveBeenCalledTimes(1);
     expect(component.setEditTimeout).toHaveBeenCalledTimes(1);
-  })
+  });
 
   it('should set locked', () => {
     spyOn(component, "getLastEditedSnippet").and.returnValue({createdAt: "2023-01-01", updatedBy: "aUser"});
@@ -261,7 +266,7 @@ describe('SnippetComponent', () => {
     spyOn(component, "lockEditUntilTimeout");
     component.setLocked();
     expect(component.lockEditUntilTimeout).toHaveBeenCalledOnceWith("aUser", component._timeoutMilliseconds - 1);
-  })
+  });
 
   it('should release old lock', () => {
     spyOn(component, "getLastEditedSnippet").and.returnValue({createdAt: "2023-01-01", updatedBy: "aUser"});
@@ -269,12 +274,12 @@ describe('SnippetComponent', () => {
     spyOn(component, "releaseLock");
     component.setLocked();
     expect(component.releaseLock).toHaveBeenCalledTimes(1);
-  })
+  });
 
   it('should get undefined from last edited snippet', () => {
     const subs = [{snippetType: 'paragraph'}, {snippetType: 'paragraph'}];
     expect(component.getLastEditedSnippet(subs)).toEqual(undefined);
-  })
+  });
 
   it('should get first toDelete from last edited snippet', () => {
     const subs = [
@@ -282,7 +287,7 @@ describe('SnippetComponent', () => {
       { snippetType: "edit", toDelete: true, id: "2" }
     ];
     expect(component.getLastEditedSnippet(subs)).toEqual(subs[0]);
-  })
+  });
 
   it('should get last snippet from last edited snippet', () => {
     const subs = [
@@ -290,12 +295,39 @@ describe('SnippetComponent', () => {
       {snippetType: "edit", createdAt: "2023-01-01"}, 
     ];
     expect(component.getLastEditedSnippet(subs)).toEqual(subs[0]);
-  })
+  });
 
   it('should call setLocked after subsnippets change', () => {
     spyOn(component, "setLocked");
     component.subsnippets = [{parentId: "123"}];
     expect(component.setLocked).toHaveBeenCalledTimes(1);
+  });
+
+  [
+    {input: {v: true, isNotExpired: true}, output: true},
+    {input: {v: true, isNotExpired: false}, output: false},
+    {input: {v: false, isNotExpired: true}, output: false},
+    {input: {v: false, isNotExpired: false}, output: false},
+  ].forEach((t, i) => {
+    it(`should test commonCondition ${i}`, () => {
+      spyOn(component['isActionAllowed'], "isNotExpired").and.returnValue(t.input.isNotExpired);
+      expect(component['commonCondition'](t.input.v)).toEqual(t.output);
+    })
+  });
+
+  [
+    {input: {v: true, canUpdate: true}, output: true},
+    {input: {v: true, canUpdate: false}, output: false},
+    {input: {v: false, canUpdate: false}, output: false},
+    {input: {v: false, canUpdate: true}, output: false},
+  ].forEach((t, i) => {
+    it(`should test enableEdit ${i}`, () => {
+      spyOn(component['isActionAllowed'], "canUpdate").and.returnValue(t.input.canUpdate);
+      spyOn(component['isActionAllowed'], "canDelete").and.returnValue(true);
+      spyOn<any>(component, "commonCondition").and.returnValue(t.input.v);
+      component.enableEdit = t.input.v;
+      expect(component._enableEdit.update).toEqual(t.output);
+    })
   })
 
 });
