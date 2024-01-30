@@ -73,24 +73,10 @@ describe('LogbookWidgetComponent', () => {
   });
 
 
-  [
-    {input: ['roles'], output: ['updateRole']},
-    {input: ['updateRole'], output: []},
-    {input: ['admin'], output: []}
-  ].forEach((t, i) => {
-    it(`should test enable members ${i}`, () => {
-      component['userPreferences'].userInfo.roles = t.input;
-      const groups = component['enabledMembers']('update');
-      expect(groups).toEqual(t.output);
-      if (t.output.length > 0)
-        expect(component.tooltips.update).toEqual(`Enabled for members of '${t.output.concat('admin')}'`);
-    });
+  it('should test enableActions', () => {
+    const isAnyEditAllowedSpy = spyOn(component['isActionAllowed'], 'isAnyEditAllowed');
+    component['enableActions']();
+    expect(isAnyEditAllowedSpy).toHaveBeenCalledTimes(1);
   });
 
-  it('should test enableActions', () => {
-    component['enableActions']();
-    expect(component.tooltips.update).toEqual(`Enabled for members of 'updateRole,admin'`);
-    expect(component.tooltips.delete).toEqual(`Enabled for members of 'deleteRole,admin'`);
-    expect(component.tooltips.edit).toEqual(`Enabled for members of 'updateRole,deleteRole,admin'`);
-  });
 });

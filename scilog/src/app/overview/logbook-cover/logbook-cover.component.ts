@@ -3,6 +3,7 @@ import { UserPreferencesService } from '@shared/user-preferences.service';
 import { Logbooks } from '@model/logbooks';
 import { LogbookInfoService } from '@shared/logbook-info.service';
 import { LogbookItemDataService } from '@shared/remote-data.service';
+import { IsAllowedService } from '../is-allowed.service';
 
 @Component({
   selector: 'app-logbook-cover',
@@ -22,12 +23,11 @@ export class LogbookWidgetComponent implements OnInit {
 
   imageToShow: any;
   isImageLoading: boolean;
-  tooltips: {edit?: string, update?: string, delete?: string} = {};
 
   constructor(
     private logbookItemDataService: LogbookItemDataService,
-    private userPreferences: UserPreferencesService,
-    private logbookInfo: LogbookInfoService) { }
+    private logbookInfo: LogbookInfoService,
+    protected isActionAllowed: IsAllowedService) { }
 
   ngOnInit(): void {
     if (this.logbook?.thumbnail) {
@@ -36,23 +36,9 @@ export class LogbookWidgetComponent implements OnInit {
     this.enableActions();
   }
 
-  private enabledMembers(action: string): string[] {
-    const aclMembers = this.logbook?.[`${action}ACL`];
-    if (this.userPreferences.userInfo?.roles.some((entry: string) =>
-      aclMembers?.includes?.(entry) || entry === 'admin'
-    ))
-      return [];
-    this.tooltips[action] = `Enabled for members of '${aclMembers.filter((m: string) => m != 'admin').concat('admin')}'`;
-    return aclMembers;
-  }
-
   private enableActions() {
-    const groups = ['update', 'delete'].reduce((previousValue, currentValue) => 
-      previousValue.concat(this.enabledMembers(currentValue)),
-      []
-    )
-    if (groups.length > 0)
-      this.tooltips.edit = `Enabled for members of '${[...new Set(groups.concat('admin'))]}'`;
+    this.isActionAllowed.snippet = this.logbook;
+    this.isActionAllowed.isAnyEditAllowed();
   }
 
   ngAfterViewInit() {
