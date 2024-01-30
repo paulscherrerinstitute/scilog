@@ -10,7 +10,7 @@
  <div *ngFor="let task of tasks; let i=index" >
   <mat-card class="task-mat-card">
     <mat-card-content class="task-content">
-        <mat-checkbox (change)="toggleTaskIsDone(i)" [checked]="task.isDone" >
+        <mat-checkbox (change)="toggleTaskIsDone(i)" [checked]="task.isDone" [disabled]="!isAllowed(i)" matTooltip="{{ isActionAllowed.tooltips.update }}">
           <div >
             
           </div>
@@ -20,7 +20,7 @@
         </span>
       <span class="flexExpand"></span>
       <span>
-        <button mat-icon-button (click)="deleteTask(i)">
+        <button mat-icon-button (click)="deleteTask(i)" [disabled]="isActionAllowed.tooltips.delete" matTooltip="{{ isActionAllowed.tooltips.delete }}">
           <mat-icon>delete</mat-icon>
         </button>
       </span>

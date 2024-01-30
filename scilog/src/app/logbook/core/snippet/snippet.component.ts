@@ -14,6 +14,7 @@ import { trigger, state, style, transition, animate } from '@angular/animations'
 import { WidgetItemConfig } from '@model/config';
 import { Edits } from 'src/app/core/model/edits';
 import { Basesnippets } from 'src/app/core/model/basesnippets';
+import { IsAllowedService } from 'src/app/overview/is-allowed.service';
 
 
 @Component({
@@ -74,7 +75,7 @@ export class SnippetComponent implements OnInit {
   showImage: boolean;
 
   timerId = null;
-  _enableEdit: boolean;
+  _enableEdit = {update: false, delete: false};
   snippetIsAccessedByAnotherUser = false;
   avatarHash = "anotherUser";
 
@@ -99,7 +100,8 @@ export class SnippetComponent implements OnInit {
     private sanitizer: DomSanitizer,
     public dialog: MatDialog,
     private logbookItemDataService: LogbookItemDataService,
-    private userPreferences: UserPreferencesService) { }
+    private userPreferences: UserPreferencesService,
+    private isActionAllowed: IsAllowedService) { }
 
   ngOnInit(): void {
     if (this.snippet.isMessage) {
@@ -163,41 +165,19 @@ export class SnippetComponent implements OnInit {
       });
   }
 
-
-  public get enableEdit(): boolean {
+  public get enableEdit() {
     return this._enableEdit;
   }
 
-
-  public set enableEdit(v: boolean) {
-    if (v) {
-      // check if user a member of the ownerGroup before enabling access
-      if (this.allowEdit()) {
-        this._enableEdit = v;
-      }
-    } else {
-      this._enableEdit = v;
-    }
-
+  public set enableEdit(v: boolean | {update: boolean, delete: boolean}) {
+    const commonConditions = this.commonCondition(v);
+    this._enableEdit.update = commonConditions && this.isActionAllowed.canUpdate();
+    this._enableEdit.delete = commonConditions && this.isActionAllowed.canDelete();
   }
 
-  allowEdit() {
-    let _hasAccessPermission = false;
-    if (typeof this.userPreferences.userInfo.roles != 'undefined') {
-      _hasAccessPermission = this.userPreferences.userInfo.roles.some(entry => {
-        return this.snippet.readACL?.includes?.(entry)
-      });
-    }
-
-    let _isExpired = false;
-    if (typeof this.snippet?.expiresAt == 'undefined') {
-      _isExpired = true;
-    } else {
-      let _expirationTime = Date.parse(this.snippet.expiresAt);
-      _isExpired = _expirationTime < Date.now()
-    }
-
-    return (_hasAccessPermission && !_isExpired)
+  private commonCondition(v: boolean | { update: boolean; delete: boolean; }) {
+    this.isActionAllowed.snippet = this.snippet;
+    return v && this.isActionAllowed.isNotExpired();
   }
 
   ngAfterViewChecked(): void {

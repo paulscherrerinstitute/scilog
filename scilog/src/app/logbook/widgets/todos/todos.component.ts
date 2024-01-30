@@ -5,9 +5,8 @@ import { TasksService } from '@shared/tasks.service';
 import { LogbookInfoService } from '@shared/logbook-info.service';
 import { ChangeStreamService } from '@shared/change-stream.service';
 import { Subscription } from 'rxjs';
-import { Basesnippets } from '@model/basesnippets';
-import { Logbooks } from '@model/logbooks';
 import { ViewsService } from '@shared/views.service';
+import { IsAllowedService } from 'src/app/overview/is-allowed.service';
 
 @Component({
   selector: 'todos',
@@ -29,13 +28,14 @@ export class TodosComponent implements OnInit {
   constructor(private tasksService: TasksService,
     private logbookInfo: LogbookInfoService,
     private notificationService: ChangeStreamService,
-    private views: ViewsService) {
+    private views: ViewsService,
+    protected isActionAllowed: IsAllowedService) {
     console.log("constructor called")
   }
 
   ngOnInit(): void {
     // get TODOs from server
-    console.log("todo: adding subscriptions")
+    console.log("todo: adding subscriptions");
     this.subscriptions.push(this.tasksService.currentTasks.subscribe(tasks => {
       this.tasks = tasks;
       this.numTasks = this.tasksService.numTasks;
@@ -87,6 +87,12 @@ export class TodosComponent implements OnInit {
   deleteTask(id: number) {
     console.log("deleting task", id);
     this.tasksService.deleteTask(this.tasks[id].id);
+  }
+
+  isAllowed(id: number) {
+    this.isActionAllowed.snippet = this.tasks[id];
+    this.isActionAllowed.canDelete();
+    return this.isActionAllowed.canUpdate();
   }
 
   ngOnDestroy(): void {
