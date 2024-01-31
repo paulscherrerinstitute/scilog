@@ -18,16 +18,17 @@ export class IsAllowedService {
   constructor(private userPreferences: UserPreferencesService){}
 
   isNotExpired() {
-    const expiresAt =  new Date(this.snippet.expiresAt);
+    const expiresAt = new Date(this.snippet.expiresAt);
     if (expiresAt > new Date()) {
       this.tooltips.expired = '';
       return true
-    } 
-    const expiresString = expiresAt.toLocaleDateString(
+    }
+    let expiresString = `(${expiresAt.toLocaleDateString(
         'en-GB', 
         {year: '2-digit', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit'}
-        );
-    this.tooltips.expired = `Editing time (${expiresString}) has passed`;
+        )}) `;
+    if (expiresString === '(Invalid Date) ') expiresString = '';
+    this.tooltips.expired = `Editing time ${expiresString}has passed`;
     return false
   }
 

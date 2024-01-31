@@ -8,8 +8,6 @@ import { of } from 'rxjs';
 import { UserPreferencesService } from '@shared/user-preferences.service';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { WidgetItemConfig } from '@model/config';
-import { IsAllowedService } from 'src/app/overview/is-allowed.service';
-
 
 describe('SnippetComponent', () => {
   let component: SnippetComponent;
