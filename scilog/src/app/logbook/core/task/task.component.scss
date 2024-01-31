@@ -1,10 +1,3 @@
-.counter{
-    text-align: right;
-}
-
-.add-task{
-    padding-left: 20px;
-}
 
 .task-mat-card{
     margin-bottom: 1px;
@@ -21,6 +14,20 @@
   
 }
 
-::ng-deep .mat-checkbox-checked.mat-accent .mat-checkbox-background {
-    background-color: var(--button-accent);
+
+.task-content{
+    display: flex;
+    align-items: center;
+    max-width: 100%;
+    padding-left: 15px;
+    padding-right: 5px;
+}
+
+.task-text {
+    padding-left: 20px;
+    padding-right: 10px;
+}
+
+.flexExpand {
+    flex: 1 1 auto;
 }
