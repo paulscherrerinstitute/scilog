@@ -1,0 +1,24 @@
+<div>
+    <mat-card class="task-mat-card">
+        <mat-card-content class="task-content">
+            <mat-checkbox (change)="toggleTaskIsDone()" [checked]="task.isDone"
+                [disabled]="isActionAllowed.tooltips.update" matTooltip="{{ isActionAllowed.tooltips.update }}">
+                <div>
+
+                </div>
+            </mat-checkbox>
+            <span
+                [ngStyle]="{'text-decoration': task.isDone? 'line-through' : 'none', 'opacity': task.isDone? '0.6' : '1'}"
+                class='task-text'>
+                {{ task.content }}
+            </span>
+            <span class="flexExpand"></span>
+            <span>
+                <button mat-icon-button (click)="deleteTask()" [disabled]="isActionAllowed.tooltips.delete"
+                    matTooltip="{{ isActionAllowed.tooltips.delete }}">
+                    <mat-icon>delete</mat-icon>
+                </button>
+            </span>
+        </mat-card-content>
+    </mat-card>
+</div>

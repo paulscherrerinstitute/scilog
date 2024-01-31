@@ -1,11 +1,11 @@
-import { Component, Input, OnInit } from '@angular/core';
-import { UntypedFormControl } from '@angular/forms';
+import { Component, Input, OnInit, ViewChild } from '@angular/core';
 import { Tasks } from '@model/tasks';
 import { TasksService } from '@shared/tasks.service';
 import { LogbookInfoService } from '@shared/logbook-info.service';
 import { ChangeStreamService } from '@shared/change-stream.service';
 import { Subscription } from 'rxjs';
 import { ViewsService } from '@shared/views.service';
+import { TaskComponent } from '../../core/task/task.component';
 
 @Component({
   selector: 'todos',
@@ -16,9 +16,10 @@ export class TodosComponent implements OnInit {
 
   @Input()
   configIndex: number;
+  @ViewChild(TaskComponent) taskComponent: TaskComponent;
 
   tasks: Tasks[] = [];
-  newTask = new UntypedFormControl('');
+  newTask = '';
   numTasks: number = 0;
   subscriptions: Subscription[] = [];
 
@@ -56,8 +57,6 @@ export class TodosComponent implements OnInit {
 
   }
 
-
-
   addTasks() {
     let newTask: Tasks = {
       ownerGroup: this.logbookInfo.logbookInfo.ownerGroup,
@@ -65,26 +64,12 @@ export class TodosComponent implements OnInit {
       isPrivate: this.logbookInfo.logbookInfo.isPrivate,
       parentId: this.logbookInfo.logbookInfo.id,
       snippetType: "task",
-      content: this.newTask.value,
+      content: this.newTask,
       isDone: false
     };
     console.log("adding new task")
-
-    this.tasksService.addTask(newTask);
-    this.newTask.setValue('');
-
-  }
-
-  toggleTaskIsDone(id: number) {
-    let payload = {
-      isDone: !this.tasks[id].isDone
-    }
-    this.tasksService.updateTask(payload, this.tasks[id].id);
-  }
-
-  deleteTask(id: number) {
-    console.log("deleting task", id);
-    this.tasksService.deleteTask(this.tasks[id].id);
+    this.taskComponent.addTask(newTask);
+    this.newTask = '';
   }
 
   ngOnDestroy(): void {
