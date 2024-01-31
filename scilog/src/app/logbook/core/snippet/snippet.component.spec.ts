@@ -16,7 +16,6 @@ describe('SnippetComponent', () => {
   let fixture: ComponentFixture<SnippetComponent>;
   let logbookItemDataServiceSpy: any;
   let userPreferencesServiceSpy: any;
-  let isActionAllowedService: IsAllowedService;
 
   logbookItemDataServiceSpy = jasmine.createSpyObj(
     "LogbookItemDataService", 
@@ -60,7 +59,6 @@ describe('SnippetComponent', () => {
         { provide: MatDialogRef, useValue: {} },
         { provide: LogbookItemDataService, useValue: logbookItemDataServiceSpy },
         { provide: UserPreferencesService, useValue: userPreferencesServiceSpy },
-        { provide: IsAllowedService, useClass: isActionAllowedService },
       ],
       declarations: [SnippetComponent]
     })
