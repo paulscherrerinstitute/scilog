@@ -11,6 +11,7 @@ import { UserPreferencesService } from '@shared/user-preferences.service';
 import { Logbooks } from '@model/logbooks';
 import { LogbookDataService, LogbookItemDataService } from '@shared/remote-data.service';
 import { SnackbarService } from 'src/app/core/snackbar.service';
+import { IsAllowedService } from '../is-allowed.service';
 
 function ownerGroupMemberValidator(groups: string[]): ValidatorFn {
   return (control: AbstractControl): { forbiddenGroup: {value: string} } | null => {
@@ -29,7 +30,8 @@ function groupCreationValidator(control: AbstractControl): { anyAuthGroup: {valu
 @Component({
   selector: 'app-add-logbook',
   templateUrl: './add-logbook.component.html',
-  styleUrls: ['./add-logbook.component.css']
+  styleUrls: ['./add-logbook.component.css'],
+  providers: [IsAllowedService]
 })
 export class AddLogbookComponent implements OnInit {
 
@@ -105,8 +107,6 @@ export class AddLogbookComponent implements OnInit {
   filteredAccessGroups: Observable<string[]>;
   filteredOwnerGroups: Observable<string[]>;
   accessGroupsAvail: string[] = [];
-  tooltips: {ownerGroup?: string, expired?: string} = {};
-
 
   @ViewChild('accessGroupsInput') accessGroupsInput: ElementRef<HTMLInputElement>;
   @ViewChild('auto') matAutocomplete: MatAutocomplete;
@@ -119,6 +119,7 @@ export class AddLogbookComponent implements OnInit {
     private userPreferences: UserPreferencesService,
     private logbookDataService: LogbookDataService,
     private snackBar: SnackbarService,
+    protected isActionAllowed: IsAllowedService,
     @Inject(MAT_DIALOG_DATA) data) {
     this.optionsFormGroup = fb.group({
       hideRequired: new UntypedFormControl(false),
@@ -131,8 +132,8 @@ export class AddLogbookComponent implements OnInit {
       isPrivate: new UntypedFormControl(false)
     });
     this.logbook = data;
+    this.isActionAllowed.snippet = data;
     console.log("inputData: ", data);
-
   }
 
   ngOnInit(): void {
@@ -154,39 +155,24 @@ export class AddLogbookComponent implements OnInit {
 
   private setOwnerGroupWithEditability() {
     this.setForm('ownerGroup');
-    if (!this.logbook.ownerGroup || this.isAdmin()) 
+    if (this.isActionAllowed.canChangeOwnerGroup()) 
       return
     this.getForm('ownerGroup').disable();
-    this.tooltips.ownerGroup = `Only members of '${this.logbook.adminACL}' can change the ownerGroup`;
-  }
-
-  private isAdmin() {
-    return this.accessGroupsAvail.some(group => this.logbook?.adminACL?.includes(group));
-  }
-
-  private setExpiredTooltip() {
-    const expiresAt =  new Date(this.logbook.expiresAt);
-    if (!expiresAt || expiresAt > new Date()) return;
-    const expiresString = expiresAt.toLocaleDateString(
-      'en-GB', 
-      {year: '2-digit', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit'}
-    );
-    this.tooltips.expired = `Editing time (${expiresString}) has passed`;
   }
 
   private setWithEditability(toKey: string) {
     let fromKey: string;
     if (toKey === 'title') fromKey = 'name';
     this.setForm(toKey, fromKey ?? toKey);
-    if (this.tooltips.expired) this.getForm(toKey).disable();
+    if (this.isActionAllowed.tooltips.expired) this.getForm(toKey).disable();
   }
 
   setDefaults(){
     this.accessGroupsAvail = this.userPreferences.userInfo?.roles;
-    if (!this.isAdmin())
+    if (!this.isActionAllowed.isAdmin())
       this.getForm('ownerGroup').addValidators(ownerGroupMemberValidator(this.accessGroupsAvail));
     if (this.logbook) {
-      this.setExpiredTooltip();
+      this.isActionAllowed.isNotExpired();
       ['title', 'description', 'location', 'isPrivate'].map(field => this.setWithEditability(field));
       this.setOwnerGroupWithEditability();
       this.accessGroups.setValue(this.logbook.accessGroups);

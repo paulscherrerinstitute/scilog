@@ -16,11 +16,11 @@
         <mat-icon>info</mat-icon>
         <span>Info</span>
       </button>
-      <button mat-menu-item (click)="editSnippet()" [disabled]="!enableEdit? 'disabled' : null" *ngIf="showEditButtons">
+      <button mat-menu-item (click)="editSnippet()" [disabled]="!enableEdit.update" *ngIf="showEditButtons" matTooltip="{{ isActionAllowed.tooltips.update }}">
         <mat-icon>edit</mat-icon>
         <span>Edit</span>
       </button>
-      <button mat-menu-item (click)="setDashboardName()" [disabled]="!enableEdit? 'disabled' : null">
+      <button mat-menu-item (click)="setDashboardName()" [disabled]="!enableEdit.update" matTooltip="{{ isActionAllowed.tooltips.update }}">
         <mat-icon>assistant</mat-icon>
         <span>Dashboard name</span>
       </button>
@@ -33,7 +33,7 @@
         <span>Reply</span>
       </button>
       <!-- <button mat-menu-item disabled> -->
-      <button mat-menu-item (click)="deleteSnippet()" [disabled]="!enableEdit? 'disabled' : null"
+      <button mat-menu-item (click)="deleteSnippet()" [disabled]="!enableEdit.delete" matTooltip="{{ isActionAllowed.tooltips.delete }}"
         *ngIf="showEditButtons">
         <mat-icon>delete</mat-icon>
         <span>Delete</span>

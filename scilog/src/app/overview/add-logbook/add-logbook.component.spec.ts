@@ -8,6 +8,7 @@ import { LogbookDataService, LogbookItemDataService } from '@shared/remote-data.
 import { of } from 'rxjs';
 import { MatChipInputEvent } from '@angular/material/chips';
 import { SnackbarService } from 'src/app/core/snackbar.service';
+import { IsAllowedService } from '../is-allowed.service';
 
 class UserPreferencesMock {
   userInfo = {
@@ -27,6 +28,7 @@ describe('AddLogbookComponent', () => {
   let logbookItemDataServiceSpy:any;
   let logbookDataSpy:any;
   let snackBarSpy: SnackbarService;
+  let isActionAllowedService: IsAllowedService;
 
   logbookItemDataServiceSpy = jasmine.createSpyObj("LogbookItemDataService", ["getFile"]);
   logbookItemDataServiceSpy.getFile.and.returnValue([]);
@@ -46,7 +48,8 @@ describe('AddLogbookComponent', () => {
         {provide: LogbookItemDataService, useValue: logbookItemDataServiceSpy},
         {provide: UserPreferencesService, useClass: UserPreferencesMock},
         {provide: LogbookDataService, useValue: logbookDataSpy},
-        {provide: SnackbarService, useValue: snackBarSpy}
+        {provide: SnackbarService, useValue: snackBarSpy},
+        {provide: IsAllowedService, useClass: isActionAllowedService}
       ],
     })
       .compileComponents();
@@ -112,49 +115,28 @@ describe('AddLogbookComponent', () => {
   });
 
   [
-    {input: ['roles'], output: true},
-    {input: [], output: false}
-  ].forEach((t, i) => {
-    it(`should test isAdmin ${i}`, () => {
-      component['logbook'] = {adminACL: t.input};
-      expect(component['isAdmin']()).toEqual(t.output);
-    });
-  });
-
-  [
-    {input: '2200-12-12T00:00:00Z', output: undefined},
-    {input: '2023-12-12T00:00:00Z', output: jasmine.anything()}
-  ].forEach((t, i) => {
-    it(`should test hasExpired ${i}`, () => {
-      component['logbook'] = {expiresAt: t.input};
-      component['setExpiredTooltip']();
-      expect(component.tooltips.expired).toEqual(t.output);
-      });
-  });
-
-  [
-    {input: ['roles'], output: [undefined, false]},
-    {input: ['admin'], output: [`Only members of 'admin' can change the ownerGroup`, true]}
+    true,
+    false
   ].forEach((t, i) => {
     it(`should test setOwnerGroupWithEditability ${i}`, () => {
-      component['logbook'] = {adminACL: t.input, ownerGroup: 'ownerGroup'};
+      component['logbook'] = {ownerGroup: 'ownerGroup'};
+      spyOn(component['isActionAllowed'], 'canChangeOwnerGroup').and.returnValue(t)
       component['setOwnerGroupWithEditability']();
-      expect(component.tooltips.ownerGroup).toEqual(t.output[0] as string);
-      expect(component['getForm']('ownerGroup').disabled).toEqual(t.output[1] as boolean);
+      expect(component['getForm']('ownerGroup').disabled).toEqual(!t);
     });
   });
 
   [
-    {input: undefined, output: false},
-    {input: 'Expired', output: true}
+    true,
+    false
   ].forEach((t, i) => {
     it(`should test setWithEditability ${i}`, () => {
-      component.tooltips.expired = t.input;
-      component['logbook'] = {name: 'a', location: 'b', expiresAt: t.input};
+      component['logbook'] = {name: 'a', location: 'b'};
+      component['isActionAllowed'].tooltips.expired = t? 'Expired': '';
       component['setWithEditability']('title');
       component['setWithEditability']('location');
-      expect(component['getForm']('title').disabled).toEqual(t.output);
-      expect(component['getForm']('location').disabled).toEqual(t.output);
+      expect(component['getForm']('title').disabled).toEqual(t);
+      expect(component['getForm']('location').disabled).toEqual(t);
     });
   });
 
@@ -183,14 +165,13 @@ describe('AddLogbookComponent', () => {
   });
 
   [
-    {input: {adminACL: ['roles']}, output: 0},
-    {input: {adminACL: []}, output: 1},
-    {input: {expiresAt: '2023-12-12T00:00:00Z'}, output: true},
-    {input: {expiresAt: '2200-12-12T00:00:00Z'}, output: false},
+    {input: {isAdmin: true}, output: 0},
+    {input: {isAdmin: false}, output: 1},
+    {input: {expired: 'expired'}, output: true},
+    {input: {expired: undefined}, output: false},
   ].forEach((t, i) => {
     it(`should test setDefaults on update ${i}`, () => {
       component.logbook = {
-        ...t.input, 
         ownerGroup: 'ownerGroup', 
         accessGroups: ['accessGroups'],
         name: 'name',
@@ -199,6 +180,10 @@ describe('AddLogbookComponent', () => {
         isPrivate: true,
       }
       const ownerGroupValidatorsSpy = spyOn(component['getForm']('ownerGroup'), 'addValidators');
+      spyOn(component['isActionAllowed'], 'isAdmin').and.returnValue(t.input.isAdmin);
+      spyOn(component['isActionAllowed'], 'isNotExpired');
+      spyOn(component['isActionAllowed'], 'canChangeOwnerGroup');
+      component['isActionAllowed'].tooltips.expired = t.input.expired;
       component['setDefaults']();
       expect(component['getForm']('ownerGroup').value).toEqual('ownerGroup');
       expect(component['getForm']('title').value).toEqual('name');
@@ -206,9 +191,9 @@ describe('AddLogbookComponent', () => {
       expect(component['getForm']('location').value).toEqual('location');
       expect(component['getForm']('isPrivate').value).toEqual(true);
       expect(component.accessGroups.value).toEqual(['accessGroups']);
-      if (t.input.adminACL)
+      if ('isAdmin' in t.input)
         expect(ownerGroupValidatorsSpy).toHaveBeenCalledTimes(t.output as number);
-      if (t.input.expiresAt) {
+      if ('expired' in t.input) {
         expect(component['getForm']('description').disabled).toEqual(t.output as boolean);
         expect(component['getForm']('title').disabled).toEqual(t.output as boolean);
         expect(component['getForm']('location').disabled).toEqual(t.output as boolean);

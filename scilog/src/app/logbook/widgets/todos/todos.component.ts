@@ -5,8 +5,6 @@ import { TasksService } from '@shared/tasks.service';
 import { LogbookInfoService } from '@shared/logbook-info.service';
 import { ChangeStreamService } from '@shared/change-stream.service';
 import { Subscription } from 'rxjs';
-import { Basesnippets } from '@model/basesnippets';
-import { Logbooks } from '@model/logbooks';
 import { ViewsService } from '@shared/views.service';
 
 @Component({
@@ -35,7 +33,7 @@ export class TodosComponent implements OnInit {
 
   ngOnInit(): void {
     // get TODOs from server
-    console.log("todo: adding subscriptions")
+    console.log("todo: adding subscriptions");
     this.subscriptions.push(this.tasksService.currentTasks.subscribe(tasks => {
       this.tasks = tasks;
       this.numTasks = this.tasksService.numTasks;

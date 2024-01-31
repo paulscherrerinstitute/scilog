@@ -38,9 +38,11 @@ const getConfig = () => ({});
 describe('TodosComponent', () => {
   let component: TodosComponent;
   let fixture: ComponentFixture<TodosComponent>;
-
-
+  let isActionAllowedServiceSpy
+ 
   beforeEach(waitForAsync(() => {
+    isActionAllowedServiceSpy = jasmine.createSpyObj("IsAllowedService", ["canUpdate", "canDelete"]);
+    isActionAllowedServiceSpy.tooltips = {update: '', delete: ''};  
     TestBed.configureTestingModule({
       providers:[
         {provide: LogbookInfoService, useClass: LogbookInfoMock},
@@ -65,4 +67,5 @@ describe('TodosComponent', () => {
   it('should create', () => {
     expect(component).toBeTruthy();
   });
+
 });

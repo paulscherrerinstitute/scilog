@@ -14,6 +14,7 @@ import { trigger, state, style, transition, animate } from '@angular/animations'
 import { WidgetItemConfig } from '@model/config';
 import { Edits } from 'src/app/core/model/edits';
 import { Basesnippets } from 'src/app/core/model/basesnippets';
+import { IsAllowedService } from 'src/app/overview/is-allowed.service';
 
 
 @Component({
@@ -27,7 +28,8 @@ import { Basesnippets } from 'src/app/core/model/basesnippets';
       transition('highlight => default', animate('2000ms ease-out')),
       transition('default => highlight', animate('200ms ease-in'))
     ])
-  ]
+  ],
+  providers: [IsAllowedService],
 })
 export class SnippetComponent implements OnInit {
 
@@ -74,7 +76,7 @@ export class SnippetComponent implements OnInit {
   showImage: boolean;
 
   timerId = null;
-  _enableEdit: boolean;
+  _enableEdit = {update: false, delete: false};
   snippetIsAccessedByAnotherUser = false;
   avatarHash = "anotherUser";
 
@@ -99,7 +101,8 @@ export class SnippetComponent implements OnInit {
     private sanitizer: DomSanitizer,
     public dialog: MatDialog,
     private logbookItemDataService: LogbookItemDataService,
-    private userPreferences: UserPreferencesService) { }
+    private userPreferences: UserPreferencesService,
+    private isActionAllowed: IsAllowedService) { }
 
   ngOnInit(): void {
     if (this.snippet.isMessage) {
@@ -144,6 +147,7 @@ export class SnippetComponent implements OnInit {
       this._hideMetadata = true;
     }
     // enable edit for snippet
+    this.isActionAllowed.snippet = this.snippet;
     this.enableEdit = true;
     this._subsnippets = new BehaviorSubject(this.snippet.subsnippets);
   }
@@ -163,41 +167,13 @@ export class SnippetComponent implements OnInit {
       });
   }
 
-
-  public get enableEdit(): boolean {
+  public get enableEdit(): any {
     return this._enableEdit;
   }
 
-
   public set enableEdit(v: boolean) {
-    if (v) {
-      // check if user a member of the ownerGroup before enabling access
-      if (this.allowEdit()) {
-        this._enableEdit = v;
-      }
-    } else {
-      this._enableEdit = v;
-    }
-
-  }
-
-  allowEdit() {
-    let _hasAccessPermission = false;
-    if (typeof this.userPreferences.userInfo.roles != 'undefined') {
-      _hasAccessPermission = this.userPreferences.userInfo.roles.some(entry => {
-        return this.snippet.readACL?.includes?.(entry)
-      });
-    }
-
-    let _isExpired = false;
-    if (typeof this.snippet?.expiresAt == 'undefined') {
-      _isExpired = true;
-    } else {
-      let _expirationTime = Date.parse(this.snippet.expiresAt);
-      _isExpired = _expirationTime < Date.now()
-    }
-
-    return (_hasAccessPermission && !_isExpired)
+    this._enableEdit.update = this.isActionAllowed.canUpdate() && v;
+    this._enableEdit.delete = this.isActionAllowed.canDelete() && v;
   }
 
   ngAfterViewChecked(): void {
