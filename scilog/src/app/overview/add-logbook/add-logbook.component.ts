@@ -30,7 +30,8 @@ function groupCreationValidator(control: AbstractControl): { anyAuthGroup: {valu
 @Component({
   selector: 'app-add-logbook',
   templateUrl: './add-logbook.component.html',
-  styleUrls: ['./add-logbook.component.css']
+  styleUrls: ['./add-logbook.component.css'],
+  providers: [IsAllowedService]
 })
 export class AddLogbookComponent implements OnInit {
 

@@ -28,7 +28,8 @@ import { IsAllowedService } from 'src/app/overview/is-allowed.service';
       transition('highlight => default', animate('2000ms ease-out')),
       transition('default => highlight', animate('200ms ease-in'))
     ])
-  ]
+  ],
+  providers: [IsAllowedService],
 })
 export class SnippetComponent implements OnInit {
 
@@ -146,6 +147,7 @@ export class SnippetComponent implements OnInit {
       this._hideMetadata = true;
     }
     // enable edit for snippet
+    this.isActionAllowed.snippet = this.snippet;
     this.enableEdit = true;
     this._subsnippets = new BehaviorSubject(this.snippet.subsnippets);
   }
@@ -165,19 +167,13 @@ export class SnippetComponent implements OnInit {
       });
   }
 
-  public get enableEdit() {
+  public get enableEdit(): any {
     return this._enableEdit;
   }
 
-  public set enableEdit(v: boolean | {update: boolean, delete: boolean}) {
-    const commonConditions = this.commonCondition(v);
-    this._enableEdit.update = commonConditions && this.isActionAllowed.canUpdate();
-    this._enableEdit.delete = commonConditions && this.isActionAllowed.canDelete();
-  }
-
-  private commonCondition(v: boolean | { update: boolean; delete: boolean; }) {
-    this.isActionAllowed.snippet = this.snippet;
-    return v && this.isActionAllowed.isNotExpired();
+  public set enableEdit(v: boolean) {
+    this._enableEdit.update = this.isActionAllowed.canUpdate() && v;
+    this._enableEdit.delete = this.isActionAllowed.canDelete() && v;
   }
 
   ngAfterViewChecked(): void {

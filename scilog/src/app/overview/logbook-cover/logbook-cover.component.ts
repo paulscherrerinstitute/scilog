@@ -1,5 +1,4 @@
 import { Component, OnInit, EventEmitter, Output, Input, ViewChild, ElementRef } from '@angular/core';
-import { UserPreferencesService } from '@shared/user-preferences.service';
 import { Logbooks } from '@model/logbooks';
 import { LogbookInfoService } from '@shared/logbook-info.service';
 import { LogbookItemDataService } from '@shared/remote-data.service';
@@ -8,7 +7,8 @@ import { IsAllowedService } from '../is-allowed.service';
 @Component({
   selector: 'app-logbook-cover',
   templateUrl: './logbook-cover.component.html',
-  styleUrls: ['./logbook-cover.component.css']
+  styleUrls: ['./logbook-cover.component.css'],
+  providers: [IsAllowedService]
 })
 export class LogbookWidgetComponent implements OnInit {
 

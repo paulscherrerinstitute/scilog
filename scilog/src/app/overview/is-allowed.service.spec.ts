@@ -21,7 +21,7 @@ describe('IsAllowedService', () => {
 
 
 [
-    {input: '2200-12-12T00:00:00Z', output: undefined},
+    {input: '2200-12-12T00:00:00Z', output: ''},
     {input: '2023-12-12T00:00:00Z', output: jasmine.anything()}
   ].forEach((t, i) => {
     it(`should test isNotExpired ${i}`, () => {
@@ -64,17 +64,21 @@ describe('IsAllowedService', () => {
   });
 
   [
-    {input: {expired: 'Expired', check: true}, output: 'Expired'},
-    {input: {expired: 'Expired', check: false}, output: 'Update'},
-    {input: {expired: '', check: true}, output: 'Update'},
+    {input: {expired: undefined, check: true}, output: 'Update'},
+    {input: {expired: undefined, check: false}, output: 'Update'},
     {input: {expired: '', check: false}, output: 'Update'},
+    {input: {expired: '', check: true}, output: 'Update'},
+    {input: {expired: 'Expired', check: false}, output: 'Expired'},
+    {input: {expired: 'Expired', check: true}, output: 'Expired'},
   ].forEach((t, i) => {
     it(`should test cascadeExpiration ${i}`, () => {
-      spyOn(service, 'isUserAllowed');
       service.tooltips.expired = t.input.expired;
+      spyOn(service, 'isNotExpired').and.returnValue(t.input.check);
+      spyOn(service, 'isUserAllowed').and.returnValue(true);
       service.tooltips.update = 'Update';
-      service['cascadeExpiration']('update', t.input.check);
+      expect(service['cascadeExpiration']('update')).toEqual(t.output === 'Expired'? false: true);
       expect(service.tooltips.update).toEqual(t.output);
+      service['cascadeExpiration']('update');
     });
   });
   

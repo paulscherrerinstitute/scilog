@@ -304,18 +304,6 @@ describe('SnippetComponent', () => {
   });
 
   [
-    {input: {v: true, isNotExpired: true}, output: true},
-    {input: {v: true, isNotExpired: false}, output: false},
-    {input: {v: false, isNotExpired: true}, output: false},
-    {input: {v: false, isNotExpired: false}, output: false},
-  ].forEach((t, i) => {
-    it(`should test commonCondition ${i}`, () => {
-      spyOn(component['isActionAllowed'], "isNotExpired").and.returnValue(t.input.isNotExpired);
-      expect(component['commonCondition'](t.input.v)).toEqual(t.output);
-    })
-  });
-
-  [
     {input: {v: true, canUpdate: true}, output: true},
     {input: {v: true, canUpdate: false}, output: false},
     {input: {v: false, canUpdate: false}, output: false},
@@ -324,7 +312,6 @@ describe('SnippetComponent', () => {
     it(`should test enableEdit ${i}`, () => {
       spyOn(component['isActionAllowed'], "canUpdate").and.returnValue(t.input.canUpdate);
       spyOn(component['isActionAllowed'], "canDelete").and.returnValue(true);
-      spyOn<any>(component, "commonCondition").and.returnValue(t.input.v);
       component.enableEdit = t.input.v;
       expect(component._enableEdit.update).toEqual(t.output);
     })

@@ -4,9 +4,7 @@ import { UserPreferencesService } from "../core/user-preferences.service";
 import { ChangeStreamNotification } from "../logbook/core/changestreamnotification.model";
 
 
-@Injectable({
-  providedIn: 'root'
-})
+@Injectable()
 export class IsAllowedService {
   tooltips: {
     update?: string,
@@ -21,7 +19,10 @@ export class IsAllowedService {
 
   isNotExpired() {
     const expiresAt =  new Date(this.snippet.expiresAt);
-    if (expiresAt > new Date()) return true
+    if (expiresAt > new Date()) {
+      this.tooltips.expired = '';
+      return true
+    } 
     const expiresString = expiresAt.toLocaleDateString(
         'en-GB', 
         {year: '2-digit', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit'}
@@ -75,18 +76,20 @@ export class IsAllowedService {
     return false
   }
 
-  canUpdate(checkExpiration = true) {
-    return this.cascadeExpiration('update', checkExpiration)
+  canUpdate() {
+    return this.cascadeExpiration('update')
   }
 
-  private cascadeExpiration(action: string, checkExpiration: boolean) {
-    const allowed = this.isUserAllowed(action);
-    if (checkExpiration && this.tooltips.expired)
-      this.tooltips[action] = this.tooltips.expired;
-    return allowed;
+  private cascadeExpiration(action: string) {
+    if (this.tooltips.expired === undefined && this.isNotExpired())
+      return this.isUserAllowed(action);
+    else if (!this.tooltips.expired)
+      return this.isUserAllowed(action);
+    this.tooltips[action] = this.tooltips.expired;
+    return false;
   }
 
-  canDelete(checkExpiration = true) {
-    return this.cascadeExpiration('delete', checkExpiration)
+  canDelete() {
+    return this.cascadeExpiration('delete')
   }
 }
