@@ -21,6 +21,7 @@ import { ChangeStreamNotification } from '@shared/changestreamnotification.model
 import { LogbookDataService } from '@shared/remote-data.service';
 import { LogbookScrollService } from '@shared/logbook-scroll.service';
 import { AppConfigService } from 'src/app/app-config.service';
+import { Renderer2 } from '@angular/core';
 
 class ChangeStreamServiceMock {
 
@@ -192,7 +193,6 @@ describe('LogbookItemComponent', () => {
     }
   }];
 
-
   const activatedRouteMock = {
     parent: { url: of(queryParams) },
     snapshot: { queryParams: { id: '1234' } }
@@ -201,8 +201,12 @@ describe('LogbookItemComponent', () => {
 
     viewsSpy = jasmine.createSpyObj("ViewsService", ["getLogbookViews"]);
 
-    logbookItemDataServiceSpy = jasmine.createSpyObj("LogbookItemDataService", ["getDataBuffer", "uploadParagraph"]);
-    scrollServiceSpy = jasmine.createSpyObj("LogbookScrollService", ["initialize", "updateViewportEstimate", "remove", "appendToEOF", "relax", "isBOF", "isEOF", "prependToBOF"]);
+    logbookItemDataServiceSpy = jasmine.createSpyObj("LogbookItemDataService", ["uploadParagraph", "getCount"]);
+    scrollServiceSpy = jasmine.createSpyObj("LogbookScrollService", [
+      "initialize", "updateViewportEstimate", "remove", 
+      "appendToEOF", "relax", "isBOF", "isEOF", 
+      "prependToBOF", "goToSnippetIndex", "datasource",
+    ]);
     scrollServiceSpy.appendToEOF.and.returnValue(of({}));
 
 
@@ -239,6 +243,7 @@ describe('LogbookItemComponent', () => {
     component.config = defaultConfig[1].config;
     component.configIndex = 1;
     component.logbookCount = 10;
+    component['renderer'] = {setStyle: () => true} as unknown as Renderer2;
 
     fixture.detectChanges();
     // views = TestBed.get(ViewsService);
@@ -595,6 +600,50 @@ describe('LogbookItemComponent', () => {
     component["updateSnippetValues"](content, snippet);
     expect(snippet.dashboardName).toEqual(content.dashboardName);
     expect(snippet.parentId).toEqual(snippet.parentId);
+  });
+
+  [
+    {input: [0, 0], output: 0},
+    {input: [1, 0], output: 1},
+    {input: [0, 1], output: 1},
+    {input: [1, 1], output: 1},
+  ].forEach((t, i) => {
+    it(`should test onResized ${i}`, () => {
+      component._editorHeightRef = 0;
+      component._snippetHeightRef = 0;
+      component.snippetContainerRef = {nativeElement: {
+        parentElement: {parentElement: {parentElement: {parentElement: {offsetHeight: t.input[0]}}}}
+      }};
+      component.editorRef = {nativeElement: {offsetHeight: t.input[1]}};
+      const updateViewHeightsSpy = spyOn(component, 'updateViewHeights').and.callFake(() => true);
+      component.onResized();
+      expect(updateViewHeightsSpy).toHaveBeenCalledTimes(t.output);
+    })
   })
+
+  it('should test stillToScroll equals old formula', () => {
+    const autoScrollFraction = 0.4;
+    const element = {scrollHeight: 10, clientHeight: 5, scrollTop: 4} as Element;
+    const oldFormula = element.scrollHeight - element.scrollTop - element.clientHeight - autoScrollFraction * element.clientHeight;
+    expect(component['stillToScroll'](element, autoScrollFraction, 0)).toEqual(oldFormula);
+  });
+
+  it('should test stillToScroll >0', () => {
+    const element = {scrollHeight: 10, clientHeight: 3, scrollTop: 6} as Element;
+    expect(component['stillToScroll'](element, 0, 0)).toEqual(1);
+  });
+
+  it('should test stillToScroll <0', () => {
+    const element = {scrollHeight: 10, clientHeight: 10, scrollTop: 4} as Element;
+    expect(component['stillToScroll'](element, 0.1, 1)).toEqual(-6);
+  });
+
+  it('should test scrollToEnd', async () => {
+    spyOn(component["logbookItemDataService"], "getCount").and.resolveTo({count: 10});
+    const goToSnippetIndexSpy = spyOn(component["logbookScrollService"], "goToSnippetIndex");
+    await component['scrollToEnd']();
+    expect(goToSnippetIndexSpy).toHaveBeenCalled();
+    expect(goToSnippetIndexSpy.calls.mostRecent().args[0]).toEqual(9);
+  });
 
 });
