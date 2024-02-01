@@ -159,13 +159,13 @@ export class LogbookItemDataService extends RemoteDataService {
     return this.getSnippets<Blob>(imageSnippetUrl, { responseType: 'blob' }).toPromise();
   }
 
-  async getImage(id: string) {
+  getImage(id: string) {
     // first retrieve image snippet, then filesnippet and then file
     // let fileSnippet = await this.getFilesnippet(id);
     // console.log(fileSnippet)
     // let headers = new HttpHeaders();
     // headers = headers.set('Accept', 'application/json');
-    return this.getSnippets<Blob>("filesnippet/" + id + "/files", { responseType: 'blob' }).toPromise();
+    return this.getSnippets<Blob>("images/" + id, { responseType: 'blob' }).toPromise();
   }
 
   getFilesnippet(id: string) {
