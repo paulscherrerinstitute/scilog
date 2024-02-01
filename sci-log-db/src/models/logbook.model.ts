@@ -39,6 +39,12 @@ export class Logbook extends Basesnippet {
 
   @property({
     type: 'string',
+    description: 'Optional hash of the image/logo associated to this logbook',
+  })
+  thumbnailHash?: string;
+
+  @property({
+    type: 'string',
     required: true,
     description:
       'A logbook is usually connected to a location, such as beamline or instrument',
