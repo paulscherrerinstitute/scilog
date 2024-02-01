@@ -37,6 +37,7 @@ services:
         condition: service_healthy
     volumes:
       # uncomment and edit the ./be/oidc.json to enable oidc
+      # for keycloak get your config values from: YOURKC_URL/realms/YOUR_REALM/.well-known/openid-configuration or YOURKC_URL/auth/realms/YOUR_REALM/.well-known/openid-configuration for older keycloak versions
       # - ./be/oidc.json:/home/node/app/oidc.json
       - ./be/datasource.json:/home/node/app/datasource.json
       - ./be/functionalAccounts.json:/home/node/app/functionalAccounts.json
@@ -53,7 +54,7 @@ services:
     image: ghcr.io/paulscherrerinstitute/scilog/fe
     # volumes:
     #   uncomment to enable the oidc form
-    #   - ./fe/config.json:/frontend/src/assets/config.json
+    #   - ./fe/config.json:/usr/share/nginx/html/assets/config.json
     profiles:
       - fe
     ports:
