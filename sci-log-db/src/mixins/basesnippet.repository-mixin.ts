@@ -25,6 +25,8 @@ const fs = require('fs');
 type ExpandedBasesnippet = Basesnippet & {
   ownerGroup: string;
   accessGroups: string[];
+  thumbnail?: string;
+  thumbnailHash: string;
 };
 
 function UpdateAndDeleteRepositoryMixin<
@@ -59,6 +61,14 @@ function UpdateAndDeleteRepositoryMixin<
     ): Promise<void> {
       const baseSnippetRepository = await this.baseSnippetRepository();
       const snippet = await baseSnippetRepository.findById(id, {}, options);
+      if (basesnippet.thumbnail && !basesnippet.thumbnailHash)
+        basesnippet.thumbnailHash = (
+          await baseSnippetRepository.findById(
+            basesnippet.thumbnail,
+            {},
+            options,
+          )
+        ).accessHash;
       const patches = await this.applyFromOwnerAccessAndGetChanged(
         basesnippet,
         snippet,

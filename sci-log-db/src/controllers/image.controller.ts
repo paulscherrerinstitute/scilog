@@ -32,7 +32,7 @@ export class ImageController {
     }
     const data = dataQuery[0];
     console.log(data);
-    if (typeof data._fileId == 'undefined') {
+    if (typeof data?._fileId == 'undefined') {
       throw new HttpErrors.BadRequest(`Retrieving sandbox data is deprecated.`);
     }
     const bucket = new Mongo.GridFSBucket(

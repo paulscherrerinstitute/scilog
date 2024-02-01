@@ -511,4 +511,25 @@ describe('Logbook', function (this: Suite) {
         throw err;
       });
   });
+
+  it('add thumbnail hash when editing logbook', async () => {
+    const file = await client
+      .post(`/filesnippet`)
+      .set('Authorization', 'Bearer ' + token)
+      .set('Content-Type', 'application/json')
+      .send({accessHash: 'hash', readACL: [logbookSnippet.ownerGroup]})
+      .expect(200);
+    await client
+      .patch(`/logbooks/${logbookSnippetId}`)
+      .set('Authorization', 'Bearer ' + token)
+      .set('Content-Type', 'application/json')
+      .send({thumbnail: file.body.id})
+      .expect(204);
+    await client
+      .get(`/logbooks/${logbookSnippetId}`)
+      .set('Authorization', 'Bearer ' + token)
+      .set('Content-Type', 'application/json')
+      .expect(200)
+      .then(result => expect(result.body.thumbnailHash).to.eql('hash'));
+  });
 });
