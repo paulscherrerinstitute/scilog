@@ -44,7 +44,7 @@ describe('LogbookWidgetComponent', () => {
   logbookSpy = jasmine.createSpyObj("LogbookInfoService", ["logbookInfo"]);
   logbookSpy.logbookInfo.and.returnValue([]);
 
-  logbookItemDataSpy = jasmine.createSpyObj("LogbookItemDataService", ["getFile"]);
+  logbookItemDataSpy = jasmine.createSpyObj("LogbookItemDataService", ["getFile", "getImage"]);
   logbookItemDataSpy.getFile.and.returnValue(of({}));
 
   beforeEach(waitForAsync(() => {
@@ -72,11 +72,21 @@ describe('LogbookWidgetComponent', () => {
     expect(component).toBeTruthy();
   });
 
-
   it('should test enableActions', () => {
     const isAnyEditAllowedSpy = spyOn(component['isActionAllowed'], 'isAnyEditAllowed');
     component['enableActions']();
     expect(isAnyEditAllowedSpy).toHaveBeenCalledTimes(1);
+  });
+
+  [undefined, 'hash'].forEach((t, i) => {
+    it(`should getImageFromService ${i}`, async () => {
+      logbookItemDataSpy.getImage.calls.reset();
+      component.logbook.thumbnail = 'abc'
+      component.logbook.thumbnailHash = t
+      spyOn(component, 'createImageFromBlob');
+      await component.getImageFromService();
+      expect(logbookItemDataSpy.getImage).toHaveBeenCalledOnceWith(t ?? 'abc');
+    });
   });
 
 });
