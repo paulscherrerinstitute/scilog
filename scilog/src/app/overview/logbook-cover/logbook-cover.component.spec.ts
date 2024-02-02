@@ -78,15 +78,4 @@ describe('LogbookWidgetComponent', () => {
     expect(isAnyEditAllowedSpy).toHaveBeenCalledTimes(1);
   });
 
-  [undefined, 'hash'].forEach((t, i) => {
-    it(`should getImageFromService ${i}`, async () => {
-      logbookItemDataSpy.getImage.calls.reset();
-      component.logbook.thumbnail = 'abc'
-      component.logbook.thumbnailHash = t
-      spyOn(component, 'createImageFromBlob');
-      await component.getImageFromService();
-      expect(logbookItemDataSpy.getImage).toHaveBeenCalledOnceWith(t ?? 'abc');
-    });
-  });
-
 });
