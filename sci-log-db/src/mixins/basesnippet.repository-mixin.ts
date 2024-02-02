@@ -61,18 +61,11 @@ function UpdateAndDeleteRepositoryMixin<
     ): Promise<void> {
       const baseSnippetRepository = await this.baseSnippetRepository();
       const snippet = await baseSnippetRepository.findById(id, {}, options);
-      if (basesnippet.thumbnail && !basesnippet.thumbnailHash)
-        basesnippet.thumbnailHash = (
-          await baseSnippetRepository.findById(
-            basesnippet.thumbnail,
-            {},
-            options,
-          )
-        ).accessHash;
       const patches = await this.applyFromOwnerAccessAndGetChanged(
         basesnippet,
         snippet,
       );
+      if (Object.keys(patches).length === 0) return;
       if (!basesnippet.deleted) {
         if (
           !this.isSharing(patches) &&
@@ -160,6 +153,7 @@ function UpdateAndDeleteRepositoryMixin<
     }
 
     private isSharing(patches: Partial<Basesnippet>) {
+      if (Object.keys(patches).length === 0) return false;
       return Object.keys(patches).every(d =>
         this.expandedACLS.includes(d as typeof this.expandedACLS[number]),
       );
