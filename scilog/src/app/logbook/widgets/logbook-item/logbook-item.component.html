@@ -23,8 +23,11 @@
     </div>
   </div>
 
-  <button mat-mini-fab class="float" (click)="scrollToEndOnClick()" [@isAtEnd]="isAtEnd()">
+  <button mat-mini-fab class="float" (click)="scrollOnClickTo('end')" [@scrollButton] *ngIf="!isAt('end') && !isDescending">
     <mat-icon>keyboard_double_arrow_down</mat-icon>
+  </button>
+  <button mat-mini-fab class="float" (click)="scrollOnClickTo('start')" [@scrollButton] *ngIf="!isAt('start') && isDescending">
+    <mat-icon>keyboard_double_arrow_up</mat-icon>
   </button>
   <div *ngIf="!mobile && !isReadOnly" [ngClass]="isLightMode == true ? 'editor-container' : 'editor-container-no-border'">
     <div #editor class="content-editor"

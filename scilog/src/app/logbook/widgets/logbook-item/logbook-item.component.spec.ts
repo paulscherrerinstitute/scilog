@@ -204,8 +204,7 @@ describe('LogbookItemComponent', () => {
     logbookItemDataServiceSpy = jasmine.createSpyObj("LogbookItemDataService", ["uploadParagraph", "getCount"]);
     scrollServiceSpy = jasmine.createSpyObj("LogbookScrollService", [
       "initialize", "updateViewportEstimate", "remove", 
-      "appendToEOF", "relax", "isBOF", "isEOF", 
-      "prependToBOF", "goToSnippetIndex", "datasource",
+      "appendToEOF", "relax", "prependToBOF", "goToSnippetIndex",
     ]);
     scrollServiceSpy.appendToEOF.and.returnValue(of({}));
 
@@ -513,7 +512,7 @@ describe('LogbookItemComponent', () => {
   })
 
   it('Should remove from index', () => {
-    component.config = { view: { order: ["defaultOrder DESC"] }, general: {}, filter: {} };
+    component.isDescending = true;
     expect(component["_indexOrder"](2)).toEqual(8);
   })
 
@@ -621,29 +620,59 @@ describe('LogbookItemComponent', () => {
     })
   })
 
-  it('should test stillToScroll equals old formula', () => {
+  it('should test stillToScrollToEnd equals old formula', () => {
     const autoScrollFraction = 0.4;
     const element = {scrollHeight: 10, clientHeight: 5, scrollTop: 4} as Element;
     const oldFormula = element.scrollHeight - element.scrollTop - element.clientHeight - autoScrollFraction * element.clientHeight;
-    expect(component['stillToScroll'](element, autoScrollFraction, 0)).toEqual(oldFormula);
+    expect(component['stillToScrollToEnd'](element, autoScrollFraction, 0)).toEqual(oldFormula);
   });
 
-  it('should test stillToScroll >0', () => {
+  it('should test stillToScrollToEnd >0', () => {
     const element = {scrollHeight: 10, clientHeight: 3, scrollTop: 6} as Element;
-    expect(component['stillToScroll'](element, 0, 0)).toEqual(1);
+    expect(component['stillToScrollToEnd'](element, 0, 0)).toEqual(1);
   });
 
-  it('should test stillToScroll <0', () => {
+  it('should test stillToScrollToEnd <0', () => {
     const element = {scrollHeight: 10, clientHeight: 10, scrollTop: 4} as Element;
-    expect(component['stillToScroll'](element, 0.1, 1)).toEqual(-6);
+    expect(component['stillToScrollToEnd'](element, 0.1, 1)).toEqual(-6);
   });
 
-  it('should test scrollToEnd', async () => {
-    spyOn(component["logbookItemDataService"], "getCount").and.resolveTo({count: 10});
-    const goToSnippetIndexSpy = spyOn(component["logbookScrollService"], "goToSnippetIndex");
-    await component['scrollToEnd']();
-    expect(goToSnippetIndexSpy).toHaveBeenCalled();
-    expect(goToSnippetIndexSpy.calls.mostRecent().args[0]).toEqual(9);
+  ['start', 'end'].forEach(t => {
+      it(`should test scrollTo ${t}`, async () => {
+      spyOn(component["logbookItemDataService"], "getCount").and.resolveTo({count: 10});
+      const goToSnippetIndexSpy = spyOn(component["logbookScrollService"], "goToSnippetIndex");
+      await component['scrollTo'](t as 'start' | 'end');
+      expect(goToSnippetIndexSpy).toHaveBeenCalled();
+      expect(goToSnippetIndexSpy.calls.mostRecent().args[0]).toEqual(t === 'end'? 9: 0);
+    });
   });
+
+  ['start', 'end'].forEach(t => {
+    it(`should test isAt ${t}`, () => {
+      const stillToScrollToEndSpy = spyOn<any>(component, "stillToScrollToEnd");
+      component.isAt(t as 'start' | 'end');
+      expect(stillToScrollToEndSpy).toHaveBeenCalledTimes(t === 'end'? 1: 0);
+    });
+  });
+
+  [
+    {position: 'end', scrollPosition: 'notEmpty'},
+    {position: 'end', scrollPosition: undefined},
+    {position: 'start', scrollPosition: 'notEmpty'},
+    {position: 'start', scrollPosition: undefined},
+  ].forEach((t, i) => {
+    it(`should test scrollOnClickTo ${t.position}:${i}`, () => {
+      spyOnProperty(component["logbookScrollService"], 'isEOF', 'get').and.returnValue(t.scrollPosition);
+      spyOnProperty(component["logbookScrollService"], 'isBOF', 'get').and.returnValue(t.scrollPosition);
+      const scrollWindowToSpy = spyOn<any>(component, "scrollWindowTo").and.callFake(() => true);
+      const scrollToSpy = spyOn<any>(component, "scrollTo").and.callFake(() => true);
+      component.scrollOnClickTo(t.position as 'end' | 'start');
+      if (t.scrollPosition)
+        expect(scrollWindowToSpy).toHaveBeenCalledOnceWith(t.position);
+      else 
+        expect(scrollToSpy).toHaveBeenCalledOnceWith(t.position);
+    });
+  });
+
 
 });
