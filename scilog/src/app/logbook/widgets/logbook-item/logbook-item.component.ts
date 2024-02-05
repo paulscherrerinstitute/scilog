@@ -22,7 +22,6 @@ import { ActivatedRoute } from '@angular/router';
 import { ViewsService } from '@shared/views.service';
 import * as ClassicEditor from '@shared/ckeditor/ckeditor5/build/ckeditor';
 import { CKEditorComponent } from '@shared/ckeditor/ckeditor5/build/ckeditor';
-import { ResizedEvent } from 'angular-resize-event';
 import { MediaObserver } from '@angular/flex-layout';
 import { CK5ImageUploadAdapter } from '@shared/ckeditor/ck5-image-upload-adapter';
 import { extractNotificationMessage } from '@shared/add-content/add-content.component';
@@ -81,6 +80,12 @@ import { LinkType } from 'src/app/core/model/paragraphs';
       transition('start => end', animate('200ms ease-in')),
       transition('end => start', animate('200ms ease-in'))
     ]),
+    trigger('scrollButton', [
+      transition(':enter', [
+        style({opacity: 0}), 
+        animate('1ms 0.2s ease-out', style({opacity: 0.4}))
+      ])
+    ]),
   ]
 })
 export class LogbookItemComponent implements OnInit {
@@ -132,12 +137,14 @@ export class LogbookItemComponent implements OnInit {
   isReadOnly = false;
 
   _snippetHeightRef = 0;
+  _editorHeightRef = 0;
   showSearch = false
   showSearchExpanded = false;
 
   forceScrollToEnd = false;
 
   logbookCount = 0;
+  isDescending: boolean;
 
   @ViewChildren(SnippetComponent) childSnippets: QueryList<SnippetComponent>;
 
@@ -195,10 +202,10 @@ export class LogbookItemComponent implements OnInit {
       if (change[0].mqAlias === 'sm' || change[0].mqAlias === 'xs') {
         this.mobile = true;
         console.log("mobile");
-        this.updateViewHeights({});
+        this.updateViewHeights();
       } else {
         this.mobile = false;
-        this.updateViewHeights({});
+        this.updateViewHeights();
       }
     }));
   }
@@ -242,6 +249,7 @@ export class LogbookItemComponent implements OnInit {
       // console.log(config[this.configIndex].config);
       if (config != null) {
         this.config = config[this.configIndex].config;
+        this.isDescending = this.config?.view?.order[0]?.split(" ")?.[1] === 'DESC';
         this.targetId = this.config.filter.targetId;
         this.isReadOnly = this.config.general.readonly;
         await this.logbookScrollService.initialize(this.config);
@@ -370,7 +378,7 @@ export class LogbookItemComponent implements OnInit {
                   // pos = this.insertIntoSortedArray(notification.content);
                   // console.log(pos);
                   console.log(notification.content);
-                  let _descending = this.config.view.order[0].split(" ")[1] == 'DESC' ? true : false;
+                  let _descending = this.isDescending;
                   let _bof = _descending ? (notification.content.defaultOrder > this.childSnippets.toArray()[0].snippet.defaultOrder) : (notification.content.defaultOrder < this.childSnippets.toArray()[0].snippet.defaultOrder)
                   let _eof = _descending ? (notification.content.defaultOrder < this.childSnippets.toArray()[this.childSnippets.toArray().length - 1].snippet.defaultOrder) : (notification.content.defaultOrder > this.childSnippets.toArray()[this.childSnippets.toArray().length - 1].snippet.defaultOrder);
                   if ((this.logbookScrollService.isBOF) && (_bof)) {
@@ -386,7 +394,7 @@ export class LogbookItemComponent implements OnInit {
                     console.log("appending to EOF")
                     console.log(notification.content);
                     await this.logbookScrollService.appendToEOF(notification.content);
-                    let autoScrollEnabled = ((this.snippetContainerRef.nativeElement.scrollHeight - this.snippetContainerRef.nativeElement.scrollTop - this.snippetContainerRef.nativeElement.clientHeight < this.autoScrollFraction * this.snippetContainerRef.nativeElement.clientHeight)) ? true : false;
+                    let autoScrollEnabled = this.isAt('end', this.autoScrollFraction, 0);
                     console.log("autoscroll: ", autoScrollEnabled)
                     if (autoScrollEnabled || this.forceScrollToEnd) {
                       console.log("scheduling scrolling to EOF");
@@ -394,7 +402,7 @@ export class LogbookItemComponent implements OnInit {
                       // await this.logbookScrollService.isLoaded$;
                       setTimeout(() => {
                         console.log("scrolling to EOF");
-                        this.snippetContainerRef.nativeElement.scrollTop = this.snippetContainerRef.nativeElement.scrollHeight;
+                        this.scrollWindowTo('end');
                       }, 50);
                     }
                   } else {
@@ -404,17 +412,7 @@ export class LogbookItemComponent implements OnInit {
                     }
                     if (this.forceScrollToEnd) {
                       console.log("scrolling to new item")
-                      this.forceScrollToEnd = false;
-                      let count = await this.logbookItemDataService.getCount(this.config);
-                      await this.logbookScrollService.goToSnippetIndex(count.count - 1, () => {
-                        this.logbookScrollService.datasource.adapter.relax(() => {
-                          setTimeout(() => {
-                            this.snippetContainerRef.nativeElement.scrollTop = this.snippetContainerRef.nativeElement.scrollHeight;
-                          }, 50);
-                        });
-
-                      }
-                      );
+                      await this.scrollTo('end');
                     } else {
                       console.log(this.childSnippets.toArray());
                       await this.logbookScrollService.appendToEOF(notification.content);
@@ -440,6 +438,25 @@ export class LogbookItemComponent implements OnInit {
       default:
         break;
     }
+  }
+
+  private async scrollTo(position: 'end' | 'start') {
+    let positionIndex = 0;
+    if (position === 'end') {
+      this.forceScrollToEnd = false;
+      positionIndex = (await this.logbookItemDataService.getCount(this.config)).count - 1;
+    }
+    await this.logbookScrollService.goToSnippetIndex(positionIndex, () => {
+      this.logbookScrollService.datasource.adapter.relax(() => {
+        setTimeout(() => {
+          this.scrollWindowTo(position);
+        }, 50);
+      });
+    });
+  }
+
+  private scrollWindowTo(position: 'end' | 'start') {
+    this.snippetContainerRef.nativeElement.scrollTop = position === 'end'? this.snippetContainerRef.nativeElement.scrollHeight: 0;
   }
 
   private updateSnippetValues(content: Basesnippets, snippet: Basesnippets) {
@@ -672,11 +689,13 @@ export class LogbookItemComponent implements OnInit {
     this.submitContent(notification);
   }
 
-  onResized(event: ResizedEvent) {
-    let _heightRef = this.snippetContainerRef.nativeElement.parentElement.parentElement.parentElement.parentElement.offsetHeight;
-    if (this._snippetHeightRef != _heightRef) {
+  onResized() {
+    const _heightRef = this.snippetContainerRef.nativeElement.parentElement.parentElement.parentElement.parentElement.offsetHeight;
+    const _editorHeight = this.editorRef?.nativeElement?.offsetHeight;
+    if (this._snippetHeightRef != _heightRef || this._editorHeightRef != _editorHeight) {
       this._snippetHeightRef = _heightRef;
-      this.updateViewHeights(event)
+      this._editorHeightRef = _editorHeight;
+      this.updateViewHeights();
     }
 
     // console.log(this.snippetContainerRef.nativeElement.parentElement.parentElement.parentElement.parentElement.offsetHeight);
@@ -686,7 +705,7 @@ export class LogbookItemComponent implements OnInit {
     // }, 10);
   }
 
-  updateViewHeights(event) {
+  updateViewHeights() {
     if (this.editorRef) {
       let offset = this.mobile ? 210 - 28 : (this.dashboardView ? 130 - 28 : 195 - 25);
       let snippetHeight: number;
@@ -704,7 +723,7 @@ export class LogbookItemComponent implements OnInit {
   ngAfterViewInit(): void {
     //Called after ngAfterContentInit when the component's view has been initialized. Applies to components only.
     //Add 'implements AfterViewInit' to the class.
-    this.updateViewHeights({});
+    this.updateViewHeights();
     this.cdr.detectChanges();
   }
 
@@ -749,6 +768,24 @@ export class LogbookItemComponent implements OnInit {
         }
       });
     })
+  }
+
+  isAt(position: 'end' | 'start', scrollPortion = 0, offset = 1) {
+    const element = this.snippetContainerRef?.nativeElement;
+    if (element)
+      return position === 'end'? this.stillToScrollToEnd(element, scrollPortion, offset) <= 0: element.scrollTop <= offset;
+  }
+
+  private stillToScrollToEnd(element: Element, scrollPortion: number, offset: number) {
+    return element.scrollHeight - element.clientHeight * (1 + scrollPortion) - element.scrollTop - offset;
+  }
+
+  scrollOnClickTo(position: 'end' | 'start') {
+    const scrollServicePosition = position === 'end'? 'isEOF' : 'isBOF';
+    if (this.logbookScrollService[scrollServicePosition])
+      this.scrollWindowTo(position);
+    else
+      this.scrollTo(position);
   }
 
   addContent(isMessage = false) {
@@ -801,7 +838,7 @@ export class LogbookItemComponent implements OnInit {
   }
 
   private _indexOrder(i: number) {
-    if (this.config.view.order[0].split(" ")[1] == 'DESC') {
+    if (this.isDescending) {
       return this.logbookCount - i
     }
     return i + 1

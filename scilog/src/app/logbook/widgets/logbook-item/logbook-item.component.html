@@ -1,4 +1,4 @@
-<div [ngSwitch]="viewOption" class="logbook-container" (resized)="onResized($event)">
+<div [ngSwitch]="viewOption" class="logbook-container" (resized)="onResized()">
   <!-- <div #searchBar>
     <button (click)="toggleSearch()" >
       Search <mat-icon>search</mat-icon>
@@ -23,10 +23,16 @@
     </div>
   </div>
 
+  <button mat-mini-fab class="float" (click)="scrollOnClickTo('end')" [@scrollButton] *ngIf="!isAt('end') && !isDescending">
+    <mat-icon>keyboard_double_arrow_down</mat-icon>
+  </button>
+  <button mat-mini-fab class="float" (click)="scrollOnClickTo('start')" [@scrollButton] *ngIf="!isAt('start') && isDescending">
+    <mat-icon>keyboard_double_arrow_up</mat-icon>
+  </button>
   <div *ngIf="!mobile && !isReadOnly" [ngClass]="isLightMode == true ? 'editor-container' : 'editor-container-no-border'">
     <div #editor class="content-editor"
       [ngStyle]="{'padding-left':dashboardView === true ? '0px' : '78px', 'width': dashboardView === true ? '97%' : '92%'}"
-      (resized)="onResized($event)">
+      (resized)="onResized()">
       <div class='accessSettings'>
         <span [ngStyle]="{'flex':'1 1 auto'}"></span>
         <span matTooltip="ownerGroup">
