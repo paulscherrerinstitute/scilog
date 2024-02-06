@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
 import { Logbooks } from '@model/logbooks';
 import { Subject, Subscription } from 'rxjs';
 import { UserPreferencesService } from '@shared/user-preferences.service';
@@ -11,6 +11,7 @@ import { CookiesService } from '@shared/cookies.service';
 import { LogbookDataService } from '@shared/remote-data.service';
 import { LogbookIconScrollService } from './logbook-icon-scroll-service.service';
 import { debounceTime } from 'rxjs/operators';
+import { ResizedEvent } from 'angular-resize-event';
 
 enum ContentType {
   COLLECTION = 'collection',
@@ -38,6 +39,8 @@ export class OverviewComponent implements OnInit {
   subscriptions: Subscription[] = [];
   private _searchString: string = '';
   searchStringSubject: Subject<void> = new Subject();
+  _matCardWidth = 300;
+  @ViewChild('logbookContainer', {static: true}) logbookContainer: ElementRef<HTMLElement>;
 
 
   constructor(
@@ -65,6 +68,7 @@ export class OverviewComponent implements OnInit {
         this.logbookSubscription.unsubscribe();
       }
       this.config = this._prepareConfig();
+      this.logbookIconScrollService.groupSize = this.groupSize(this.logbookContainer.nativeElement.clientWidth);
       this.logbookIconScrollService.initialize(this.config);
     }));
     this.subscriptions.push(this.searchStringSubject.pipe(debounceTime(500)).subscribe(() => {
@@ -72,6 +76,29 @@ export class OverviewComponent implements OnInit {
       this.logbookIconScrollService.reset();
 
     }));
+  }
+
+  onResized(event: ResizedEvent){
+    const newSize = this.groupSize(event.newRect.width);
+    if (newSize === this.logbookIconScrollService.groupSize) return
+    this.logbookIconScrollService.groupSize = newSize;
+    if (event.newRect.width > 2 * event.oldRect.width || event.oldRect.width > 2 * event.newRect.width) {
+      this.logbookIconScrollService.initialize(this.config);
+    }
+    else
+      this.logbookIconScrollService.reload();
+  }
+
+  get matCardWith () {
+    const matCardWidth = this.logbookIconScrollService?.datasource?.adapter?.firstVisible?.element?.querySelector?.('.logbook-card')?.clientWidth;
+    if (!matCardWidth) 
+      return this._matCardWidth;
+    this._matCardWidth = matCardWidth
+    return matCardWidth
+  }
+
+  groupSize (viewPortWidth: number) {
+    return Math.floor(viewPortWidth / this.matCardWith) || 1;
   }
 
   collectionSelected(collection: CollectionConfig) {

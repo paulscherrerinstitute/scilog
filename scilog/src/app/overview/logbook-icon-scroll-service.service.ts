@@ -8,11 +8,13 @@ import { Datasource } from 'ngx-ui-scroll';
 })
 export class LogbookIconScrollService extends ScrollBaseService {
 
+  groupSize = 3;
   constructor(private logbookDataService: LogbookDataService) {
     super();
   }
 
   protected setupDatasource() {
+    const bufferSize = (this.groupSize + 1) * 3;
     if (this.datasource != null) {
       this.datasource.adapter.reset(new Datasource({
         get: async (index: number, count: number) => {
@@ -22,7 +24,7 @@ export class LogbookIconScrollService extends ScrollBaseService {
         settings: {
           minIndex: 0,
           startIndex: this.startIndex,
-          bufferSize: 9,
+          bufferSize: bufferSize,
           padding: 0.5,
         }
       }));
@@ -35,7 +37,7 @@ export class LogbookIconScrollService extends ScrollBaseService {
         settings: {
           minIndex: 0,
           startIndex: this.startIndex,
-          bufferSize: 9,
+          bufferSize: bufferSize,
           padding: 0.5,
         }
       });
@@ -43,16 +45,14 @@ export class LogbookIconScrollService extends ScrollBaseService {
   }
 
   getDataBuffer(index: number, count: number, config: any) {
-    // return this.logbookDataService.getDataBuffer(index, count, config);
     return this.getData(index, count, config);
   }
 
   async getData(index: number, count: number, config: any) {
-    let data = [];
-    let buffer = await this.logbookDataService.getDataBuffer(index, count * 3, config);
+    const buffer = await this.logbookDataService.getDataBuffer(index, count, config);
     this.datasource.adapter.relax();
     const groupedBuffer = [];
-    while (buffer.length) groupedBuffer.push(buffer.splice(0, 3));
+    while (buffer.length) groupedBuffer.push(buffer.splice(0, this.groupSize));
     return groupedBuffer
   }
 }
