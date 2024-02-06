@@ -21,7 +21,7 @@
     <!-- <mat-divider></mat-divider> -->
     <h1>Logbooks</h1>
     <button (click)='addCollectionLogbook("logbook")'>Add logbook</button><br>
-    <div class="logbook-container">
+    <div class="logbook-container" (resized)="onResized($event)" #logbookContainer>
       <div *uiScroll="let logbookGroup of logbookIconScrollService.datasource; let i = index">
         <span *ngFor="let logbook of logbookGroup">
           <app-logbook-cover [logbook]="logbook" (logbookEdit)="editLogbook($event)"
