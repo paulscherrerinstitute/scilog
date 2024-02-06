@@ -109,16 +109,27 @@ h1 {
     margin-bottom: 0;
 }
 
+.table-landscape,
 table,
 th,
 td {
     table-layout: fixed;
-    font-size: 10px;
+    font-size: 10pt;
     width: 100%;
     border-spacing: 0;
     border-collapse: collapse;
     border: 1px solid black;
+    word-wrap: break-word;
+}
+
+.table-landscape {
     page: landscape;
+}
+
+.table-with-space::after {
+    content: "\A";
+    white-space: pre;
+    display: block;
 }
 
 img {
