@@ -265,4 +265,32 @@ describe('Export service unit', function (this: Suite) {
       .eql(`<div><pre class="language-python" tabindex="0"><code class="language-python"><span class="token keyword">def</span> <span class="token function">foo</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
     <span class="token keyword">return</span> <span class="token number">1</span></code></pre></div>`);
   });
+
+  tests = [
+    ['<p>not a table</p>', '<p>not a table</p>'],
+    [
+      '<figure class="table"><table><tbody><tr><td>a</td></tr></tbody></table></figure><p>&nbsp;</p>',
+      '<figure class="table"><table><tbody><tr><td>a</td></tr></tbody></table></figure><p>&nbsp;</p>',
+    ],
+    [
+      '<figure class="table"><table><tbody><tr><td>a</td></tr></tbody></table></figure>',
+      '<figure class="table"><table><tbody><tr><td>a</td></tr></tbody></table></figure>',
+    ],
+    [
+      '<figure class="table"><table><tbody><tr><td>someLongsomeLongsomeLongsomeLongsomeLongsomeLong</td><td>someLongsomeLongsomeLongsomeLongsomeLongsomeLongsomeLongsomeLong</td></tr><tr><td>1</td><td>1</td></tr></tbody></table></figure>',
+      '<figure class="table table-with-space"><table class="table-landscape"><tbody><tr><td>someLongsomeLongsomeLongsomeLongsomeLongsomeLong</td><td>someLongsomeLongsomeLongsomeLongsomeLongsomeLongsomeLongsomeLong</td></tr><tr><td>1</td><td>1</td></tr></tbody></table></figure>',
+    ],
+    [
+      '<figure class="table"><table><tbody><tr><td>someLongsomeLongsomeLongsomeLongsomeLongsomeLong</td><td>someLongsomeLongsomeLongsomeLongsomeLongsomeLongsomeLongsomeLong</td></tr><tr><td>1</td><td>1</td></tr></tbody></table></figure><p>&nbsp;</p>',
+      '<figure class="table"><table class="table-landscape"><tbody><tr><td>someLongsomeLongsomeLongsomeLongsomeLongsomeLong</td><td>someLongsomeLongsomeLongsomeLongsomeLongsomeLongsomeLongsomeLong</td></tr><tr><td>1</td><td>1</td></tr></tbody></table></figure><p>&nbsp;</p>',
+    ],
+  ];
+  tests.forEach((t, i) => {
+    it(`table ${i}`, () => {
+      const element = textContentToHTML({textcontent: t[0]} as Paragraph);
+      expect(
+        exportService['table']({} as Paragraph, element).innerHTML,
+      ).to.be.eql(t[1]);
+    });
+  });
 });

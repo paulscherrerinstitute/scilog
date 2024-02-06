@@ -146,6 +146,7 @@ export class ExportService {
     return [
       this.textContentToHTML,
       this.code,
+      this.table,
       this.figure,
       this.tags,
       this.dateAndAuthor,
@@ -193,6 +194,28 @@ export class ExportService {
     codeElements.forEach(codeElement => {
       LoadLanguages(codeElement?.className.replace('language-', ''));
       Prism.highlightElement(codeElement);
+    });
+    return element;
+  };
+
+  private table = (snippet: Paragraph, element: Element) => {
+    const tableElements = element.querySelectorAll('table');
+    if (tableElements.length === 0) return element;
+    tableElements.forEach(tableElement => {
+      let maxWidth = 0;
+      tableElement.querySelectorAll('tr').forEach(row => {
+        let totalWidth = 0;
+        row
+          .querySelectorAll('td')
+          .forEach(column => (totalWidth += column.innerHTML.length));
+        maxWidth = totalWidth > maxWidth ? totalWidth : maxWidth;
+      });
+      if (maxWidth < 500 / 10) return tableElement;
+      tableElement.className = 'table-landscape';
+      const parentElement = tableElement.parentElement;
+      if (parentElement?.nextElementSibling?.innerHTML !== '&nbsp;')
+        parentElement?.classList?.add('table-with-space');
+      return tableElement;
     });
     return element;
   };
