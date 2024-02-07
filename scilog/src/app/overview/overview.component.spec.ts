@@ -80,18 +80,18 @@ describe('OverviewComponent', () => {
   ].forEach((t, i) => {
     it(`should test get matCardWith ${i}`, () => {
       component['logbookIconScrollService']['datasource'] = t as unknown as IDatasource;
-      expect(component.matCardWith).toEqual(i === 3? 10: 300);
+      expect(component.matCardWith).toEqual(i === 3? 10: 352);
     });
   });
 
-  [[1, 1], [700, 2]].forEach(t => {
+  [[1, 1], [800, 2]].forEach(t => {
     it(`shokd test groupSize ${t[0]}`, () => {
       expect(component.groupSize(t[0])).toEqual(t[1]);
     });
   });
 
   [
-    [{newRect: {width: 900}}, [0, 0]], 
+    [{newRect: {width: 1056}}, [0, 0]], 
     [{newRect: {width: 700}, oldRect: {width: 300}}, [1, 0]], 
     [{newRect: {width: 100}, oldRect: {width: 300}}, [1, 0]],
     [{newRect: {width: 200}, oldRect: {width: 300}}, [0, 1]],
