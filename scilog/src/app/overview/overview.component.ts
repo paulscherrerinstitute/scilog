@@ -39,7 +39,7 @@ export class OverviewComponent implements OnInit {
   subscriptions: Subscription[] = [];
   private _searchString: string = '';
   searchStringSubject: Subject<void> = new Subject();
-  _matCardWidth = 300;
+  _matCardWidth = 352;
   @ViewChild('logbookContainer', {static: true}) logbookContainer: ElementRef<HTMLElement>;
 
 
