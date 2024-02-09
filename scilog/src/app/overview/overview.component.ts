@@ -1,4 +1,4 @@
-import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
+import { Component, ElementRef, HostListener, OnInit, ViewChild } from '@angular/core';
 import { Logbooks } from '@model/logbooks';
 import { Subject, Subscription } from 'rxjs';
 import { UserPreferencesService } from '@shared/user-preferences.service';
@@ -17,6 +17,8 @@ enum ContentType {
   COLLECTION = 'collection',
   LOGBOOK = 'logbook',
 }
+
+export type MatCardType = 'logbook-module' | 'logbook-headline';
 
 @Component({
   selector: 'app-overview',
@@ -39,8 +41,9 @@ export class OverviewComponent implements OnInit {
   subscriptions: Subscription[] = [];
   private _searchString: string = '';
   searchStringSubject: Subject<void> = new Subject();
-  _matCardWidth = 352;
-  @ViewChild('logbookContainer', {static: true}) logbookContainer: ElementRef<HTMLElement>;
+  _matCardSide = { 'logbook-module': 352, 'logbook-headline': 47 };
+  @ViewChild('logbookContainer', { static: true }) logbookContainer: ElementRef<HTMLElement>;
+  matCardType: MatCardType = 'logbook-module';
 
 
   constructor(
@@ -78,27 +81,44 @@ export class OverviewComponent implements OnInit {
     }));
   }
 
-  onResized(event: ResizedEvent){
-    const newSize = this.groupSize(event.newRect.width);
+
+  reInitScrollAfterToggle(matCardType: MatCardType) {
+    this.matCardType = matCardType;
+    const newSize = this.groupSize(this.logbookContainer.nativeElement[this.clientSide]);
+    this.logbookIconScrollService.groupSize = newSize;
+    this.logbookIconScrollService.initialize(this.config);
+  }
+
+  @HostListener('window:resize')
+  onResized(event: ResizedEvent) {
+    if (!event) return
+    const side = this.matCardType === 'logbook-module' ? 'width' : 'height'
+    const newSize = this.groupSize(event.newRect[side]);
     if (newSize === this.logbookIconScrollService.groupSize) return
     this.logbookIconScrollService.groupSize = newSize;
-    if (event.newRect.width > 2 * event.oldRect.width || event.oldRect.width > 2 * event.newRect.width) {
+    if (event.newRect[side] > 2 * event.oldRect[side] || event.oldRect[side] > 2 * event.newRect[side]) {
       this.logbookIconScrollService.initialize(this.config);
     }
     else
       this.logbookIconScrollService.reload();
   }
 
-  get matCardWith () {
-    const matCardWidth = this.logbookIconScrollService?.datasource?.adapter?.firstVisible?.element?.querySelector?.('.logbook-card')?.clientWidth;
-    if (!matCardWidth) 
-      return this._matCardWidth;
-    this._matCardWidth = matCardWidth
-    return matCardWidth
+  get clientSide() {
+    return this.matCardType === 'logbook-module' ? 'clientWidth' : 'clientHeight'
   }
 
-  groupSize (viewPortWidth: number) {
-    return Math.floor(viewPortWidth / this.matCardWith) || 1;
+  get matCardSide() {
+    const matCardType = this.matCardType;
+    const element = this.logbookIconScrollService?.datasource?.adapter?.firstVisible?.element?.querySelector?.(`.${matCardType}`);
+    const matCardSide = element?.[this.clientSide];
+    if (!matCardSide)
+      return this._matCardSide[matCardType];
+    this._matCardSide[matCardType] = matCardSide;
+    return this._matCardSide[matCardType]
+  }
+
+  groupSize(viewPortSide: number) {
+    return Math.floor(viewPortSide / this.matCardSide) || 1;
   }
 
   collectionSelected(collection: CollectionConfig) {

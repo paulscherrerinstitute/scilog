@@ -3,6 +3,8 @@ import { Logbooks } from '@model/logbooks';
 import { LogbookInfoService } from '@shared/logbook-info.service';
 import { LogbookItemDataService } from '@shared/remote-data.service';
 import { IsAllowedService } from '../is-allowed.service';
+import { Router } from '@angular/router';
+import { MatCardType } from '../overview.component';
 
 @Component({
   selector: 'app-logbook-cover',
@@ -19,6 +21,9 @@ export class LogbookWidgetComponent implements OnInit {
   @Input()
   logbook: Logbooks;
 
+  @Input()
+  matView: MatCardType;
+
   @ViewChild('cardHeader') cardHeader: ElementRef;
 
   imageToShow: any;
@@ -27,7 +32,8 @@ export class LogbookWidgetComponent implements OnInit {
   constructor(
     private logbookItemDataService: LogbookItemDataService,
     private logbookInfo: LogbookInfoService,
-    protected isActionAllowed: IsAllowedService) { }
+    protected isActionAllowed: IsAllowedService,
+    private router: Router) { }
 
   ngOnInit(): void {
     if (this.logbook?.thumbnail) {
@@ -63,7 +69,7 @@ export class LogbookWidgetComponent implements OnInit {
     this.isImageLoading = false;
   }
 
-  selection($event) {
+  selection() {
     this.logbookSelection.emit(this.logbook.id);
     this.logbookInfo.logbookInfo = this.logbook;
     console.log("updating logbook in service:", this.logbookInfo.logbookInfo)
@@ -82,6 +88,7 @@ export class LogbookWidgetComponent implements OnInit {
   }
 
   adjustHeaderFontSize(element: ElementRef) {
+    if (!element) return
     let fontSize = parseInt(element.nativeElement.style.fontSize);
     for (let i = fontSize; i >= 0; i--) {
       let overflow = this.isOverflown(element);
@@ -94,6 +101,11 @@ export class LogbookWidgetComponent implements OnInit {
 
   ngOnDestroy(): void {
 
+  }
+
+  selectOnDoubleClick() {
+    this.router.navigateByUrl(`/logbooks/${this.logbook.id}/dashboard`);
+    this.selection();
   }
 
 }
