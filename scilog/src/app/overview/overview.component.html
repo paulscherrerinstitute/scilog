@@ -9,23 +9,20 @@
       <mat-icon>close</mat-icon>
     </button>
   </mat-form-field>
-  <!-- <div *ngIf="searchString==''">
-    <h1>Collection</h1>
-    <button (click)='addCollectionLogbook("collection")'>Add collection</button><br>
-    <div *ngFor="let collection of collections" class="logbook-card">
-      <app-collection-widget [collection]="collection" (collectionSelection)="collectionSelected($event)"></app-collection-widget>
-    </div>
-  </div> -->
-  <!-- <div *ngIf="showViewSelection"> -->
   <div>
-    <!-- <mat-divider></mat-divider> -->
     <h1>Logbooks</h1>
+    <mat-button-toggle-group [value]="matCardType"
+      (change)="reInitScrollAfterToggle($event.value)">
+      <mat-button-toggle value="logbook-module"><mat-icon>view_module</mat-icon></mat-button-toggle>
+      <mat-button-toggle value="logbook-headline"><mat-icon>view_headline</mat-icon></mat-button-toggle>
+    </mat-button-toggle-group>
     <button (click)='addCollectionLogbook("logbook")'>Add logbook</button><br>
     <div class="logbook-container" (resized)="onResized($event)" #logbookContainer>
-      <div *uiScroll="let logbookGroup of logbookIconScrollService.datasource; let i = index">
+      <div *uiScroll="let logbookGroup of logbookIconScrollService.datasource">
         <span *ngFor="let logbook of logbookGroup">
           <app-logbook-cover [logbook]="logbook" (logbookEdit)="editLogbook($event)"
-            (logbookSelection)="logbookSelected($event)" (logbookDelete)="deleteLogbook($event)" class="logbook-card">
+            (logbookSelection)="logbookSelected($event)" (logbookDelete)="deleteLogbook($event)"
+            [matView]="matCardType" [ngClass]="matCardType">
           </app-logbook-cover>
         </span>
       </div>
@@ -33,6 +30,3 @@
 
   </div>
 </div>
-
-
-<!-- <button #upload (click)="file.click()">Upload file</button> -->

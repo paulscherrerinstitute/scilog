@@ -1,7 +1,7 @@
 import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 import { MatDialogModule, MAT_DIALOG_DATA } from '@angular/material/dialog';
 
-import { OverviewComponent } from './overview.component';
+import { MatCardType, OverviewComponent } from './overview.component';
 import { LogbookInfoService } from '@shared/logbook-info.service';
 import { UserPreferencesService } from '@shared/user-preferences.service';
 import { CookieService } from 'ngx-cookie-service';
@@ -75,17 +75,21 @@ describe('OverviewComponent', () => {
   [
     {adapter: {firstVisible: {element: {}}}},
     {},
-    {adapter: {firstVisible: {element: {querySelector: () => ({clientWidht: 0})}}}},
-    {adapter: {firstVisible: {element: {querySelector: () => ({clientWidth: 10})}}}},    
+    {adapter: {firstVisible: {element: {querySelector: () => ({clientWidth: 0, clientHeight: 0})}}}},
+    {adapter: {firstVisible: {element: {querySelector: () => ({clientWidth: 10, clientHeight: 20})}}}},
   ].forEach((t, i) => {
-    it(`should test get matCardWith ${i}`, () => {
-      component['logbookIconScrollService']['datasource'] = t as unknown as IDatasource;
-      expect(component.matCardWith).toEqual(i === 3? 10: 352);
+    [['logbook-module', 10], ['logbook-headline', 20]].forEach(st => {
+      it(`should test get matCardSide ${i}:${st[0]}`, () => {
+        component['logbookIconScrollService']['datasource'] = t as unknown as IDatasource;
+        component.matCardType = st[0] as MatCardType;
+        const expected = st[0] === 'logbook-module' ? 352 : 47;
+        expect(component.matCardSide).toEqual(i === 3 ? st[1] as number : expected);
+      });
     });
   });
 
   [[1, 1], [800, 2]].forEach(t => {
-    it(`shokd test groupSize ${t[0]}`, () => {
+    it(`should test groupSize ${t[0]}`, () => {
       expect(component.groupSize(t[0])).toEqual(t[1]);
     });
   });
@@ -97,13 +101,57 @@ describe('OverviewComponent', () => {
     [{newRect: {width: 200}, oldRect: {width: 300}}, [0, 1]],
     [{newRect: {width: 400}, oldRect: {width: 300}}, [0, 1]],
   ].forEach((t, i) => {
-    it(`shokd test onResized ${i}`, async () => {
+    it(`should test onResized ${i}:logbook-module`, () => {
       const initializeSpy = spyOn(component["logbookIconScrollService"], "initialize");
       const reloadSpy = spyOn(component["logbookIconScrollService"], "reload");
-      await component.onResized(t[0] as ResizedEvent);
+      component.onResized(t[0] as ResizedEvent);
       expect(initializeSpy).toHaveBeenCalledTimes(t[1][0]);
       expect(reloadSpy).toHaveBeenCalledTimes(t[1][1]);
     });
+  });
+
+  [
+    [{newRect: {height: 147}}, [0, 0]],
+    [{newRect: {height: 700}, oldRect: {height: 300}}, [1, 0]],
+    [{newRect: {height: 100}, oldRect: {height: 300}}, [1, 0]],
+    [{newRect: {height: 200}, oldRect: {height: 300}}, [0, 1]],
+    [{newRect: {height: 400}, oldRect: {height: 300}}, [0, 1]],
+  ].forEach((t, i) => {
+    it(`should test onResized ${i}:logbook-headline`, () => {
+      component.matCardType = 'logbook-headline';
+      const initializeSpy = spyOn(component["logbookIconScrollService"], "initialize");
+      const reloadSpy = spyOn(component["logbookIconScrollService"], "reload");
+      component.onResized(t[0] as ResizedEvent);
+      expect(initializeSpy).toHaveBeenCalledTimes(t[1][0]);
+      expect(reloadSpy).toHaveBeenCalledTimes(t[1][1]);
+    });
+  });
+
+  [
+    ['logbook-module', 'clientWidth'],
+    ['logbook-headline', 'clientHeight']
+  ].forEach(t => {
+    it(`should test clientSide ${t[0]}`, () => {
+      component.matCardType = t[0] as MatCardType;
+      expect(component.clientSide).toEqual(t[1]);
+    });
+  });
+
+  [
+    ['logbook-module', 2],
+    ['logbook-headline', 3]
+  ].forEach(t => {
+    it(`should test reInitScrollAfterToggle ${t[0]}`, () => {
+      component.logbookContainer.nativeElement = { clientWidth: 704, clientHeight: 147 } as HTMLElement;
+      component.reInitScrollAfterToggle(t[0] as MatCardType);
+      expect(component.logbookIconScrollService.groupSize).toEqual(t[1] as number);
+    });
+  });
+
+  it('should trigger onResized on window resize', () => {
+    const onResizedSpy = spyOn(component, 'onResized');
+    window.dispatchEvent(new Event('resize'));
+    expect(onResizedSpy).toHaveBeenCalled();
   });
 
 });

@@ -1,29 +1,40 @@
+.logbook-module {
+  display: inline-flex;
+  padding: 10px;
+}
 
-  .logbook-card {
-    display: inline-flex;
-    /* justify-content: space-between; */
-    padding: 10px;
-  }
+.logbook-headline {
+  display: block;
+  max-width: 100%;
+  padding-top: 5px;
+  padding-right: 20px;
+}
 
-  .overview-container{
-    position: relative;
-    top: 40px;
-    padding: 20px; 
-  }
+.overview-container {
+  position: relative;
+  top: 40px;
+  padding: 20px;
+}
 
-  .logbook-container {
-    overflow: scroll;
-    height: calc(100vh - 250px);
-    width: calc(100vw - 20px);
-  }
-   
-  ::ng-deep .mat-toolbar{
-    z-index: 998;
-    position: fixed;
-    height: 50px;
-    flex: 1 1 auto;
-  }
+.logbook-container {
+  overflow: scroll;
+  height: calc(100vh - 250px);
+  width: calc(100vw - 20px);
+}
 
-  .flexExpand {
-    flex: 1 1 auto;
-  }
+::ng-deep .mat-toolbar {
+  z-index: 998;
+  position: fixed;
+  height: 50px;
+  flex: 1 1 auto;
+}
+
+.flexExpand {
+  flex: 1 1 auto;
+}
+
+mat-button-toggle-group {
+  float: right;
+  transform: scale(75%) translate(18px, -50%);
+  margin-right: 0;
+}
