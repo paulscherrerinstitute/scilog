@@ -25,8 +25,6 @@ const fs = require('fs');
 type ExpandedBasesnippet = Basesnippet & {
   ownerGroup: string;
   accessGroups: string[];
-  thumbnail?: string;
-  thumbnailHash: string;
 };
 
 function UpdateAndDeleteRepositoryMixin<
