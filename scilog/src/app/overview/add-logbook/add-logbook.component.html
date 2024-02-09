@@ -94,7 +94,7 @@
           {{ thumbnailText }}
         </button>
         <button color="accent" aria-label="RemoveThumbnail" class="mat-fab-bottom-right" (click)="removeThumbnail()"
-          disabled="{{ tooltips.expired }}" matTooltip="{{ tooltips.expired }}"
+          disabled="{{ isActionAllowed.tooltips.expired }}" matTooltip="{{ isActionAllowed.tooltips.expired }}"
           *ngIf="imageLoaded">
           Delete
         </button>
