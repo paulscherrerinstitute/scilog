@@ -65,12 +65,11 @@
 
 
   .owner {
-    margin: 15px;
+    margin-bottom: -1px;
+    margin-right: 10px;
     width: 10%;
     overflow-x: scroll;
-    padding-bottom: 20px;
-    margin-bottom: 2px;
-    margin-right: 10px;
+    min-height: 20px;
   }
 
   .date {
@@ -83,8 +82,8 @@
     width: 20%;
     overflow-x: scroll;
     word-wrap: break-word;
-    padding-bottom: 20px;
-    margin-bottom: 2px;
+    min-height: 20px;
+    margin-bottom: 1px;
     margin-right: 10px;
   }
 
@@ -92,8 +91,8 @@
     width: 40%;
     overflow-x: scroll;
     word-wrap: break-word;
-    padding-bottom: 20px;
-    margin-bottom: 2px;
+    min-height: 20px;
+    margin-bottom: 1px;
     margin-right: 10px;
   }
 
