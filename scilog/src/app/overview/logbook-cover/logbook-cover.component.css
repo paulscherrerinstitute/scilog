@@ -51,6 +51,8 @@
 
 .logbook-headline {
 
+  display: flex;
+
   .mat-fab-top-right {
     position: absolute;
     top: 1px;
@@ -61,17 +63,18 @@
     align-items: center;
   }
 
-  mat-card-content {
-    display: inline-block;
-    padding: 5px;
-    height: 10px;
-  }
 
   .owner {
-    width: 5%;
+    margin-bottom: -1px;
+    margin-right: 10px;
+    width: 10%;
+    overflow-x: scroll;
+    min-height: 20px;
   }
 
   .date {
+    font-size: small;
+    margin: 15px;
     width: 10%;
   }
 
@@ -79,17 +82,17 @@
     width: 20%;
     overflow-x: scroll;
     word-wrap: break-word;
-    padding-bottom: 20px;
-    margin-bottom: 2px;
+    min-height: 20px;
+    margin-bottom: 1px;
     margin-right: 10px;
   }
 
   .title {
-    width: 50%;
+    width: 40%;
     overflow-x: scroll;
     word-wrap: break-word;
-    padding-bottom: 20px;
-    margin-bottom: 2px;
+    min-height: 20px;
+    margin-bottom: 1px;
     margin-right: 10px;
   }
 
@@ -101,12 +104,15 @@
 
   .card-container {
     height: 10px;
+    flex: 1 1 auto;
     display: flex;
     flex-direction: column;
     align-content: flex-start;
     justify-content: center;
     align-items: center;
     flex-wrap: wrap;
+    margin-right: 10px;
+    overflow-x: clip;
   }
 
 }
