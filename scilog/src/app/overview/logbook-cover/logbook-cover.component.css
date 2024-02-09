@@ -66,10 +66,15 @@
 
   .owner {
     margin: 15px;
-    width: 5%;
+    width: 10%;
+    overflow-x: scroll;
+    padding-bottom: 20px;
+    margin-bottom: 2px;
+    margin-right: 10px;
   }
 
   .date {
+    font-size: small;
     margin: 15px;
     width: 10%;
   }
