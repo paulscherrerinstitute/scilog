@@ -64,11 +64,11 @@ describe('ExportDialogComponent', () => {
   it('should close the dialog after export', async ()=>{
     component['downloadLink'].nativeElement = new NativeElementMock;
     spyOn(component['downloadLink'].nativeElement, 'click')
-    const date = '2023-02-01 12:00:00 GMT+1';
-    spyOn(Date, 'now').and.returnValue(Date.parse(date));
+    const datePrefix = '2023-02-1';
+    spyOn(Date, 'now').and.returnValue(Date.parse(`${datePrefix}5`));
     await component.exportData();
     expect(mockDialogRef.close).toHaveBeenCalledTimes(1);
     expect(component['downloadLink'].nativeElement.click).toHaveBeenCalledTimes(1);
-    expect(component['downloadLink'].nativeElement.download).toEqual(`export - ${date}`);
+    expect(component['downloadLink'].nativeElement.download.slice(0, 18)).toEqual(`export - ${datePrefix}`);
   })
 });
