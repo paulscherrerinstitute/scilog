@@ -8,6 +8,10 @@ import PDFMerger from 'pdf-merger-js';
 import Prism from 'prismjs';
 import LoadLanguages from 'prismjs/components/';
 import {omit} from 'lodash';
+import {writeFile} from 'fs/promises';
+import {create as tarCreate} from 'tar';
+import {mkdirSync, existsSync} from 'fs';
+import {basename} from 'path';
 
 @bind({
   scope: BindingScope.TRANSIENT,
@@ -30,6 +34,8 @@ export class ExportService {
   batchSize = 2000;
   paragraphCounter: number;
   subsnippetCounter: number;
+  attachments: string[][] = [];
+  attachmentsFolder = 'attachments';
 
   constructor(
     @inject(RestBindings.SERVER)
@@ -148,6 +154,7 @@ export class ExportService {
       this.code,
       this.table,
       this.figure,
+      this.attachment,
       this.tags,
       this.dateAndAuthor,
     ].reduce(
@@ -220,6 +227,21 @@ export class ExportService {
     return element;
   };
 
+  private attachment = (snippet: Paragraph, element: Element) => {
+    snippet.files?.map(fileSnippet => {
+      const fileLinkElement = element.querySelector(
+        `.fileLink[href='file:${fileSnippet.fileHash}']`,
+      );
+      if (!fileLinkElement) return;
+      const attachment = fileLinkElement.innerHTML;
+      const attachmentElement = this.document.createElement('fileLink');
+      attachmentElement.innerHTML = `${this.attachmentsFolder}/${fileLinkElement.innerHTML}`;
+      fileLinkElement.replaceWith(attachmentElement);
+      this.attachments.push([attachment, fileSnippet.accessHash as string]);
+    });
+    return element;
+  };
+
   private countSnippets(linkType?: LinkType) {
     let counter: number | string = '';
     if (linkType === 'paragraph') {
@@ -239,11 +261,16 @@ export class ExportService {
     this.body = dom.window.document.body as HTMLBodyElement;
   }
 
-  async exportToPdf(snippets: Paragraph[], exportFile: string, title?: string) {
+  async exportToPdf(
+    snippets: Paragraph[],
+    exportPath: {exportFile: string; exportDir: string},
+    title?: string,
+  ) {
     const browser = await puppeteerLaunc({
       executablePath: process.env.CHROME_BIN,
       args: ['--no-sandbox'],
     });
+    const exportFile = exportPath.exportFile;
     const chunks = Math.ceil(snippets.length / this.batchSize);
     const pdfs = [...Array(chunks).keys()].map(async c => {
       this.createDocumentBody();
@@ -258,12 +285,45 @@ export class ExportService {
     await Promise.all(pdfs);
     await browser.close();
     await this.mergePDFs(chunks, exportFile);
+    return this.zipAttachments(exportPath);
   }
 
   private async mergePDFs(chunks: number, exportFile: string) {
     const merger = new PDFMerger();
     for (let c = 0; c < chunks; c++) await merger.add(`${exportFile}.${c}`);
-    await merger.save(`${exportFile}`);
+    await merger.save(exportFile);
+  }
+
+  private async zipAttachments(exportPath: {
+    exportFile: string;
+    exportDir: string;
+  }) {
+    if (this.attachments.length === 0) return exportPath.exportFile;
+    const attachmentDir = `${exportPath.exportDir}/${this.attachmentsFolder}`;
+    if (!existsSync(attachmentDir)) mkdirSync(attachmentDir);
+    const downloadAttachmentDestinationBinding = this.downloadAttachment.bind(
+      this,
+      attachmentDir,
+    );
+    await Promise.all(
+      this.attachments.map(downloadAttachmentDestinationBinding),
+    );
+    const exportZip = `${exportPath.exportDir}.gz`;
+    await tarCreate({gzip: true, file: exportZip, C: exportPath.exportDir}, [
+      this.attachmentsFolder,
+      basename(exportPath.exportFile),
+    ]);
+    return exportZip;
+  }
+
+  private async downloadAttachment(
+    attachmentDir: string,
+    attachment: string[],
+  ) {
+    const response = await fetch(`${this.server.url}/images/${attachment[1]}`);
+    const buffer = Buffer.from(await response.arrayBuffer());
+    const destinationFile = `${attachmentDir}/${attachment[0]}`;
+    await writeFile(destinationFile, buffer);
   }
 
   private async htmlToPDF(

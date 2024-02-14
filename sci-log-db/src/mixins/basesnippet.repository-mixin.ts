@@ -429,12 +429,12 @@ function ExportRepositoryMixin<
       const jobEntity = await this.createExportJob(snippets, filter, user);
       const {exportFile, exportDir} = this.createPathsFromJob(jobEntity);
       const exportService = await this.exportServiceGetter();
-      await exportService.exportToPdf(
+      const outFile = await exportService.exportToPdf(
         snippets as unknown as Paragraph[],
-        exportFile,
+        {exportFile, exportDir},
         parentName,
       );
-      response.download(exportFile, (err, path = exportDir) => {
+      response.download(outFile, (err, path = exportDir) => {
         console.log('file transferred successfully', err);
         if (path.includes(this.basePath)) {
           fs.rmSync(path, {recursive: true});

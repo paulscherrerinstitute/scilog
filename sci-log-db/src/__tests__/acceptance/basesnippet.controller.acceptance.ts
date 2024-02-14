@@ -608,6 +608,34 @@ describe('Basesnippet', function (this: Suite) {
       });
   });
 
+  it('export snippet with token and parentId should return 200 and exported gz', async () => {
+    await client
+      .post('/basesnippets')
+      .set('Authorization', 'Bearer ' + token)
+      .set('Content-Type', 'application/json')
+      .send({
+        ...baseSnippet,
+        files: [{accessHash: 'someHash', fileHash: 'file1'}],
+        textcontent: "<div class='fileLink' href='file:file1'>someFile</div>",
+        parentId: baseSnippetId,
+      });
+
+    const whereParentId = {where: {parentId: baseSnippetId}};
+    await client
+      .get(`/basesnippets/export=pdf?filter=${JSON.stringify(whereParentId)}`)
+      .set('Authorization', 'Bearer ' + token)
+      .set('Content-Type', 'application/json')
+      .expect(200)
+      .then(result =>
+        expect(result.headers['content-disposition'].slice(-4, -1)).to.be.eql(
+          '.gz',
+        ),
+      )
+      .catch(err => {
+        throw err;
+      });
+  });
+
   [
     {
       input: {
