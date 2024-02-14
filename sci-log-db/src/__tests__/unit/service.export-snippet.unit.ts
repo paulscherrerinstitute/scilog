@@ -1,12 +1,15 @@
 import {expect} from '@loopback/testlab';
 import {Suite} from 'mocha';
-import {createSandbox, SinonSandbox} from 'sinon';
+import {createSandbox, SinonSandbox, match} from 'sinon';
 
 import {ExportService} from '../../services/export-snippets.service';
 import {LinkType, Paragraph} from '../../models';
 import {Server} from '@loopback/rest';
 import PDFMerger from 'pdf-merger-js';
 import puppeteer from 'puppeteer';
+import fspromise from 'fs/promises';
+import fs from 'fs';
+import tar from 'tar';
 
 describe('Export service unit', function (this: Suite) {
   let tests: string[] | string[][];
@@ -234,9 +237,14 @@ describe('Export service unit', function (this: Suite) {
         <keyof ExportService>'addTitle',
       );
       sandbox.stub(exportService, <keyof ExportService>'mergePDFs');
-      await exportService['exportToPdf'](paragraphs, 'aFile', 'aTitle');
+      const exportFile = await exportService['exportToPdf'](
+        paragraphs,
+        {exportFile: 'dir/file.pdf', exportDir: 'dir'},
+        'aTitle',
+      );
       expect(addTitle.callCount).to.be.eql(1);
       expect(htmlToPDF.callCount).to.be.eql(o);
+      expect(exportFile).to.be.eql('dir/file.pdf');
     });
   });
 
@@ -291,6 +299,89 @@ describe('Export service unit', function (this: Suite) {
       expect(
         exportService['table']({} as Paragraph, element).innerHTML,
       ).to.be.eql(t[1]);
+    });
+  });
+
+  [
+    {input: [{files: []}], expected: ['', []]},
+    {
+      input: [
+        {files: [{fileHash: 'hash123', accessHash: 'accessHash1'}]},
+        '<div class="notFileLink" href="hash456">notFileLink</div>',
+      ],
+      expected: [
+        '<div class="notFileLink" href="hash456">notFileLink</div>',
+        [],
+      ],
+    },
+    {
+      input: [
+        {files: [{fileHash: 'hash123', accessHash: 'accessHash1'}]},
+        '<div class="fileLink" href="hash456">anotherHref</div>',
+      ],
+      expected: ['<div class="fileLink" href="hash456">anotherHref</div>', []],
+    },
+    {
+      input: [
+        {files: [{fileHash: 'hash123', accessHash: 'accessHash2'}]},
+        '<div class="fileLink" href="file:hash123">someFile.pdf</div>',
+      ],
+      expected: [
+        '<filelink>attachments/someFile.pdf</filelink>',
+        [['someFile.pdf', 'accessHash2']],
+      ],
+    },
+  ].forEach((t, i) => {
+    it(`attachment ${i}`, async () => {
+      const element = textContentToHTML({textcontent: t.input[1]} as Paragraph);
+      expect(
+        exportService['attachment'](t.input[0] as Paragraph, element).innerHTML,
+      ).to.be.eql(t.expected[0]);
+      expect(exportService.attachments).to.be.eql(t.expected[1]);
+    });
+  });
+
+  it('downloadAttachment', async () => {
+    const responseSpy = sandbox
+      .stub(global, 'fetch')
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      .resolves({arrayBuffer: async () => '' as any} as Response);
+    sandbox.stub(Buffer, 'from');
+    const writeFileSpy = sandbox.stub(fspromise, 'writeFile');
+    await exportService['downloadAttachment']('someDir', ['a', 'b']);
+    expect(writeFileSpy.calledWith('someDir/a', match.any)).to.be.eql(true);
+    expect(responseSpy.calledWith('http://localhost:3000/images/b')).to.be.eql(
+      true,
+    );
+  });
+
+  [
+    {input: [], expected: ['dir/file.pdf', 0, false]},
+    {input: ['a', 'b'], expected: ['dir.gz', 2, true]},
+  ].forEach((t, i) => {
+    it(`zipAttachments ${i}`, async () => {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      exportService.attachments = t.input as any;
+      const tarSpy = sandbox.stub(tar, 'create');
+      sandbox.stub(fs, 'mkdirSync');
+
+      const downloadAttachmentSpy = sandbox.stub(
+        exportService,
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        <any>'downloadAttachment',
+      );
+      const zip = await exportService['zipAttachments']({
+        exportFile: 'dir/file.pdf',
+        exportDir: 'dir',
+      });
+      expect(zip).to.be.eql(t.expected[0]);
+      expect(downloadAttachmentSpy.callCount).to.be.eql(t.expected[1]);
+      expect(
+        tarSpy.calledWith({gzip: true, file: 'dir.gz', C: 'dir'}, [
+          'attachments',
+          'file.pdf',
+        ]),
+      ).to.eql(t.expected[2]);
     });
   });
 });
