@@ -1,10 +1,11 @@
-FROM node:16-alpine AS builder
+FROM node:18-alpine AS builder
 
 WORKDIR /frontend
 COPY package*.json /frontend/
 RUN npm install
+RUN npm install -g @angular/cli
 COPY . /frontend/
-RUN npx ng build --output-path=dist
+# RUN npx ng build --output-path=dist
 
 FROM nginx:1.21-alpine
 RUN rm -rf /usr/share/nginx/html*
