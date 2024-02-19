@@ -1,6 +1,6 @@
 import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 import { UntypedFormBuilder } from '@angular/forms';
-import { MatDialogModule, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
+import { MatLegacyDialogModule as MatDialogModule, MatLegacyDialogRef as MatDialogRef, MAT_LEGACY_DIALOG_DATA as MAT_DIALOG_DATA } from '@angular/material/legacy-dialog';
 
 import { WidgetPreferencesComponent } from './widget-preferences.component';
 import { LogbookInfoService } from '@shared/logbook-info.service';
@@ -8,7 +8,7 @@ import { UserPreferencesService } from '@shared/user-preferences.service';
 import { WidgetPreferencesDataService, LogbookDataService } from '@shared/remote-data.service';
 import { of } from 'rxjs';
 import { CdkTextareaAutosize } from '@angular/cdk/text-field';
-import { MatAutocompleteModule } from '@angular/material/autocomplete';
+import { MatLegacyAutocompleteModule as MatAutocompleteModule } from '@angular/material/legacy-autocomplete';
 
 
 class UserPreferencesMock {
