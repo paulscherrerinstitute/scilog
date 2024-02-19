@@ -1,4 +1,4 @@
-import { ChangeDetectorRef, Component, ElementRef, Input, OnInit, QueryList, Renderer2, ViewChild, ViewChildren } from '@angular/core';
+import { ChangeDetectorRef, Component, ElementRef, HostListener, Input, OnInit, QueryList, Renderer2, ViewChild, ViewChildren } from '@angular/core';
 import { ChangeStreamService } from '@shared/change-stream.service';
 import { ChangeStreamNotification } from '@shared/changestreamnotification.model'
 import { HttpClient } from '@angular/common/http';
@@ -17,12 +17,11 @@ import {
 import { Basesnippets, Filecontainer } from '@model/basesnippets';
 import { SnippetComponent } from '@shared/snippet/snippet.component';
 import { LogbookInfoService } from '@shared/logbook-info.service';
-import { Subject, Subscription, BehaviorSubject, fromEvent } from 'rxjs';
+import { Subject, Subscription, BehaviorSubject } from 'rxjs';
 import { ActivatedRoute } from '@angular/router';
 import { ViewsService } from '@shared/views.service';
 import * as ClassicEditor from '@shared/ckeditor/ckeditor5/build/ckeditor';
 import { CKEditorComponent } from '@shared/ckeditor/ckeditor5/build/ckeditor';
-import { MediaObserver } from '@angular/flex-layout';
 import { CK5ImageUploadAdapter } from '@shared/ckeditor/ck5-image-upload-adapter';
 import { extractNotificationMessage } from '@shared/add-content/add-content.component';
 import { UserPreferencesService } from '@shared/user-preferences.service';
@@ -169,7 +168,6 @@ export class LogbookItemComponent implements OnInit {
     private route: ActivatedRoute,
     private views: ViewsService,
     private renderer: Renderer2,
-    private media: MediaObserver,
     private httpClient: HttpClient,
     private userPreferences: UserPreferencesService,
     private logbookItemDataService: LogbookItemDataService,
@@ -198,16 +196,6 @@ export class LogbookItemComponent implements OnInit {
       console.log("retrieving logbook info");
       this.logbookInfo.getLogbookInfo(this.logbookId);
     }
-    this.subscriptions.push(this.media.asObservable().subscribe((change: any) => {
-      if (change[0].mqAlias === 'sm' || change[0].mqAlias === 'xs') {
-        this.mobile = true;
-        console.log("mobile");
-        this.updateViewHeights();
-      } else {
-        this.mobile = false;
-        this.updateViewHeights();
-      }
-    }));
   }
 
   ngOnInit(): void {
@@ -689,20 +677,20 @@ export class LogbookItemComponent implements OnInit {
     this.submitContent(notification);
   }
 
+  isMobile() {
+    this.mobile = window.innerWidth < 959;
+  }
+
+  @HostListener('window:resize')
   onResized() {
     const _heightRef = this.snippetContainerRef.nativeElement.parentElement.parentElement.parentElement.parentElement.offsetHeight;
     const _editorHeight = this.editorRef?.nativeElement?.offsetHeight;
     if (this._snippetHeightRef != _heightRef || this._editorHeightRef != _editorHeight) {
       this._snippetHeightRef = _heightRef;
       this._editorHeightRef = _editorHeight;
+      this.isMobile();
       this.updateViewHeights();
     }
-
-    // console.log(this.snippetContainerRef.nativeElement.parentElement.parentElement.parentElement.parentElement.offsetHeight);
-    // this.throttle(() => {
-    //   console.log("update view")
-    //   return this.updateViewHeights(event);
-    // }, 10);
   }
 
   updateViewHeights() {

@@ -4,7 +4,6 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { Subscription } from 'rxjs';
 import { ViewsService } from '@shared/views.service';
 import { WidgetConfig } from '@model/config';
-import { MediaObserver } from '@angular/flex-layout';
 import { Hotkeys } from '@shared/hotkeys.service';
 import { ComponentCanDeactivate } from '../core/navigation-guard-service';
 
@@ -88,7 +87,6 @@ export class DashboardComponent implements OnInit, ComponentCanDeactivate {
   constructor(
     private route: ActivatedRoute,
     private router: Router,
-    private media: MediaObserver,
     private views: ViewsService,
     private hotkeys: Hotkeys) { }
 
@@ -110,15 +108,6 @@ export class DashboardComponent implements OnInit, ComponentCanDeactivate {
     }));
     console.log(this.optionsEdit);
     console.log(this.options);
-    this.subscriptions.push(this.media.asObservable().subscribe((change: any) => {
-      if (change[0].mqAlias === 'sm' || change[0].mqAlias === 'xs') {
-        this.mobile = true;
-        console.log("mobile");
-      } else {
-        this.mobile = false;
-      }
-    }));
-
 
     if (this.route.parent != null) {
       this.subscriptions.push(this.route.parent.url.subscribe((urlPath) => {
@@ -219,6 +208,11 @@ export class DashboardComponent implements OnInit, ComponentCanDeactivate {
     }
     // console.log("routerPath:", routerPath, $event["type"]);
     this.router.navigate([routerPath, 'dashboard-item'], { queryParams: { id: index } });
+  }
+
+  @HostListener('window:resize')
+  onResized() {
+    this.mobile = window.innerWidth < 959;
   }
 
   ngOnDestroy(): void {

@@ -30,4 +30,20 @@ describe('LogbookComponent', () => {
     expect(component).toBeTruthy();
   });
 
+  it('should set mobile true', () => {
+    window.innerWidth = 10;
+    component['setMobileDependentOptions']();
+    expect(component.mobile).toEqual(true);
+    expect(component.sidenavOpened).toEqual(false);
+    expect(component.sidenavOver).toEqual('over');
+  });
+
+  it('should set mobile false', () => {
+    window.innerWidth = 2000;
+    component['setMobileDependentOptions']();
+    expect(component.mobile).toEqual(false);
+    expect(component.sidenavOpened).toEqual(true);
+    expect(component.sidenavOver).toEqual('side');
+  });
+
 });
