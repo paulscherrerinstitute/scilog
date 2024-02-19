@@ -1,43 +1,37 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { Component, DebugElement } from '@angular/core';
-import { By } from '@angular/platform-browser';
 
 import { ResizedDirective } from './resized.directive';
+import { By } from '@angular/platform-browser';
 
 @Component({
-    template: `<div style="width: 10px" (resized)=hasBeenResized()></div>`,
+    template: `<div style="width: 10px" (resized)="hasBeenResized()"></div>`,
     imports: [ResizedDirective],
   })
 class TestComponent {
-  resized = false;
+  isResized = false;
   hasBeenResized() {
-    this.resized = true;
+    this.isResized = true;
   }
 }
 
 describe('resizedDirective', () => {
   let fixture: ComponentFixture<TestComponent>;
-  let divElement: DebugElement;
-  let directive: DebugElement;
   let component: TestComponent;
+  let divElement: DebugElement;
 
-  
   beforeEach(() => {
     fixture = TestBed.configureTestingModule({
         declarations: [ResizedDirective, TestComponent],
     }).createComponent(TestComponent);
     component = fixture.componentInstance;
-    fixture.detectChanges();
     divElement = fixture.debugElement.query(By.css('div'));
-    directive = fixture.debugElement.query(By.directive(ResizedDirective));
+    fixture.detectChanges();
   });
 
-  it('should respond to resize event', async () => {
-    expect(component.resized).toEqual(false);
-    divElement.nativeElement.style.width = '20px';
-    fixture.detectChanges();  
-    fixture.whenStable().then(() => {
-      expect(component.resized).toEqual(true);
-    });
+  it('should respond to resize event', () => {
+    expect(component.isResized).toEqual(false);
+    divElement.triggerEventHandler('resized');
+    expect(component.isResized).toEqual(true);
   });
 });
