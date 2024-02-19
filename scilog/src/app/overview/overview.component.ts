@@ -11,7 +11,7 @@ import { CookiesService } from '@shared/cookies.service';
 import { LogbookDataService } from '@shared/remote-data.service';
 import { LogbookIconScrollService } from './logbook-icon-scroll-service.service';
 import { debounceTime } from 'rxjs/operators';
-import { ResizedEvent } from 'angular-resize-event';
+import { ResizedEvent } from '@shared/directives/resized.directive';
 
 enum ContentType {
   COLLECTION = 'collection',

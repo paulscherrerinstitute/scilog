@@ -31,7 +31,6 @@
     "@material/textfield": "^7.0.0",
     "@wiris/mathtype-ckeditor5": "^7.24.1",
     "angular-gridster2": "^14.1.2",
-    "angular-resize-event": "^3.2.0",
     "assert": "^2.0.0",
     "browserify-fs": "^1.0.0",
     "browserify-zlib": "^0.2.0",
