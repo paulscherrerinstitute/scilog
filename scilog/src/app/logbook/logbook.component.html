@@ -1,4 +1,4 @@
-<app-toolbar [showMenuIcon]='mobile' (openMenu)="openMenu()"></app-toolbar>
+<app-toolbar [showMenuIcon]='mobile' (openMenu)="openMenu()" (resized)="onResized()"></app-toolbar>
 <mat-sidenav-container>
 
     <mat-sidenav #sidenav [(mode)]="sidenavOver" [(opened)]="sidenavOpened" class="left-sidenav">

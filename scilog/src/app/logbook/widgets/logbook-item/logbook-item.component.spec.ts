@@ -243,7 +243,7 @@ describe('LogbookItemComponent', () => {
     component.configIndex = 1;
     component.logbookCount = 10;
     component['renderer'] = {setStyle: () => true} as unknown as Renderer2;
-
+    window.innerWidth = 2000;
     fixture.detectChanges();
     // views = TestBed.get(ViewsService);
   });
@@ -615,8 +615,10 @@ describe('LogbookItemComponent', () => {
       }};
       component.editorRef = {nativeElement: {offsetHeight: t.input[1]}};
       const updateViewHeightsSpy = spyOn(component, 'updateViewHeights').and.callFake(() => true);
+      if (i === 3) window.innerWidth = 10;
       component.onResized();
       expect(updateViewHeightsSpy).toHaveBeenCalledTimes(t.output);
+      expect(component.mobile).toEqual(i === 3);
     })
   })
 
@@ -674,5 +676,10 @@ describe('LogbookItemComponent', () => {
     });
   });
 
+  it('should set mobile', () => {
+    window.innerWidth = 10;
+    component.isMobile();
+    expect(component.mobile).toEqual(true);
+  });
 
 });
