@@ -30,6 +30,7 @@ describe('WidgetPreferencesComponent', () => {
   logbookSpy.logbookInfo.and.returnValue([]);
 
   logbookDataSpy = jasmine.createSpyObj("LogbookDataService", ["getLogbookInfo", "getLogbooksInfo"]);
+  logbookDataSpy.getLogbooksInfo.and.returnValue([]);
 
   widgetPreferencesSpy = jasmine.createSpyObj("WidgetPreferencesDataService", ["getSnippetsForLogbook", "getPlotSnippets"]);
   widgetPreferencesSpy.getSnippetsForLogbook.and.returnValue(of({}));
