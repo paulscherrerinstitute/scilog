@@ -44,7 +44,7 @@ import { MatLegacyInputModule as MatInputModule } from '@angular/material/legacy
 import { AuthInterceptor } from '@shared/auth-services/auth.interceptor';
 import { HTTP_INTERCEPTORS } from '@angular/common/http';
 import { ToolbarComponent } from '@shared/toolbar/toolbar.component';
-import { ChartsModule } from 'ng2-charts';
+import { NgChartsModule } from 'ng2-charts';
 import { MatLegacyTooltipModule as MatTooltipModule } from '@angular/material/legacy-tooltip';
 import { WidgetPreferencesComponent } from './logbook/widgets/widget-preferences/widget-preferences.component';
 import { MatLegacySelectModule as MatSelectModule } from '@angular/material/legacy-select';
@@ -158,7 +158,7 @@ const appConfigInitializerFn = (appConfig: AppConfigService) => {
         MatBadgeModule,
         ReactiveFormsModule,
         MatInputModule,
-        ChartsModule,
+        NgChartsModule,
         MatTooltipModule,
         MatSelectModule,
         MatRadioModule,
