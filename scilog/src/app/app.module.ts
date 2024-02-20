@@ -44,7 +44,7 @@ import { MatInputModule } from '@angular/material/input';
 import { AuthInterceptor } from '@shared/auth-services/auth.interceptor';
 import { HTTP_INTERCEPTORS } from '@angular/common/http';
 import { ToolbarComponent } from '@shared/toolbar/toolbar.component';
-import { ChartsModule } from 'ng2-charts';
+import { NgChartsModule } from 'ng2-charts';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { WidgetPreferencesComponent } from './logbook/widgets/widget-preferences/widget-preferences.component';
 import { MatSelectModule } from '@angular/material/select';
@@ -157,7 +157,7 @@ const appConfigInitializerFn = (appConfig: AppConfigService) => {
         MatBadgeModule,
         ReactiveFormsModule,
         MatInputModule,
-        ChartsModule,
+        NgChartsModule,
         MatTooltipModule,
         MatSelectModule,
         MatRadioModule,
