@@ -48,7 +48,6 @@
     "prismjs": "^1.29.0",
     "prismjs-components-importer": "^0.2.0",
     "process": "^0.11.10",
-    "raw-loader": "^3.1.0",
     "rxjs": "^7.8.0",
     "rxjs-observable": "0.0.7",
     "socket.io": "^2.3.0",
