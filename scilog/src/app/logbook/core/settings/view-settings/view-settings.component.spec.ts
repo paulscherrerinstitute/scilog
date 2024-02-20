@@ -32,6 +32,7 @@ describe('ViewSettingsComponent', () => {
   logbookSpy.logbookInfo.and.returnValue([]);
 
   logbookDataSpy = jasmine.createSpyObj("LogbookDataService", ["getLocations"]);
+  logbookDataSpy.getLocations.and.returnValue([{}])
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({

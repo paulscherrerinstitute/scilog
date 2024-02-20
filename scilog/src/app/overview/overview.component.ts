@@ -109,12 +109,16 @@ export class OverviewComponent implements OnInit {
 
   get matCardSide() {
     const matCardType = this.matCardType;
-    const element = this.logbookIconScrollService?.datasource?.adapter?.firstVisible?.element?.querySelector?.(`.${matCardType}`);
+    const element = this.getFirstVisibleElement(matCardType);
     const matCardSide = element?.[this.clientSide];
     if (!matCardSide)
       return this._matCardSide[matCardType];
     this._matCardSide[matCardType] = matCardSide;
     return this._matCardSide[matCardType]
+  }
+
+  private getFirstVisibleElement(matCardType: string) {
+    return this.logbookIconScrollService?.datasource?.adapter?.firstVisible?.element?.querySelector?.(`.${matCardType}`);
   }
 
   groupSize(viewPortSide: number) {

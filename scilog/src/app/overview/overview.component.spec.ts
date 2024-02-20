@@ -10,7 +10,6 @@ import { of } from 'rxjs';
 import { RouterTestingModule } from '@angular/router/testing';
 import {Pipe, PipeTransform} from '@angular/core';
 import { Logbooks } from '@model/logbooks';
-import { IDatasource } from 'ngx-ui-scroll';
 import { ResizedEvent } from '@shared/directives/resized.directive';
 
 @Pipe({name: 'logbookSearch'})
@@ -73,14 +72,14 @@ describe('OverviewComponent', () => {
   });
 
   [
-    {adapter: {firstVisible: {element: {}}}},
     {},
-    {adapter: {firstVisible: {element: {querySelector: () => ({clientWidth: 0, clientHeight: 0})}}}},
-    {adapter: {firstVisible: {element: {querySelector: () => ({clientWidth: 10, clientHeight: 20})}}}},
+    undefined,
+    {clientWidth: 0, clientHeight: 0},
+    {clientWidth: 10, clientHeight: 20},
   ].forEach((t, i) => {
     [['logbook-module', 10], ['logbook-headline', 20]].forEach(st => {
       it(`should test get matCardSide ${i}:${st[0]}`, () => {
-        component['logbookIconScrollService']['datasource'] = t as unknown as IDatasource;
+        spyOn<any>(component, 'getFirstVisibleElement').and.returnValue(t);
         component.matCardType = st[0] as MatCardType;
         const expected = st[0] === 'logbook-module' ? 352 : 47;
         expect(component.matCardSide).toEqual(i === 3 ? st[1] as number : expected);
