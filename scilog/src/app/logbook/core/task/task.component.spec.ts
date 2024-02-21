@@ -32,13 +32,6 @@ describe('TaskComponent', () => {
       expect(component).toBeTruthy();
     });
 
-    it('should addTask', () => {
-      const addTaskSpy = spyOn(component['tasksService'], 'addTask');
-      const task = {isDone: false} as Tasks;
-      component.addTask(task);
-      expect(addTaskSpy).toHaveBeenCalledOnceWith(task);
-    });
-
     it('should toggleTaskIsDone', () => {
       const updateTaskSpy = spyOn(component['tasksService'], 'updateTask');
       component.toggleTaskIsDone();

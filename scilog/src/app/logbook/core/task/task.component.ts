@@ -25,10 +25,6 @@ export class TaskComponent implements OnInit {
     this.isAllowed();
   }
 
-  addTask(task: Tasks) {
-    this.tasksService.addTask(task);
-  }
-
   toggleTaskIsDone() {
     let payload = {
       isDone: !this.task.isDone
