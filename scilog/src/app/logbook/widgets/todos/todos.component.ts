@@ -1,11 +1,10 @@
-import { Component, Input, OnInit, ViewChild } from '@angular/core';
+import { Component, Input, OnInit } from '@angular/core';
 import { Tasks } from '@model/tasks';
 import { TasksService } from '@shared/tasks.service';
 import { LogbookInfoService } from '@shared/logbook-info.service';
 import { ChangeStreamService } from '@shared/change-stream.service';
 import { Subscription } from 'rxjs';
 import { ViewsService } from '@shared/views.service';
-import { TaskComponent } from '../../core/task/task.component';
 
 @Component({
   selector: 'todos',
@@ -16,7 +15,6 @@ export class TodosComponent implements OnInit {
 
   @Input()
   configIndex: number;
-  @ViewChild(TaskComponent) taskComponent: TaskComponent;
 
   tasks: Tasks[] = [];
   newTask = '';
@@ -68,7 +66,7 @@ export class TodosComponent implements OnInit {
       isDone: false
     };
     console.log("adding new task")
-    this.taskComponent.addTask(newTask);
+    this.tasksService.addTask(newTask);
     this.newTask = '';
   }
 

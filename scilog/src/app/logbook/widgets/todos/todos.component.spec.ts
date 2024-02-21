@@ -18,7 +18,8 @@ class ChangeStreamServiceMock {
 class TasksServiceMock {
   numTasks = 0;
   currentTasks = of([{}]);
-  taskChange(data: any){}
+  taskChange(data: any){};
+  addTask(){};
 }
 
 class ViewsServiceMock {
@@ -27,7 +28,13 @@ class ViewsServiceMock {
 
 class LogbookInfoMock {
   logbookInfo = {
-    id: '1234'
+    id: '1234',
+    ownerGroup: 'some',
+    accessGroups: ['someAccess'],
+    isPrivate: false,
+    snippetType: "task",
+    content: '2',
+    isDone: false
   };
   currentLogbookInfo = of({});
 
@@ -66,6 +73,21 @@ describe('TodosComponent', () => {
 
   it('should create', () => {
     expect(component).toBeTruthy();
+  });
+
+  it('should addTask', () => {
+    component.newTask = '2'
+    const addTaskSpy = spyOn(component['tasksService'], 'addTask');
+    component.addTasks();
+    expect(addTaskSpy).toHaveBeenCalledOnceWith({
+      ownerGroup: 'some',
+      accessGroups: ['someAccess'],
+      isPrivate: false,
+      parentId: '1234',
+      snippetType: "task",
+      content: '2',
+      isDone: false
+    });
   });
 
 });
