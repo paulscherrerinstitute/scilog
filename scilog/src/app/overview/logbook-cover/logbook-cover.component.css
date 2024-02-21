@@ -8,6 +8,7 @@
     padding: 15px;
     height: 170px;
     overflow-y: scroll;
+    scrollbar-width: none;
 }
 
 .logbook-module .mat-card-header .mat-card-title {
