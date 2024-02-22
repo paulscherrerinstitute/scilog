@@ -60,7 +60,6 @@ import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { MatAutocompleteModule } from '@angular/material/autocomplete';
 import { LogbookSearchPipe } from './overview/logbook-search.pipe';
 import { NavigationButtonComponent } from './logbook/navigation-button/navigation-button.component';
-import { AngularResizeEventModule } from 'angular-resize-event';
 import { SnippetContentComponent } from '@shared/snippet/snippet-content/snippet-content.component';
 import { CookieService } from 'ngx-cookie-service';
 import { NgxJdenticonModule, JDENTICON_CONFIG } from 'ngx-jdenticon';
@@ -84,6 +83,7 @@ import { SearchWindowComponent } from '@shared/search-window/search-window.compo
 import { AppConfigService } from "./app-config.service";
 import { NavigationGuardService } from './logbook/core/navigation-guard-service';
 import { TaskComponent } from './logbook/core/task/task.component';
+import { ResizedDirective } from '@shared/directives/resized.directive';
 
 const appConfigInitializerFn = (appConfig: AppConfigService) => {
     return () => appConfig.loadAppConfig();
@@ -128,7 +128,8 @@ const appConfigInitializerFn = (appConfig: AppConfigService) => {
         DownloadComponent,
         SearchComponent,
         SearchWindowComponent,
-        TaskComponent
+        TaskComponent,
+        ResizedDirective
     ],
     imports: [
         BrowserModule,
@@ -165,7 +166,6 @@ const appConfigInitializerFn = (appConfig: AppConfigService) => {
         FormsModule,
         MatSlideToggleModule,
         MatAutocompleteModule,
-        AngularResizeEventModule,
         NgxJdenticonModule,
         MatTabsModule,
         UiScrollModule,

@@ -10,7 +10,7 @@ import { of } from 'rxjs';
 import { RouterTestingModule } from '@angular/router/testing';
 import {Pipe, PipeTransform} from '@angular/core';
 import { Logbooks } from '@model/logbooks';
-import { ResizedEvent } from 'angular-resize-event';
+import { ResizedEvent } from '@shared/directives/resized.directive';
 
 @Pipe({name: 'logbookSearch'})
 class LogbookSearchMockPipe implements PipeTransform {
