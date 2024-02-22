@@ -1,7 +1,6 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, HostListener, OnInit } from '@angular/core';
 import { ChangeStreamService } from '@shared/change-stream.service';
 import { ChangeStreamNotification } from '@shared/changestreamnotification.model'
-import { MediaObserver } from '@angular/flex-layout';
 import { Subscription } from 'rxjs';
 import { ActivatedRoute, Router } from '@angular/router';
 import { LogbookInfoService } from '@shared/logbook-info.service';
@@ -47,30 +46,12 @@ export class LogbookComponent implements OnInit {
   subscriptions: Subscription[] = [];
 
   constructor(
-    private media: MediaObserver,
     private route: ActivatedRoute,
     private logbookInfo: LogbookInfoService,
     private tasks: TasksService,
     private views: ViewsService,
     private router: Router,
-    private tags: TagService) {
-    this.subscriptions.push(this.media.asObservable().subscribe((change: any) => {
-      if (change[0].mqAlias === 'sm' || change[0].mqAlias === 'xs') {
-        this.sidenavOpened = false;
-        this.sidenavOver = 'over';
-        this.mobile = true;
-        console.log("mobile");
-        if (this.route.snapshot.queryParams.id) {
-          this.dashboardView = false;
-        }
-        // this.initialNavigation(); -- this should be fixed!!!
-      } else {
-        this.sidenavOpened = true;
-        this.sidenavOver = 'side';
-        this.mobile = false;
-      }
-    }));
-  }
+    private tags: TagService) {}
 
   ngOnInit() {
     this.subscriptions.push(this.tasks.currentTasks.subscribe(tasks => {
@@ -141,6 +122,26 @@ export class LogbookComponent implements OnInit {
     if (this.mobile && this.logbookId) {
       console.log(['logbooks/' + this.logbookId + '/dashboard-item'])
       this.router.navigate(['logbooks/' + this.logbookId + '/dashboard-item'], { queryParams: { id: 0 } });
+    }
+  }
+
+  @HostListener('window:resize')
+  onResized() {
+    this.setMobileDependentOptions();
+  }
+
+
+  private setMobileDependentOptions() {
+    this.mobile = window.innerWidth < 959;
+    if (this.mobile) {
+      this.sidenavOpened = false;
+      this.sidenavOver = 'over';
+      if (this.route.snapshot.queryParams.id) {
+        this.dashboardView = false;
+      }
+    } else {
+      this.sidenavOpened = true;
+      this.sidenavOver = 'side';
     }
   }
 

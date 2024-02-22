@@ -1,4 +1,4 @@
-<div class="gridster-container">
+<div class="gridster-container" (resized)="onResized()">
     <div class="dashboard-edit">
         <button mat-icon-button (click)="addItemToDashboard()" *ngIf="editMode">
             <mat-icon matTooltip="Add widget">add</mat-icon>
