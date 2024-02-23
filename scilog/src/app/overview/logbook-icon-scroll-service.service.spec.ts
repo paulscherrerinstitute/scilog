@@ -2,7 +2,7 @@ import { TestBed } from '@angular/core/testing';
 import { LogbookDataService } from '@shared/remote-data.service';
 
 import { LogbookIconScrollService } from './logbook-icon-scroll-service.service';
-import { AdapterMethodResult, IDatasource } from 'ngx-ui-scroll/src/component/interfaces';
+import { IDatasource } from 'ngx-ui-scroll';
 
 describe('LogbookIconScrollServiceService', () => {
   let service: LogbookIconScrollService;
@@ -24,7 +24,7 @@ describe('LogbookIconScrollServiceService', () => {
   });
 
   it('should test getData', async () => {
-    service['datasource'] = {adapter: {relax: async () => ({} as AdapterMethodResult)}} as IDatasource;
+    service['datasource'] = {adapter: {relax: async () => ({})}} as IDatasource;
     expect(await service.getData(0, 10, {})).toEqual([[1, 2, 3], [4, 5, 6], [7]]);
   });
 

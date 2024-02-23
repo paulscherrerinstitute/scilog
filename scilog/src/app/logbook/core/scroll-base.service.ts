@@ -70,7 +70,7 @@ export class ScrollBaseService {
   }
 
   remove(id: string) {
-    this.datasource.adapter.remove({ predicate: ({ data }) => data.id === id });
+    this.datasource.adapter.remove({ predicate: ({ data }) => (data as {id: string}).id === id });
   }
 
   reset() {
