@@ -39,7 +39,7 @@
     "jdenticon": "^3.2.0",
     "ng2-charts": "^4.1.1",
     "ngx-cookie-service": "^14.0.1",
-    "ngx-jdenticon": "^1.0.4",
+    "ngx-jdenticon": "^2.0.0",
     "ngx-ui-scroll": "^1.11.0-rc.1",
     "node-polyfill-webpack-plugin": "^2.0.1",
     "postcss-loader": "^3.0.0",
