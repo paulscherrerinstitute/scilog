@@ -4,7 +4,7 @@ import { ChangeStreamService } from './change-stream.service';
 import { SnackbarService } from '@shared/snackbar.service';
 import { ServerSettingsService } from '@shared/config/server-settings.service';
 import { AppConfigService } from 'src/app/app-config.service';
-import { MatLegacySnackBar as MatSnackBar } from '@angular/material/legacy-snack-bar';
+import { MatSnackBar } from '@angular/material/snack-bar';
 import { Overlay } from '@angular/cdk/overlay';
 
 const getConfig = () => ({});

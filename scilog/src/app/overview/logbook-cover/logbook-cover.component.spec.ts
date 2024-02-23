@@ -4,7 +4,7 @@ import { LogbookItemDataService } from '@shared/remote-data.service';
 import { UserPreferencesService } from '@shared/user-preferences.service';
 import { LogbookInfoService } from '@shared/logbook-info.service';
 import { of } from 'rxjs';
-import { MatLegacyMenuModule as MatMenuModule } from '@angular/material/legacy-menu';
+import { MatMenuModule } from '@angular/material/menu';
 import { Logbooks } from '@model/logbooks';
 import { MatCardType } from '../overview.component';
 

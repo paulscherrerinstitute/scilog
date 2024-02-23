@@ -35,21 +35,25 @@
   align-items: center;
 }
 
+  /* TODO(mdc-migration): The following rule targets internal classes of form-field that may no longer apply for the MDC version. */
   ::ng-deep .mat-focused .mat-form-field-label {
     /*change color of label*/
     color: var(--button-accent) !important;
    }
   
+   /* TODO(mdc-migration): The following rule targets internal classes of form-field that may no longer apply for the MDC version. */
    ::ng-deep.mat-form-field-underline {
     /*change color of underline*/
     background-color: var(--button-accent) !important;
   } 
   
+  /* TODO(mdc-migration): The following rule targets internal classes of form-field that may no longer apply for the MDC version. */
   ::ng-deep.mat-form-field-ripple {
    /*change color of underline when focused*/
    background-color: var(--button-accent) !important;;
   }
 
+  /* TODO(mdc-migration): The following rule targets internal classes of form-field that may no longer apply for the MDC version. */
   ::ng-deep .mat-form-field-appearance-legacy .mat-form-field-label{
     color: var(--default-text-color);
   }
@@ -99,7 +103,8 @@
     border-radius: 4px !important;
   }
 
-.mat-standard-chip.mat-chip-with-trailing-icon {
+/* TODO(mdc-migration): The following rule targets internal classes of chips that may no longer apply for the MDC version. */
+.mat-mdc-standard-chip.mat-chip-with-trailing-icon {
   font-size: 10px;
   border-radius: 10px;
   padding-top: 2px;

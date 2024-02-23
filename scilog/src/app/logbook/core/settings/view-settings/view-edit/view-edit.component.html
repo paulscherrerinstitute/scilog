@@ -17,7 +17,7 @@
       </div>
       <mat-divider></mat-divider>
       <div>
-        <mat-form-field appearance="standard" required>
+        <mat-form-field required>
             <mat-label>Title</mat-label>
             <input matInput placeholder="Title of the view" [formControl]="editFormGroup.get('name')">
             <mat-error *ngIf="editFormGroup.get('name').hasError('required')">Please specify a name.</mat-error>
@@ -26,7 +26,7 @@
           </mat-form-field>
       </div>
       <div>
-        <mat-form-field appearance="standard">
+        <mat-form-field>
           <mat-label>Location</mat-label>
           <mat-select [formControl]="editFormGroup.get('location')" (selectionChange)="selectLocation($event)">
             <ng-container *ngFor="let location of availLocations">
@@ -38,7 +38,7 @@
         </mat-form-field>
       </div>
       <div>
-        <mat-form-field appearance="standard" required>
+        <mat-form-field required>
           <mat-label>ownerGroup</mat-label>
           <input matInput placeholder="ownerGroup" [matAutocomplete]="autoOwnerGroup" [formControl]="editFormGroup.get('ownerGroup')">
           <mat-error *ngIf="editFormGroup.get('ownerGroup').hasError('required')">Please specify the owner
@@ -55,19 +55,19 @@
       </div>
       <div>
         <mat-form-field>
-          <mat-chip-list #accessGroupsChipList aria-label="AccessGroups selection" >
-            <mat-chip *ngFor="let group of accessGroupsSelected" [selectable]="selectable"
+          <mat-chip-grid #accessGroupsChipList aria-label="AccessGroups selection" >
+            <mat-chip-row *ngFor="let group of accessGroupsSelected" [selectable]="selectable"
               [removable]="removable" (removed)="removeAccessGroup(group)">
               {{group}}
               <mat-icon matChipRemove *ngIf="removable">cancel</mat-icon>
-            </mat-chip>
+            </mat-chip-row>
             <input placeholder="accessGroups" #accessGroupsInput [formControl]="editFormGroup.get('accessGroupsCtrl')"
               [matAutocomplete]="autoAccessGroups" [matChipInputFor]="accessGroupsChipList"
               [matChipInputSeparatorKeyCodes]="separatorKeysCodes"
               (matChipInputTokenEnd)="addAccessGroup($event)" [disabled]="editFormGroup.get('accessGroupsCtrl').disabled">
               <mat-error *ngIf="editFormGroup.get('accessGroupsCtrl').hasError('forbiddenGroup')">You are not a member of this group.
             </mat-error>
-          </mat-chip-list>
+          </mat-chip-grid>
           <mat-autocomplete #autoAccessGroups="matAutocomplete" (optionSelected)="selectedAccessGroup($event)">
             <mat-option *ngFor="let group of filteredAccessGroups | async" [value]="group">
               {{group}}
