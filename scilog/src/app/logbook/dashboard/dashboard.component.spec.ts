@@ -3,7 +3,7 @@ import {HttpClientTestingModule} from '@angular/common/http/testing';
 import { DashboardComponent } from './dashboard.component';
 import { RouterTestingModule } from '@angular/router/testing';
 import { AppConfigService } from 'src/app/app-config.service';
-import { MatDialog } from '@angular/material/dialog';
+import { MatLegacyDialog as MatDialog } from '@angular/material/legacy-dialog';
 
 const getConfig = () => ({});
 
