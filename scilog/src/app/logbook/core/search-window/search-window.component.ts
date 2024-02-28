@@ -65,13 +65,12 @@ export class SearchWindowComponent implements OnInit {
     this.subscriptions.push(this.searchStringSubject.pipe(debounceTime(500)).subscribe(() => {
       if (this._searchString.length > 0) {
         this.showResults = !this.showHelp;
+        this.searchScrollService.config = this._prepareConfig();
+        this.searchScrollService.reset();
       } else {
         this.showHelp = true;
         this.showResults = false;
       }
-      this.searchScrollService.config = this._prepareConfig();
-      this.searchScrollService.reset();
-
     }));
     this._initialize_help();
 

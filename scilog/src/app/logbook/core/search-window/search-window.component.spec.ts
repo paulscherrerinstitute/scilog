@@ -1,5 +1,5 @@
 import { HttpClientTestingModule } from '@angular/common/http/testing';
-import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
+import { ComponentFixture, TestBed, fakeAsync, tick, waitForAsync } from '@angular/core/testing';
 import { MatDialog } from '@angular/material/dialog';
 import { LogbookInfoService } from '@shared/logbook-info.service';
 import { AppConfigService } from 'src/app/app-config.service';
@@ -34,4 +34,13 @@ describe('SearchWindowComponent', () => {
   it('should create', () => {
     expect(component).toBeTruthy();
   });
+
+  it('should call _prepareConfig on searchString emission', fakeAsync(() => {
+    const prepareConfigSpy = spyOn<any>(component, '_prepareConfig');
+    component.searchString = '';
+    component.searchString = 'someSearch';
+    tick(501);
+    expect(prepareConfigSpy).toHaveBeenCalledTimes(1);
+  }));
+
 });

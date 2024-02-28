@@ -28,4 +28,11 @@ describe('LogbookIconScrollServiceService', () => {
     expect(await service.getData(0, 10, {})).toEqual([[1, 2, 3], [4, 5, 6], [7]]);
   });
 
+  it('should test getDataBuffer after decoration', async () => {
+    expect(service['isLoaded']).toEqual(false);
+    spyOn(service, 'getData').and.resolveTo([]);
+    await service.getDataBuffer(1, 2, 3);
+    expect(service['isLoaded']).toEqual(true);
+  });
+
 });

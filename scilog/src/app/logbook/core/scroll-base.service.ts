@@ -8,8 +8,11 @@ export class ScrollBaseService {
   datasource: IDatasource = null;
   startIndex = 0;
   config: WidgetItemConfig = null;
+  isLoaded = false;
 
-  constructor() { }
+  constructor() {
+    this.getDataBuffer = this.isLoadedDecorator(this.getDataBuffer.bind(this));
+  }
 
   public async initialize(config: WidgetItemConfig) {
     // console.log("Config: ", this.config);
@@ -64,6 +67,16 @@ export class ScrollBaseService {
     throw new Error("Abstract method needs to be implemented in derived class.")
   }
 
+  isLoadedDecorator(func: Function) {
+    const decorated = async (index: number, count: number, config: any) => {
+      this.isLoaded = false;
+      const data = await func(index, count, config);
+      this.isLoaded = true;
+      return data;
+    }
+    return decorated;
+  }
+
   async updateViewportEstimate() {
     await this.datasource.adapter.relax();
     this.datasource.adapter.check();
@@ -75,6 +88,7 @@ export class ScrollBaseService {
 
   reset() {
     if (this.datasource != null) {
+      this.isLoaded = false;
       this.datasource.adapter.reset();
     }
   }
