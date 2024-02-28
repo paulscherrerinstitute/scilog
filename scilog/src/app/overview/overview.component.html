@@ -17,6 +17,7 @@
       <mat-button-toggle value="logbook-headline"><mat-icon>view_headline</mat-icon></mat-button-toggle>
     </mat-button-toggle-group>
     <button (click)='addCollectionLogbook("logbook")'>Add logbook</button><br>
+    <mat-spinner *ngIf="!logbookIconScrollService.isLoaded" [@spinner] class="spinner"></mat-spinner>
     <div class="logbook-container" (resized)="onResized($event)" #logbookContainer>
       <div *uiScroll="let logbookGroup of logbookIconScrollService.datasource">
         <span *ngFor="let logbook of logbookGroup">
