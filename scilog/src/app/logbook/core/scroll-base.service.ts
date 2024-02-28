@@ -70,9 +70,17 @@ export class ScrollBaseService {
   isLoadedDecorator(func: Function) {
     const decorated = async (index: number, count: number, config: any) => {
       this.isLoaded = false;
-      const data = await func(index, count, config);
-      this.isLoaded = true;
-      return data;
+      let data;
+      try {
+        data = await func(index, count, config);
+      }
+      catch {
+        console.log('scroller get data returned an error');
+      }
+      finally {
+        this.isLoaded = true;
+        return data;
+      }
     }
     return decorated;
   }
