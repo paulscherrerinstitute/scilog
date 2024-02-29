@@ -11,6 +11,7 @@ import { RouterTestingModule } from '@angular/router/testing';
 import {Pipe, PipeTransform} from '@angular/core';
 import { Logbooks } from '@model/logbooks';
 import { ResizedEvent } from '@shared/directives/resized.directive';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 
 @Pipe({name: 'logbookSearch'})
 class LogbookSearchMockPipe implements PipeTransform {
@@ -47,7 +48,7 @@ describe('OverviewComponent', () => {
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       declarations: [ OverviewComponent, LogbookSearchMockPipe],
-      imports: [MatDialogModule, RouterTestingModule],
+      imports: [MatDialogModule, RouterTestingModule, BrowserAnimationsModule],
       providers: [
         { provide: MAT_DIALOG_DATA, useValue: {} },
         {provide: LogbookInfoService, useValue: logbookInfoSpy},
