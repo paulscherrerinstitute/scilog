@@ -12,6 +12,7 @@ import { LogbookDataService } from '@shared/remote-data.service';
 import { LogbookIconScrollService } from './logbook-icon-scroll-service.service';
 import { debounceTime } from 'rxjs/operators';
 import { ResizedEvent } from '@shared/directives/resized.directive';
+import { animate, style, transition, trigger } from '@angular/animations';
 
 enum ContentType {
   COLLECTION = 'collection',
@@ -24,8 +25,15 @@ export type MatCardType = 'logbook-module' | 'logbook-headline';
   selector: 'app-overview',
   templateUrl: './overview.component.html',
   styleUrls: ['./overview.component.css'],
-  providers: [LogbookIconScrollService]
-
+  providers: [LogbookIconScrollService],
+  animations: [
+    trigger('spinner', [
+      transition(':enter', [
+        style({opacity: 0}), 
+        animate('1ms 0.2s ease-out', style({opacity: 1}))
+      ])
+    ]),
+  ]
 })
 export class OverviewComponent implements OnInit {
 

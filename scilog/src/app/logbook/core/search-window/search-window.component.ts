@@ -9,6 +9,7 @@ import { LogbookInfoService } from '@shared/logbook-info.service';
 import { TagService } from '@shared/tag.service';
 import { ScrollToElementService } from '@shared/scroll-to-element.service';
 import { Hotkeys } from '@shared/hotkeys.service';
+import { animate, style, transition, trigger } from '@angular/animations';
 
 interface SearchResult {
   location: string[],
@@ -23,7 +24,15 @@ interface SearchResult {
   selector: 'search-window',
   templateUrl: './search-window.component.html',
   styleUrls: ['./search-window.component.css'],
-  providers: [SearchScrollService]
+  providers: [SearchScrollService],
+  animations: [
+    trigger('spinner', [
+      transition(':enter', [
+        style({opacity: 0}), 
+        animate('1ms 0.2s ease-out', style({opacity: 1}))
+      ])
+    ]),
+  ]
 })
 export class SearchWindowComponent implements OnInit {
 
