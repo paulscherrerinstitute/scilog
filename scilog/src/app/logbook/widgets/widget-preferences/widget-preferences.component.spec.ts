@@ -38,8 +38,8 @@ describe('WidgetPreferencesComponent', () => {
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      declarations: [WidgetPreferencesComponent, CdkTextareaAutosize,],
-      imports: [MatDialogModule, MatAutocompleteModule],
+      declarations: [WidgetPreferencesComponent],
+      imports: [MatDialogModule, MatAutocompleteModule, CdkTextareaAutosize],
       providers: [
         UntypedFormBuilder,
         { provide: MatDialogRef, useValue: MatDialogRef },

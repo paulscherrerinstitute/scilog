@@ -14,16 +14,16 @@
           <mat-icon class='renewButtonIcon' matTooltip="Copy tags from last entry">autorenew</mat-icon>
         </button>
         <mat-form-field [floatLabel]="'never'">
-          <mat-chip-list #chipList aria-label="Tag selection">
-            <mat-chip *ngFor="let tagItem of tag" [selectable]="selectable" [removable]="removable"
+          <mat-chip-grid #chipList aria-label="Tag selection">
+            <mat-chip-row *ngFor="let tagItem of tag" [selectable]="selectable" [removable]="removable"
               (removed)="remove(tagItem)" class='tag'>
               {{tagItem.name}}
               <mat-icon matChipRemove *ngIf="removable">cancel</mat-icon>
-            </mat-chip>
+            </mat-chip-row>
             <input matInput placeholder="Add tags" #tagInput [formControl]="tagsCtrl"
               [matAutocomplete]="auto" [matChipInputFor]="chipList"
               [matChipInputSeparatorKeyCodes]="separatorKeysCodes" (matChipInputTokenEnd)="addTag($event)">
-          </mat-chip-list>
+          </mat-chip-grid>
           <mat-autocomplete #auto="matAutocomplete" (optionSelected)="selectedTags($event)">
             <mat-option *ngFor="let tag of filteredTags | async" [value]="tag" class='tagOption'>
               {{tag.name}}

@@ -5,20 +5,23 @@
 .tagContainer {
     width: 100%;
 }
+/* TODO(mdc-migration): The following rule targets internal classes of form-field that may no longer apply for the MDC version. */
 :host ::ng-deep .mat-form-field-appearance-legacy .mat-form-field-underline {
     display: none;
 }
 
+/* TODO(mdc-migration): The following rule targets internal classes of form-field that may no longer apply for the MDC version. */
 :host ::ng-deep .mat-form-field-appearance-legacy .mat-form-field-wrapper {
     padding-bottom: 0px;
 }
 
+/* TODO(mdc-migration): The following rule targets internal classes of form-field that may no longer apply for the MDC version. */
 :host ::ng-deep .mat-form-field-infix{
     width: 50%;
     border-top-width: 0px;
 }
 
-:host ::ng-deep .mat-form-field{
+:host ::ng-deep .mat-mdc-form-field{
     max-width: 80%;
 }
 .tag {
@@ -31,16 +34,19 @@
     margin: 1px;
 }
 
+/* TODO(mdc-migration): The following rule targets internal classes of chips that may no longer apply for the MDC version. */
 :host ::ng-deep .mat-chip-list-wrapper {
     margin: -6px;
 }
 
+/* TODO(mdc-migration): The following rule targets internal classes of chips that may no longer apply for the MDC version. */
 :host ::ng-deep .mat-chip-list-wrapper input.mat-input-element{
     padding: 0px;
 }
 
+/* TODO(mdc-migration): The following rule targets internal classes of chips that may no longer apply for the MDC version. */
 :host ::ng-deep .mat-chip-list-wrapper input.mat-input-element,
-.mat-chip-list-wrapper .mat-standard-chip {
+.mat-chip-list-wrapper .mat-mdc-standard-chip {
     padding-top: 2px;
 }
 .renewButton {

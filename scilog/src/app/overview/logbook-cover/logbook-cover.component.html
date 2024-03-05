@@ -8,7 +8,7 @@
 </div>
 
 <ng-template #logbookModule>
-  <mat-card [ngClass]="matView">
+  <mat-card appearance="outlined" [ngClass]="matView">
     <mat-card-header>
       <mat-card-title #cardHeader style="font-size: 18px;">{{ logbook?.name }}</mat-card-title>
       <mat-card-subtitle>{{ logbook?.ownerGroup }}</mat-card-subtitle>
@@ -51,7 +51,7 @@
 </ng-template>
 
 <ng-template #logbookHeadline>
-  <mat-card [ngClass]="matView">
+  <mat-card appearance="outlined" [ngClass]="matView">
     <div (dblclick)="selectOnDoubleClick()" class="card-container">
       <mat-card-content class="title">{{ logbook?.name }}</mat-card-content>
       <mat-card-content class="description">{{ logbook?.description }}</mat-card-content>
