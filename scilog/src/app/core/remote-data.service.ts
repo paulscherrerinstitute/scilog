@@ -1,6 +1,6 @@
 import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { Basesnippets, Filecontainer } from '@model/basesnippets';
+import { Basesnippets } from '@model/basesnippets';
 import { Filesnippet } from '@model/filesnippet';
 import { Logbooks } from '@model/logbooks';
 import { LinkType } from '@model/paragraphs';
@@ -67,9 +67,66 @@ export class RemoteDataService {
     return this.postSnippet<Filesnippet>("filesnippet/files", formData, headersFile).toPromise();
   }
 
-  // getFile(imageSnippetUrl: string): Promise<Blob> {
-  //   return this.getSnippets<Blob>(imageSnippetUrl, { responseType: 'blob' }).toPromise();
-  // }
+  protected _prepareParams(config: WidgetItemConfig, index: number = 0, count: number = Infinity): HttpParams {
+    let params = new HttpParams();
+    params = params.set('filter', JSON.stringify(this._prepareFilters(config, index, count)));
+    return params;
+  }
+
+  protected _prepareFilters(config: WidgetItemConfig, index: number = 0, count: number = Infinity): Object {
+    let httpFilter: Object = {};
+    if (typeof config.view.order != 'undefined') {
+      httpFilter["order"] = config.view.order;
+    } else {
+      httpFilter["order"] = ["defaultOrder ASC"];
+    }
+
+    httpFilter["include"] = [{ relation: "subsnippets", ...this.addIncludeScope() }];
+    httpFilter["where"] = { "and": [...this.staticFilters(), ...this.tagsFilter(config.filter), ...this.parentFilter(config.filter)] };
+
+    if (count < Infinity) {
+      httpFilter["limit"] = count;
+    }
+    if (index > 0) {
+      httpFilter["skip"] = index;
+    }
+    return httpFilter;
+  }
+
+  private staticFilters() {
+    return [{ snippetType: { inq: ["paragraph", "image"] } }, { deleted: false }];
+  }
+
+  private tagsFilter(configFilter: { tags?: string[], excludeTags?: string[] }) {
+    const tagFilter = [];
+    if (configFilter?.tags?.length > 0) {
+      tagFilter.push({ tags: { inq: configFilter.tags } });
+    }
+    if (configFilter?.excludeTags?.length > 0) {
+      tagFilter.push({ tags: { nin: configFilter.excludeTags } });
+    }
+    return tagFilter;
+  }
+
+  private parentFilter(configFilter: { targetId?: string, additionalLogbooks?: string[] }) {
+    const parentIds = [configFilter?.targetId, ...(configFilter?.additionalLogbooks ?? [])].filter(parentId => parentId);
+    if (parentIds.length === 0) return [];
+    return [{ parentId: { inq: parentIds } }];
+  }
+
+  protected addIncludeScope(): Object {
+    return {
+      scope:
+      {
+        include: [{
+          relation: 'subsnippets',
+          scope: {
+            where: { snippetType: 'edit' }
+          }
+        }]
+      }
+    };
+  }
 
 }
 
@@ -87,60 +144,6 @@ export class LogbookItemDataService extends RemoteDataService {
     this._searchString = value;
   }
 
-
-  static _prepareFilters(config: WidgetItemConfig, index: number = 0, count: number = Infinity): Object {
-    let httpFilter: Object = {};
-    if (typeof config.view.order != 'undefined') {
-      httpFilter["order"] = config.view.order;
-    } else {
-      httpFilter["order"] = ["defaultOrder ASC"];
-    }
-
-    let whereFilter: Object[] = [];
-    whereFilter.push({ "and": [{ "or": [{ "snippetType": "paragraph" }, { "snippetType": "image" }] }, { "deleted": false }] });
-
-    let parentIds: string[] = [];
-    if ((config.filter?.targetId) && (config.filter.targetId.length > 1)) {
-      parentIds.push(config.filter.targetId);
-    }
-    if (config.filter.additionalLogbooks.length > 0) {
-      parentIds.push(...config.filter.additionalLogbooks);
-    }
-    if (parentIds.length > 0) {
-      let parentFilter = [];
-      for (let parent of parentIds) {
-        parentFilter.push({ "parentId": { "eq": parent } });
-      }
-      whereFilter.push({ "or": parentFilter });
-    }
-
-
-    if (config.filter.tags?.length > 0) {
-      whereFilter.push({ "tags": { "inq": config.filter.tags } })
-    }
-    if (config.filter.excludeTags?.length > 0) {
-      whereFilter.push({ "tags": { "nin": config.filter.excludeTags } })
-    }
-    httpFilter["where"] = { "and": whereFilter };
-
-    if (count < Infinity) {
-      httpFilter["limit"] = count;
-    }
-    if (index > 0) {
-      httpFilter["skip"] = index;
-    }
-    // console.log(httpFilter);
-    // console.log(tagContainer);
-    httpFilter["include"] = [{ "relation": "subsnippets", "scope": {include: [{"relation": "subsnippets", scope: {where: {snippetType: 'edit'}}}]} }];
-    return httpFilter;
-  }
-
-  static _prepareParams(config: WidgetItemConfig, index: number = 0, count: number = Infinity): HttpParams {
-    let params = new HttpParams();
-    params = params.set('filter', JSON.stringify(LogbookItemDataService._prepareFilters(config, index, count)));
-    return params;
-  }
-
   getDataBuffer(index: number, count: number, config: WidgetItemConfig) {
     console.log(index, count)
 
@@ -148,9 +151,9 @@ export class LogbookItemDataService extends RemoteDataService {
     headers = headers.set('Content-Type', 'application/json; charset=utf-8');
     this._searchString = this._searchString.trim();
     if (this._searchString.length == 0) {
-      return this.getSnippets<any[]>('basesnippets', { headers: headers, params: LogbookItemDataService._prepareParams(config, index, count) }).toPromise();
+      return this.getSnippets<any[]>('basesnippets', { headers: headers, params: this._prepareParams(config, index, count) }).toPromise();
     } else {
-      return this.getSnippets<any[]>('basesnippets/search=' + this._searchString, { headers: headers, params: LogbookItemDataService._prepareParams(config, index, count) }).toPromise();
+      return this.getSnippets<any[]>('basesnippets/search=' + this._searchString, { headers: headers, params: this._prepareParams(config, index, count) }).toPromise();
     }
 
   }
@@ -195,7 +198,7 @@ export class LogbookItemDataService extends RemoteDataService {
   }
 
   async getCount(config: any) {
-    let filter = LogbookItemDataService._prepareFilters(config);
+    let filter = this._prepareFilters(config);
     // let whereFilter = filter["where"];
     console.log(filter);
     let params = new HttpParams();
@@ -205,7 +208,7 @@ export class LogbookItemDataService extends RemoteDataService {
   }
 
   async getIndex(id: string, config: any) {
-    let filter = LogbookItemDataService._prepareFilters(config);
+    let filter = this._prepareFilters(config);
     console.log(filter);
     let params = new HttpParams();
     params = params.set('filter', JSON.stringify(filter));
@@ -274,7 +277,7 @@ export class LogbookItemDataService extends RemoteDataService {
   exportLogbook(exportType: string, config: any, skip: number, limit: number): Promise<Blob> {
     let headers = new HttpHeaders();
     headers = headers.set('Content-Type', 'application/json');
-    return this.getSnippets<Blob>("basesnippets/export=" + exportType + "", { headers: headers, responseType: 'blob', params: LogbookItemDataService._prepareParams(config, skip, limit) }).toPromise();
+    return this.getSnippets<Blob>("basesnippets/export=" + exportType + "", { headers: headers, responseType: 'blob', params: this._prepareParams(config, skip, limit) }).toPromise();
   }
 }
 
@@ -533,7 +536,7 @@ export class TagDataService extends RemoteDataService {
       _config.view.order = ["defaultOrder DESC"];
     }
     console.log(_config);
-    return this.getSnippets<any[]>('basesnippets', { headers: headers, params: LogbookItemDataService._prepareParams(_config, 0, 1) }).toPromise();
+    return this.getSnippets<any[]>('basesnippets', { headers: headers, params: this._prepareParams(_config, 0, 1) }).toPromise();
   }
 }
 
@@ -608,6 +611,10 @@ export class SearchDataService extends RemoteDataService {
     this._searchString = value;
   }
 
+  protected addIncludeScope(): Object {
+    return {};
+  }
+
   getDataBuffer(index: number, count: number, config: WidgetItemConfig) {
     console.log(index, count)
 
@@ -615,9 +622,9 @@ export class SearchDataService extends RemoteDataService {
     headers = headers.set('Content-Type', 'application/json; charset=utf-8');
     this._searchString = this._searchString.trim();
     if (this._searchString.length == 0) {
-      return this.getSnippets<any[]>('basesnippets', { headers: headers, params: LogbookItemDataService._prepareParams(config, index, count) }).toPromise();
+      return this.getSnippets<any[]>('basesnippets', { headers: headers, params: this._prepareParams(config, index, count) }).toPromise();
     } else {
-      return this.getSnippets<any[]>('basesnippets/search=' + this._searchString, { headers: headers, params: LogbookItemDataService._prepareParams(config, index, count) }).toPromise();
+      return this.getSnippets<any[]>(`basesnippets/search=${encodeURIComponent(this._searchString)}`, { headers: headers, params: this._prepareParams(config, index, count) }).toPromise();
     }
 
   }
