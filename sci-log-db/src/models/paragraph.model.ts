@@ -27,6 +27,7 @@ export class Paragraph extends Basesnippet {
   @property({
     type: 'string',
     description: 'Markup contents in markdown (MD) syntax of this paragraph',
+    index: true,
   })
   textcontent?: string;
 
