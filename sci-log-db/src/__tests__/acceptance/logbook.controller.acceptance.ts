@@ -187,7 +187,9 @@ describe('Logbook', function (this: Suite) {
     const includeTags = {fields: {tags: true}, include: ['subsnippets']};
     await client
       .get(
-        `/logbooks/search=aSearchabletag?filter=${JSON.stringify(includeTags)}`,
+        `/logbooks/search=${encodeURIComponent(
+          '#aSearchableTag',
+        )}?filter=${JSON.stringify(includeTags)}`,
       )
       .set('Authorization', 'Bearer ' + token)
       .set('Content-Type', 'application/json')
