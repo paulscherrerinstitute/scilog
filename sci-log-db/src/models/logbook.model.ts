@@ -21,6 +21,7 @@ export class Logbook extends Basesnippet {
     type: 'string',
     required: true,
     description: 'Name of logbook as presented to user in GUI',
+    index: true,
   })
   name: string;
 
@@ -28,6 +29,7 @@ export class Logbook extends Basesnippet {
     type: 'string',
     description:
       'Optional detailed definition of contents and purpose of this logbook',
+    index: true,
   })
   description?: string;
 

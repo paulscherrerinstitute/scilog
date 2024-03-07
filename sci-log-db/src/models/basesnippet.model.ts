@@ -144,6 +144,7 @@ export class Basesnippet extends Entity {
 
   @property.array(String, {
     description: 'arbitrray strings meant as tags attached to this snippet',
+    index: true,
   })
   tags?: string[];
 
