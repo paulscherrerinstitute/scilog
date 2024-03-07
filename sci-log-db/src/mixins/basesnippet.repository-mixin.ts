@@ -9,7 +9,6 @@ import {
   FilterBuilder,
   Inclusion,
   Condition,
-  OrClause,
   InclusionFilter,
 } from '@loopback/repository';
 import {Basesnippet, Logbook, Paragraph} from '../models';
@@ -18,7 +17,12 @@ import {HttpErrors, Response} from '@loopback/rest';
 import _ from 'lodash';
 import {EXPORT_SERVICE} from '../keys';
 import {ExportService} from '../services/export-snippets.service';
-import {arrayOfUniqueFrom, concatOwnerAccessGroups} from '../utils/misc';
+import {
+  arrayOfUniqueFrom,
+  concatOwnerAccessGroups,
+  filterEmptySubsnippets,
+  standardiseIncludes,
+} from '../utils/misc';
 import {AutoAddRepository} from '../repositories/autoadd.repository.base';
 const fs = require('fs');
 
@@ -257,112 +261,68 @@ function FindWithSearchRepositoryMixin<
   R extends MixinTarget<DefaultCrudRepository<M, ID, Relations>>,
 >(superClass: R) {
   class Mixed extends superClass {
+    user: UserProfile;
+
+    async recursivelyApplySearchCondition(
+      fullFilter: Filter<M> | undefined,
+      condition: Condition<M>,
+      filter: Filter<M> | undefined,
+      snippets: {[id: string]: Basesnippet} = {},
+      depth = 0,
+    ) {
+      const whereCopy = JSON.parse(JSON.stringify(filter?.where ?? {}));
+      this.addSearchToFilter(filter, condition);
+      const snippet = await this.find(fullFilter, {currentUser: this.user});
+      const fakeFirstLevel = {subsnippets: snippet} as unknown as Basesnippet;
+      depth += 1;
+      filterEmptySubsnippets(fakeFirstLevel, depth);
+      fakeFirstLevel.subsnippets?.map(snip => {
+        if (!_.has(snippets, snip.id)) snippets[snip.id] = snip;
+      });
+      if (filter) filter.where = whereCopy;
+      if (!filter?.include || filter.include.length === 0) return snippets;
+      for (const relation of filter?.include as Inclusion[]) {
+        relation.scope = relation.scope ?? {};
+        await this.recursivelyApplySearchCondition(
+          fullFilter,
+          condition,
+          relation.scope as Filter<M>,
+          snippets,
+          depth,
+        );
+      }
+    }
+
     async findWithSearch(
       search: string,
       user: UserProfile,
-      filter?: Filter<M>,
-    ): Promise<M[]> {
-      const includeTags =
-        (filter?.fields as {[P in keyof M]: boolean})?.tags ?? false;
-
+      filter: Filter<M> = {},
+    ): Promise<Basesnippet[]> {
       delete filter?.fields;
-      const searchRegex = {regexp: new RegExp(`.*?${search}.*?`, 'i')};
-      const commonSearchableFields = {
-        textcontent: {
-          regexp: new RegExp(
-            `(?<=<p>)((?!&).)*${search}((?!&).)*(?=<\/p>)`,
-            'i',
-          ),
-        },
-        tags: searchRegex,
-        readACL: searchRegex,
-      } as Condition<M>;
-
-      const withSubsnippets = await this._searchForSubsnippets(
+      standardiseIncludes(filter);
+      const searchCondition = this.buildAdditionalConditions(search);
+      this.user = user;
+      const snippets: {[id: string]: Basesnippet} = {};
+      await this.recursivelyApplySearchCondition(
         filter,
-        commonSearchableFields,
-        includeTags,
-        user,
-      );
-
-      const logbookSearchableFields = {
-        ...commonSearchableFields,
-        name: searchRegex,
-        description: searchRegex,
-        id: {inq: withSubsnippets.map(s => s.id)},
-      };
-      const snippets = await this._searchForSnippets(
+        searchCondition,
         filter,
-        logbookSearchableFields,
-        includeTags,
-        user,
+        snippets,
       );
-      return snippets;
+      return Object.values(snippets);
     }
 
-    private async _searchForSnippets(
+    private addSearchToFilter(
       filter: Filter<M> | undefined,
-      logbookSearchableFields: Condition<M>,
-      includeTags: boolean,
-      user: UserProfile,
+      additionalConditions: Condition<M>,
     ) {
-      const ors = this._searchConditionBuilder(
-        logbookSearchableFields,
-        includeTags,
-      );
-
-      filter = this._addSearchCondition(filter, ors);
-
-      const snippets = await this.find(filter, {
-        currentUser: user,
-      });
-      return snippets;
-    }
-
-    private async _searchForSubsnippets(
-      filter: Filter<M> | undefined,
-      commonSearchableFields: Condition<M>,
-      includeTags: boolean,
-      user: UserProfile,
-    ) {
-      const subsnippetsIncludeIndex = (filter?.include ?? []).findIndex(
-        include =>
-          (include as Inclusion).relation === 'subsnippets' ||
-          include === 'subsnippets',
-      ) as number;
-
-      let withSubsnippets: (M & Relations)[] = [];
-      if (filter?.include && subsnippetsIncludeIndex !== -1) {
-        const includeOrs = this._searchConditionBuilder(
-          commonSearchableFields,
-          includeTags,
-        );
-        const includeFilter = this._addSearchCondition(
-          (filter.include[subsnippetsIncludeIndex] as Inclusion)
-            .scope as Filter<M>,
-          includeOrs,
-        );
-
-        const filterCopy = JSON.parse(JSON.stringify(filter));
-        if (filterCopy.include[subsnippetsIncludeIndex] === 'subsnippets')
-          filterCopy.include[subsnippetsIncludeIndex] = {
-            relation: 'subsnippets',
-          };
-        (filterCopy.include[subsnippetsIncludeIndex] as Inclusion).scope =
-          includeFilter;
-        withSubsnippets = await this.find(
-          {...filterCopy, fields: ['id']},
-          {
-            currentUser: user,
-          },
-        );
-      }
-      return withSubsnippets.filter(s => s.subsnippets);
+      if (!_.isEmpty(additionalConditions))
+        this._addSearchCondition(filter, additionalConditions);
     }
 
     private _addSearchCondition(
       filter: Filter<M> | undefined,
-      includeOrs: OrClause<M>,
+      includeOrs: Where<M>,
     ) {
       const searchCondition = new WhereBuilder(filter?.where)
         .and(includeOrs)
@@ -370,16 +330,76 @@ function FindWithSearchRepositoryMixin<
       return new FilterBuilder(filter).where(searchCondition).build();
     }
 
-    private _searchConditionBuilder(
-      commonSearchableFields: Condition<M>,
-      includeTags: boolean,
-    ) {
+    private _additionalConditionBuilder(commonSearchableFields: Condition<M>) {
       return {
-        or: Object.entries(commonSearchableFields).flatMap(([k, v]) => {
-          if (!includeTags && k === 'tags') return [] as Where<M>;
+        and: Object.entries(commonSearchableFields).flatMap(([k, v]) => {
           return {[k]: v} as Where<M>;
         }),
-      };
+      } as Condition<M>;
+    }
+
+    private buildAdditionalConditions(search: string) {
+      const additionalConditions: {
+        tags?: {inq: string[]};
+        readACL?: {inq: string[]};
+        or?: {
+          textcontent?: {regexp: RegExp};
+          name?: {regexp: RegExp};
+          description?: {regexp: RegExp};
+        }[];
+      } & Condition<M> = {};
+      let searchText = '';
+      search.split(' ').map(searchTerms => {
+        if (searchTerms.startsWith('#')) {
+          additionalConditions.tags = additionalConditions.tags ?? {inq: []};
+          additionalConditions.tags.inq.push(searchTerms.slice(1));
+        } else if (searchTerms.startsWith('@')) {
+          additionalConditions.readACL = additionalConditions.readACL ?? {
+            inq: [],
+          };
+          additionalConditions.readACL.inq.push(searchTerms.slice(1));
+        } else searchText += ` ${searchTerms}`;
+      });
+      this.addSearchOr(searchText, additionalConditions);
+      if (
+        (additionalConditions.or &&
+          Object.keys(additionalConditions).length > 2) ||
+        Object.keys(additionalConditions).length > 1
+      )
+        return this._additionalConditionBuilder(additionalConditions);
+      return additionalConditions;
+    }
+
+    private addSearchOr(
+      searchText: string,
+      additionalConditions: {
+        tags?: {inq: string[]} | undefined;
+        readACL?: {inq: string[]} | undefined;
+        or?:
+          | {
+              textcontent?: {regexp: RegExp} | undefined;
+              name?: {regexp: RegExp} | undefined;
+              description?: {regexp: RegExp} | undefined;
+            }[]
+          | undefined;
+      } & Condition<M>,
+    ) {
+      if (!searchText) return;
+      searchText = searchText.trimStart();
+      const searchRegex = {regexp: new RegExp(`.*?${searchText}.*?`, 'i')};
+      const searchCondition = [
+        {name: searchRegex},
+        {description: searchRegex},
+        {
+          textcontent: {
+            regexp: new RegExp(
+              `(?<=<p>)((?!&).)*${searchText}((?!&).)*(?=<\/p>)`,
+              'i',
+            ),
+          },
+        },
+      ];
+      additionalConditions.or = searchCondition;
     }
 
     async findIndexInBuffer(

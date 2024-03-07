@@ -3,6 +3,7 @@ import {
   Entity,
   JsonSchema,
   ModelDefinition,
+  Filter,
 } from '@loopback/repository';
 import {JsonSchemaOptions} from '@loopback/repository-json-schema';
 import {
@@ -11,6 +12,7 @@ import {
   SchemaObject,
 } from '@loopback/rest';
 import _ from 'lodash';
+import {Basesnippet} from '../models';
 
 export function getModelSchemaRefWithDeprecated<T extends Entity>(
   modelCtor: Function & {prototype: T},
@@ -175,4 +177,38 @@ export function concatOwnerAccessGroups(data: {
       );
     data.accessGroups = arrayOfUniqueFrom(data.ownerGroup, data.accessGroups);
   }
+}
+
+export function filterEmptySubsnippets(
+  snippet: Basesnippet,
+  maxDepth: number | undefined = undefined,
+  level = 0,
+  parent?: Basesnippet,
+  subsnippetIndex = 0,
+) {
+  if (
+    !Object.keys(snippet).includes('subsnippets') ||
+    (maxDepth !== undefined && level >= maxDepth)
+  )
+    return;
+  snippet.subsnippets = snippet?.subsnippets?.filter(sub => sub);
+  if (
+    (!snippet.subsnippets || snippet?.subsnippets?.length === 0) &&
+    parent?.subsnippets
+  ) {
+    parent.subsnippets[subsnippetIndex] = undefined as unknown as Basesnippet;
+    filterEmptySubsnippets(parent as Basesnippet, maxDepth, level - 1);
+  } else
+    snippet?.subsnippets?.map((sub, i) =>
+      filterEmptySubsnippets(sub, maxDepth, level + 1, snippet, i),
+    );
+}
+
+export function standardiseIncludes(filter: Pick<Filter, 'include'>) {
+  const include = filter?.include;
+  if (!include) return;
+  include.map((relation, i) => {
+    if (typeof relation === 'string') include[i] = {relation: relation};
+    else standardiseIncludes(relation as Pick<Filter, 'include'>);
+  });
 }
