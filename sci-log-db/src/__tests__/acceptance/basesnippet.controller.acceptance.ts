@@ -8,7 +8,6 @@ import {
   setupApplication,
 } from './test-helper';
 import _ from 'lodash';
-import {Basesnippet} from '../../models';
 
 describe('Basesnippet', function (this: Suite) {
   this.timeout(5000);
@@ -34,7 +33,7 @@ describe('Basesnippet', function (this: Suite) {
     versionable: true,
     name: 'aSearchableName',
     description: 'aSearchableDescription',
-    textcontent: '<p>aSearchableTextContent</p>',
+    textcontent: '<p>aSearchable TextContent</p>',
   };
 
   before('setupApplication', async () => {
@@ -222,7 +221,7 @@ describe('Basesnippet', function (this: Suite) {
 
   it('Search with token should return 200 and matching body.textcontent', async () => {
     await client
-      .get(`/basesnippets/search=aSearchableText`)
+      .get(`/basesnippets/search=aSearchable TextCont`)
       .set('Authorization', 'Bearer ' + token)
       .set('Content-Type', 'application/json')
       .expect(200)
@@ -230,7 +229,7 @@ describe('Basesnippet', function (this: Suite) {
         result => (
           expect(result.body.length).to.be.eql(1),
           expect(result.body[0].textcontent).to.be.eql(
-            '<p>aSearchableTextContent</p>',
+            '<p>aSearchable TextContent</p>',
           )
         ),
       )
@@ -240,12 +239,34 @@ describe('Basesnippet', function (this: Suite) {
   });
 
   it('Search with token should return 200 and matching body.tags', async () => {
-    const includeTags = {fields: {tags: true}, include: ['subsnippets']};
+    const includeTags = {include: ['subsnippets']};
     await client
       .get(
-        `/basesnippets/search=aSearchabletag?filter=${JSON.stringify(
-          includeTags,
-        )}`,
+        `/basesnippets/search=${encodeURIComponent(
+          '#aSearchableTag',
+        )}?filter=${JSON.stringify(includeTags)}`,
+      )
+      .set('Authorization', 'Bearer ' + token)
+      .set('Content-Type', 'application/json')
+      .expect(200)
+      .then(
+        result => (
+          expect(result.body.length).to.be.eql(1),
+          expect(result.body[0].tags[0]).to.be.eql('aSearchableTag')
+        ),
+      )
+      .catch(err => {
+        throw err;
+      });
+  });
+
+  it('Search with token should return 200 and matching body.tags + body.textcontent', async () => {
+    const includeTags = {include: ['subsnippets']};
+    await client
+      .get(
+        `/basesnippets/search=aSearchable Tex ${encodeURIComponent(
+          '#aSearchableTag',
+        )}?filter=${JSON.stringify(includeTags)}`,
       )
       .set('Authorization', 'Bearer ' + token)
       .set('Content-Type', 'application/json')
@@ -263,7 +284,7 @@ describe('Basesnippet', function (this: Suite) {
 
   it('Search with token should return 200 and matching readACL', async () => {
     await client
-      .get(`/basesnippets/search=basesnippetAccept`)
+      .get(`/basesnippets/search=@basesnippetAcceptance`)
       .set('Authorization', 'Bearer ' + token)
       .set('Content-Type', 'application/json')
       .expect(200)
@@ -299,20 +320,30 @@ describe('Basesnippet', function (this: Suite) {
         name: 'aSearchExcludedName',
         description: 'aSearchExcludedDescription',
         textcontent:
-          '<p>aSearchExcludedTextContent</p><p>&aSearchableTextContent</p>',
+          '<p>aSearchExcludedTextContent</p><p>&aSearchable TextContent</p>',
         ownerGroup: 'basesnippetAcceptance',
         accessGroups: ['basesnippetAcceptance'],
       })
       .expect(204);
   });
 
-  it('Search index with token should return 200 and matching subsnippets', async () => {
-    const includeTags = {fields: {tags: true}, include: ['subsnippets']};
+  it('Search with token should return 200 and matching subsnippets', async () => {
+    const includeTags = {include: ['subsnippets']};
+    await client
+      .post('/basesnippets')
+      .set('Authorization', 'Bearer ' + token)
+      .set('Content-Type', 'application/json')
+      .send({
+        ...baseSnippet,
+        parentId: baseSnippetId,
+        tags: ['aSubsnippetTag'],
+      });
+
     await client
       .get(
-        `/basesnippets/search=aSearchabletag?filter=${JSON.stringify(
-          includeTags,
-        )}`,
+        `/basesnippets/search=${encodeURIComponent(
+          '#aSubsnippetTag',
+        )}?filter=${JSON.stringify(includeTags)}`,
       )
       .set('Authorization', 'Bearer ' + token)
       .set('Content-Type', 'application/json')
@@ -320,12 +351,10 @@ describe('Basesnippet', function (this: Suite) {
       .then(
         result => (
           expect(result.body.length).to.be.eql(2),
-          result.body.map((res: Basesnippet) => {
-            if (res.subsnippets) {
-              expect(res.subsnippets[0].tags).to.be.eql(['aSearchableTag']);
-              expect(res.snippetType).to.be.eql('history');
-            } else expect(res.tags).to.be.eql(['aSearchableTag']);
-          })
+          expect(result.body[0].tags).to.be.eql(['aSubsnippetTag']),
+          expect(result.body[1].subsnippets[0].tags).to.be.eql([
+            'aSubsnippetTag',
+          ])
         ),
       )
       .catch(err => {
@@ -745,7 +774,7 @@ describe('Basesnippet', function (this: Suite) {
           name: 'aSearchExcludedName',
           description: 'aSearchExcludedDescription',
           textcontent:
-            '<p>aSearchExcludedTextContent</p><p>&aSearchableTextContent</p>',
+            '<p>aSearchExcludedTextContent</p><p>&aSearchable TextContent</p>',
           ...t.input,
         })
         .expect(t.expected)

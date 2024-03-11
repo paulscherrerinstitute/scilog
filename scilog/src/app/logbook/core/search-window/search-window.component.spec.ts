@@ -43,4 +43,19 @@ describe('SearchWindowComponent', () => {
     expect(prepareConfigSpy).toHaveBeenCalledTimes(1);
   }));
 
+  it('should _parseSearchString', () => {
+    component.searchString = 'someSearch';
+    expect(component['_parseSearchString']()).toEqual(
+      {
+        location: ['id'],
+        tags: [],
+        ownerGroup: "",
+        createdBy: "",
+        startDate: "",
+        endDate: "",
+      }
+    );
+    expect(component.searchString).toEqual('someSearch');
+  });
+
 });

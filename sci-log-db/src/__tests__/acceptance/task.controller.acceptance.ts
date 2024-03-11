@@ -164,7 +164,11 @@ describe('TaskRepositorySnippet', function (this: Suite) {
   it('Search index with token should return 200 and matching body.tags', async () => {
     const includeTags = {fields: {tags: true}, include: ['subsnippets']};
     await client
-      .get(`/tasks/search=aSearchabletag?filter=${JSON.stringify(includeTags)}`)
+      .get(
+        `/tasks/search=${encodeURIComponent(
+          '#aSearchableTag',
+        )}?filter=${JSON.stringify(includeTags)}`,
+      )
       .set('Authorization', 'Bearer ' + token)
       .set('Content-Type', 'application/json')
       .expect(200)

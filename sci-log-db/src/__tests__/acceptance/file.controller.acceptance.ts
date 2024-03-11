@@ -190,9 +190,9 @@ describe('File controller services', function (this: Suite) {
     const includeTags = {fields: {tags: true}, include: ['subsnippets']};
     await client
       .get(
-        `/filesnippet/search=aSearchabletag?filter=${JSON.stringify(
-          includeTags,
-        )}`,
+        `/filesnippet/search=${encodeURIComponent(
+          '#aSearchableTag',
+        )}?filter=${JSON.stringify(includeTags)}`,
       )
       .set('Authorization', 'Bearer ' + token)
       .set('Content-Type', 'application/json')

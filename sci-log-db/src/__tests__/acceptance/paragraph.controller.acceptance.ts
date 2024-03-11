@@ -167,9 +167,9 @@ describe('Paragraph', function (this: Suite) {
     const includeTags = {fields: {tags: true}, include: ['subsnippets']};
     await client
       .get(
-        `/paragraphs/search=aSearchabletag?filter=${JSON.stringify(
-          includeTags,
-        )}`,
+        `/paragraphs/search=${encodeURIComponent(
+          '#aSearchableTag',
+        )}?filter=${JSON.stringify(includeTags)}`,
       )
       .set('Authorization', 'Bearer ' + token)
       .set('Content-Type', 'application/json')

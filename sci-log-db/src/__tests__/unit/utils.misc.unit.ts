@@ -9,9 +9,95 @@ import {
   defaultSequentially,
   concatOwnerAccessGroups,
   arrayOfUniqueFrom,
+  filterEmptySubsnippets,
+  standardiseIncludes,
 } from '../../utils/misc';
 
 describe('Utils unit tests', function (this: Suite) {
+  it('Should filterEmptySubsnippets', () => {
+    const snippet = {
+      subsnippets: [
+        {
+          subsnippets: [
+            undefined,
+            {subsnippets: [1, undefined]},
+            {subsnippets: [undefined, undefined]},
+            {subsnippets: undefined},
+            {subsnippets: []},
+          ],
+        },
+      ],
+    } as Basesnippet;
+    filterEmptySubsnippets(snippet);
+    expect(snippet).to.eql({
+      subsnippets: [{subsnippets: [{subsnippets: [1]}]}],
+    });
+  });
+
+  [
+    {
+      subsnippets: [
+        {
+          subsnippets: [
+            undefined,
+            {subsnippets: [1, undefined]},
+            {subsnippets: [undefined, undefined]},
+            {subsnippets: undefined},
+            {subsnippets: []},
+          ],
+        },
+        undefined,
+      ],
+    },
+    {
+      subsnippets: [
+        {
+          subsnippets: [
+            undefined,
+            {subsnippets: [1, undefined]},
+            {subsnippets: [undefined, undefined]},
+            {subsnippets: undefined},
+            {subsnippets: []},
+          ],
+        },
+      ],
+    },
+    {
+      subsnippets: [
+        {
+          subsnippets: [
+            {subsnippets: [1, undefined]},
+            {subsnippets: [undefined, undefined]},
+            {subsnippets: undefined},
+            {subsnippets: []},
+          ],
+        },
+      ],
+    },
+    {
+      subsnippets: [{subsnippets: [{subsnippets: [1]}]}],
+    },
+  ].forEach((t, i) => {
+    it(`Should filterEmptySubsnippets with maxDept ${i}`, () => {
+      const snippet = {
+        subsnippets: [
+          {
+            subsnippets: [
+              undefined,
+              {subsnippets: [1, undefined]},
+              {subsnippets: [undefined, undefined]},
+              {subsnippets: undefined},
+              {subsnippets: []},
+            ],
+          },
+          undefined,
+        ],
+      } as Basesnippet;
+      filterEmptySubsnippets(snippet, i);
+      expect(snippet).to.eql(t);
+    });
+  });
+
   it('Should add deprecated to delete', () => {
     const withDeprecated = getModelSchemaRefWithDeprecated(Basesnippet, {
       deprecated: ['deleted'],
@@ -156,6 +242,34 @@ describe('Utils unit tests', function (this: Suite) {
   ].forEach((t, i) => {
     it(`Should test arrayOfUniqueFrom ${i}`, () => {
       expect(arrayOfUniqueFrom(...t.input)).to.be.eql(t.expected);
+    });
+  });
+
+  [
+    {
+      input: {include: ['a']},
+      expected: {include: [{relation: 'a'}]},
+    },
+    {
+      input: {include: [{relation: 'a'}]},
+      expected: {include: [{relation: 'a'}]},
+    },
+    {
+      input: {},
+      expected: {},
+    },
+    {
+      input: {include: ['a'], where: 'b'},
+      expected: {include: [{relation: 'a'}], where: 'b'},
+    },
+    {
+      input: {include: [{relation: 'a', include: ['c']}]},
+      expected: {include: [{relation: 'a', include: [{relation: 'c'}]}]},
+    },
+  ].forEach((t, i) => {
+    it(`Should test standardiseIncludes ${i}`, () => {
+      standardiseIncludes(t.input);
+      expect(t.input).to.be.eql(t.expected);
     });
   });
 });

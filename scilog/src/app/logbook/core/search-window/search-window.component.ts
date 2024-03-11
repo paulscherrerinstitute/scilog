@@ -156,26 +156,11 @@ export class SearchWindowComponent implements OnInit {
       startDate: "",
       endDate: "",
     }
-    let searchValue = "";
-    let searchParts = this.searchString.split(" ");
-    searchParts.forEach(searchPart => {
-      console.log(searchPart);
-      if (searchPart.length > 0) {
-        if (searchPart.startsWith("@")) {
-          searchResult.ownerGroup = searchPart.slice(1);
-        } else if (searchPart.startsWith("#")) {
-          console.log(searchPart)
-          searchResult.tags.push(searchPart.slice(1));
-        } else {
-          searchValue += " " + searchPart;
-        }
-      }
-    })
     console.log("local search")
     searchResult.location.push(this.logbookInfo.logbookInfo.id);
-    console.log("Search value: ", searchValue);
+    console.log("Search value: ", this.searchString);
     console.log("Search config: ", searchResult)
-    this.searchDataservice.searchString = searchValue;
+    this.searchDataservice.searchString = this.searchString;
     return searchResult;
   }
 
