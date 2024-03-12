@@ -174,7 +174,8 @@ export class BasesnippetController {
   })
   async findWithSearch(
     @param.path.string('search') search: string,
-    @param.filter(Basesnippet) filter?: Filter<Basesnippet>,
+    @param.filter(Basesnippet, {exclude: 'fields'})
+    filter?: Filter<Basesnippet>,
   ): Promise<Basesnippet[]> {
     const snippetsFiltered = await this.basesnippetRepository.findWithSearch(
       search,

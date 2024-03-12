@@ -309,7 +309,12 @@ function FindWithSearchRepositoryMixin<
         filter,
         snippets,
       );
-      return Object.values(snippets);
+      const desc = filter.order?.[0] === 'defaultOrder DESC';
+      return Object.values(snippets).sort((first, second) =>
+        desc
+          ? second.createdAt.valueOf() - first.createdAt.valueOf()
+          : first.createdAt.valueOf() - second.createdAt.valueOf(),
+      );
     }
 
     private addSearchToFilter(
