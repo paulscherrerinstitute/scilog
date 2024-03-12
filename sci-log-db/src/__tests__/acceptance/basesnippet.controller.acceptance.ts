@@ -351,10 +351,13 @@ describe('Basesnippet', function (this: Suite) {
       .then(
         result => (
           expect(result.body.length).to.be.eql(2),
-          expect(result.body[0].tags).to.be.eql(['aSubsnippetTag']),
-          expect(result.body[1].subsnippets[0].tags).to.be.eql([
+          expect(result.body[1].tags).to.be.eql(['aSubsnippetTag']),
+          expect(result.body[0].subsnippets[0].tags).to.be.eql([
             'aSubsnippetTag',
-          ])
+          ]),
+          expect(new Date(result.body[0].createdAt).valueOf()).to.be.lessThan(
+            new Date(result.body[1].createdAt).valueOf(),
+          )
         ),
       )
       .catch(err => {
