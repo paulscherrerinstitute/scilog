@@ -32,7 +32,7 @@ describe('Basesnippet', function (this: Suite) {
     versionable: true,
     name: 'aSearchableName',
     description: 'aSearchableDescription',
-    textcontent: '<p>aSearchable TextContent</p>',
+    textcontent: '<p>aSearchable TextContent &hearts;</p>',
   };
 
   before('setupApplication', async () => {
@@ -218,23 +218,25 @@ describe('Basesnippet', function (this: Suite) {
       });
   });
 
-  it('Search with token should return 200 and matching body.textcontent', async () => {
-    await client
-      .get(`/basesnippets/search=aSearchable TextCont`)
-      .set('Authorization', 'Bearer ' + token)
-      .set('Content-Type', 'application/json')
-      .expect(200)
-      .then(
-        result => (
-          expect(result.body.length).to.be.eql(1),
-          expect(result.body[0].textcontent).to.be.eql(
-            '<p>aSearchable TextContent</p>',
-          )
-        ),
-      )
-      .catch(err => {
-        throw err;
-      });
+  ['aSearchable TextCont', '♥'].forEach((t, i) => {
+    it(`Search with token should return 200 and matching body.textcontent ${i}`, async () => {
+      await client
+        .get(`/basesnippets/search=${encodeURIComponent(t)}`)
+        .set('Authorization', 'Bearer ' + token)
+        .set('Content-Type', 'application/json')
+        .expect(200)
+        .then(
+          result => (
+            expect(result.body.length).to.be.eql(1),
+            expect(result.body[0].textcontent).to.be.eql(
+              '<p>aSearchable TextContent &hearts;</p>',
+            )
+          ),
+        )
+        .catch(err => {
+          throw err;
+        });
+    });
   });
 
   it('Search with token should return 200 and matching body.tags', async () => {
