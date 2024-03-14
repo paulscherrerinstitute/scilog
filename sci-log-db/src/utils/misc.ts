@@ -184,7 +184,6 @@ export function filterEmptySubsnippets(
   maxDepth: number | undefined = undefined,
   level = 0,
   parent?: Basesnippet,
-  subsnippetIndex = 0,
 ) {
   if (
     !Object.keys(snippet).includes('subsnippets') ||
@@ -196,11 +195,15 @@ export function filterEmptySubsnippets(
     (!snippet.subsnippets || snippet?.subsnippets?.length === 0) &&
     parent?.subsnippets
   ) {
-    parent.subsnippets[subsnippetIndex] = undefined as unknown as Basesnippet;
+    const subsnippetIndex = parent.subsnippets.findIndex(
+      sub => sub.id === snippet.id,
+    );
+    if (subsnippetIndex >= 0)
+      parent.subsnippets[subsnippetIndex] = undefined as unknown as Basesnippet;
     filterEmptySubsnippets(parent as Basesnippet, maxDepth, level - 1);
   } else
-    snippet?.subsnippets?.map((sub, i) =>
-      filterEmptySubsnippets(sub, maxDepth, level + 1, snippet, i),
+    snippet?.subsnippets?.map(sub =>
+      filterEmptySubsnippets(sub, maxDepth, level + 1, snippet),
     );
 }
 

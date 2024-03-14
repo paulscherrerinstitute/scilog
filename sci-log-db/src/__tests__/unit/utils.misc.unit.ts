@@ -16,78 +16,94 @@ import {
 describe('Utils unit tests', function (this: Suite) {
   it('Should filterEmptySubsnippets', () => {
     const snippet = {
+      id: '1',
       subsnippets: [
         {
+          id: '2',
           subsnippets: [
             undefined,
-            {subsnippets: [1, undefined]},
-            {subsnippets: [undefined, undefined]},
-            {subsnippets: undefined},
-            {subsnippets: []},
+            {id: '3', subsnippets: [{id: '7'}, undefined]},
+            {id: '4', subsnippets: [undefined, undefined]},
+            {id: '5', subsnippets: undefined},
+            {id: '6', subsnippets: []},
           ],
         },
       ],
     } as Basesnippet;
     filterEmptySubsnippets(snippet);
     expect(snippet).to.eql({
-      subsnippets: [{subsnippets: [{subsnippets: [1]}]}],
+      id: '1',
+      subsnippets: [
+        {id: '2', subsnippets: [{id: '3', subsnippets: [{id: '7'}]}]},
+      ],
     });
   });
 
   [
     {
+      id: '1',
       subsnippets: [
         {
+          id: '2',
           subsnippets: [
             undefined,
-            {subsnippets: [1, undefined]},
-            {subsnippets: [undefined, undefined]},
-            {subsnippets: undefined},
-            {subsnippets: []},
+            {id: '3', subsnippets: [{id: '7'}, undefined]},
+            {id: '4', subsnippets: [undefined, undefined]},
+            {id: '5', subsnippets: undefined},
+            {id: '6', subsnippets: []},
           ],
         },
         undefined,
       ],
     },
     {
+      id: '1',
       subsnippets: [
         {
+          id: '2',
           subsnippets: [
             undefined,
-            {subsnippets: [1, undefined]},
-            {subsnippets: [undefined, undefined]},
-            {subsnippets: undefined},
-            {subsnippets: []},
+            {id: '3', subsnippets: [{id: '7'}, undefined]},
+            {id: '4', subsnippets: [undefined, undefined]},
+            {id: '5', subsnippets: undefined},
+            {id: '6', subsnippets: []},
           ],
         },
       ],
     },
     {
+      id: '1',
       subsnippets: [
         {
+          id: '2',
           subsnippets: [
-            {subsnippets: [1, undefined]},
-            {subsnippets: [undefined, undefined]},
-            {subsnippets: undefined},
-            {subsnippets: []},
+            {id: '3', subsnippets: [{id: '7'}, undefined]},
+            {id: '4', subsnippets: [undefined, undefined]},
+            {id: '5', subsnippets: undefined},
+            {id: '6', subsnippets: []},
           ],
         },
       ],
     },
     {
-      subsnippets: [{subsnippets: [{subsnippets: [1]}]}],
+      id: '1',
+      subsnippets: [
+        {id: '2', subsnippets: [{id: '3', subsnippets: [{id: '7'}]}]},
+      ],
     },
   ].forEach((t, i) => {
     it(`Should filterEmptySubsnippets with maxDept ${i}`, () => {
       const snippet = {
+        id: '1',
         subsnippets: [
           {
+            id: '2',
             subsnippets: [
               undefined,
-              {subsnippets: [1, undefined]},
-              {subsnippets: [undefined, undefined]},
-              {subsnippets: undefined},
-              {subsnippets: []},
+              {id: '3', subsnippets: [{id: '7'}, undefined]},
+              {id: '4', subsnippets: [undefined, undefined]},
+              {id: '5', subsnippets: undefined},
+              {id: '6', subsnippets: []},
             ],
           },
           undefined,
