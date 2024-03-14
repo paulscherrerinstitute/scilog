@@ -11,6 +11,8 @@ import {
   arrayOfUniqueFrom,
   filterEmptySubsnippets,
   standardiseIncludes,
+  sanitizeTextContent,
+  sanitizeTextContentInPlace,
 } from '../../utils/misc';
 
 describe('Utils unit tests', function (this: Suite) {
@@ -285,6 +287,32 @@ describe('Utils unit tests', function (this: Suite) {
   ].forEach((t, i) => {
     it(`Should test standardiseIncludes ${i}`, () => {
       standardiseIncludes(t.input);
+      expect(t.input).to.be.eql(t.expected);
+    });
+  });
+
+  [
+    {input: '<p>a</p>', expected: 'a'},
+    {input: '<p><div>abc</div>def</p>', expected: 'abcdef'},
+    {input: '<p>def</p><div>ghi</div>', expected: 'defghi'},
+    {input: '<p>h &hearts;</p>', expected: 'h ♥'},
+  ].forEach((t, i) => {
+    it(`Should test sanitizeTextContent ${i}`, () => {
+      expect(sanitizeTextContent(t.input)).to.be.eql(t.expected);
+    });
+  });
+
+  [
+    {input: undefined, expected: undefined},
+    {input: {textcontent: undefined}, expected: {textcontent: undefined}},
+    {input: {textcontent: '<p></p>'}, expected: {textcontent: '<p></p>'}},
+    {
+      input: {textcontent: '<p>a</p>'},
+      expected: {textcontent: '<p>a</p>', htmlTextcontent: 'a'},
+    },
+  ].forEach((t, i) => {
+    it(`Should test sanitizeTextContentInPlace ${i}`, () => {
+      sanitizeTextContentInPlace(t.input);
       expect(t.input).to.be.eql(t.expected);
     });
   });
