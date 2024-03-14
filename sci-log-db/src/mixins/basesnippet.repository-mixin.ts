@@ -391,18 +391,11 @@ function FindWithSearchRepositoryMixin<
     ) {
       if (!searchText) return;
       searchText = searchText.trimStart();
-      const searchRegex = {regexp: new RegExp(`.*?${searchText}.*?`, 'i')};
+      const searchRegex = {regexp: new RegExp(`.*${searchText}.*`, 'i')};
       const searchCondition = [
         {name: searchRegex},
         {description: searchRegex},
-        {
-          textcontent: {
-            regexp: new RegExp(
-              `(?<=<p>)((?!&).)*${searchText}((?!&).)*(?=<\/p>)`,
-              'i',
-            ),
-          },
-        },
+        {htmlTextcontent: searchRegex},
       ];
       additionalConditions.or = searchCondition;
     }
