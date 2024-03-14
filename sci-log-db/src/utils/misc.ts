@@ -13,6 +13,7 @@ import {
 } from '@loopback/rest';
 import _ from 'lodash';
 import {Basesnippet} from '../models';
+import {JSDOM} from 'jsdom';
 
 export function getModelSchemaRefWithDeprecated<T extends Entity>(
   modelCtor: Function & {prototype: T},
@@ -214,4 +215,21 @@ export function standardiseIncludes(filter: Pick<Filter, 'include'>) {
     if (typeof relation === 'string') include[i] = {relation: relation};
     else standardiseIncludes(relation as Pick<Filter, 'include'>);
   });
+}
+
+export function sanitizeTextContent(textcontent: string) {
+  const dom = new JSDOM('<!DOCTYPE html>');
+  const div = dom.window.document.createElement('div');
+  div.innerHTML = textcontent;
+  return div.textContent ?? undefined;
+}
+
+export function sanitizeTextContentInPlace(data?: {
+  textcontent?: string;
+  htmlTextcontent?: string;
+}) {
+  if (typeof data?.textcontent !== 'string') return;
+  const sanitisedText = sanitizeTextContent(data.textcontent);
+  if (!sanitisedText) return;
+  data.htmlTextcontent = sanitisedText;
 }

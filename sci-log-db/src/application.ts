@@ -32,8 +32,6 @@ import {
   RestExplorerComponent,
 } from '@loopback/rest-explorer';
 import {ServiceMixin} from '@loopback/service-proxy';
-import fs from 'fs';
-import _ from 'lodash';
 import multer from 'multer';
 import path from 'path';
 import {
@@ -42,7 +40,7 @@ import {
   STORAGE_DIRECTORY,
 } from './keys';
 import {User} from './models';
-import {UserRepository} from './repositories';
+import {ParagraphRepository} from './repositories';
 import {MySequence} from './sequence';
 import {BcryptHasher} from './services/hash.password.bcryptjs';
 import {JWTService} from './services/jwt-service';
@@ -56,7 +54,6 @@ import passport from 'passport';
 import {OIDCAuthentication} from './authentication-strategies';
 import {UserServiceBindings} from './keys';
 
-import YAML = require('yaml');
 import {ExpressRequestHandlersProvider} from './express-handlers/middleware-sequence';
 
 export {ApplicationConfig};
@@ -232,46 +229,10 @@ export class SciLogDbApplication extends BootMixin(
   }
 
   async migrateSchema(options?: SchemaMigrationOptions): Promise<void> {
+    const paragraphRepo = await this.getRepository(ParagraphRepository);
+    await paragraphRepo.migrateHtmlTexcontent();
+
     await super.migrateSchema(options);
-
-    // Pre-populate products
-    // TODO replace this by snippet data
-
-    /*     const productRepo = await this.getRepository(ProductRepository);
-        await productRepo.deleteAll();
-        const productsDir = path.join(__dirname, '../fixtures/products');
-        const productFiles = fs.readdirSync(productsDir);
-    
-        for (const file of productFiles) {
-          if (file.endsWith('.yml')) {
-            const productFile = path.join(productsDir, file);
-            const yamlString = fs.readFileSync(productFile, 'utf8');
-            const product = YAML.parse(yamlString);
-            await productRepo.create(product);
-          }
-        } */
-
-    // Pre-populate users
-    const passwordHasher = await this.get(
-      PasswordHasherBindings.PASSWORD_HASHER,
-    );
-    const userRepo = await this.getRepository(UserRepository);
-    await userRepo.deleteAll();
-    const usersDir = path.join(__dirname, '../fixtures/users');
-    const userFiles = fs.readdirSync(usersDir);
-
-    for (const file of userFiles) {
-      if (file.endsWith('.yml')) {
-        const userFile = path.join(usersDir, file);
-        const yamlString = YAML.parse(fs.readFileSync(userFile, 'utf8'));
-        const input = new NewUser(yamlString);
-        const password = await passwordHasher.hashPassword(input.password);
-        input.password = password;
-        const user = await userRepo.create(_.omit(input, 'password'));
-
-        await userRepo.userCredentials(user.id).create({password});
-      }
-    }
 
     // TODO adjust to SciLog case Delete existing shopping carts
     // cconst cartRepo = await this.getRepository(ShoppingCartRepository);

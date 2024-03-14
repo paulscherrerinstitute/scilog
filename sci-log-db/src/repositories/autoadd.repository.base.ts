@@ -14,7 +14,11 @@ import {
 } from '@loopback/repository';
 import {Location, Logbook, User} from '../models';
 import {Basesnippet} from '../models/basesnippet.model';
-import {arrayOfUniqueFrom, defaultSequentially} from '../utils/misc';
+import {
+  arrayOfUniqueFrom,
+  defaultSequentially,
+  sanitizeTextContentInPlace,
+} from '../utils/misc';
 import {BasesnippetRepository} from './basesnippet.repository';
 import _ from 'lodash';
 import {HttpErrors} from '@loopback/rest';
@@ -353,6 +357,7 @@ export class AutoAddRepository<
           // ctx.instance.unsetAttribute('id')
         }
       }
+      sanitizeTextContentInPlace(ctx.data ?? ctx.instance);
       console.log('going to save:' + JSON.stringify(ctx, null, 3));
     });
 
