@@ -27,18 +27,16 @@ export class ParagraphRepository extends SnippetRepositoryMixin<
       htmlTextcontent: null,
       textcontent: {$ne: null},
     });
-    const paragraphs = await paragraphsCursor.toArray();
     const baseSnippetRepository = await this.baseSnippetRepository();
-    await Promise.all(
-      paragraphs.map(async (paragraph: {_id: string; textcontent: string}) => {
-        const sanitised = sanitizeTextContent(paragraph.textcontent);
-        if (!sanitised) return;
-        return baseSnippetRepository.updateById(
-          `${paragraph._id}`,
-          {htmlTextcontent: sanitised},
-          {currentUser: {roles: ['admin']}},
-        );
-      }),
-    );
+    for await (const paragraph of paragraphsCursor) {
+      const sanitised = sanitizeTextContent(paragraph.textcontent);
+      if (!sanitised) return;
+      await baseSnippetRepository.updateById(
+        `${paragraph._id}`,
+        {htmlTextcontent: sanitised},
+        {currentUser: {roles: ['admin']}},
+      );
+    }
+    await paragraphsCursor.close();
   }
 }
