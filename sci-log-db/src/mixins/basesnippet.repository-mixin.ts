@@ -312,8 +312,8 @@ function FindWithSearchRepositoryMixin<
       const desc = filter.order?.[0] === 'defaultOrder DESC';
       return Object.values(snippets).sort((first, second) =>
         desc
-          ? second.createdAt.valueOf() - first.createdAt.valueOf()
-          : first.createdAt.valueOf() - second.createdAt.valueOf(),
+          ? second.defaultOrder - first.defaultOrder
+          : first.defaultOrder - second.defaultOrder,
       );
     }
 
