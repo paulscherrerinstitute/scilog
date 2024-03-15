@@ -30,7 +30,7 @@ export class ParagraphRepository extends SnippetRepositoryMixin<
     const baseSnippetRepository = await this.baseSnippetRepository();
     for await (const paragraph of paragraphsCursor) {
       const sanitised = sanitizeTextContent(paragraph.textcontent);
-      if (!sanitised) return;
+      if (!sanitised) continue;
       await baseSnippetRepository.updateById(
         `${paragraph._id}`,
         {htmlTextcontent: sanitised},
