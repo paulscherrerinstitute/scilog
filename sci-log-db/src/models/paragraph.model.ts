@@ -15,6 +15,7 @@ export enum LinkType {
       where: {snippetType: 'paragraph'},
     },
     mongodb: {collection: 'Basesnippet'},
+    hiddenProperties: ['htmlTextcontent'],
   },
 })
 export class Paragraph extends Basesnippet {
@@ -27,9 +28,15 @@ export class Paragraph extends Basesnippet {
   @property({
     type: 'string',
     description: 'Markup contents in markdown (MD) syntax of this paragraph',
-    index: true,
   })
   textcontent?: string;
+
+  @property({
+    type: 'string',
+    description: 'HTML sanitized elements text content',
+    index: true,
+  })
+  htmlTextcontent?: string;
 
   @property({
     type: 'string',

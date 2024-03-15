@@ -96,7 +96,8 @@ describe('Paragraph', function (this: Suite) {
       .then(
         result => (
           expect(result.body.length).to.be.eql(1),
-          expect(result.body[0]).to.containEql(paragraphSnippet)
+          expect(result.body[0]).to.containEql(paragraphSnippet),
+          expect(result.body[0]).not.to.have.key('htmlTextcontent')
         ),
       )
       .catch(err => {
