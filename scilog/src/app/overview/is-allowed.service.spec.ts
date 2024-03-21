@@ -81,5 +81,27 @@ describe('IsAllowedService', () => {
       service['cascadeExpiration']('update');
     });
   });
-  
+
+  [
+    [true, 1],
+    [false, 0]
+  ].forEach((t, i) => {
+    it(`should test canDelete ${i}`, () => {
+      const cascadeExpirationSpy = spyOn<any>(service, 'cascadeExpiration');
+      service.canDelete(t[0] as boolean);
+      expect(cascadeExpirationSpy).toHaveBeenCalledTimes(t[1] as number);
+    });
+  });
+
+  [
+    [true, 1],
+    [false, 0]
+  ].forEach((t, i) => {
+    it(`should test canUpdate ${i}`, () => {
+      const cascadeExpirationSpy = spyOn<any>(service, 'cascadeExpiration');
+      service.canUpdate(t[0] as boolean);
+      expect(cascadeExpirationSpy).toHaveBeenCalledTimes(t[1] as number);
+    });
+  });
+
 });

@@ -54,8 +54,8 @@ describe('TaskComponent', () => {
       const canUpdateSpy = spyOn(component['isActionAllowed'], 'canUpdate');
       const canDeleteSpy = spyOn(component['isActionAllowed'], 'canDelete');
       component.isAllowed();
-      expect(canUpdateSpy).toHaveBeenCalledTimes(1);
-      expect(canDeleteSpy).toHaveBeenCalledTimes(1);
+      expect(canUpdateSpy).toHaveBeenCalledOnceWith(false);
+      expect(canDeleteSpy).toHaveBeenCalledOnceWith(false);
     });
 
   });

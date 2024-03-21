@@ -35,7 +35,7 @@ export class IsAllowedService {
   private otherEnabledMembers(action: string): string[] {
     const aclMembers = (this.snippet?.[`${action}ACL`] ?? []).filter(
         (m: string) => m != 'admin').concat('admin');
-    if (this.userPreferences.userInfo?.roles.some((entry: string) =>
+    if (this.userPreferences.userInfo?.roles?.some((entry: string) =>
       aclMembers?.includes?.(entry)
     ))
       return [];
@@ -77,8 +77,8 @@ export class IsAllowedService {
     return false
   }
 
-  canUpdate() {
-    return this.cascadeExpiration('update')
+  canUpdate(checkExpiration=true) {
+    return checkExpiration? this.cascadeExpiration('update'): this.isUserAllowed('update')
   }
 
   private cascadeExpiration(action: string) {
@@ -90,7 +90,7 @@ export class IsAllowedService {
     return false;
   }
 
-  canDelete() {
-    return this.cascadeExpiration('delete')
+  canDelete(checkExpiration=true) {
+    return checkExpiration? this.cascadeExpiration('delete'): this.isUserAllowed('delete')
   }
 }
