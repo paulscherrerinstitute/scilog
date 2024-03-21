@@ -38,8 +38,8 @@ export class TaskComponent implements OnInit {
   }
 
   isAllowed() {
-    this.isActionAllowed.canDelete();
-    this.isActionAllowed.canUpdate();
+    this.isActionAllowed.canDelete(false);
+    this.isActionAllowed.canUpdate(false);
   }
 
 }
