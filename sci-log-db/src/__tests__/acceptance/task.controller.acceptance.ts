@@ -19,7 +19,7 @@ describe('TaskRepositorySnippet', function (this: Suite) {
     shareACL: ['taskAcceptance'],
     isPrivate: true,
     defaultOrder: 0,
-    expiresAt: '2055-10-10T14:04:19.522Z',
+    expiresAt: '1991-10-10T14:04:19.522Z',
     tags: ['aSearchableTag'],
     dashboardName: 'string',
     versionable: true,
@@ -194,7 +194,7 @@ describe('TaskRepositorySnippet', function (this: Suite) {
   // when patching by id, to preserve the history, the original snippet is duplicated, then a history snippet is created and then the original one is updated
   // to keep the linking between the three, the parentId of the duplicated one = id of the history snippet and the parentId of the history snippet = id of the original one
   // to prevent the search to return too many snippets, the fields used in the subsequent search are updated
-  it('patch snippet by id with token should return 204', async () => {
+  it('patch snippet by id with token should return 204 even if expired', async () => {
     await client
       .patch(`/tasks/${taskSnippetId}`)
       .set('Authorization', 'Bearer ' + token)

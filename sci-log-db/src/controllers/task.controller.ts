@@ -202,9 +202,14 @@ export class TaskController {
     })
     task: Task,
   ): Promise<void> {
-    await this.taskRepository.updateByIdWithHistory(id, task, {
-      currentUser: this.user,
-    });
+    await this.taskRepository.updateByIdWithHistory(
+      id,
+      task,
+      {
+        currentUser: this.user,
+      },
+      false,
+    );
   }
 
   @del('/tasks/{id}', {

@@ -823,4 +823,24 @@ describe('Basesnippet', function (this: Suite) {
         .expect(t);
     });
   });
+
+  it(`patch expired snippet by id should return 403`, async () => {
+    const bs = await client
+      .post('/basesnippets')
+      .set('Authorization', 'Bearer ' + token)
+      .set('Content-Type', 'application/json')
+      .send({
+        ...baseSnippet,
+        expiresAt: '1990-10-10T14:04:19.522Z',
+      });
+    await client
+      .patch(`/basesnippets/${bs.body.id}`)
+      .set('Authorization', 'Bearer ' + token)
+      .set('Content-Type', 'application/json')
+      .send({name: 'something'})
+      .expect(403)
+      .catch(err => {
+        throw err;
+      });
+  });
 });

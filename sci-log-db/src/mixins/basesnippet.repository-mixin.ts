@@ -60,6 +60,7 @@ function UpdateAndDeleteRepositoryMixin<
       id: ID,
       basesnippet: ExpandedBasesnippet,
       options?: Options,
+      checkExpiration = true,
     ): Promise<void> {
       const baseSnippetRepository = await this.baseSnippetRepository();
       const snippet = await baseSnippetRepository.findById(id, {}, options);
@@ -70,6 +71,7 @@ function UpdateAndDeleteRepositoryMixin<
       if (Object.keys(patches).length === 0) return;
       if (!basesnippet.deleted) {
         if (
+          checkExpiration &&
           !this.isSharing(patches) &&
           (snippet.expiresAt?.getTime() < Date.now() || !snippet?.expiresAt)
         ) {
