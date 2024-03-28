@@ -4,7 +4,7 @@ import { ViewEditComponent } from './view-edit.component';
 import { UntypedFormBuilder } from '@angular/forms';
 import { UserPreferencesService } from '@shared/user-preferences.service';
 import { ViewDataService } from '@shared/remote-data.service';
-import { MatAutocomplete } from '@angular/material/autocomplete';
+import { MatLegacyAutocomplete as MatAutocomplete } from '@angular/material/legacy-autocomplete';
 
 
 class UserPreferencesMock {

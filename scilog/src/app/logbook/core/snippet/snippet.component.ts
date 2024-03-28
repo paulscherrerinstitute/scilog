@@ -1,7 +1,7 @@
 import { Component, OnInit, Input, SecurityContext, ElementRef, ViewChild, Output, EventEmitter, ChangeDetectorRef, SimpleChange, SimpleChanges } from '@angular/core';
 import { ChangeStreamNotification } from '../changestreamnotification.model';
 import { DomSanitizer } from '@angular/platform-browser';
-import { MatDialogConfig, MatDialog, MatDialogRef } from '@angular/material/dialog';
+import { MatLegacyDialogConfig as MatDialogConfig, MatLegacyDialog as MatDialog, MatLegacyDialogRef as MatDialogRef } from '@angular/material/legacy-dialog';
 import { AddContentComponent } from '../add-content/add-content.component';
 import { Paragraphs, LinkType } from '@model/paragraphs';
 import { BehaviorSubject, Subscription } from 'rxjs';

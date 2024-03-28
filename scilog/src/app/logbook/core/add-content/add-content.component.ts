@@ -1,5 +1,5 @@
 import { Component, OnInit, Inject, HostListener } from '@angular/core';
-import { MAT_DIALOG_DATA } from '@angular/material/dialog';
+import { MAT_LEGACY_DIALOG_DATA as MAT_DIALOG_DATA } from '@angular/material/legacy-dialog';
 import * as ClassicEditor from '../ckeditor/ckeditor5/build/ckeditor';
 import { ChangeEvent } from '../ckeditor/ckeditor5/build/ckeditor';
 import { AddContentService } from "../add-content.service";

@@ -1,5 +1,5 @@
 import { Component, OnInit, Input, Output, EventEmitter, ViewChild, HostListener } from '@angular/core';
-import { MatDialogConfig, MatDialog } from '@angular/material/dialog';
+import { MatLegacyDialogConfig as MatDialogConfig, MatLegacyDialog as MatDialog } from '@angular/material/legacy-dialog';
 import { WidgetPreferencesComponent } from '../../widgets/widget-preferences/widget-preferences.component';
 import { LogbookItemComponent } from '../../widgets/logbook-item/logbook-item.component';
 import { ActivatedRoute } from '@angular/router';
