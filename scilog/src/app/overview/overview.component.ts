@@ -3,7 +3,7 @@ import { Logbooks } from '@model/logbooks';
 import { Subject, Subscription } from 'rxjs';
 import { UserPreferencesService } from '@shared/user-preferences.service';
 import { CollectionConfig, WidgetItemConfig } from '@model/config';
-import { MatDialog, MatDialogConfig } from '@angular/material/dialog';
+import { MatLegacyDialog as MatDialog, MatLegacyDialogConfig as MatDialogConfig } from '@angular/material/legacy-dialog';
 import { AddCollectionComponent } from './add-collection/add-collection.component';
 import { AddLogbookComponent } from './add-logbook/add-logbook.component';
 import { LogbookInfoService } from '@shared/logbook-info.service';

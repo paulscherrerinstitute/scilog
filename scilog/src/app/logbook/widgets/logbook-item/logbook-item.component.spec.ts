@@ -1,13 +1,13 @@
 import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
-import { MatDialogModule, MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
+import { MatLegacyDialogModule as MatDialogModule, MAT_LEGACY_DIALOG_DATA as MAT_DIALOG_DATA, MatLegacyDialogRef as MatDialogRef } from '@angular/material/legacy-dialog';
 import { LogbookItemComponent } from './logbook-item.component';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { ChangeStreamService } from '@shared/change-stream.service';
 import { AddContentService } from '@shared/add-content.service';
 import { ViewsService } from '@shared/views.service';
 import { LogbookInfoService } from '@shared/logbook-info.service';
-import { MatSnackBarModule } from '@angular/material/snack-bar';
+import { MatLegacySnackBarModule as MatSnackBarModule } from '@angular/material/legacy-snack-bar';
 import { SnackbarService } from '@shared/snackbar.service';
 import { ActivatedRoute } from '@angular/router';
 import { Observable, BehaviorSubject } from 'rxjs';

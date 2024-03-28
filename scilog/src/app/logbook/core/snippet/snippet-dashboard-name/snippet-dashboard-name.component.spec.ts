@@ -1,7 +1,7 @@
 import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 
 import { SnippetDashboardNameComponent } from './snippet-dashboard-name.component';
-import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
+import { MAT_LEGACY_DIALOG_DATA as MAT_DIALOG_DATA, MatLegacyDialogRef as MatDialogRef } from '@angular/material/legacy-dialog';
 import { LogbookItemDataService } from '@shared/remote-data.service';
 import { of } from 'rxjs';
 import { Paragraphs } from '@model/paragraphs';

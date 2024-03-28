@@ -4,7 +4,7 @@ import { TagEditorComponent } from './tag-editor.component';
 import { TagService } from '../tag.service';
 import { ViewsService } from '@shared/views.service';
 import { of } from 'rxjs';
-import { MatAutocompleteModule } from '@angular/material/autocomplete';
+import { MatLegacyAutocompleteModule as MatAutocompleteModule } from '@angular/material/legacy-autocomplete';
 import { SimpleChange } from '@angular/core';
 
 describe('TagEditorComponent', () => {

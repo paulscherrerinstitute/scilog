@@ -1,8 +1,8 @@
 import { Component, OnInit, Inject, ViewChild, NgZone, ElementRef, ChangeDetectorRef } from '@angular/core';
 import { UntypedFormArray, UntypedFormBuilder, UntypedFormControl, UntypedFormGroup } from '@angular/forms';
-import { MatChipInputEvent } from '@angular/material/chips';
+import { MatLegacyChipInputEvent as MatChipInputEvent } from '@angular/material/legacy-chips';
 import { COMMA, ENTER, SPACE } from '@angular/cdk/keycodes';
-import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
+import { MatLegacyDialogRef as MatDialogRef, MAT_LEGACY_DIALOG_DATA as MAT_DIALOG_DATA } from '@angular/material/legacy-dialog';
 import { Tags } from '@model/metadata'
 import { Observable, Subscription } from 'rxjs';
 import { Basesnippets } from '@model/basesnippets';
