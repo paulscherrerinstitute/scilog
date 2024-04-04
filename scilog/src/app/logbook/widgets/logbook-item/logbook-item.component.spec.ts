@@ -615,9 +615,11 @@ describe('LogbookItemComponent', () => {
       }};
       component.editorRef = {nativeElement: {offsetHeight: t.input[1]}};
       const updateViewHeightsSpy = spyOn(component, 'updateViewHeights').and.callFake(() => true);
+      const isMobileSpy = spyOn(component, 'isMobile').and.callThrough();
       if (i === 3) window.innerWidth = 10;
       component.onResized();
       expect(updateViewHeightsSpy).toHaveBeenCalledTimes(t.output);
+      expect(isMobileSpy).toHaveBeenCalledTimes(1);
       expect(component.mobile).toEqual(i === 3);
     })
   })
