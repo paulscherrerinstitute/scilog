@@ -682,4 +682,10 @@ describe('LogbookItemComponent', () => {
     expect(component.mobile).toEqual(true);
   });
 
+  it('should open dialog with or without last', () => {
+    const dialogOpenMock = spyOn(component.dialog, 'open');
+    component.openDialog();
+    expect(dialogOpenMock.calls.mostRecent().args[1].data['defaultTags']).toEqual(undefined);
+  });
+
 });
