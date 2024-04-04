@@ -1,49 +1,54 @@
-.mat-dialog-content{
-    max-height:60vh;
-    /* width: 400px;  */
-    padding: 15px;
-    margin: 10px;
+.mat-dialog-content {
+  max-height: 60vh;
+  padding: 15px;
+  margin: 10px;
 }
 
 ::ng-deep .ck.ck-toolbar {
-    font-size: 12px;
-  }
+  font-size: 12px;
+}
 
- ::ng-deep .ck-editor__editable_inline {
-    max-height: 40vh;
+::ng-deep .ck-editor__editable_inline {
+  max-height: 40vh;
 }
 
 .content-editor {
-    width: calc(92%); 
-    background-color: white;
-    padding: 15px;
-    margin: 10px;
-  }
+  width: calc(92%);
+  background-color: white;
+  padding: 15px;
+  margin: 10px;
+}
 
-  .metadata{
-    box-shadow: unset;
-  }
+.metadata {
+  box-shadow: unset;
+}
 
 
-  ::ng-deep .mat-dialog-container{
-      width: 120vh;
-  }
+::ng-deep .mat-dialog-container {
+  width: 120vh;
+}
 
-  ::ng-deep .fileLink {
-    background-color: #113657;
-    color: rgba(255, 255, 255, 0.87);
-    border-radius: 3px;
-    padding: 4px;
-    margin: 1px;
-    text-decoration: none;  
-  }
-  
-  ::ng-deep .fileLink::before {
-    font-family: "Material Icons";
-    content: "attach_file";
-    display: inline-block;
-    font-size: initial;
-    vertical-align: middle;
-  }
-  
+::ng-deep .fileLink {
+  background-color: #113657;
+  color: rgba(255, 255, 255, 0.87);
+  border-radius: 3px;
+  padding: 4px;
+  margin: 1px;
+  text-decoration: none;
+}
 
+::ng-deep .fileLink::before {
+  font-family: "Material Icons";
+  content: "attach_file";
+  display: inline-block;
+  font-size: initial;
+  vertical-align: middle;
+}
+
+::ng-deep .ck-insert-table-dropdown__grid {
+  width: calc(
+    var(--ck-insert-table-dropdown-box-width)*10 + 
+    var(--ck-insert-table-dropdown-box-margin)*2 + 
+    var(--ck-insert-table-dropdown-padding)*2
+  )!important
+}

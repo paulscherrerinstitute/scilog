@@ -7,12 +7,10 @@
 .button-toggle-group-view {
   position: absolute;
   z-index: 900;
-  /* top: 55px; */
   right: 20px;
-  /* box-shadow: 0 1px 4px 0 rgba(0, 0, 0, .2), 0 2px 8px 0 rgba(0, 0, 0, .14), 0 4px 8px -1px rgba(0, 0, 0, .12); */
 }
 
-.searchComponent{
+.searchComponent {
   z-index: 1000;
   position: absolute;
   top: 15px;
@@ -35,69 +33,65 @@
   align-items: center;
 }
 
-  ::ng-deep .mat-focused .mat-form-field-label {
-    /*change color of label*/
-    color: var(--button-accent) !important;
-   }
-  
-   ::ng-deep.mat-form-field-underline {
-    /*change color of underline*/
-    background-color: var(--button-accent) !important;
-  } 
-  
-  ::ng-deep.mat-form-field-ripple {
-   /*change color of underline when focused*/
-   background-color: var(--button-accent) !important;;
-  }
+::ng-deep .mat-focused .mat-form-field-label {
+  /*change color of label*/
+  color: var(--button-accent) !important;
+}
 
-  ::ng-deep .mat-form-field-appearance-legacy .mat-form-field-label{
-    color: var(--default-text-color);
-  }
+::ng-deep.mat-form-field-underline {
+  /*change color of underline*/
+  background-color: var(--button-accent) !important;
+}
 
-  .search-form-field{
-    padding-left: 20px;
-    color:var(--default-text-color);
-  }
+::ng-deep.mat-form-field-ripple {
+  /*change color of underline when focused*/
+  background-color: var(--button-accent) !important;
 
-  .content-editor {
-    width: calc(92%); 
-    // background-color: var(--ck-toolbar-color-background);
-    // padding-bottom: 15px;
-    margin: 10px;
-    // border-radius: 5px;
-  }
+}
 
-  .metadata{
-    box-shadow: unset;
-    background-color: var(--ck-toolbar-color-background);
-  }
+::ng-deep .mat-form-field-appearance-legacy .mat-form-field-label {
+  color: var(--default-text-color);
+}
 
-  
-  .editor-container{
-    position: fixed;
-    /* left: 5px; */
-    right: 0px;
-    bottom: 0px;
-    width: calc(100%);
-    background-color: var(--editor);
-    padding-bottom: 5px;
-    @include default-shadow;
-    width: 100%;
-    border-radius: 4px;
-  }
+.search-form-field {
+  padding-left: 20px;
+  color: var(--default-text-color);
+}
 
-  .editor-container-no-border{
-    position: fixed;
-    /* left: 5px; */
-    right: 0px;
-    bottom: 0px;
-    background-color: var(--editor);
-    padding-bottom: 5px;
-    border: 1px var(--default-text-color) solid;
-    margin: 7px;
-    width: calc(100% - 20px);
-    border-radius: 4px !important;
-  }
+.content-editor {
+  width: calc(92%);
+  margin: 10px;
+}
+
+.metadata {
+  box-shadow: unset;
+  background-color: var(--ck-toolbar-color-background);
+}
+
+
+.editor-container {
+  position: fixed;
+  right: 0px;
+  bottom: 0px;
+  width: calc(100%);
+  background-color: var(--editor);
+  padding-bottom: 5px;
+  @include default-shadow;
+  width: 100%;
+  border-radius: 4px;
+}
+
+.editor-container-no-border {
+  position: fixed;
+  right: 0px;
+  bottom: 0px;
+  background-color: var(--editor);
+  padding-bottom: 5px;
+  border: 1px var(--default-text-color) solid;
+  margin: 7px;
+  width: calc(100% - 20px);
+  border-radius: 4px !important;
+}
 
 .mat-standard-chip.mat-chip-with-trailing-icon {
   font-size: 10px;
@@ -109,15 +103,9 @@
 }
 
 .logbook-content {
-  /* padding-bottom: 80px; */
-  /* padding-top: 20px; */
   height: 400px;
   overflow-y: scroll;
 }
-
-/* .editor-fixed{
-    height: 800px;
-  } */
 
 .addButton {
   padding: 5px;
@@ -129,6 +117,7 @@
   padding-bottom: 5px;
   font-size: 12px;
 }
+
 .tagsContainer {
   display: flex;
   padding-left: 8px;
@@ -137,31 +126,32 @@
   border-bottom-left-radius: 5px;
   border-bottom-right-radius: 5px;
   background-color: var(--ck-toolbar-color-background);
-  /* width: 100%; */
 }
 
-.logbook-container{
+.logbook-container {
   width: 100%;
   height: 100%;
   padding-top: 25px;
 }
 
- ::ng-deep .ck.ck-toolbar {
-    font-size: 12px;
-    background-color: var(--ck-toolbar-color-background);
-  }
-  .tagEditor {
-    flex: 1 1 auto !important;
-    display: flex;
-    align-items: center;
-    /* width: 100%; */
-  }
+::ng-deep .ck.ck-toolbar {
+  font-size: 12px;
+  background-color: var(--ck-toolbar-color-background);
+  padding: 0;
+}
+
+.tagEditor {
+  flex: 1 1 auto !important;
+  display: flex;
+  align-items: center;
+}
 
 ::ng-deep .ck-rounded-corners .ck.ck-toolbar {
   border-color: var(--ck-toolbar-border-color);
 }
 
-::ng-deep .ck.ck-toolbar > .ck-toolbar__items > :not(.ck-toolbar__line-break), .ck.ck-toolbar > .ck.ck-toolbar__grouped-dropdown {
+::ng-deep .ck.ck-toolbar>.ck-toolbar__items> :not(.ck-toolbar__line-break),
+.ck.ck-toolbar>.ck.ck-toolbar__grouped-dropdown {
   color: var(--default-text-color);
 }
 
@@ -178,10 +168,13 @@
   text-decoration: none;
 
 }
+
 @supports (-moz-appearance:none) {
-  ::ng-deep .fileLink { display: block;
-    word-wrap: break-word; }
+  ::ng-deep .fileLink {
+    display: block;
+    word-wrap: break-word;
   }
+}
 
 ::ng-deep .fileLink::before {
   font-family: "Material Icons";
@@ -197,4 +190,12 @@
   left: 50%;
   transform: translate(-50%, -50%);
   opacity: 0.4;
+}
+
+::ng-deep .ck-insert-table-dropdown__grid {
+  width: calc(
+    var(--ck-insert-table-dropdown-box-width)*10 + 
+    var(--ck-insert-table-dropdown-box-margin)*2 + 
+    var(--ck-insert-table-dropdown-padding)*2
+  )!important
 }
