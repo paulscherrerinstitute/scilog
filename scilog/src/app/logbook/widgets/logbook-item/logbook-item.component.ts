@@ -685,10 +685,10 @@ export class LogbookItemComponent implements OnInit {
   onResized() {
     const _heightRef = this.snippetContainerRef.nativeElement.parentElement.parentElement.parentElement.parentElement.offsetHeight;
     const _editorHeight = this.editorRef?.nativeElement?.offsetHeight;
+    this.isMobile();
     if (this._snippetHeightRef != _heightRef || this._editorHeightRef != _editorHeight) {
       this._snippetHeightRef = _heightRef;
       this._editorHeightRef = _editorHeight;
-      this.isMobile();
       this.updateViewHeights();
     }
   }
