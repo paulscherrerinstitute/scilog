@@ -642,7 +642,7 @@ export class LogbookItemComponent implements OnInit {
     const dialogConfig = new MatDialogConfig();
     dialogConfig.autoFocus = true;
     dialogConfig.disableClose = true;
-    dialogConfig.data = { "defaultTags": this.childSnippets.last.snippet.tags, "config": this.config }
+    dialogConfig.data = { "defaultTags": this.childSnippets?.last?.snippet?.tags, "config": this.config }
     const dialogRef = this.dialog.open(AddContentComponent, dialogConfig);
   }
 
