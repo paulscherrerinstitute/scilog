@@ -46,3 +46,12 @@ mat-button-toggle-group {
   left: 50%;
   transform: translate(-50%, -50%);
 }
+
+.search {
+  width: 180px;
+}
+
+.expanded-search {
+  width: 540px;
+}
+
