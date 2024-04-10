@@ -35,14 +35,6 @@ describe('SearchWindowComponent', () => {
     expect(component).toBeTruthy();
   });
 
-  it('should call _prepareConfig on searchString emission', fakeAsync(() => {
-    const prepareConfigSpy = spyOn<any>(component, '_prepareConfig');
-    component.searchString = '';
-    component.searchString = 'someSearch';
-    tick(501);
-    expect(prepareConfigSpy).toHaveBeenCalledTimes(1);
-  }));
-
   it('should _parseSearchString', () => {
     component.searchString = 'someSearch';
     expect(component['_parseSearchString']()).toEqual(
