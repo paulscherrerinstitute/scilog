@@ -58,4 +58,20 @@ describe('SearchWindowComponent', () => {
     expect(component.searchString).toEqual('someSearch');
   });
 
+  [
+    ['some', false, true, 1],
+    ['', true, false, 0]
+  ].forEach((t, i) => {
+    it(`should submitSearch ${i}`, () => {
+      component.searchString = 'someSearch';
+      const resetSpy = spyOn(component.searchScrollService, 'reset');
+      const prepareConfigSpy = spyOn<any>(component, '_prepareConfig');
+      component.submitSearch(t[0] as string);
+      expect(component.showHelp).toEqual(t[1] as boolean);
+      expect(component.showResults).toEqual(t[2] as boolean);
+      expect(resetSpy).toHaveBeenCalledTimes(t[3] as number);
+      expect(prepareConfigSpy).toHaveBeenCalledTimes(t[3] as number);
+    });
+  });
+
 });

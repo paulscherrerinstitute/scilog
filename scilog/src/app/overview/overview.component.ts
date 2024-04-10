@@ -1,6 +1,6 @@
 import { Component, ElementRef, HostListener, OnInit, ViewChild } from '@angular/core';
 import { Logbooks } from '@model/logbooks';
-import { Subject, Subscription } from 'rxjs';
+import { Subscription } from 'rxjs';
 import { UserPreferencesService } from '@shared/user-preferences.service';
 import { CollectionConfig, WidgetItemConfig } from '@model/config';
 import { MatDialog, MatDialogConfig } from '@angular/material/dialog';
@@ -10,7 +10,6 @@ import { LogbookInfoService } from '@shared/logbook-info.service';
 import { CookiesService } from '@shared/cookies.service';
 import { LogbookDataService } from '@shared/remote-data.service';
 import { LogbookIconScrollService } from './logbook-icon-scroll-service.service';
-import { debounceTime } from 'rxjs/operators';
 import { ResizedEvent } from '@shared/directives/resized.directive';
 import { animate, style, transition, trigger } from '@angular/animations';
 
@@ -48,10 +47,10 @@ export class OverviewComponent implements OnInit {
   logbookSubscription: Subscription = null;
   subscriptions: Subscription[] = [];
   private _searchString: string = '';
-  searchStringSubject: Subject<void> = new Subject();
   _matCardSide = { 'logbook-module': 352, 'logbook-headline': 47 };
   @ViewChild('logbookContainer', { static: true }) logbookContainer: ElementRef<HTMLElement>;
   matCardType: MatCardType = 'logbook-module';
+  searchClass = 'search';
 
 
   constructor(
@@ -60,9 +59,7 @@ export class OverviewComponent implements OnInit {
     public dialog: MatDialog,
     private logbookInfo: LogbookInfoService,
     private cookie: CookiesService,
-    private dataService: LogbookDataService) {
-
-  }
+    private dataService: LogbookDataService) {}
 
   ngOnInit(): void {
     this.logbookInfo.logbookInfo = null;
@@ -81,11 +78,6 @@ export class OverviewComponent implements OnInit {
       this.config = this._prepareConfig();
       this.logbookIconScrollService.groupSize = this.groupSize(this.logbookContainer.nativeElement.clientWidth);
       this.logbookIconScrollService.initialize(this.config);
-    }));
-    this.subscriptions.push(this.searchStringSubject.pipe(debounceTime(500)).subscribe(() => {
-      this.logbookIconScrollService.config = this._prepareConfig();
-      this.logbookIconScrollService.reset();
-
     }));
   }
 
@@ -144,8 +136,8 @@ export class OverviewComponent implements OnInit {
     return this._searchString;
   }
   public set searchString(value: string) {
+    this.searchClass = 'expanded-search';
     this._searchString = value;
-    this.searchStringSubject.next();
     this.dataService.searchString = this._searchString;
   }
 
@@ -222,6 +214,13 @@ export class OverviewComponent implements OnInit {
       }
     }
     return _config;
+  }
+
+  submitSearch(searchString: string='') {
+    this.searchString = searchString;
+    this.searchClass = 'search';
+    this.logbookIconScrollService.config = this._prepareConfig();
+    this.logbookIconScrollService.reset();
   }
 
   ngOnDestroy(): void {

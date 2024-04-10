@@ -154,4 +154,14 @@ describe('OverviewComponent', () => {
     expect(onResizedSpy).toHaveBeenCalled();
   });
 
+  it('should submitSearch', () => {
+    component.searchString = 'someSearch';
+    const resetSpy = spyOn<any>(component.logbookIconScrollService, 'reset');
+    const prepareConfigSpy = spyOn<any>(component, '_prepareConfig');
+    component.submitSearch();
+    expect(resetSpy).toHaveBeenCalledTimes(1);
+    expect(prepareConfigSpy).toHaveBeenCalledTimes(1);
+  });
+
+
 });

@@ -13,6 +13,9 @@
             </mat-form-field>
         </span>
         <span>
+            <button mat-icon-button (click)="submitSearch(searchString)">
+                <mat-icon>search</mat-icon>
+            </button>
             <button mat-icon-button (click)="closeSearch()">
                 <mat-icon>close</mat-icon>
             </button>
@@ -79,12 +82,12 @@
     </div>
 
 </div>
-<div class="statusMessage" *ngIf=showResults>
+<div class="statusMessage" *ngIf=searchedString>
     <mat-divider></mat-divider>
     <div>
         Showing results for:
         <span>
-            {{searchString}}
+            {{searchedString}}
         </span>
     </div>
 
