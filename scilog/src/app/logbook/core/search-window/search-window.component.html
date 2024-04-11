@@ -13,7 +13,7 @@
             </mat-form-field>
         </span>
         <span>
-            <button mat-icon-button (click)="submitSearch(searchString)">
+            <button mat-icon-button (click)="submitSearch()">
                 <mat-icon>search</mat-icon>
             </button>
             <button mat-icon-button (click)="closeSearch()">
@@ -22,7 +22,8 @@
         </span>
 
     </mat-toolbar>
-    <div class="searchHelp" *ngIf="showHelp">
+    <search *ngIf="submittedSearch && searchString" [config]="config" [searchString]="submittedSearch" (close)="closeSearch()"></search>
+    <div class="searchHelp" *ngIf="!submittedSearch || !searchString">
         <mat-divider></mat-divider>
         <div class="header">
             Suggestions...
@@ -57,38 +58,4 @@
         </div>
 
     </div>
-    <div class="searchResults" *ngIf=showResults>
-        <div class="header">
-            Logbook view:
-            <mat-spinner *ngIf="!searchScrollService.isLoaded" [@spinner] class="spinner"></mat-spinner>
-            <div class="searchContainer">
-                <div *uiScroll="let snippet of searchScrollService.datasource; let i = index">
-                    <snippet [snippet]="snippet" [updatedAt]="snippet.updatedAt" [index]=i+1 [config]="config"
-                        [showEditButtonsMenu]="false" (selected)="selectedSnippet($event)">
-                    </snippet>
-                </div>
-            </div>
-        </div>
-        <!-- <div class="header">
-            Tasks:
-            <div *uiScroll="let snippet of searchScrollService.datasource; let i = index">
-                <snippet [snippet]="snippet" [updatedAt]="snippet.updatedAt" [index]=i+1 [config]="config"
-                    [showEditButtonsMenu]="false" (selected)="selectedSnippet($event)">
-                </snippet>
-            </div>
-        </div> -->
-
-        
-    </div>
-
-</div>
-<div class="statusMessage" *ngIf=searchedString>
-    <mat-divider></mat-divider>
-    <div>
-        Showing results for:
-        <span>
-            {{searchedString}}
-        </span>
-    </div>
-
 </div>

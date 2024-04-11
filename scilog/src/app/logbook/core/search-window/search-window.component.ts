@@ -1,14 +1,9 @@
 import { Component, OnInit, Output, EventEmitter, Input, ElementRef, ViewChild } from '@angular/core';
-import { SearchScrollService } from '@shared/search-scroll.service';
 import { WidgetConfig, WidgetItemConfig } from '@model/config';
 import { Subscription } from 'rxjs';
-import { SearchDataService } from '@shared/remote-data.service';
 import { UserPreferencesService } from '@shared/user-preferences.service';
-import { LogbookInfoService } from '@shared/logbook-info.service';
 import { TagService } from '@shared/tag.service';
-import { ScrollToElementService } from '@shared/scroll-to-element.service';
 import { Hotkeys } from '@shared/hotkeys.service';
-import { animate, style, transition, trigger } from '@angular/animations';
 
 interface SearchResult {
   location: string[],
@@ -23,18 +18,8 @@ interface SearchResult {
   selector: 'search-window',
   templateUrl: './search-window.component.html',
   styleUrls: ['./search-window.component.css'],
-  providers: [SearchScrollService],
-  animations: [
-    trigger('spinner', [
-      transition(':enter', [
-        style({opacity: 0}), 
-        animate('1ms 0.2s ease-out', style({opacity: 1}))
-      ])
-    ]),
-  ]
 })
 export class SearchWindowComponent implements OnInit {
-
 
   @Input()
   configsArray: WidgetConfig[];
@@ -45,29 +30,21 @@ export class SearchWindowComponent implements OnInit {
 
   @ViewChild('searchSnippets') searchSnippets: ElementRef;
 
-  searchString: string = '';
+  _searchString: string = '';
   searchSnippetIndex: string = '';
-  showResults = false;
-  showHelp = true;
   tags: string[] = [];
   _sample_user: string = "";
   subscriptions: Subscription[] = [];
-  searchedString: string;
+  submittedSearch: string;
 
   constructor(
-    public searchScrollService: SearchScrollService,
-    private searchDataservice: SearchDataService,
     public userPreferences: UserPreferencesService,
-    private logbookInfo: LogbookInfoService,
     private tagService: TagService,
-    private scrollToElementService: ScrollToElementService,
     private hotkeys: Hotkeys,
   ) { }
 
   async ngOnInit(): Promise<void> {
-    // console.log(this.configsArray[1].config);
     this.config = this._prepareConfig();
-    this.searchScrollService.initialize(this.config);
 
     this._initialize_help();
 
@@ -75,8 +52,7 @@ export class SearchWindowComponent implements OnInit {
       this.closeSearch();
     }));
     this.subscriptions.push(this.hotkeys.addShortcut({ keys: 'enter', description: { label: 'Submit search', group: "General" } }).subscribe(() => {
-      if (this.searchString)
-        this.submitSearch(this.searchString);
+      this.submitSearch();
     }));
 
   }
@@ -87,11 +63,11 @@ export class SearchWindowComponent implements OnInit {
     this.searchSnippets.nativeElement.focus();
   }
 
+  submitSearch() {
+    this.submittedSearch = this.searchString;
+  }
+
   private async _initialize_help() {
-    this.tags = await this.tagService.getTags();
-    if (this.tags.length == 0) {
-      this.tags = ["alignment"];
-    }
 
     this._sample_user = this.userPreferences.userInfo.username;
     // roles.find((val)=>{
@@ -102,6 +78,10 @@ export class SearchWindowComponent implements OnInit {
     // })
     if (typeof this._sample_user == 'undefined') {
       this._sample_user = "p12345";
+    }
+    this.tags = await this.tagService.getTags();
+    if (this.tags.length == 0) {
+      this.tags = ["alignment"];
     }
 
   }
@@ -122,12 +102,14 @@ export class SearchWindowComponent implements OnInit {
     this.close.emit();
   }
 
-  selectedSnippet($event) {
-    console.log($event);
-    this.scrollToElementService.selectedItem = $event;
-    this.closeSearch();
+  set searchString(searchString: string) {
+    this._searchString = searchString;
+    if (!searchString) this.submittedSearch = searchString;
   }
 
+  get searchString() {
+    return this._searchString;
+  }
 
   private _parseSearchString(): SearchResult {
     let searchResult: SearchResult = {
@@ -139,10 +121,8 @@ export class SearchWindowComponent implements OnInit {
       endDate: "",
     }
     console.log("local search")
-    searchResult.location.push(this.logbookInfo.logbookInfo.id);
     console.log("Search value: ", this.searchString);
     console.log("Search config: ", searchResult)
-    this.searchDataservice.searchString = this.searchString;
     return searchResult;
   }
 
@@ -168,19 +148,6 @@ export class SearchWindowComponent implements OnInit {
     }
     return _config;
   }
-
-  submitSearch(searchText: string = '') {
-    this.searchedString = searchText;
-    if (searchText) {
-      this.showHelp = false;
-      this.showResults = true;
-      this.searchScrollService.config = this._prepareConfig();
-      this.searchScrollService.reset();
-    } else {
-      this.showHelp = true;
-      this.showResults = false;
-    }
-  };
 
   ngOnDestroy(): void {
     //Called once, before the instance is destroyed.
