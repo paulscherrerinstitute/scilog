@@ -1,18 +1,5 @@
 <app-toolbar></app-toolbar>
 <div class="overview-container">
-  <mat-form-field [ngClass]=searchClass>
-    <mat-label>
-      Search <mat-icon>search</mat-icon>
-    </mat-label>
-    <input matInput type="text" [(ngModel)]="searchString" (keyup.enter)="submitSearch(searchString)">
-    <button mat-button *ngIf="searchString" matSuffix mat-icon-button aria-label="Search"
-      (click)="submitSearch(searchString)">
-      <mat-icon>search</mat-icon>
-    </button>
-    <button mat-button *ngIf="searchString" matSuffix mat-icon-button aria-label="Clear" (click)="submitSearch()">
-      <mat-icon>close</mat-icon>
-    </button>
-  </mat-form-field>
   <div>
     <h1>Logbooks</h1>
     <mat-button-toggle-group [value]="matCardType"
