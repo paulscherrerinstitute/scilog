@@ -1,15 +1,15 @@
 import { Injectable } from '@angular/core';
 import { LogbookDataService } from '@shared/remote-data.service';
-import { ScrollBaseService } from '@shared/scroll-base.service';
+import { SearchScrollBaseService } from '@shared/search-scroll.service';
 import { Datasource } from 'ngx-ui-scroll';
 
 @Injectable({
   providedIn: 'root'
 })
-export class LogbookIconScrollService extends ScrollBaseService {
+export class LogbookIconScrollService extends SearchScrollBaseService {
 
   groupSize = 3;
-  constructor(private logbookDataService: LogbookDataService) {
+  constructor(protected dataService: LogbookDataService) {
     super();
   }
 
@@ -49,7 +49,7 @@ export class LogbookIconScrollService extends ScrollBaseService {
   }
 
   async getData(index: number, count: number, config: any) {
-    const buffer = await this.logbookDataService.getDataBuffer(index, count, config);
+    const buffer = await this.dataService.getDataBuffer(index, count, config);
     this.datasource.adapter.relax();
     const groupedBuffer = [];
     while (buffer.length) groupedBuffer.push(buffer.splice(0, this.groupSize));

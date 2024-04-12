@@ -1,22 +1,34 @@
 import { Injectable } from '@angular/core';
-import { Subscription } from 'rxjs';
-import { SearchDataService } from '@shared/remote-data.service';
+import { SearchDataService, LogbookDataService } from '@shared/remote-data.service';
 import { ScrollBaseService } from '@shared/scroll-base.service';
 
+export class SearchScrollBaseService extends ScrollBaseService {
+
+  protected dataService: SearchDataService | LogbookDataService
+
+  private setSearchString(searchString: string) {
+    this.dataService.searchString = searchString;
+  }
+
+  reset(searchString?: string) {
+    this.setSearchString(searchString);
+    super.reset();
+  }
+
+}
+
 @Injectable()
-export class SearchScrollService extends ScrollBaseService {
-  
-  currentViewSubscription: Subscription = null;
+export class SearchScrollService extends SearchScrollBaseService {
 
   constructor(
-    private searchDataService: SearchDataService,
-  ) { 
+    protected dataService: SearchDataService,
+  ) {
     super();
   }
 
 
   getDataBuffer(index:number, count:number, config:any){
-    return this.searchDataService.getDataBuffer(index, count, config);
+    return this.dataService.getDataBuffer(index, count, config);
   }
 
 }

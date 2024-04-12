@@ -2,9 +2,10 @@ import { Component, OnInit, Output, EventEmitter, Input, ElementRef, ViewChild }
 import { WidgetConfig, WidgetItemConfig } from '@model/config';
 import { Subscription } from 'rxjs';
 import { UserPreferencesService } from '@shared/user-preferences.service';
+import { LogbookInfoService } from '@shared/logbook-info.service';
 import { TagService } from '@shared/tag.service';
 import { Hotkeys } from '@shared/hotkeys.service';
-import { LogbookInfoService } from 'src/app/core/logbook-info.service';
+import { LogbookIconScrollService } from 'src/app/overview/logbook-icon-scroll-service.service';
 
 interface SearchResult {
   location: string[],
@@ -26,11 +27,12 @@ export class SearchWindowComponent implements OnInit {
   configsArray: WidgetConfig[];
 
   @Input()
-  isLogbookOpen: boolean;
+  searched: string;
 
   config: WidgetItemConfig;
 
   @Output() close = new EventEmitter<void>();
+  @Output() overviewSearch = new EventEmitter<string>();
 
   @ViewChild('searchSnippets') searchSnippets: ElementRef;
 
@@ -40,19 +42,22 @@ export class SearchWindowComponent implements OnInit {
   _sample_user: string = "";
   subscriptions: Subscription[] = [];
   submittedSearch: string;
+  logbookId?: string;
 
   constructor(
     public userPreferences: UserPreferencesService,
     private logbookInfo: LogbookInfoService,
     private tagService: TagService,
     private hotkeys: Hotkeys,
+    private logbookIconScrollService: LogbookIconScrollService,
   ) { }
 
   async ngOnInit(): Promise<void> {
+    this.searchString = this.searched;
+    this.logbookId = this.logbookInfo?.logbookInfo?.id;
     this.config = this._prepareConfig();
 
-    this._initialize_help();
-
+    await this._initialize_help();
     this.subscriptions.push(this.hotkeys.addShortcut({ keys: 'esc', description: { label: 'Close search', group: "General" } }).subscribe(() => {
       this.closeSearch();
     }));
@@ -69,7 +74,13 @@ export class SearchWindowComponent implements OnInit {
   }
 
   submitSearch() {
-    this.submittedSearch = this.searchString;
+    if (this.logbookId) {
+      this.submittedSearch = this.searchString;
+      return
+    }
+    this.logbookIconScrollService.reset(this.searchString);
+    this.overviewSearch.emit(this.searchString);
+    this.closeSearch();
   }
 
   private async _initialize_help() {
@@ -84,15 +95,17 @@ export class SearchWindowComponent implements OnInit {
     if (typeof this._sample_user == 'undefined') {
       this._sample_user = "p12345";
     }
-    this.tags = await this.tagService.getTags();
-    if (this.tags.length == 0) {
+    if (!this.logbookId) return
+    this.tags = await this.tagService?.getTags();
+    if (this.tags?.length == 0) {
       this.tags = ["alignment"];
     }
-
   }
+
   reset() {
     this.searchString = "";
   }
+
   addToSearch(val: string) {
     let _stringParts = val.split(" ");
     _stringParts.forEach((subVal) => {
@@ -104,12 +117,13 @@ export class SearchWindowComponent implements OnInit {
   }
 
   closeSearch() {
+    this.reset();
     this.close.emit();
   }
 
   set searchString(searchString: string) {
     this._searchString = searchString;
-    if (!searchString) this.submittedSearch = searchString;
+    if (this.logbookId && !searchString) this.submittedSearch = searchString;
   }
 
   get searchString() {
@@ -126,7 +140,7 @@ export class SearchWindowComponent implements OnInit {
       endDate: "",
     }
     console.log("local search")
-    searchResult.location.push(this.logbookInfo.logbookInfo.id);
+    if (this.logbookId) searchResult.location.push(this.logbookId);
     console.log("Search value: ", this.searchString);
     console.log("Search config: ", searchResult)
     return searchResult;

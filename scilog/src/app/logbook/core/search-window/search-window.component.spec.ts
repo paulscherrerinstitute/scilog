@@ -50,12 +50,25 @@ describe('SearchWindowComponent', () => {
     expect(component.searchString).toEqual('someSearch');
   });
 
-  it('should submitSearch', () => {
+  it('should submitSearch logbook', () => {
     component.searchString = 'some';
     expect(component.submittedSearch).toEqual(undefined);
     component.submitSearch();
     expect(component.submittedSearch).toEqual('some');
   });
 
+  it('should submitSearch overview', () => {
+    component.logbookId = undefined;
+    const search = 'some';
+    component.searchString = search;
+    expect(component.submittedSearch).toEqual(undefined);
+    const resetSpy = spyOn(component['logbookIconScrollService'], 'reset');
+    const emitSpy = spyOn(component.overviewSearch, 'emit');
+    const closeSearchSpy = spyOn(component, 'closeSearch');
+    component.submitSearch();
+    expect(resetSpy).toHaveBeenCalledOnceWith(search);
+    expect(emitSpy).toHaveBeenCalledOnceWith(search);
+    expect(closeSearchSpy).toHaveBeenCalled();
+  });
 
 });
