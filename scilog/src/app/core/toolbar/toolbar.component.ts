@@ -24,6 +24,7 @@ export class ToolbarComponent implements OnInit {
   @Input()
   showMenuIcon: boolean;
 
+  searched: string;
   subscriptions: Subscription[] = [];
   logbookName: string;
   isLogbookOpen = false;
@@ -45,8 +46,6 @@ export class ToolbarComponent implements OnInit {
         this.adjustHeaderFontSize(this.logbookTitleRef);
     }
  }
-
- @ViewChild('searchWindow') searchWindow: SearchWindowComponent;
 
   views: Views[] = [];
   appConfig: AppConfig = this.appConfigService.getConfig();
@@ -92,9 +91,11 @@ export class ToolbarComponent implements OnInit {
     }));
     this.showVersionInfo = !this.showMenuIcon;
     console.log(this.showVersionInfo)
-    
   }
 
+  overviewSearch($event) {
+    this.searched = $event
+  }
 
   logout() {
     console.log("logout");
@@ -137,11 +138,6 @@ export class ToolbarComponent implements OnInit {
 
   closeSearch(){
     this.showSearch = false;
-    this.searchWindow.reset();
-  }
-
-  selectedSearchEntry($event){
-    
   }
 
   loadView(index: number){

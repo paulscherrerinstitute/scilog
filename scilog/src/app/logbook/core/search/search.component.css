@@ -23,27 +23,3 @@
     left: 50%;
     transform: translate(-50%, -50%);
 }
-
-.statusMessage {
-    position: absolute;
-    bottom: -px;
-    color: black;
-    padding: 10px;
-    font-size: 12px;
-    width: calc(100% - 20px);
-}
-
-.statusMessage > div {
-    padding-left:20px;
-}
-
-.statusMessage > div > span {
-    border-radius: 5px;
-    background-color: #004c63;
-    color: white;
-    box-shadow: 0 1px 4px 0 var(--default-shadow-0), 0 2px 8px 0 var(--default-shadow-1),
-        0 4px 8px -1px var(--default-shadow-2);
-    border: unset;
-    padding: 4px;
-    margin-left: 4px;
-}

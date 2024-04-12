@@ -2,7 +2,6 @@ import { Component, Input, OnInit, Output, EventEmitter } from '@angular/core';
 import { SearchScrollService } from 'src/app/core/search-scroll.service';
 import { ScrollToElementService } from '../scroll-to-element.service';
 import { WidgetItemConfig } from 'src/app/core/model/config';
-import { SearchDataService } from 'src/app/core/remote-data.service';
 import { animate, style, transition, trigger } from '@angular/animations';
 
 @Component({
@@ -32,7 +31,6 @@ export class SearchComponent implements OnInit {
   constructor(
     public searchScrollService: SearchScrollService,
     private scrollToElementService: ScrollToElementService,
-    private searchDataservice: SearchDataService,
   ) { }
 
   async ngOnInit(): Promise<void> {
@@ -41,8 +39,7 @@ export class SearchComponent implements OnInit {
   }
 
   submitSearch() {
-    this.searchDataservice.searchString = this.searchString;
-    this.searchScrollService.reset();
+    this.searchScrollService.reset(this.searchString);
   }
 
   selectedSnippet($event) {

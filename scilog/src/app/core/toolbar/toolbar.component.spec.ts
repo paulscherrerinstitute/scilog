@@ -6,6 +6,7 @@ import { MatLegacyMenuModule as MatMenuModule } from '@angular/material/legacy-m
 
 import { ToolbarComponent } from './toolbar.component';
 import { AppConfigService } from 'src/app/app-config.service';
+import { By } from '@angular/platform-browser';
 
 const getConfig = () => ({});
 
@@ -31,4 +32,14 @@ describe('ToolbarComponent', () => {
   it('should create', () => {
     expect(component).toBeTruthy();
   });
+
+  it('should overviewSearch', () => {
+    component.showSearch = true;
+    fixture.detectChanges();
+    fixture.debugElement.query(
+      By.css('search-window')
+    ).triggerEventHandler('overviewSearch', 'searched');
+    expect(component.searched).toEqual('searched');
+  });
+
 });
