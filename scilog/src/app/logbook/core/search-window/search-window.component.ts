@@ -4,6 +4,7 @@ import { Subscription } from 'rxjs';
 import { UserPreferencesService } from '@shared/user-preferences.service';
 import { TagService } from '@shared/tag.service';
 import { Hotkeys } from '@shared/hotkeys.service';
+import { LogbookInfoService } from 'src/app/core/logbook-info.service';
 
 interface SearchResult {
   location: string[],
@@ -24,6 +25,9 @@ export class SearchWindowComponent implements OnInit {
   @Input()
   configsArray: WidgetConfig[];
 
+  @Input()
+  isLogbookOpen: boolean;
+
   config: WidgetItemConfig;
 
   @Output() close = new EventEmitter<void>();
@@ -39,6 +43,7 @@ export class SearchWindowComponent implements OnInit {
 
   constructor(
     public userPreferences: UserPreferencesService,
+    private logbookInfo: LogbookInfoService,
     private tagService: TagService,
     private hotkeys: Hotkeys,
   ) { }
@@ -121,6 +126,7 @@ export class SearchWindowComponent implements OnInit {
       endDate: "",
     }
     console.log("local search")
+    searchResult.location.push(this.logbookInfo.logbookInfo.id);
     console.log("Search value: ", this.searchString);
     console.log("Search config: ", searchResult)
     return searchResult;

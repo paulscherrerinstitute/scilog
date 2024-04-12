@@ -1,5 +1,5 @@
 import { HttpClientTestingModule } from '@angular/common/http/testing';
-import { ComponentFixture, TestBed, fakeAsync, tick, waitForAsync } from '@angular/core/testing';
+import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 import { MatLegacyDialog as MatDialog } from '@angular/material/legacy-dialog';
 import { LogbookInfoService } from '@shared/logbook-info.service';
 import { AppConfigService } from 'src/app/app-config.service';
@@ -50,20 +50,12 @@ describe('SearchWindowComponent', () => {
     expect(component.searchString).toEqual('someSearch');
   });
 
-  [
-    ['some', false, true, 1],
-    ['', true, false, 0]
-  ].forEach((t, i) => {
-    it(`should submitSearch ${i}`, () => {
-      component.searchString = 'someSearch';
-      const resetSpy = spyOn(component.searchScrollService, 'reset');
-      const prepareConfigSpy = spyOn<any>(component, '_prepareConfig');
-      component.submitSearch(t[0] as string);
-      expect(component.showHelp).toEqual(t[1] as boolean);
-      expect(component.showResults).toEqual(t[2] as boolean);
-      expect(resetSpy).toHaveBeenCalledTimes(t[3] as number);
-      expect(prepareConfigSpy).toHaveBeenCalledTimes(t[3] as number);
-    });
+  it('should submitSearch', () => {
+    component.searchString = 'some';
+    expect(component.submittedSearch).toEqual(undefined);
+    component.submitSearch();
+    expect(component.submittedSearch).toEqual('some');
   });
+
 
 });
