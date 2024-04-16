@@ -32,12 +32,6 @@ describe('SearchComponent', () => {
     expect(component).toBeTruthy();
   });
 
-  it('should submitSearch', () => {
-    const resetSpy = spyOn<any>(component.searchScrollService, 'reset');
-    component.submitSearch();
-    expect(resetSpy).toHaveBeenCalled();
-  });
-
   it('should selectedSnippet', () => {
     const emitSpy = spyOn(component.close, 'emit');
     component.selectedSnippet('');

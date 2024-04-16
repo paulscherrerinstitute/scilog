@@ -14,7 +14,6 @@ describe('SearchWindowComponent', () => {
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      declarations: [ SearchWindowComponent ],
       providers: [
         { provide: AppConfigService, useValue: { getConfig } },
         { provide: MatDialog, useValue: {} },
@@ -51,17 +50,18 @@ describe('SearchWindowComponent', () => {
   });
 
   it('should submitSearch logbook', () => {
-    component.searchString = 'some';
-    expect(component.submittedSearch).toEqual(undefined);
+    const resetSpy = spyOn(component['searchScrollService'], 'reset');
+    const search = 'some';
+    component.searchString = search;
     component.submitSearch();
-    expect(component.submittedSearch).toEqual('some');
+    expect(resetSpy).toHaveBeenCalledOnceWith(search);
+    expect(component.searched).toEqual(search);
   });
 
   it('should submitSearch overview', () => {
     component.logbookId = undefined;
     const search = 'some';
     component.searchString = search;
-    expect(component.submittedSearch).toEqual(undefined);
     const resetSpy = spyOn(component['logbookIconScrollService'], 'reset');
     const emitSpy = spyOn(component.overviewSearch, 'emit');
     const closeSearchSpy = spyOn(component, 'closeSearch');

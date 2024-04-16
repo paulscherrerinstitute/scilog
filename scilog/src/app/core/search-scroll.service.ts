@@ -17,7 +17,7 @@ export class SearchScrollBaseService extends ScrollBaseService {
 
 }
 
-@Injectable()
+@Injectable({ providedIn: 'root' })
 export class SearchScrollService extends SearchScrollBaseService {
 
   constructor(

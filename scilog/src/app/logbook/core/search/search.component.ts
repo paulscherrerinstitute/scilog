@@ -8,7 +8,6 @@ import { animate, style, transition, trigger } from '@angular/animations';
   selector: 'search',
   templateUrl: './search.component.html',
   styleUrls: ['./search.component.css'],
-  providers: [SearchScrollService],
   animations: [
     trigger('spinner', [
       transition(':enter', [
@@ -23,9 +22,6 @@ export class SearchComponent implements OnInit {
   @Input()
   config: WidgetItemConfig;
 
-  @Input()
-  searchString: string;
-
   @Output() close = new EventEmitter<void>();
 
   constructor(
@@ -35,11 +31,6 @@ export class SearchComponent implements OnInit {
 
   async ngOnInit(): Promise<void> {
     this.searchScrollService.initialize(this.config);
-    if (this.searchString) this.submitSearch();
-  }
-
-  submitSearch() {
-    this.searchScrollService.reset(this.searchString);
   }
 
   selectedSnippet($event) {

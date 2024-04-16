@@ -22,8 +22,8 @@
         </span>
 
     </mat-toolbar>
-    <search *ngIf="submittedSearch && searchString" [config]="config" [searchString]="submittedSearch" (close)="closeSearch()"></search>
-    <div class="searchHelp" *ngIf="!submittedSearch || !searchString">
+    <search *ngIf="logbookId && searched" [config]="config" (close)="closeSearch()"></search>
+    <div class="searchHelp" *ngIf="!logbookId || !searched ">
         <mat-divider></mat-divider>
         <div class="header">
             Suggestions...

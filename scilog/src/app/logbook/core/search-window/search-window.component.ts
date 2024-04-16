@@ -6,6 +6,7 @@ import { LogbookInfoService } from '@shared/logbook-info.service';
 import { TagService } from '@shared/tag.service';
 import { Hotkeys } from '@shared/hotkeys.service';
 import { LogbookIconScrollService } from 'src/app/overview/logbook-icon-scroll-service.service';
+import { SearchScrollService } from 'src/app/core/search-scroll.service';
 
 interface SearchResult {
   location: string[],
@@ -41,7 +42,6 @@ export class SearchWindowComponent implements OnInit {
   tags: string[] = [];
   _sample_user: string = "";
   subscriptions: Subscription[] = [];
-  submittedSearch: string;
   logbookId?: string;
 
   constructor(
@@ -50,6 +50,7 @@ export class SearchWindowComponent implements OnInit {
     private tagService: TagService,
     private hotkeys: Hotkeys,
     private logbookIconScrollService: LogbookIconScrollService,
+    private searchScrollService: SearchScrollService,
   ) { }
 
   async ngOnInit(): Promise<void> {
@@ -74,8 +75,9 @@ export class SearchWindowComponent implements OnInit {
   }
 
   submitSearch() {
+    this.searched = this.searchString;
     if (this.logbookId) {
-      this.submittedSearch = this.searchString;
+      this.searchScrollService.reset(this.searchString);
       return
     }
     this.logbookIconScrollService.reset(this.searchString);
@@ -123,7 +125,7 @@ export class SearchWindowComponent implements OnInit {
 
   set searchString(searchString: string) {
     this._searchString = searchString;
-    if (this.logbookId && !searchString) this.submittedSearch = searchString;
+    if (!searchString) this.searched = searchString;
   }
 
   get searchString() {
