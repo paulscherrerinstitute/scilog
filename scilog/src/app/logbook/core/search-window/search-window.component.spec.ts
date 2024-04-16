@@ -1,5 +1,5 @@
 import { HttpClientTestingModule } from '@angular/common/http/testing';
-import { ComponentFixture, TestBed, fakeAsync, tick, waitForAsync } from '@angular/core/testing';
+import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 import { MatLegacyDialog as MatDialog } from '@angular/material/legacy-dialog';
 import { LogbookInfoService } from '@shared/logbook-info.service';
 import { AppConfigService } from 'src/app/app-config.service';
@@ -14,7 +14,6 @@ describe('SearchWindowComponent', () => {
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      declarations: [ SearchWindowComponent ],
       providers: [
         { provide: AppConfigService, useValue: { getConfig } },
         { provide: MatDialog, useValue: {} },
@@ -50,20 +49,26 @@ describe('SearchWindowComponent', () => {
     expect(component.searchString).toEqual('someSearch');
   });
 
-  [
-    ['some', false, true, 1],
-    ['', true, false, 0]
-  ].forEach((t, i) => {
-    it(`should submitSearch ${i}`, () => {
-      component.searchString = 'someSearch';
-      const resetSpy = spyOn(component.searchScrollService, 'reset');
-      const prepareConfigSpy = spyOn<any>(component, '_prepareConfig');
-      component.submitSearch(t[0] as string);
-      expect(component.showHelp).toEqual(t[1] as boolean);
-      expect(component.showResults).toEqual(t[2] as boolean);
-      expect(resetSpy).toHaveBeenCalledTimes(t[3] as number);
-      expect(prepareConfigSpy).toHaveBeenCalledTimes(t[3] as number);
-    });
+  it('should submitSearch logbook', () => {
+    const resetSpy = spyOn(component['searchScrollService'], 'reset');
+    const search = 'some';
+    component.searchString = search;
+    component.submitSearch();
+    expect(resetSpy).toHaveBeenCalledOnceWith(search);
+    expect(component.searched).toEqual(search);
+  });
+
+  it('should submitSearch overview', () => {
+    component.logbookId = undefined;
+    const search = 'some';
+    component.searchString = search;
+    const resetSpy = spyOn(component['logbookIconScrollService'], 'reset');
+    const emitSpy = spyOn(component.overviewSearch, 'emit');
+    const closeSearchSpy = spyOn(component, 'closeSearch');
+    component.submitSearch();
+    expect(resetSpy).toHaveBeenCalledOnceWith(search);
+    expect(emitSpy).toHaveBeenCalledOnceWith(search);
+    expect(closeSearchSpy).toHaveBeenCalled();
   });
 
 });

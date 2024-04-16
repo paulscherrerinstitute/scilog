@@ -12,18 +12,22 @@
     </button>
   </div>
   <div *ngIf='showSearch' class="searchWindow">
-    <search-window #searchWindow [configsArray]='config' (close)="closeSearch()" (selectedSnippet)="selectedSearchEntry($event)"></search-window>
+    <search-window #searchWindow [configsArray]='config' [searched]="searched" (close)="closeSearch()" (overviewSearch)="overviewSearch($event)"></search-window>
   </div>
   <div class="flexExpand">
-    <button mat-icon-button class='searchButton' (click)="openSearch()" *ngIf="!showMenuIcon && isLogbookOpen">
-        <mat-icon class='searchIcon'>
-          search
-        </mat-icon>
-        <span>
-          Search 
-        </span>
+    <button mat-icon-button class='searchButton' (click)="openSearch()" *ngIf="!showMenuIcon">
+      <mat-icon class='searchIcon'>
+        search
+      </mat-icon>
+      <span>
+        Search
+      </span>
+      <mat-icon class="searchIcon" style="color: red;" *ngIf="searched">
+        filter_list_alt
+      </mat-icon>
     </button>
   </div>
+
   <span>
     <span class="version-info" *ngIf="showVersionInfo" matTooltip="v0.9">
       {{ versionInfo }}

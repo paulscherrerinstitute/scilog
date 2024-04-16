@@ -8,17 +8,8 @@ import { CookieService } from 'ngx-cookie-service';
 import { LogbookDataService } from '@shared/remote-data.service';
 import { of } from 'rxjs';
 import { RouterTestingModule } from '@angular/router/testing';
-import {Pipe, PipeTransform} from '@angular/core';
-import { Logbooks } from '@model/logbooks';
 import { ResizedEvent } from '@shared/directives/resized.directive';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
-
-@Pipe({name: 'logbookSearch'})
-class LogbookSearchMockPipe implements PipeTransform {
-    transform(logbooks: Logbooks[], searchString: string){
-        return logbooks;
-    }
-}
 
 class UserPreferencesMock {
   userInfo = {
@@ -47,7 +38,7 @@ describe('OverviewComponent', () => {
   
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      declarations: [ OverviewComponent, LogbookSearchMockPipe],
+      declarations: [ OverviewComponent],
       imports: [MatDialogModule, RouterTestingModule, BrowserAnimationsModule],
       providers: [
         { provide: MAT_DIALOG_DATA, useValue: {} },
@@ -153,15 +144,5 @@ describe('OverviewComponent', () => {
     window.dispatchEvent(new Event('resize'));
     expect(onResizedSpy).toHaveBeenCalled();
   });
-
-  it('should submitSearch', () => {
-    component.searchString = 'someSearch';
-    const resetSpy = spyOn<any>(component.logbookIconScrollService, 'reset');
-    const prepareConfigSpy = spyOn<any>(component, '_prepareConfig');
-    component.submitSearch();
-    expect(resetSpy).toHaveBeenCalledTimes(1);
-    expect(prepareConfigSpy).toHaveBeenCalledTimes(1);
-  });
-
 
 });

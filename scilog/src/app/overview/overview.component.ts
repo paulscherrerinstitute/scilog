@@ -24,7 +24,6 @@ export type MatCardType = 'logbook-module' | 'logbook-headline';
   selector: 'app-overview',
   templateUrl: './overview.component.html',
   styleUrls: ['./overview.component.css'],
-  providers: [LogbookIconScrollService],
   animations: [
     trigger('spinner', [
       transition(':enter', [
@@ -46,11 +45,9 @@ export class OverviewComponent implements OnInit {
 
   logbookSubscription: Subscription = null;
   subscriptions: Subscription[] = [];
-  private _searchString: string = '';
   _matCardSide = { 'logbook-module': 352, 'logbook-headline': 47 };
   @ViewChild('logbookContainer', { static: true }) logbookContainer: ElementRef<HTMLElement>;
   matCardType: MatCardType = 'logbook-module';
-  searchClass = 'search';
 
 
   constructor(
@@ -132,15 +129,6 @@ export class OverviewComponent implements OnInit {
 
   }
 
-  public get searchString(): string {
-    return this._searchString;
-  }
-  public set searchString(value: string) {
-    this.searchClass = 'expanded-search';
-    this._searchString = value;
-    this.dataService.searchString = this._searchString;
-  }
-
   logbookSelected(logbookID: string) {
     this.cookie.lastLogbook = logbookID;
     console.log("selected logbook: ", logbookID);
@@ -214,13 +202,6 @@ export class OverviewComponent implements OnInit {
       }
     }
     return _config;
-  }
-
-  submitSearch(searchString: string='') {
-    this.searchString = searchString;
-    this.searchClass = 'search';
-    this.logbookIconScrollService.config = this._prepareConfig();
-    this.logbookIconScrollService.reset();
   }
 
   ngOnDestroy(): void {
