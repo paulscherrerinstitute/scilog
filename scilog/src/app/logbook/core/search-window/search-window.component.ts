@@ -8,15 +8,6 @@ import { Hotkeys } from '@shared/hotkeys.service';
 import { LogbookIconScrollService } from 'src/app/overview/logbook-icon-scroll-service.service';
 import { SearchScrollService } from 'src/app/core/search-scroll.service';
 
-interface SearchResult {
-  location: string[],
-  tags: string[],
-  ownerGroup: string,
-  createdBy: string,
-  startDate: string,
-  endDate: string,
-}
-
 @Component({
   selector: 'search-window',
   templateUrl: './search-window.component.html',
@@ -132,34 +123,13 @@ export class SearchWindowComponent implements OnInit {
     return this._searchString;
   }
 
-  private _parseSearchString(): SearchResult {
-    let searchResult: SearchResult = {
-      location: [],
-      tags: [],
-      ownerGroup: "",
-      createdBy: "",
-      startDate: "",
-      endDate: "",
-    }
-    console.log("local search")
-    if (this.logbookId) searchResult.location.push(this.logbookId);
-    console.log("Search value: ", this.searchString);
-    console.log("Search config: ", searchResult)
-    return searchResult;
-  }
-
-  private _prepareConfig() {
-    let searchResult = this._parseSearchString();
-    let _config: WidgetItemConfig = {
+  get defaultConfig() {
+    return {
       filter: {
-        targetId: "",
-        additionalLogbooks: searchResult.location,
-        tags: searchResult.tags,
-        ownerGroup: searchResult.ownerGroup,
+        targetId: this.logbookId,
       },
       general: {
         type: "logbook",
-        title: "",
         readonly: true
       },
       view: {
@@ -167,8 +137,19 @@ export class SearchWindowComponent implements OnInit {
         hideMetadata: false,
         showSnippetHeader: false
       }
-    }
-    return _config;
+    };
+  }
+
+  private _prepareConfig() {
+    return this._extractConfig() ?? this.defaultConfig;
+  }
+
+  private _extractConfig() {
+    return this.configsArray?.filter?.(configItem => 
+      configItem?.config?.filter?.targetId === this.logbookId &&
+      configItem?.config?.general?.type === 'logbook' &&
+      configItem?.config?.general?.title === 'Logbook view'
+    )?.[0]?.config;
   }
 
   ngOnDestroy(): void {

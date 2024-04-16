@@ -213,19 +213,25 @@ export class LogbookItemComponent implements OnInit {
 
     this.updateViewSubscription();
 
-    this.subscriptions.push(this.scrollToElementService.$selectedItem.subscribe(async (element) => {
+    this.scrollToElement();
+  }
+
+  private scrollToElement() {
+    this.subscriptions.push(this.scrollToElementService.$selectedItem.subscribe(async (event) => {
+      if (this.config?.general?.title !== event?.config?.general?.title) return;
+      const element = event.event;
       if (element != null) {
         if (typeof element.id == 'string') {
           let index = await this.logbookItemDataService.getIndex(element.id, this.config);
           console.log("snippet:", element);
-          console.log("index: ", index)
+          console.log("index: ", index);
           console.log(this.config);
           if (index >= 0) {
             this.goToSnippetIndex(index);
           }
         }
       }
-    }))
+    }));
   }
 
   updateViewSubscription() {

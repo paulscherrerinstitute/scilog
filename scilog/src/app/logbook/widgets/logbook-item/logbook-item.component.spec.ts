@@ -690,4 +690,16 @@ describe('LogbookItemComponent', () => {
     expect(dialogOpenMock.calls.mostRecent().args[1].data['defaultTags']).toEqual(undefined);
   });
 
+  it('should scrollToElement', async () => {
+    const _id = '123';
+    const config = { general: { title: 'Logbook view' } };
+    const componentConfig = component.config;
+    component['scrollToElementService']['$selectedItem'] = 
+      of({ event: { id: _id }, config: config });
+    const getIndexSpy = spyOn(component['logbookItemDataService'], 'getIndex');
+    component['scrollToElement']();
+    fixture.detectChanges();
+    expect(getIndexSpy).toHaveBeenCalledWith(_id, componentConfig);
+  });
+
 });
