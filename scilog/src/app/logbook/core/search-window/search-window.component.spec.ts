@@ -5,6 +5,7 @@ import { LogbookInfoService } from '@shared/logbook-info.service';
 import { AppConfigService } from 'src/app/app-config.service';
 
 import { SearchWindowComponent } from './search-window.component';
+import { WidgetItemConfig } from 'src/app/core/model/config';
 
 const getConfig = () => ({});
 
@@ -34,21 +35,6 @@ describe('SearchWindowComponent', () => {
     expect(component).toBeTruthy();
   });
 
-  it('should _parseSearchString', () => {
-    component.searchString = 'someSearch';
-    expect(component['_parseSearchString']()).toEqual(
-      {
-        location: ['id'],
-        tags: [],
-        ownerGroup: "",
-        createdBy: "",
-        startDate: "",
-        endDate: "",
-      }
-    );
-    expect(component.searchString).toEqual('someSearch');
-  });
-
   it('should submitSearch logbook', () => {
     const resetSpy = spyOn(component['searchScrollService'], 'reset');
     const search = 'some';
@@ -69,6 +55,71 @@ describe('SearchWindowComponent', () => {
     expect(resetSpy).toHaveBeenCalledOnceWith(search);
     expect(emitSpy).toHaveBeenCalledOnceWith(search);
     expect(closeSearchSpy).toHaveBeenCalled();
+  });
+
+  it('should defaultConfig', () => {
+    expect(component.defaultConfig).toEqual({
+      filter: {
+        targetId: 'id',
+      },
+      general: {
+        type: "logbook",
+        readonly: true
+      },
+      view: {
+        order: ["defaultOrder DESC"],
+        hideMetadata: false,
+        showSnippetHeader: false
+      }
+    });
+  });
+
+  it('should _extractConfig', () => {
+    const firstConfig = {
+      general: {
+        type: 'logbook',
+        title: 'some different',
+      },
+      filter: {
+        targetId: 'id'
+      }
+    };
+    const secondConfig = JSON.parse(JSON.stringify(firstConfig));
+    secondConfig.general.title = 'Logbook view';
+    const positions = { cols: 0, rows: 1, y: 2, x: 3 };
+    component.configsArray = [
+      { ...positions, config: firstConfig },
+      { ...positions, config: secondConfig },
+    ];
+    expect(component["_extractConfig"]()).toEqual(secondConfig);
+  });
+
+  [
+    undefined,
+    {
+      general: { type: 'logbook', title: 'Logbook view' },
+      filter: { targetId: 'id' }
+    } as WidgetItemConfig,
+  ].forEach((t, i) => {
+    it(`should _prepareConfig ${i}`, () => {
+      const defaultConfig = {
+        filter: {
+          targetId: "id",
+        },
+        general: {
+          type: "logbook",
+          readonly: true
+        },
+        view: {
+          order: ["defaultOrder DESC"],
+          hideMetadata: false,
+          showSnippetHeader: false
+        }
+      };
+      if (t)
+        component.configsArray = [{ cols: 0, rows: 1, y: 2, x: 3, config: t }];
+      expect(component["_prepareConfig"]()).toEqual(t ?? defaultConfig);
+    });
   });
 
 });

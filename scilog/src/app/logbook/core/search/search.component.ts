@@ -35,7 +35,10 @@ export class SearchComponent implements OnInit {
 
   selectedSnippet($event) {
     console.log($event);
-    this.scrollToElementService.selectedItem = $event;
+    this.scrollToElementService.selectedItem = {
+      event: $event,
+      config: this.config
+    };
     this.close.emit();
   }
 
