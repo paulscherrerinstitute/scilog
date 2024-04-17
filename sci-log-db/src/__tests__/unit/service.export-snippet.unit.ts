@@ -331,6 +331,16 @@ describe('Export service unit', function (this: Suite) {
         [['someFile.pdf', 'accessHash2']],
       ],
     },
+    {
+      input: [
+        {files: [{fileHash: 'hash123', accessHash: 'accessHash2'}]},
+        '<div class="fileLink" href="file:hash123">someFile_>_.pdf</div>',
+      ],
+      expected: [
+        '<filelink>attachments/someFile_&gt;_.pdf</filelink>',
+        [['someFile_>_.pdf', 'accessHash2']],
+      ],
+    },
   ].forEach((t, i) => {
     it(`attachment ${i}`, async () => {
       const element = textContentToHTML({textcontent: t.input[1]} as Paragraph);
