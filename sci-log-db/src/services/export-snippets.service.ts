@@ -233,7 +233,7 @@ export class ExportService {
         `.fileLink[href='file:${fileSnippet.fileHash}']`,
       );
       if (!fileLinkElement) return;
-      const attachment = fileLinkElement.innerHTML;
+      const attachment = fileLinkElement.textContent ?? '';
       const attachmentElement = this.document.createElement('fileLink');
       attachmentElement.innerHTML = `${this.attachmentsFolder}/${fileLinkElement.innerHTML}`;
       fileLinkElement.replaceWith(attachmentElement);
