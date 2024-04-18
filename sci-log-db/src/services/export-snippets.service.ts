@@ -36,6 +36,7 @@ export class ExportService {
   subsnippetCounter: number;
   attachments: string[][] = [];
   attachmentsFolder = 'attachments';
+  authorizationHeader: {authorization?: string};
 
   constructor(
     @inject(RestBindings.SERVER)
@@ -228,19 +229,39 @@ export class ExportService {
   };
 
   private attachment = (snippet: Paragraph, element: Element) => {
-    snippet.files?.map(fileSnippet => {
-      const fileLinkElement = element.querySelector(
-        `.fileLink[href='file:${fileSnippet.fileHash}']`,
-      );
-      if (!fileLinkElement) return;
+    element.querySelectorAll('.fileLink').forEach(fileLinkElement => {
+      const href = fileLinkElement.getAttribute('href');
+      const downloadUrl = this.attachmentDownloadUrl(href, snippet.files);
+      if (!downloadUrl) return;
       const attachment = fileLinkElement.textContent ?? '';
       const attachmentElement = this.document.createElement('fileLink');
       attachmentElement.innerHTML = `${this.attachmentsFolder}/${fileLinkElement.innerHTML}`;
       fileLinkElement.replaceWith(attachmentElement);
-      this.attachments.push([attachment, fileSnippet.accessHash as string]);
+      this.attachments.push([attachment, downloadUrl]);
     });
     return element;
   };
+
+  private attachmentDownloadUrl(
+    href: string | null,
+    files: {fileHash?: string; accessHash?: string}[] | undefined,
+  ) {
+    let accessHash: string | undefined;
+    if (href?.startsWith('https://') || href?.startsWith('http://')) {
+      const objectId = require('mongodb').ObjectId;
+      const hrefParts = href.split('/');
+      const fileId = hrefParts.pop();
+      if (objectId.isValid(fileId) && hrefParts.pop() === 'download')
+        return fileId;
+      return;
+    } else if (
+      files?.some(
+        f => `file:${f.fileHash}` === href && (accessHash = f.accessHash),
+      )
+    )
+      return accessHash;
+    return;
+  }
 
   private countSnippets(linkType?: LinkType) {
     let counter: number | string = '';
@@ -264,8 +285,10 @@ export class ExportService {
   async exportToPdf(
     snippets: Paragraph[],
     exportPath: {exportFile: string; exportDir: string},
+    authorizationHeader: {authorization?: string},
     title?: string,
   ) {
+    this.authorizationHeader = authorizationHeader;
     const browser = await puppeteerLaunc({
       executablePath: process.env.CHROME_BIN,
       args: ['--no-sandbox'],
@@ -320,7 +343,9 @@ export class ExportService {
     attachmentDir: string,
     attachment: string[],
   ) {
-    const response = await fetch(`${this.server.url}/images/${attachment[1]}`);
+    const response = await fetch(`${this.server.url}/images/${attachment[1]}`, {
+      headers: this.authorizationHeader,
+    });
     const buffer = Buffer.from(await response.arrayBuffer());
     const destinationFile = `${attachmentDir}/${attachment[0]}`;
     await writeFile(destinationFile, buffer);

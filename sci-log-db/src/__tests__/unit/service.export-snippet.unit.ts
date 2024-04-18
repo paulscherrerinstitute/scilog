@@ -240,9 +240,13 @@ describe('Export service unit', function (this: Suite) {
       const exportFile = await exportService['exportToPdf'](
         paragraphs,
         {exportFile: 'dir/file.pdf', exportDir: 'dir'},
+        {authorization: 'Bearer XXXX'},
         'aTitle',
       );
       expect(addTitle.callCount).to.be.eql(1);
+      expect(exportService.authorizationHeader).to.be.eql({
+        authorization: 'Bearer XXXX',
+      });
       expect(htmlToPDF.callCount).to.be.eql(o);
       expect(exportFile).to.be.eql('dir/file.pdf');
     });
@@ -341,6 +345,26 @@ describe('Export service unit', function (this: Suite) {
         [['someFile_>_.pdf', 'accessHash2']],
       ],
     },
+    {
+      input: [
+        {files: []},
+        '<div class="fileLink" href="https://some/download/111fd07c4f1f010a51e32b36">someFile.pdf</div>',
+      ],
+      expected: [
+        '<filelink>attachments/someFile.pdf</filelink>',
+        [['someFile.pdf', '111fd07c4f1f010a51e32b36']],
+      ],
+    },
+    {
+      input: [
+        {files: []},
+        '<div class="fileLink" href="https://some/download/1">someFile.pdf</div>',
+      ],
+      expected: [
+        '<div class="fileLink" href="https://some/download/1">someFile.pdf</div>',
+        [],
+      ],
+    },
   ].forEach((t, i) => {
     it(`attachment ${i}`, async () => {
       const element = textContentToHTML({textcontent: t.input[1]} as Paragraph);
@@ -357,12 +381,15 @@ describe('Export service unit', function (this: Suite) {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       .resolves({arrayBuffer: async () => '' as any} as Response);
     sandbox.stub(Buffer, 'from');
+    exportService.authorizationHeader = {authorization: 'Bearer XXXX'};
     const writeFileSpy = sandbox.stub(fspromise, 'writeFile');
     await exportService['downloadAttachment']('someDir', ['a', 'b']);
     expect(writeFileSpy.calledWith('someDir/a', match.any)).to.be.eql(true);
-    expect(responseSpy.calledWith('http://localhost:3000/images/b')).to.be.eql(
-      true,
-    );
+    expect(
+      responseSpy.calledWith('http://localhost:3000/images/b', {
+        headers: {authorization: 'Bearer XXXX'},
+      }),
+    ).to.be.eql(true);
   });
 
   [
@@ -392,6 +419,36 @@ describe('Export service unit', function (this: Suite) {
           'file.pdf',
         ]),
       ).to.eql(t.expected[2]);
+    });
+  });
+
+  [
+    {input: [null], expected: undefined},
+    {input: ['some'], expected: undefined},
+    {input: ['https://abc'], expected: undefined},
+    {input: ['http://abc'], expected: undefined},
+    {input: ['http://abc/download'], expected: undefined},
+    {input: ['http://abc/download/123'], expected: undefined},
+    {
+      input: ['http://abc/download/111fd07c4f1f010a51e32b36'],
+      expected: '111fd07c4f1f010a51e32b36',
+    },
+    {input: ['file:somefile', []], expected: undefined},
+    {
+      input: [
+        'file:somefile',
+        [{fileHash: 'somefile', accessHash: 'accessHash'}],
+      ],
+      expected: 'accessHash',
+    },
+  ].forEach((t, i) => {
+    it(`attachmentDownloadUrl ${i}`, async () => {
+      expect(
+        exportService['attachmentDownloadUrl'](
+          t.input[0] as string | null,
+          t.input[1] as {fileHash?: string; accessHash?: string}[] | undefined,
+        ),
+      ).to.eql(t.expected);
     });
   });
 });
