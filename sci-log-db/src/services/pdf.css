@@ -103,10 +103,14 @@ h1 {
 
 @page landscape {
     size: A4 landscape;
-    margin-right: -50px;
-    margin-left: -50px;
+    margin-right: -40px;
+    margin-left: -40px;
     margin-top: 0;
     margin-bottom: 0;
+}
+
+table {
+    min-width: 180mm;
 }
 
 .table-landscape,
@@ -115,15 +119,17 @@ th,
 td {
     table-layout: fixed;
     font-size: 10pt;
-    width: 100%;
     border-spacing: 0;
     border-collapse: collapse;
     border: 1px solid black;
     word-wrap: break-word;
+    width: auto;
 }
 
 .table-landscape {
     page: landscape;
+    min-width: 270mm;
+    width: auto;
 }
 
 .table-with-space::after {
