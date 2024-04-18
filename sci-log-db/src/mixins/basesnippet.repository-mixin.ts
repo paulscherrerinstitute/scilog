@@ -452,6 +452,7 @@ function ExportRepositoryMixin<
       const outFile = await exportService.exportToPdf(
         snippets as unknown as Paragraph[],
         {exportFile, exportDir},
+        _.pick(response?.req?.headers, 'authorization'),
         parentName,
       );
       response.download(outFile, (err, path = exportDir) => {
