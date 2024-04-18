@@ -347,7 +347,7 @@ describe('Export service unit', function (this: Suite) {
     },
     {
       input: [
-        {files: [{fileHash: 'hash123', accessHash: 'accessHash2'}]},
+        {files: []},
         '<div class="fileLink" href="https://some/download/111fd07c4f1f010a51e32b36">someFile.pdf</div>',
       ],
       expected: [
@@ -357,7 +357,7 @@ describe('Export service unit', function (this: Suite) {
     },
     {
       input: [
-        {files: [{fileHash: 'hash123', accessHash: 'accessHash2'}]},
+        {files: []},
         '<div class="fileLink" href="https://some/download/1">someFile.pdf</div>',
       ],
       expected: [
