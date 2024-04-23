@@ -240,13 +240,9 @@ describe('Basesnippet', function (this: Suite) {
   });
 
   it('Search with token should return 200 and matching body.tags', async () => {
-    const includeTags = {include: ['subsnippets']};
+    const includeTags = {where: {tags: 'aSearchableTag'}};
     await client
-      .get(
-        `/basesnippets/search=${encodeURIComponent(
-          '#aSearchableTag',
-        )}?filter=${JSON.stringify(includeTags)}`,
-      )
+      .get(`/basesnippets/search=%00?filter=${JSON.stringify(includeTags)}`)
       .set('Authorization', 'Bearer ' + token)
       .set('Content-Type', 'application/json')
       .expect(200)
@@ -262,12 +258,12 @@ describe('Basesnippet', function (this: Suite) {
   });
 
   it('Search with token should return 200 and matching body.tags + body.textcontent', async () => {
-    const includeTags = {include: ['subsnippets']};
+    const includeTags = {where: {tags: 'aSearchableTag'}};
     await client
       .get(
-        `/basesnippets/search=aSearchable Tex ${encodeURIComponent(
-          '#aSearchableTag',
-        )}?filter=${JSON.stringify(includeTags)}`,
+        `/basesnippets/search=aSearchable Tex?filter=${JSON.stringify(
+          includeTags,
+        )}`,
       )
       .set('Authorization', 'Bearer ' + token)
       .set('Content-Type', 'application/json')
@@ -284,8 +280,9 @@ describe('Basesnippet', function (this: Suite) {
   });
 
   it('Search with token should return 200 and matching readACL', async () => {
+    const filter = {where: {readACL: 'basesnippetAcceptance'}};
     await client
-      .get(`/basesnippets/search=@basesnippetAcceptance`)
+      .get(`/basesnippets/search=%00?filter=${JSON.stringify(filter)}`)
       .set('Authorization', 'Bearer ' + token)
       .set('Content-Type', 'application/json')
       .expect(200)
@@ -329,7 +326,10 @@ describe('Basesnippet', function (this: Suite) {
   });
 
   it('Search with token should return 200 and matching subsnippets', async () => {
-    const includeTags = {include: ['subsnippets']};
+    const includeTags = {
+      where: {tags: 'aSubsnippetTag'},
+      include: ['subsnippets'],
+    };
     await client
       .post('/basesnippets')
       .set('Authorization', 'Bearer ' + token)
@@ -342,9 +342,9 @@ describe('Basesnippet', function (this: Suite) {
 
     await client
       .get(
-        `/basesnippets/search=${encodeURIComponent(
-          '#aSubsnippetTag',
-        )}?filter=${JSON.stringify(includeTags)}`,
+        `/basesnippets/search=aSearch?filter=${JSON.stringify(
+          includeTags,
+        )}&deepby=tags`,
       )
       .set('Authorization', 'Bearer ' + token)
       .set('Content-Type', 'application/json')

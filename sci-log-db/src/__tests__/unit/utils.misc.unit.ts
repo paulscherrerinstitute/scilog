@@ -13,7 +13,9 @@ import {
   standardiseIncludes,
   sanitizeTextContent,
   sanitizeTextContentInPlace,
+  removeDeepBy,
 } from '../../utils/misc';
+import {Where} from '@loopback/repository';
 
 describe('Utils unit tests', function (this: Suite) {
   it('Should filterEmptySubsnippets', () => {
@@ -314,6 +316,50 @@ describe('Utils unit tests', function (this: Suite) {
     it(`Should test sanitizeTextContentInPlace ${i}`, () => {
       sanitizeTextContentInPlace(t.input);
       expect(t.input).to.be.eql(t.expected);
+    });
+  });
+
+  [
+    {input: [{key1: 'a', key2: 'b'}, ['key2']], expected: {key1: 'a'}},
+    {input: [{a: {key1: 'a'}, key2: 'b'}, ['key1', 'key2']], expected: {a: {}}},
+    {
+      input: [{a: {key1: 'a'}, key2: 'b'}, ['key1']],
+      expected: {a: {}, key2: 'b'},
+    },
+    {
+      input: [{a: {b: {key1: 'a'}}, key2: 'b'}, ['key1']],
+      expected: {a: {b: {}}, key2: 'b'},
+    },
+  ].forEach((t, i) => {
+    it(`Should test removeDeepBy ${i}`, () => {
+      removeDeepBy(t.input[0] as Where, (key: string) =>
+        (t.input[1] as string[]).includes(key),
+      );
+      expect(t.input[0]).to.be.eql(t.expected);
+    });
+  });
+
+  [
+    {input: [{key1: 'a', key2: 'b'}, ['key2']], expected: {key2: 'b'}},
+    {
+      input: [{a: {key1: 'a'}, key2: 'b'}, ['a', 'key2']],
+      expected: {a: {}, key2: 'b'},
+    },
+    {
+      input: [{a: {key1: 'a'}, key2: 'b'}, ['key1']],
+      expected: {},
+    },
+    {
+      input: [{a: {b: {key1: 'a'}}, key2: 'b'}, ['key2']],
+      expected: {key2: 'b'},
+    },
+  ].forEach((t, i) => {
+    it(`Should test removeDeepBy with negation ${i}`, () => {
+      removeDeepBy(
+        t.input[0] as Where,
+        (key: string) => !(t.input[1] as string[]).includes(key),
+      );
+      expect(t.input[0]).to.be.eql(t.expected);
     });
   });
 });

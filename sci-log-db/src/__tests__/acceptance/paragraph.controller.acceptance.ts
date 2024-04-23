@@ -165,13 +165,9 @@ describe('Paragraph', function (this: Suite) {
   });
 
   it('Search index with token should return 200 and matching body.tags', async () => {
-    const includeTags = {fields: {tags: true}, include: ['subsnippets']};
+    const includeTags = {where: {tags: 'aSearchableTag'}};
     await client
-      .get(
-        `/paragraphs/search=${encodeURIComponent(
-          '#aSearchableTag',
-        )}?filter=${JSON.stringify(includeTags)}`,
-      )
+      .get(`/paragraphs/search=%00?filter=${JSON.stringify(includeTags)}`)
       .set('Authorization', 'Bearer ' + token)
       .set('Content-Type', 'application/json')
       .expect(200)
