@@ -141,10 +141,10 @@ export class ExportService {
   private dateAndAuthor = (snippet: Paragraph, element: Element): Element => {
     const tagElement = this.document.createElement('snippet-header');
     const counter: number | string = this.countSnippets(snippet.linkType);
-    tagElement.innerHTML = `${counter} / ${snippet.updatedAt.toLocaleDateString(
+    tagElement.innerHTML = `${counter} / ${snippet.createdAt.toLocaleDateString(
       this.dateOptions.locales,
       this.dateOptions.options,
-    )} / ${snippet.updatedBy}`;
+    )} / ${snippet.createdBy}`;
     element.insertAdjacentElement('afterbegin', tagElement);
     return element;
   };
