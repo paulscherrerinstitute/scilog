@@ -22,20 +22,20 @@ describe('Export service unit', function (this: Suite) {
     new Paragraph({
       linkType: LinkType.COMMENT,
       textcontent: '<p>a comment</p>',
-      updatedAt: date,
-      updatedBy: 'test',
+      createdAt: date,
+      createdBy: 'test',
     }),
     new Paragraph({
       linkType: LinkType.QUOTE,
       textcontent: '<p>a quote</p>',
-      updatedAt: date,
-      updatedBy: 'test',
+      createdAt: date,
+      createdBy: 'test',
     }),
     new Paragraph({
       linkType: LinkType.PARAGRAPH,
       textcontent: '<p>a paragraph sub</p>',
-      updatedAt: date,
-      updatedBy: 'test',
+      createdAt: date,
+      createdBy: 'test',
     }),
   ];
   const paragraph = new Paragraph({
@@ -46,8 +46,8 @@ describe('Export service unit', function (this: Suite) {
       {fileHash: '789', accessHash: 'ghi'},
     ],
     tags: ['tag1', 'tag2'],
-    updatedAt: date,
-    updatedBy: 'test',
+    createdAt: date,
+    createdBy: 'test',
     linkType: LinkType.PARAGRAPH,
   });
 
