@@ -176,11 +176,13 @@ export class BasesnippetController {
     @param.path.string('search') search: string,
     @param.filter(Basesnippet, {exclude: 'fields'})
     filter?: Filter<Basesnippet>,
+    @param.array('deepby', 'query', {type: 'string'}) deepBy?: string[],
   ): Promise<Basesnippet[]> {
     const snippetsFiltered = await this.basesnippetRepository.findWithSearch(
       search,
       this.user,
       filter,
+      deepBy,
     );
     return snippetsFiltered;
   }

@@ -4,6 +4,7 @@ import {
   JsonSchema,
   ModelDefinition,
   Filter,
+  Where,
 } from '@loopback/repository';
 import {JsonSchemaOptions} from '@loopback/repository-json-schema';
 import {
@@ -232,4 +233,16 @@ export function sanitizeTextContentInPlace(data?: {
   const sanitisedText = sanitizeTextContent(data.textcontent);
   if (!sanitisedText) return;
   data.htmlTextcontent = sanitisedText;
+}
+
+export function removeDeepBy<M extends object>(
+  where: Where<M>,
+  condition: Function,
+) {
+  if (!where || typeof where !== 'object') return;
+  const isObject = _.isPlainObject(where);
+  Object.entries(where).map(([key, value]) => {
+    if (condition(key) && isObject) delete where[key as keyof Where<M>];
+    else removeDeepBy(value as Where<M>, condition);
+  });
 }

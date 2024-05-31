@@ -21,6 +21,7 @@ import {
   arrayOfUniqueFrom,
   concatOwnerAccessGroups,
   filterEmptySubsnippets,
+  removeDeepBy,
   standardiseIncludes,
 } from '../utils/misc';
 import {AutoAddRepository} from '../repositories/autoadd.repository.base';
@@ -262,35 +263,71 @@ function FindWithSearchRepositoryMixin<
   Relations extends {subsnippets: M},
   R extends MixinTarget<DefaultCrudRepository<M, ID, Relations>>,
 >(superClass: R) {
+  type DeepBy = keyof M;
   class Mixed extends superClass {
     user: UserProfile;
+    private _deepBy: DeepBy[] = [];
+    private _filter: Filter<M>;
+    private _searchCondition: Condition<M>;
+    private _deepCondition: Where<M>;
+
+    private extractDeepCondition(where: Where<M> | undefined) {
+      if (!where) return;
+      this._deepCondition = JSON.parse(JSON.stringify(where));
+      removeDeepBy(
+        this._deepCondition,
+        (key: string) =>
+          ![
+            ...this._deepBy,
+            ...Object.getOwnPropertyNames(WhereBuilder.prototype),
+          ].includes(key),
+      );
+    }
 
     async recursivelyApplySearchCondition(
-      fullFilter: Filter<M> | undefined,
-      condition: Condition<M>,
       filter: Filter<M> | undefined,
       snippets: {[id: string]: Basesnippet} = {},
-      depth = 0,
+      depth = 1,
     ) {
       const whereCopy = JSON.parse(JSON.stringify(filter?.where ?? {}));
-      this.addSearchToFilter(filter, condition);
-      const snippet = await this.find(fullFilter, {currentUser: this.user});
-      const fakeFirstLevel = {subsnippets: snippet} as unknown as Basesnippet;
-      depth += 1;
-      filterEmptySubsnippets(fakeFirstLevel, depth);
-      fakeFirstLevel.subsnippets?.map(snip => {
-        if (!_.has(snippets, snip.id)) snippets[snip.id] = snip;
-      });
-      if (filter) filter.where = whereCopy;
+      this.enrichFilter(filter);
+      const snippet = await this.find(this._filter, {currentUser: this.user});
+      this.removeEmptySubsnippets(snippet, depth, snippets);
+      this.resetWhere(filter, whereCopy);
       if (!filter?.include || filter.include.length === 0) return snippets;
       for (const relation of filter?.include as Inclusion[]) {
         relation.scope = relation.scope ?? {};
         await this.recursivelyApplySearchCondition(
-          fullFilter,
-          condition,
           relation.scope as Filter<M>,
           snippets,
-          depth,
+          depth + 1,
+        );
+      }
+    }
+
+    private enrichFilter(filter: Filter<M> | undefined) {
+      this.addSearchToFilter(filter);
+      this.addDeepToFilter(filter);
+    }
+
+    private removeEmptySubsnippets(
+      snippet: (M & Relations)[],
+      depth: number,
+      snippets: {[id: string]: Basesnippet},
+    ) {
+      const fakeFirstLevel = {subsnippets: snippet} as unknown as Basesnippet;
+      filterEmptySubsnippets(fakeFirstLevel, depth);
+      fakeFirstLevel.subsnippets?.map(snip => {
+        if (!_.has(snippets, snip.id)) snippets[snip.id] = snip;
+      });
+    }
+
+    private resetWhere(filter: Filter<M> | undefined, whereCopy: Where<M>) {
+      if (filter) {
+        filter.where = whereCopy;
+        this.extractDeepCondition(filter.where);
+        removeDeepBy(filter.where as Where<M>, (key: DeepBy) =>
+          this._deepBy.includes(key),
         );
       }
     }
@@ -299,18 +336,11 @@ function FindWithSearchRepositoryMixin<
       search: string,
       user: UserProfile,
       filter: Filter<M> = {},
+      deepBy: DeepBy[] = [],
     ): Promise<Basesnippet[]> {
-      delete filter?.fields;
-      standardiseIncludes(filter);
-      const searchCondition = this.buildAdditionalConditions(search);
-      this.user = user;
+      this.init(filter, search, user, deepBy);
       const snippets: {[id: string]: Basesnippet} = {};
-      await this.recursivelyApplySearchCondition(
-        filter,
-        searchCondition,
-        filter,
-        snippets,
-      );
+      await this.recursivelyApplySearchCondition(filter, snippets);
       const desc = filter.order?.[0] === 'defaultOrder DESC';
       return Object.values(snippets).sort((first, second) =>
         desc
@@ -319,87 +349,49 @@ function FindWithSearchRepositoryMixin<
       );
     }
 
-    private addSearchToFilter(
-      filter: Filter<M> | undefined,
-      additionalConditions: Condition<M>,
+    private init(
+      filter: Filter<M>,
+      search: string,
+      user: UserProfile,
+      deepBy: (keyof M)[],
     ) {
-      if (!_.isEmpty(additionalConditions))
-        this._addSearchCondition(filter, additionalConditions);
+      delete filter?.fields;
+      standardiseIncludes(filter);
+      this._filter = filter;
+      this._searchCondition = this.buildSearchCondition(search);
+      this.user = user;
+      this._deepBy = deepBy;
     }
 
-    private _addSearchCondition(
-      filter: Filter<M> | undefined,
-      includeOrs: Where<M>,
-    ) {
-      const searchCondition = new WhereBuilder(filter?.where)
-        .and(includeOrs)
-        .build();
-      return new FilterBuilder(filter).where(searchCondition).build();
+    private addSearchToFilter(filter: Filter<M> | undefined) {
+      this._addCondition(filter, this._searchCondition);
     }
 
-    private _additionalConditionBuilder(commonSearchableFields: Condition<M>) {
+    private addDeepToFilter(filter: Filter<M> | undefined) {
+      this._addCondition(filter, this._deepCondition);
+    }
+
+    private _addCondition(
+      filter: Filter<M> | undefined,
+      additionalWhere: Where<M>,
+    ) {
+      if (_.isEmpty(additionalWhere)) return;
+      let additionalCondition = additionalWhere;
+      if (filter?.where)
+        additionalCondition = {and: [additionalWhere, filter.where]};
+      return new FilterBuilder(filter).where(additionalCondition).build();
+    }
+
+    private buildSearchCondition(search: string) {
+      if (!search || encodeURIComponent(search) === '%00') return {};
+      const searchRegex = {regexp: new RegExp(`.*${search}.*`, 'i')};
       return {
-        and: Object.entries(commonSearchableFields).flatMap(([k, v]) => {
-          return {[k]: v} as Where<M>;
-        }),
+        or: [
+          {name: searchRegex},
+          {description: searchRegex},
+          {htmlTextcontent: searchRegex},
+        ],
       } as Condition<M>;
-    }
-
-    private buildAdditionalConditions(search: string) {
-      const additionalConditions: {
-        tags?: {inq: string[]};
-        readACL?: {inq: string[]};
-        or?: {
-          textcontent?: {regexp: RegExp};
-          name?: {regexp: RegExp};
-          description?: {regexp: RegExp};
-        }[];
-      } & Condition<M> = {};
-      let searchText = '';
-      search.split(' ').map(searchTerms => {
-        if (searchTerms.startsWith('#')) {
-          additionalConditions.tags = additionalConditions.tags ?? {inq: []};
-          additionalConditions.tags.inq.push(searchTerms.slice(1));
-        } else if (searchTerms.startsWith('@')) {
-          additionalConditions.readACL = additionalConditions.readACL ?? {
-            inq: [],
-          };
-          additionalConditions.readACL.inq.push(searchTerms.slice(1));
-        } else searchText += ` ${searchTerms}`;
-      });
-      this.addSearchOr(searchText, additionalConditions);
-      if (
-        (additionalConditions.or &&
-          Object.keys(additionalConditions).length > 2) ||
-        Object.keys(additionalConditions).length > 1
-      )
-        return this._additionalConditionBuilder(additionalConditions);
-      return additionalConditions;
-    }
-
-    private addSearchOr(
-      searchText: string,
-      additionalConditions: {
-        tags?: {inq: string[]} | undefined;
-        readACL?: {inq: string[]} | undefined;
-        or?:
-          | {
-              textcontent?: {regexp: RegExp} | undefined;
-              name?: {regexp: RegExp} | undefined;
-              description?: {regexp: RegExp} | undefined;
-            }[]
-          | undefined;
-      } & Condition<M>,
-    ) {
-      if (!searchText) return;
-      searchText = searchText.trimStart();
-      const searchRegex = {regexp: new RegExp(`.*${searchText}.*`, 'i')};
-      const searchCondition = [
-        {name: searchRegex},
-        {description: searchRegex},
-        {htmlTextcontent: searchRegex},
-      ];
-      additionalConditions.or = searchCondition;
     }
 
     async findIndexInBuffer(
