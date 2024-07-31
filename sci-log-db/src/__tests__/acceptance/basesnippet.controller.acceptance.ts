@@ -261,6 +261,23 @@ describe('Basesnippet', function (this: Suite) {
       });
   });
 
+  it('Search with token should return 200 and exclude matching body.tags', async () => {
+    const includeTags = {include: ['subsnippets']};
+    await client
+      .get(
+        `/basesnippets/search=${encodeURIComponent(
+          '-#aSearchableTag',
+        )}?filter=${JSON.stringify(includeTags)}`,
+      )
+      .set('Authorization', 'Bearer ' + token)
+      .set('Content-Type', 'application/json')
+      .expect(200)
+      .then(result => expect(result.body.length).to.be.eql(0))
+      .catch(err => {
+        throw err;
+      });
+  });
+
   it('Search with token should return 200 and matching body.tags + body.textcontent', async () => {
     const includeTags = {include: ['subsnippets']};
     await client
@@ -295,6 +312,18 @@ describe('Basesnippet', function (this: Suite) {
           expect(result.body[0].readACL).to.be.eql(['basesnippetAcceptance'])
         ),
       )
+      .catch(err => {
+        throw err;
+      });
+  });
+
+  it('Search with token should return 200 and exclude matching readACL', async () => {
+    await client
+      .get(`/basesnippets/search=-@basesnippetAcceptance`)
+      .set('Authorization', 'Bearer ' + token)
+      .set('Content-Type', 'application/json')
+      .expect(200)
+      .then(result => expect(result.body.length).to.be.eql(0))
       .catch(err => {
         throw err;
       });
