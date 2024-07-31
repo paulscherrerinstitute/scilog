@@ -346,26 +346,23 @@ function FindWithSearchRepositoryMixin<
     }
 
     private buildAdditionalConditions(search: string) {
-      const additionalConditions: {
-        tags?: {inq: string[]};
-        readACL?: {inq: string[]};
-        or?: {
-          textcontent?: {regexp: RegExp};
-          name?: {regexp: RegExp};
-          description?: {regexp: RegExp};
-        }[];
-      } & Condition<M> = {};
+      const additionalConditions: Where<M> & {or?: Condition<M>[]} = {};
       let searchText = '';
       search.split(' ').map(searchTerms => {
-        if (searchTerms.startsWith('#')) {
-          additionalConditions.tags = additionalConditions.tags ?? {inq: []};
-          additionalConditions.tags.inq.push(searchTerms.slice(1));
-        } else if (searchTerms.startsWith('@')) {
-          additionalConditions.readACL = additionalConditions.readACL ?? {
-            inq: [],
-          };
-          additionalConditions.readACL.inq.push(searchTerms.slice(1));
-        } else searchText += ` ${searchTerms}`;
+        searchTerms = this._searchPrefixToIncludeCondition(
+          additionalConditions,
+          searchTerms,
+          '#',
+          'tags' as keyof Where<M>,
+        );
+        searchTerms = this._searchPrefixToIncludeCondition(
+          additionalConditions,
+          searchTerms,
+          '@',
+          'readACL' as keyof Where<M>,
+        );
+        searchText += ` ${searchTerms}`;
+        searchText = searchText.trim();
       });
       this.addSearchOr(searchText, additionalConditions);
       if (
@@ -377,19 +374,29 @@ function FindWithSearchRepositoryMixin<
       return additionalConditions;
     }
 
+    private _searchPrefixToIncludeCondition(
+      additionalCondition: Where<M>,
+      searchTerm: string,
+      prefix: string,
+      field: keyof Where<M>,
+    ) {
+      if (!searchTerm) return '';
+      let term = searchTerm;
+      const condition = searchTerm.startsWith('-')
+        ? (term = searchTerm.slice(1)) && 'nin'
+        : 'inq';
+      if (!term.startsWith(prefix)) return searchTerm;
+      if (!additionalCondition[field])
+        (additionalCondition[field] as object) = {};
+      if (!additionalCondition[field][condition])
+        (additionalCondition[field][condition] as string[]) = [];
+      (additionalCondition[field][condition] as string[]).push(term.slice(1));
+      return '';
+    }
+
     private addSearchOr(
       searchText: string,
-      additionalConditions: {
-        tags?: {inq: string[]} | undefined;
-        readACL?: {inq: string[]} | undefined;
-        or?:
-          | {
-              textcontent?: {regexp: RegExp} | undefined;
-              name?: {regexp: RegExp} | undefined;
-              description?: {regexp: RegExp} | undefined;
-            }[]
-          | undefined;
-      } & Condition<M>,
+      additionalConditions: Where<M> & {or?: {}[]},
     ) {
       if (!searchText) return;
       searchText = searchText.trimStart();
