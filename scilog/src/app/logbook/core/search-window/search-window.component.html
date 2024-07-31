@@ -28,24 +28,19 @@
         <div class="header">
             Suggestions...
             <div>
-                Created by:
+                Created by (prepend "-" to negate):
                 <button class="suggestion-button" (click)="addToSearch('@' + _sample_user)">
                     @{{_sample_user}}
                 </button>
             </div>
             <div *ngIf="tags[0]">
-                Tag:
+                Tag (prepend "-" to negate):
                 <span *ngFor="let tag of tags.slice(0,3)">
                     <button class="suggestion-button" (click)="addToSearch('#' + tag)">
                         #{{tag}}
                     </button>
                 </span>
-                
-    
             </div>
-            <div>
-            </div>
-        </div>
         <mat-divider></mat-divider>
         <div class="header">
             Examples:

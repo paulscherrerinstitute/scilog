@@ -102,8 +102,8 @@ export class SearchWindowComponent implements OnInit {
   addToSearch(val: string) {
     let _stringParts = val.split(" ");
     _stringParts.forEach((subVal) => {
-      if (!this.searchString.includes(subVal)) {
-        this.searchString = subVal + " " + this.searchString;
+      if (!this.searchString?.includes(subVal)) {
+        this.searchString = `${subVal} ${this.searchString ?? ''}`;
       }
     }
     );
