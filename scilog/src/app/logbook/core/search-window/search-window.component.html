@@ -5,11 +5,10 @@
                 <mat-label>
                     Search <mat-icon>search</mat-icon>
                 </mat-label>
+                <input *ngIf="searchStringFromConfig" matInput class="searchConfig" 
+                    [ngModel]="searchStringFromConfig" disabled="true" 
+                    matTooltip="Remove from widget preferences">
                 <input #searchSnippets matInput type="text" [(ngModel)]="searchString">
-                <!-- <button mat-button *ngIf="searchString" matSuffix mat-icon-button aria-label="Clear"
-                    (click)="searchString=''">
-                    <mat-icon>close</mat-icon>
-                </button> -->
             </mat-form-field>
         </span>
         <span>

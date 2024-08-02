@@ -96,10 +96,30 @@ describe('SearchWindowComponent', () => {
 
   [
     undefined,
-    {
-      general: { type: 'logbook', title: 'Logbook view' },
-      filter: { targetId: 'id' }
-    } as WidgetItemConfig,
+    {config: 
+      {
+        general: { type: 'logbook', title: 'Logbook view' },
+        filter: { targetId: 'id' }
+      } as WidgetItemConfig,
+      searchStringFromConfig: '',
+      configOut: 
+      {
+        general: { type: 'logbook', title: 'Logbook view' },
+        filter: { targetId: 'id' }
+      } as WidgetItemConfig,
+    },
+    {config: 
+      {
+        general: { type: 'logbook', title: 'Logbook view' },
+        filter: { targetId: 'id', tags: ['a', 'b'], excludeTags: ['c', 'd'] }
+      } as WidgetItemConfig,
+      searchStringFromConfig: '-#c -#d #a #b',
+      configOut: 
+      {
+        general: { type: 'logbook', title: 'Logbook view' },
+        filter: { targetId: 'id' }
+      } as WidgetItemConfig,
+    }
   ].forEach((t, i) => {
     it(`should _prepareConfig ${i}`, () => {
       const defaultConfig = {
@@ -117,8 +137,41 @@ describe('SearchWindowComponent', () => {
         }
       };
       if (t)
-        component.configsArray = [{ cols: 0, rows: 1, y: 2, x: 3, config: t }];
-      expect(component["_prepareConfig"]()).toEqual(t ?? defaultConfig);
+        component.configsArray = [{ cols: 0, rows: 1, y: 2, x: 3, config: t.config }];
+      expect(component["_prepareConfig"]()).toEqual(t? t.configOut: defaultConfig);
+      if (t)
+        expect(component.searchStringFromConfig).toEqual(t.searchStringFromConfig);
+    });
+  });
+
+  [
+    {filter: {tags: ['a', 'b'], excludeTags: ['c', 'd'] }, prefix: '#', key: 'tags', output: '#a #b'},
+    {filter: {tags: ['a', 'b'], excludeTags: ['c', 'd'] }, prefix: '-#', key: 'excludeTags', output: '-#c -#d'},
+  ].forEach((t, i) => {
+    it(`should tagsToString ${i}`, () => {
+      expect(component['tagsToString'](t.filter, t.key, t.prefix)).toEqual(t.output);
+    });
+  });
+
+  it('should composeSearchString', () => {
+    const tagFilter = {tags: ['a', 'b'], excludeTags: ['c', 'd'] };
+    expect(component['composeSearchString'](tagFilter)).toEqual('-#c -#d #a #b');
+  });
+
+  [
+    {searchString: '', searchStringFromConfig: '', output: ''},
+    {searchString: ' ', searchStringFromConfig: ' ', output: ''},
+    {searchString: ' ', searchStringFromConfig: 'def', output: 'def'},
+    {searchString: 'abc', searchStringFromConfig: '', output: 'abc'},
+    {searchString: 'abc', searchStringFromConfig: ' ', output: 'abc'},
+    {searchString: 'abc', searchStringFromConfig: 'def', output: 'abc def'},
+    {searchString: 'abc', searchStringFromConfig: 'def ', output: 'abc def'},
+    {searchString: ' abc', searchStringFromConfig: 'def ', output: 'abc def'},
+  ].forEach((t, i) => {
+    it(`should concatSearchStrings ${i}`, () => {
+      component.searchString = t.searchString;
+      component.searchStringFromConfig = t.searchStringFromConfig;
+      expect(component['concatSearchStrings']()).toEqual(t.output);
     });
   });
 
