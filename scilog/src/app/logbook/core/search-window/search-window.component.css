@@ -57,3 +57,9 @@
     width: 50vw !important;
 }
 
+.searchConfig {
+    width: 50px;
+    color: var(--toolbar-text-color);
+    filter: brightness(0.5);
+    margin-inline-end: 5px;
+}

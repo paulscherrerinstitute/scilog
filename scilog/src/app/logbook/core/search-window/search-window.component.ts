@@ -34,6 +34,7 @@ export class SearchWindowComponent implements OnInit {
   _sample_user: string = "";
   subscriptions: Subscription[] = [];
   logbookId?: string;
+  searchStringFromConfig = '';
 
   constructor(
     public userPreferences: UserPreferencesService,
@@ -68,12 +69,16 @@ export class SearchWindowComponent implements OnInit {
   submitSearch() {
     this.searched = this.searchString;
     if (this.logbookId) {
-      this.searchScrollService.reset(this.searchString);
+      this.searchScrollService.reset(this.concatSearchStrings());
       return
     }
     this.logbookIconScrollService.reset(this.searchString);
     this.overviewSearch.emit(this.searchString);
     this.closeSearch();
+  }
+
+  private concatSearchStrings(): string {
+    return `${this.searchString} ${this.searchStringFromConfig}`.trim();
   }
 
   private async _initialize_help() {
@@ -141,7 +146,10 @@ export class SearchWindowComponent implements OnInit {
   }
 
   private _prepareConfig() {
-    return this._extractConfig() ?? this.defaultConfig;
+    const config = JSON.parse(JSON.stringify(this._extractConfig() ?? this.defaultConfig));
+    if (config.filter?.tags || config.filter?.excludeTags)
+      this.searchStringFromConfig = this.composeSearchString(config.filter);
+    return config;
   }
 
   private _extractConfig() {
@@ -150,6 +158,16 @@ export class SearchWindowComponent implements OnInit {
       configItem?.config?.general?.type === 'logbook' &&
       configItem?.config?.general?.title === 'Logbook view'
     )?.[0]?.config;
+  }
+
+  private tagsToString(configFilter: WidgetItemConfig['filter'], tagKey: string, prefix: string) {
+    const tagsString = `${configFilter?.[tagKey]?.length > 0? `${prefix}` + configFilter?.[tagKey].join(` ${prefix}`): ''}`
+    delete configFilter[tagKey]
+    return tagsString
+  }
+
+  private composeSearchString(configFilter: WidgetItemConfig['filter']) {
+    return `${this.tagsToString(configFilter, 'excludeTags', '-#')} ${this.tagsToString(configFilter, 'tags', '#')}`.trim();
   }
 
   ngOnDestroy(): void {
