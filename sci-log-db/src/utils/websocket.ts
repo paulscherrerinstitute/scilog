@@ -2,6 +2,7 @@ import {TokenServiceBindings} from '@loopback/authentication-jwt';
 import {AnyObject} from '@loopback/repository';
 import {SciLogDbApplication} from '../application';
 import {MongoDataSource} from '../datasources';
+import {Basesnippet} from '../models';
 
 export interface WebsocketClient {
   // eslint-disable-next-line  @typescript-eslint/no-explicit-any
@@ -245,22 +246,15 @@ export async function startWebsocket(app: SciLogDbApplication) {
   });
 }
 
-// eslint-disable-next-line  @typescript-eslint/no-explicit-any
-function matchesFilterSettings(snippet: any, config: any): boolean {
-  const acceptSnippet = true;
-  if (typeof config.filter.tags != 'undefined') {
-    // eslint-disable-next-line  @typescript-eslint/no-explicit-any
-    config.filter.tags.forEach((tag: any) => {
-      if (!snippet.tags.includes(tag)) {
-        return false;
-      }
-    });
-  }
-
-  if (typeof config.filter.snippetType != 'undefined') {
-    if (!config.filter.snippetType.includes(snippet.snippetType)) {
-      return false;
-    }
-  }
-  return acceptSnippet;
+export function matchesFilterSettings(
+  snippet: Basesnippet,
+  config: {filter?: {tags?: string[]; snippetType?: string[]}},
+): boolean {
+  const tagCondition =
+    !config.filter?.tags ||
+    config.filter?.tags?.some(tag => snippet.tags?.includes(tag));
+  const snippetTypeCondition =
+    !config.filter?.snippetType ||
+    config.filter?.snippetType?.includes(snippet.snippetType);
+  return tagCondition && snippetTypeCondition;
 }
