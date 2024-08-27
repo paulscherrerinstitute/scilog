@@ -1,13 +1,15 @@
 <div class='windowContainer'>
     <mat-toolbar class='searchBarTop'>
         <span class="searchInput">
-            <mat-form-field class="search-form-field" floatLabel="never">
+            <mat-form-field *ngIf="searchStringFromConfig" class="searchConfigField" floatLabel="never">
+                <input matInput class="searchConfig" 
+                    [ngModel]="searchStringFromConfig" disabled="true" 
+                    matTooltip="Remove from widget preferences">
+            </mat-form-field>
+            <mat-form-field floatLabel="never">
                 <mat-label>
                     Search <mat-icon>search</mat-icon>
                 </mat-label>
-                <input *ngIf="searchStringFromConfig" matInput class="searchConfig" 
-                    [ngModel]="searchStringFromConfig" disabled="true" 
-                    matTooltip="Remove from widget preferences">
                 <input #searchSnippets matInput type="text" [(ngModel)]="searchString">
             </mat-form-field>
         </span>
