@@ -119,6 +119,7 @@ describe('SearchWindowComponent', () => {
         general: { type: 'logbook', title: 'Logbook view' },
         filter: { targetId: 'id' }
       } as WidgetItemConfig,
+      tagsOut: ['a', 'b']
     }
   ].forEach((t, i) => {
     it(`should _prepareConfig ${i}`, () => {
@@ -141,6 +142,7 @@ describe('SearchWindowComponent', () => {
       expect(component["_prepareConfig"]()).toEqual(t? t.configOut: defaultConfig);
       if (t)
         expect(component.searchStringFromConfig).toEqual(t.searchStringFromConfig);
+      expect(component.tags).toEqual(t?.tagsOut ?? [])
     });
   });
 
