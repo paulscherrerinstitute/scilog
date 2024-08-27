@@ -227,6 +227,31 @@ describe('Paragraph', function (this: Suite) {
       });
   });
 
+  it('posts a comment with tags and should update the parent', async () => {
+    await client
+      .post('/paragraphs')
+      .set('Authorization', 'Bearer ' + token)
+      .set('Content-Type', 'application/json')
+      .send({
+        ...paragraphSnippet,
+        tags: ['another'],
+        linkType: 'comment',
+        parentId: paragraphSnippetId,
+      })
+      .expect(200);
+    await client
+      .get(`/paragraphs/${paragraphSnippetId}`)
+      .set('Authorization', 'Bearer ' + token)
+      .set('Content-Type', 'application/json')
+      .expect(200)
+      .then(result =>
+        expect(result.body.tags).to.eql(['aSearchExcludedTag', 'another']),
+      )
+      .catch(err => {
+        throw err;
+      });
+  });
+
   it('delete snippet by id without token should return 401', async () => {
     await client
       .delete(`/paragraphs/${paragraphSnippetId}`)
