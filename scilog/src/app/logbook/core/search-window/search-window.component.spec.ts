@@ -145,7 +145,7 @@ describe('SearchWindowComponent', () => {
       expect(component["_prepareConfig"]()).toEqual(t? t.configOut: defaultConfig);
       if (t)
         expect(component.searchStringFromConfig).toEqual(t.searchStringFromConfig);
-      expect(component.tags).toEqual(t?.tagsOut ?? [])
+      expect(component.tags).toEqual(t?.tagsOut ?? ['alignment'])
     });
   });
 
