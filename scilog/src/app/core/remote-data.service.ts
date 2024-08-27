@@ -81,7 +81,7 @@ export class RemoteDataService {
       httpFilter["order"] = ["defaultOrder ASC"];
     }
 
-    httpFilter["include"] = [{ relation: "subsnippets", ...this.addIncludeScope() }];
+    httpFilter["include"] = [{ relation: "subsnippets", ...this.addIncludeScope(config.filter) }];
     httpFilter["where"] = { "and": [...this.staticFilters(), ...this.tagsFilter(config.filter), ...this.parentFilter(config.filter)] };
 
     if (count < Infinity) {
@@ -97,7 +97,7 @@ export class RemoteDataService {
     return [{ snippetType: { inq: ["paragraph", "image"] } }, { deleted: false }];
   }
 
-  private tagsFilter(configFilter: { tags?: string[], excludeTags?: string[] }) {
+  protected tagsFilter(configFilter: { tags?: string[], excludeTags?: string[] }) {
     const tagFilter = [];
     if (configFilter?.tags?.length > 0) {
       tagFilter.push({ tags: { inq: configFilter.tags } });
@@ -114,7 +114,7 @@ export class RemoteDataService {
     return [{ parentId: { inq: parentIds } }];
   }
 
-  protected addIncludeScope(): Object {
+  protected addIncludeScope(configFilter?: { tags?: string[], excludeTags?: string[] }): object {
     return {
       scope:
       {
@@ -156,6 +156,15 @@ export class LogbookItemDataService extends RemoteDataService {
       return this.getSnippets<any[]>('basesnippets/search=' + this._searchString, { headers: headers, params: this._prepareParams(config, index, count) }).toPromise();
     }
 
+  }
+
+  protected addIncludeScope(configFilter: { tags?: string[], excludeTags?: string[] }): Object {
+    const scope = super.addIncludeScope() as {scope: {where?: {}}};
+    const tags = this.tagsFilter(configFilter);
+    if (tags.length === 0)
+      return scope;
+    scope.scope.where = {and: tags};
+    return scope;
   }
 
   getFile(imageSnippetUrl: string): Promise<Blob> {
