@@ -88,6 +88,7 @@ export class SearchWindowComponent implements OnInit {
       this._sample_user = "p12345";
     }
     if (!this.logbookId) return
+    this.tags = await this.tagService?.getTags();
     if (this.tags?.length == 0) {
       this.tags = ["alignment"];
     }
