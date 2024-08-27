@@ -46,6 +46,24 @@ describe('Websocket unit tests', function (this: Suite) {
       ],
       expected: false,
     },
+    {
+      input: [
+        {tags: ['b', 'p'], snippetType: 'aType'},
+        {filter: {snippetType: []}},
+      ],
+      expected: true,
+    },
+    {
+      input: [{tags: ['b', 'p'], snippetType: 'aType'}, {filter: {tags: []}}],
+      expected: true,
+    },
+    {
+      input: [
+        {tags: ['b', 'p'], snippetType: 'aType'},
+        {filter: {tags: [], snippetType: []}},
+      ],
+      expected: true,
+    },
   ].forEach((t, i) => {
     it(`Should test matchesFilterSettings ${i}`, () => {
       expect(
