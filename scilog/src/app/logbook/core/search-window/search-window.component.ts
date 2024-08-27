@@ -48,9 +48,9 @@ export class SearchWindowComponent implements OnInit {
   async ngOnInit(): Promise<void> {
     this.searchString = this.searched;
     this.logbookId = this.logbookInfo?.logbookInfo?.id;
+    await this._initialize_help();
     this.config = this._prepareConfig();
 
-    await this._initialize_help();
     this.subscriptions.push(this.hotkeys.addShortcut({ keys: 'esc', description: { label: 'Close search', group: "General" } }).subscribe(() => {
       this.closeSearch();
     }));
@@ -84,17 +84,10 @@ export class SearchWindowComponent implements OnInit {
   private async _initialize_help() {
 
     this._sample_user = this.userPreferences.userInfo.username;
-    // roles.find((val)=>{
-    //   if ((val.length == 6)&&(val.substring(0,1)=="p")){
-    //     return true;
-    //   }
-    //   return false;
-    // })
     if (typeof this._sample_user == 'undefined') {
       this._sample_user = "p12345";
     }
     if (!this.logbookId) return
-    this.tags = await this.tagService?.getTags();
     if (this.tags?.length == 0) {
       this.tags = ["alignment"];
     }
@@ -147,9 +140,18 @@ export class SearchWindowComponent implements OnInit {
 
   private _prepareConfig() {
     const config = JSON.parse(JSON.stringify(this._extractConfig() ?? this.defaultConfig));
-    if (config.filter?.tags || config.filter?.excludeTags)
-      this.searchStringFromConfig = this.composeSearchString(config.filter);
+    if (!config?.filter?.tags && !config?.filter?.excludeTags)
+      return config;
+    this._prepareTags(config);
+    this.searchStringFromConfig = this.composeSearchString(config.filter);
     return config;
+  }
+
+  private _prepareTags(config: Partial<WidgetItemConfig>) {
+    if (config.filter?.tags)
+      this.tags = this.tags.filter(tag => config.filter.tags.includes(tag));
+    if (config.filter?.excludeTags)
+      this.tags = this.tags.filter(tag => !config.filter.excludeTags.includes(tag));
   }
 
   private _extractConfig() {
