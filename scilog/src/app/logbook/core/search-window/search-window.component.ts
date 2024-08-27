@@ -89,7 +89,7 @@ export class SearchWindowComponent implements OnInit {
     }
     if (!this.logbookId) return
     this.tags = await this.tagService?.getTags();
-    if (this.tags?.length == 0) {
+    if (this.tags?.length === 0) {
       this.tags = ["alignment"];
     }
   }
@@ -149,9 +149,9 @@ export class SearchWindowComponent implements OnInit {
   }
 
   private _prepareTags(config: Partial<WidgetItemConfig>) {
-    if (config.filter?.tags)
+    if (config.filter?.tags?.length > 0)
       this.tags = this.tags.filter(tag => config.filter.tags.includes(tag));
-    if (config.filter?.excludeTags)
+    if (config.filter?.excludeTags?.length > 0)
       this.tags = this.tags.filter(tag => !config.filter.excludeTags.includes(tag));
   }
 
