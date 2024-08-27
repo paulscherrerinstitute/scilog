@@ -132,7 +132,7 @@ export class AutoAddRepository<
     );
   }
 
-  private async getParent(
+  async getParent(
     data: (Basesnippet | Logbook) & {
       ownerGroup?: string | undefined;
       accessGroups?: string[];
@@ -357,6 +357,10 @@ export class AutoAddRepository<
           // ctx.instance.unsetAttribute('id')
         }
       }
+      const baseSnippetRepository = await this.baseSnippetRepository();
+      await baseSnippetRepository.updateParentTagsOnComment(
+        ctx.data ?? ctx.instance,
+      );
       sanitizeTextContentInPlace(ctx.data ?? ctx.instance);
       console.log('going to save:' + JSON.stringify(ctx, null, 3));
     });

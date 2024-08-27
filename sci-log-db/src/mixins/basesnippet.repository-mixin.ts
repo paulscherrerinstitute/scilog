@@ -27,8 +27,9 @@ import {AutoAddRepository} from '../repositories/autoadd.repository.base';
 const fs = require('fs');
 
 type ExpandedBasesnippet = Basesnippet & {
-  ownerGroup: string;
-  accessGroups: string[];
+  ownerGroup?: string;
+  accessGroups?: string[];
+  tags?: string[];
 };
 
 function UpdateAndDeleteRepositoryMixin<
@@ -251,6 +252,20 @@ function UpdateAndDeleteRepositoryMixin<
           currentUser: user,
         });
       }
+    }
+
+    private async updateParentTagsOnComment(basesnippet: Paragraph) {
+      if (basesnippet.linkType !== 'comment') return;
+      const self = this as unknown as AutoAddRepository<M, ID, Relations>;
+      const parent = (await self.getParent(basesnippet)) as Paragraph;
+      const tags = arrayOfUniqueFrom(parent.tags, basesnippet.tags);
+      if (!_.isEqual(tags, parent.tags))
+        await this.updateByIdWithHistory(
+          parent.id as ID,
+          {tags: tags} as ExpandedBasesnippet,
+          {currentUser: {roles: ['admin']}},
+          false,
+        );
     }
   }
   return Mixed;
