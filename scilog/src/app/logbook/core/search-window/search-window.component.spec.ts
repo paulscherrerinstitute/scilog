@@ -6,6 +6,7 @@ import { AppConfigService } from 'src/app/app-config.service';
 
 import { SearchWindowComponent } from './search-window.component';
 import { WidgetItemConfig } from 'src/app/core/model/config';
+import { TagService } from '../tag.service';
 
 const getConfig = () => ({});
 
@@ -140,12 +141,11 @@ describe('SearchWindowComponent', () => {
       };
       if (t)
         component.configsArray = [{ cols: 0, rows: 1, y: 2, x: 3, config: t.config }];
-      if (t?.tagsIn)
-        component.tags = t.tagsIn;
+      component.tags = t?.tagsIn ?? [];
       expect(component["_prepareConfig"]()).toEqual(t? t.configOut: defaultConfig);
       if (t)
         expect(component.searchStringFromConfig).toEqual(t.searchStringFromConfig);
-      expect(component.tags).toEqual(t?.tagsOut ?? ['alignment'])
+      expect(component.tags).toEqual(t?.tagsOut ?? [])
     });
   });
 
@@ -186,6 +186,7 @@ describe('SearchWindowComponent', () => {
     {config: {filter: {excludeTags: ['c'] }}, tags: ['a', 'b', 'c', 'd'], expected: ['a', 'b', 'd']},
     {config: {filter: {}}, tags: ['a', 'b', 'c', 'd'], expected: ['a', 'b', 'c', 'd']},
     {config: {}, tags: ['a', 'b', 'c', 'd'], expected: ['a', 'b', 'c', 'd']},
+    {config: {filter: {tags: [], excludeTags: [] }}, tags: ['a', 'b', 'c', 'd'], expected: ['a', 'b', 'c', 'd']}
   ].forEach((t, i) => {
     it(`should _prepareTags ${i}`, () => {
       component.tags = t.tags;
