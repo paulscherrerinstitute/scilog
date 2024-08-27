@@ -131,6 +131,10 @@ describe('LogbookItemDataService', () => {
       relation: 'subsnippets',
       scope:
       {
+        where: {and: [
+          {tags: {inq: ['a', 'b']}}, 
+          {tags: {nin: ['c', 'd']}}
+        ]},
         include: [{
           relation: 'subsnippets',
           scope: {
@@ -232,6 +236,31 @@ describe('LogbookItemDataService', () => {
     const spyDeleteSnippet = spyOn<LogbookItemDataService, any>(service, "deleteSnippet").and.returnValue(of([]));
     service.deleteAllInProgressEditing("1");
     expect(spyDeleteSnippet.calls.mostRecent().args).toEqual(["edits/paragraphs-to-delete", "1"]);
+  });
+
+
+  [
+    {
+      input: undefined, 
+      expected: {scope:{include:[{relation:'subsnippets',scope:{where:{snippetType:'edit'}}}]}}
+    },
+    {
+      input: {tags: ['a', 'b'], excludeTags: ['c', 'd']},
+      expected: {scope:{include:[{relation:'subsnippets',scope:{where:{snippetType:'edit'}}}],where:{and:[{tags:{inq:['a','b']}},{tags:{nin:['c','d']}}]}}}
+    },
+    {
+      input: {tags: ['a', 'b']},
+      expected: {scope:{include:[{relation:'subsnippets',scope:{where:{snippetType:'edit'}}}],where:{and:[{tags:{inq:['a','b']}}]}}}
+    },
+    {
+      input: {excludeTags: ['c', 'd']},
+      expected: {scope:{include:[{relation:'subsnippets',scope:{where:{snippetType:'edit'}}}],where:{and:[{tags:{nin:['c','d']}}]}}}
+    }
+  ]
+  .forEach((t, i) => {
+    it(`should addIncludeScope ${i}`, () => {
+      expect(service['addIncludeScope'](t.input)).toEqual(t.expected);
+    });
   });
 
 });
