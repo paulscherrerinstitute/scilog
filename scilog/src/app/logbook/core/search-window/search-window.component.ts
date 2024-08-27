@@ -48,6 +48,7 @@ export class SearchWindowComponent implements OnInit {
   async ngOnInit(): Promise<void> {
     this.searchString = this.searched;
     this.logbookId = this.logbookInfo?.logbookInfo?.id;
+    this.tags = await this.tagService.getTags();
     this.config = this._prepareConfig();
 
     await this._initialize_help();
@@ -147,10 +148,18 @@ export class SearchWindowComponent implements OnInit {
 
   private _prepareConfig() {
     const config = JSON.parse(JSON.stringify(this._extractConfig() ?? this.defaultConfig));
-    this.tags = config?.filter?.tags ?? [];
-    if (config.filter?.tags || config.filter?.excludeTags)
-      this.searchStringFromConfig = this.composeSearchString(config.filter);
+    if (!config?.filter?.tags && !config?.filter?.excludeTags)
+      return config;
+    this._prepareTags(config);
+    this.searchStringFromConfig = this.composeSearchString(config.filter);
     return config;
+  }
+
+  private _prepareTags(config: Partial<WidgetItemConfig>) {
+    if (config.filter?.tags)
+      this.tags = this.tags.filter(tag => config.filter.tags.includes(tag));
+    if (config.filter?.excludeTags)
+      this.tags = this.tags.filter(tag => !config.filter.excludeTags.includes(tag));
   }
 
   private _extractConfig() {

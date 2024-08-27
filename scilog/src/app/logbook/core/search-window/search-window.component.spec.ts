@@ -114,6 +114,7 @@ describe('SearchWindowComponent', () => {
         filter: { targetId: 'id', tags: ['a', 'b'], excludeTags: ['c', 'd'] }
       } as WidgetItemConfig,
       searchStringFromConfig: '-#c -#d #a #b',
+      tagsIn: ['a', 'b', 'c', 'd', 'e'],
       configOut: 
       {
         general: { type: 'logbook', title: 'Logbook view' },
@@ -139,6 +140,8 @@ describe('SearchWindowComponent', () => {
       };
       if (t)
         component.configsArray = [{ cols: 0, rows: 1, y: 2, x: 3, config: t.config }];
+      if (t?.tagsIn)
+        component.tags = t.tagsIn;
       expect(component["_prepareConfig"]()).toEqual(t? t.configOut: defaultConfig);
       if (t)
         expect(component.searchStringFromConfig).toEqual(t.searchStringFromConfig);
@@ -174,6 +177,20 @@ describe('SearchWindowComponent', () => {
       component.searchString = t.searchString;
       component.searchStringFromConfig = t.searchStringFromConfig;
       expect(component['concatSearchStrings']()).toEqual(t.output);
+    });
+  });
+
+  [
+    {config: {filter: {tags: ['a', 'b', 'c'], excludeTags: ['c', 'd'] }}, tags: ['a', 'b', 'c', 'd'], expected: ['a', 'b']},
+    {config: {filter: {tags: ['a'] }}, tags: ['a', 'b', 'c', 'd'], expected: ['a']},
+    {config: {filter: {excludeTags: ['c'] }}, tags: ['a', 'b', 'c', 'd'], expected: ['a', 'b', 'd']},
+    {config: {filter: {}}, tags: ['a', 'b', 'c', 'd'], expected: ['a', 'b', 'c', 'd']},
+    {config: {}, tags: ['a', 'b', 'c', 'd'], expected: ['a', 'b', 'c', 'd']},
+  ].forEach((t, i) => {
+    it(`should _prepareTags ${i}`, () => {
+      component.tags = t.tags;
+      component['_prepareTags'](t.config as Partial<WidgetItemConfig>);
+      expect(component.tags).toEqual(t.expected);
     });
   });
 
