@@ -252,9 +252,11 @@ export function matchesFilterSettings(
 ): boolean {
   const tagCondition =
     !config.filter?.tags ||
-    config.filter?.tags?.some(tag => snippet.tags?.includes(tag));
+    config.filter.tags.length === 0 ||
+    config.filter.tags.some(tag => snippet.tags?.includes(tag));
   const snippetTypeCondition =
     !config.filter?.snippetType ||
-    config.filter?.snippetType?.includes(snippet.snippetType);
+    config.filter.snippetType.length === 0 ||
+    config.filter.snippetType.includes(snippet.snippetType);
   return tagCondition && snippetTypeCondition;
 }
