@@ -299,7 +299,12 @@ export class LogbookItemComponent implements OnInit {
             console.log(subPos);
           }
           // deleting elements is communicated by special tags. If they are present, delete the element
-          if (notification.content.deleted) {
+          if (
+            notification.content.deleted ||
+            (this.config.filter?.tags?.length > 0 && 
+            !this.config.filter.tags.some((tag: string) => notification.content.tags?.includes(tag))) ||
+            this.config.filter.excludeTags?.some((tag: string) => notification.content.tags?.includes(tag))
+          ) {
             if (isSubsnippet && subPos.length == 2) {
               // subsnippets don't have a viewport index so we can / have to update the childSnippet directly. 
               // However, afterwards we need to make sure that viewport's height is updated
