@@ -64,10 +64,29 @@ describe('Websocket unit tests', function (this: Suite) {
       ],
       expected: true,
     },
+    {
+      input: [
+        {tags: [], snippetType: 'aType'},
+        {filter: {tags: ['a', 'c'], snippetType: ['aType']}},
+      ],
+      expected: false,
+    },
+    {
+      input: [
+        {tags: [], snippetType: 'aType'},
+        {filter: {tags: ['a', 'c'], snippetType: ['aType']}},
+        {updatedFields: {tags: []}, removedFields: {}},
+      ],
+      expected: true,
+    },
   ].forEach((t, i) => {
     it(`Should test matchesFilterSettings ${i}`, () => {
       expect(
-        matchesFilterSettings(t.input[0] as Basesnippet, t.input[1]),
+        matchesFilterSettings(
+          t.input[0] as Basesnippet,
+          t.input[1],
+          t.input[2] as {updatedFields: object; removedFields: object},
+        ),
       ).to.be.eql(t.expected);
     });
   });
