@@ -265,17 +265,7 @@ describe('LogbookItemComponent', () => {
     component.parseNotification(notificationMock[0]);
     expect(component["logbookScrollService"].updateViewportEstimate).toHaveBeenCalledTimes(1);
   })
-  // it('should remove snippet if notification has _delete_ tag', ()=>{
-  //   component.dash
-  //   component.datasource = new DatasourceMock();
-  //   spyOn(component.datasource.adapter, 'check');
-  //   let notificationMock:ChangeStreamNotification[] = [
-  //     {id: "123", operationType: "update", content: {id: "123", parentId:"wrongID", snippetType: "image", tags:["_delete_123"], linkType:"quote"}}
-  //   ];
-  //   component.parseNotification(notificationMock[0]);
-  //   expect(component.datasource.adapter.check).toHaveBeenCalledTimes(1);
 
-  // })
   it('should parse new paragraph insert notification', () => {
     spyOn(component["logbookScrollService"], "appendToEOF");
     let notificationMock: ChangeStreamNotification[] = [
@@ -514,14 +504,32 @@ describe('LogbookItemComponent', () => {
   it('Should remove from index', () => {
     component.isDescending = true;
     expect(component["_indexOrder"](2)).toEqual(8);
-  })
+  });
 
-  it('should delete logbook and update logbook count', () => {
-    spyOn(component["logbookScrollService"], "remove");
-    let notificationMock: ChangeStreamNotification = { operationType: "update", content: { deleted: true } };
-    component.parseNotification(notificationMock);
-    expect(component.logbookCount).toEqual(9);
-    expect(component["logbookScrollService"].remove).toHaveBeenCalled();
+  [
+    {input: [{ deleted: true }], expected: 1},
+    {input: [{ tags: [] }, {tags: ['a']}], expected: 1},
+    {input: [{ tags: ['a'] }, {tags: ['a']}], expected: 0},
+    {input: [{ tags: ['a', 'b'] }, {tags: ['a']}], expected: 0},
+    {input: [{ tags: ['a'] }, {tags: ['a', 'b']}], expected: 0},
+    {input: [{ tags: [] }, {tags: []}], expected: 0},
+    {input: [{ tags: ['c'] }, {excludeTags: ['c']}], expected: 1},
+    {input: [{ tags: ['c'] }, {excludeTags: ['c', 'd']}], expected: 1},
+    {input: [{ tags: ['c'] }, {excludeTags: ['d']}], expected: 0},
+    {input: [{ tags: ['c', 'd'] }, {excludeTags: ['d']}], expected: 1},
+  ].forEach((t, i) => {
+    it(`should delete logbook and update logbook count: ${i}`, () => {
+      spyOn(component["logbookScrollService"], "remove");
+      let originalFilter = JSON.parse(JSON.stringify(component.config.filter))
+      let notificationMock: ChangeStreamNotification = { operationType: "update", content: t.input[0] };
+      if (t.input[1])
+        component.config.filter = {...originalFilter, ...t.input[1]};
+      component.parseNotification(notificationMock);
+      expect(component["logbookScrollService"].remove).toHaveBeenCalledTimes(t.expected);
+      if (t.expected > 0)
+        expect(component.logbookCount).toEqual(9);
+      component.config.filter = originalFilter;
+    })
   })
 
   it('should prepare POST edit message', () => {
