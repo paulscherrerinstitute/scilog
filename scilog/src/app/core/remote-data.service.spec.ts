@@ -131,9 +131,12 @@ describe('LogbookItemDataService', () => {
       relation: 'subsnippets',
       scope:
       {
-        where: {and: [
-          {tags: {inq: ['a', 'b']}}, 
-          {tags: {nin: ['c', 'd']}}
+        where: {or: [
+          {snippetType: 'edit'},
+          {and: [
+            {tags: {inq: ['a', 'b']}}, 
+            {tags: {nin: ['c', 'd']}}
+          ]},
         ]},
         include: [{
           relation: 'subsnippets',
@@ -246,15 +249,15 @@ describe('LogbookItemDataService', () => {
     },
     {
       input: {tags: ['a', 'b'], excludeTags: ['c', 'd']},
-      expected: {scope:{include:[{relation:'subsnippets',scope:{where:{snippetType:'edit'}}}],where:{and:[{tags:{inq:['a','b']}},{tags:{nin:['c','d']}}]}}}
+      expected: {scope:{include:[{relation:'subsnippets',scope:{where:{snippetType:'edit'}}}],where:{or:[{snippetType: 'edit'},{and:[{tags:{inq:['a','b']}},{tags:{nin:['c','d']}}]}]}}}
     },
     {
       input: {tags: ['a', 'b']},
-      expected: {scope:{include:[{relation:'subsnippets',scope:{where:{snippetType:'edit'}}}],where:{and:[{tags:{inq:['a','b']}}]}}}
+      expected: {scope:{include:[{relation:'subsnippets',scope:{where:{snippetType:'edit'}}}],where:{or:[{snippetType: 'edit'},{and:[{tags:{inq:['a','b']}}]}]}}}
     },
     {
       input: {excludeTags: ['c', 'd']},
-      expected: {scope:{include:[{relation:'subsnippets',scope:{where:{snippetType:'edit'}}}],where:{and:[{tags:{nin:['c','d']}}]}}}
+      expected: {scope:{include:[{relation:'subsnippets',scope:{where:{snippetType:'edit'}}}],where:{or:[{snippetType: 'edit'},{and:[{tags:{nin:['c','d']}}]}]}}}
     }
   ]
   .forEach((t, i) => {

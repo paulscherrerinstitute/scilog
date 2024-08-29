@@ -163,7 +163,7 @@ export class LogbookItemDataService extends RemoteDataService {
     const tags = this.tagsFilter(configFilter);
     if (tags.length === 0)
       return scope;
-    scope.scope.where = {and: tags};
+    scope.scope.where = {or: [{snippetType: 'edit'}, {and: tags}]}
     return scope;
   }
 
