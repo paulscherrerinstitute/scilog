@@ -201,7 +201,13 @@ export async function startWebsocket(app: SciLogDbApplication) {
                 if (
                   doc['readACL']?.some((r: string) => c.user.roles.includes(r))
                 ) {
-                  if (matchesFilterSettings(doc, c.config))
+                  if (
+                    matchesFilterSettings(
+                      doc,
+                      c.config,
+                      change.updateDescription,
+                    )
+                  )
                     c.ws.send(JSON.stringify({'new-notification': change}));
                 }
               });
@@ -249,14 +255,41 @@ export async function startWebsocket(app: SciLogDbApplication) {
 export function matchesFilterSettings(
   snippet: Basesnippet,
   config: {filter?: {tags?: string[]; snippetType?: string[]}},
+  changeUpdate:
+    | {
+        updatedFields: {tags?: string[]; snippetType?: string};
+        removedFields: {tags?: string[]; snippetType?: string};
+      }
+    | undefined,
 ): boolean {
+  if (snippet.snippetType === 'edit') return true;
   const tagCondition =
-    !config.filter?.tags ||
-    config.filter.tags.length === 0 ||
-    config.filter.tags.some(tag => snippet.tags?.includes(tag));
+    matchFilterField(config, changeUpdate, 'tags') ||
+    (config.filter as {tags: string[]}).tags?.some(tag =>
+      snippet.tags?.includes(tag),
+    );
   const snippetTypeCondition =
-    !config.filter?.snippetType ||
-    config.filter.snippetType.length === 0 ||
-    config.filter.snippetType.includes(snippet.snippetType);
+    matchFilterField(config, changeUpdate, 'snippetType') ||
+    (config.filter as {snippetType: string[]}).snippetType?.includes(
+      snippet.snippetType,
+    );
   return tagCondition && snippetTypeCondition;
+}
+
+function matchFilterField(
+  config: {filter?: {tags?: string[]; snippetType?: string[]}},
+  changeUpdate:
+    | {
+        updatedFields: {tags?: string[]; snippetType?: string};
+        removedFields: {tags?: string[]; snippetType?: string};
+      }
+    | undefined,
+  field: 'tags' | 'snippetType',
+) {
+  return (
+    !config.filter?.[field] ||
+    config.filter[field]?.length === 0 ||
+    changeUpdate?.removedFields?.[field] !== undefined ||
+    changeUpdate?.updatedFields?.[field] !== undefined
+  );
 }
