@@ -8,7 +8,7 @@ To get an overview of the main SciLog features and design please refer to the [o
 ## Repository structure
 
 ### Frontend (angular)
-The [scilog](./scilog) folder contains the [angular](https://angular.dev/) components and the Dockerfile that implement the scilog UI.
+The [scilog](./scilog) folder contains the [angular](https://angular.dev/) components and the Dockerfile that implement the SciLog UI.
 
 ### Backend (loobpack4)
 The [sci-log-db](./sci-log-db) folder contains REST API based backend implementation. It is implemented using [loopback4](https://loopback.io/doc/en/lb4/index.html), a [node.js](https://nodejs.org/en) framework developed by IBM.
@@ -16,16 +16,16 @@ The [sci-log-db](./sci-log-db) folder contains REST API based backend implementa
 ### SDK (python)
 The [sdk/python](./sdk/python) folder contains a wrapper of the backend REST APIs in python. It is currently limited to the core endpoints and doesn't yet cover all HTTP endpoints.
 
-### examples
+### Examples
 The [demo](./demo) folder has examples of usage of the python SDK.
 
-### utility tools
-The [importTools](./importTools) folder has common tooling scripts for integration with scilog, using the SDK.
+### Utility tools
+The [importTools](./importTools) folder has common tooling scripts for integration with SciLog, using the SDK.
 
-### DOCS
-The [docs](./docs) folder contains a preliminary and unpolished first draft of the documentation. It is made available here but still hasn't been officially maintained.
+### Docs
+The [docs](./docs) folder contains a preliminary and unpolished first draft of the documentation. It is made available [here](https://paulscherrerinstitute.github.io/scilog/) but still hasn't been officially maintained.
 
-### local environment
+### Local environment
 The [config](./config) folder contains configuration options for creating a local environment with docker. See the [getting started](#getting-started) section for instructions.
 
 ## Getting started
