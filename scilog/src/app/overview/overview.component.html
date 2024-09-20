@@ -8,13 +8,15 @@
     </mat-button-toggle-group>
     <button (click)='addCollectionLogbook("logbook")'>Add logbook</button><br>
     <mat-spinner *ngIf="!logbookIconScrollService.isLoaded" [@spinner] class="spinner"></mat-spinner>
-    <overview-table *ngIf="matCardType === 'logbook-headline'"></overview-table>
-    <div class="logbook-container" (resized)="onResized($event)" #logbookContainer *ngIf="matCardType === 'logbook-module'">
+    <overview-table *ngIf="matCardType === 'logbook-headline'" (logbookEdit)="editLogbook($event)"
+      (logbookDelete)="deleteLogbook($event)"></overview-table>
+    <div class="logbook-container" (resized)="onResized($event)" #logbookContainer
+      *ngIf="matCardType === 'logbook-module'">
       <div *uiScroll="let logbookGroup of logbookIconScrollService.datasource">
         <span *ngFor="let logbook of logbookGroup">
           <app-logbook-cover [logbook]="logbook" (logbookEdit)="editLogbook($event)"
-            (logbookSelection)="logbookSelected($event)" (logbookDelete)="deleteLogbook($event)"
-            [matView]="matCardType" [ngClass]="matCardType">
+            (logbookSelection)="logbookSelected($event)" (logbookDelete)="deleteLogbook($event)" [matView]="matCardType"
+            [ngClass]="matCardType">
           </app-logbook-cover>
         </span>
       </div>

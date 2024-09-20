@@ -1,31 +1,33 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
-import { MatTableModule, MatTableDataSource } from '@angular/material/table';
-import { MatPaginatorModule, MatPaginator } from '@angular/material/paginator';
-import { MatSortModule, MatSort } from '@angular/material/sort';
-import { CdkDragDrop, CdkDrag, CdkDropList, moveItemInArray } from '@angular/cdk/drag-drop';
+import { Component, EventEmitter, OnInit, Output, ViewChild } from '@angular/core';
+import { MatTableDataSource } from '@angular/material/table';
+import { MatPaginator } from '@angular/material/paginator';
+import { MatSort } from '@angular/material/sort';
+import { CdkDragDrop, moveItemInArray } from '@angular/cdk/drag-drop';
 import { Logbooks } from '../core/model/logbooks';
 import { WidgetItemConfig } from '../core/model/config';
 import { LogbookDataService } from '../core/remote-data.service';
-import { DatePipe } from '@angular/common';
 import { Router } from '@angular/router';
+import { IsAllowedService } from './is-allowed.service';
 
 @Component({
   selector: 'overview-table',
   templateUrl: './overview-table.component.html',
   styleUrls: ['./overview-table.component.scss'],
-  standalone: true,
-  imports: [MatTableModule, MatSortModule, MatPaginatorModule, DatePipe, CdkDropList, CdkDrag],
+  providers: [IsAllowedService],
 })
 export class OverviewTableComponent implements OnInit {
   @ViewChild(MatPaginator) paginator!: MatPaginator;
   @ViewChild(MatSort) sort!: MatSort;
   dataSource: MatTableDataSource<Logbooks>;
+  @Output() logbookEdit = new EventEmitter<Logbooks>();
+  @Output() logbookDelete = new EventEmitter<string>();
 
-  displayedColumns = ['name', 'description', 'ownerGroup', 'createdAt', 'thumbnail'];
+  displayedColumns = ['name', 'description', 'ownerGroup', 'createdAt', 'thumbnail', 'actions'];
 
   constructor(
     private dataService: LogbookDataService, 
     private router: Router,
+    protected isActionAllowed: IsAllowedService,
   ) {}
   
   ngOnInit() {
@@ -70,6 +72,14 @@ export class OverviewTableComponent implements OnInit {
   getImage(thumbnailId: string | undefined){
     if (!thumbnailId) return;
     return`${this.dataService.imagesLocation}/${thumbnailId}`;
+  }
+
+  editLogbook(logbook: Logbooks) {
+    this.logbookEdit.emit(logbook);
+  }
+
+  deleteLogbook(logbookId: string) {
+    this.logbookDelete.emit(logbookId);
   }
 
 }

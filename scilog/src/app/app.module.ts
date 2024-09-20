@@ -13,7 +13,7 @@ import { MatLegacyProgressSpinnerModule as MatProgressSpinnerModule } from '@ang
 import { MatSidenavModule } from '@angular/material/sidenav';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { ScrollingModule as ExperimentalScrollingModule } from '@angular/cdk-experimental/scrolling';
-import { DragDropModule } from '@angular/cdk/drag-drop';
+import { CdkDrag, CdkDropList, DragDropModule } from '@angular/cdk/drag-drop';
 import { ScrollingModule } from '@angular/cdk/scrolling';
 import { HttpClientModule } from '@angular/common/http';
 import { CKEditorModule } from '@ckeditor/ckeditor5-angular';
@@ -85,6 +85,8 @@ import { NavigationGuardService } from './logbook/core/navigation-guard-service'
 import { TaskComponent } from './logbook/core/task/task.component';
 import { ResizedDirective } from '@shared/directives/resized.directive';
 import { OverviewTableComponent } from './overview/overview-table.component';
+import { MatPaginatorModule } from '@angular/material/paginator';
+import { MatSortModule } from '@angular/material/sort';
 
 const appConfigInitializerFn = (appConfig: AppConfigService) => {
     return () => appConfig.loadAppConfig();
@@ -131,6 +133,7 @@ const appConfigInitializerFn = (appConfig: AppConfigService) => {
         SearchWindowComponent,
         TaskComponent,
         ResizedDirective,
+        OverviewTableComponent
     ],
     imports: [
         BrowserModule,
@@ -172,7 +175,11 @@ const appConfigInitializerFn = (appConfig: AppConfigService) => {
         UiScrollModule,
         MatProgressBarModule,
         MatSnackBarModule,
-        OverviewTableComponent
+        MatTableModule,
+        MatPaginatorModule,
+        MatSortModule,
+        CdkDrag,
+        CdkDropList,
     ],
     providers: [
         AppConfigService,
