@@ -1,0 +1,30 @@
+table {
+  width: 100%;
+}
+
+.logbooks:hover {
+  background-color: var(--main-background)!important;
+  -webkit-transition: background-color 100ms linear, color 100ms linear;
+  -ms-transition: background-color 100ms linear, color 100ms linear;
+  transition: background-color 100ms linear, color 100ms linear;
+}
+
+.logbooks {
+  height: 60px;
+}
+
+.logbooks img {
+  max-height: 60px;
+  object-fit: contain;
+}
+
+.mat-fab-top-right {
+  text-align: right;
+  width: 2px;
+}
+
+.scrollable-container {
+  max-height: 73vh;
+  width: 100%;
+  overflow: auto;
+}

@@ -25,6 +25,10 @@ interface Count {
 export class RemoteDataService {
 
 
+  get imagesLocation () {
+    return `${this.serverSettings.getServerAddress()}/images`
+  }
+
   constructor(private httpClient: HttpClient,
     private serverSettings: ServerSettingsService) { }
 
