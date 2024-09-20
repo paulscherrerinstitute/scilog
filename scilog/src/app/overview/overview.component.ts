@@ -73,17 +73,8 @@ export class OverviewComponent implements OnInit {
         this.logbookSubscription.unsubscribe();
       }
       this.config = this._prepareConfig();
-      this.logbookIconScrollService.groupSize = this.groupSize(this.logbookContainer.nativeElement.clientWidth);
       this.logbookIconScrollService.initialize(this.config);
     }));
-  }
-
-
-  reInitScrollAfterToggle(matCardType: MatCardType) {
-    this.matCardType = matCardType;
-    const newSize = this.groupSize(this.logbookContainer.nativeElement[this.clientSide]);
-    this.logbookIconScrollService.groupSize = newSize;
-    this.logbookIconScrollService.initialize(this.config);
   }
 
   @HostListener('window:resize')
@@ -93,7 +84,7 @@ export class OverviewComponent implements OnInit {
     const newSize = this.groupSize(event.newRect[side]);
     if (newSize === this.logbookIconScrollService.groupSize) return
     this.logbookIconScrollService.groupSize = newSize;
-    if (event.newRect[side] > 2 * event.oldRect[side] || event.oldRect[side] > 2 * event.newRect[side]) {
+    if (event.newRect?.[side] > 2 * event.oldRect?.[side] || event.oldRect?.[side] > 2 * event.newRect?.[side]) {
       this.logbookIconScrollService.initialize(this.config);
     }
     else

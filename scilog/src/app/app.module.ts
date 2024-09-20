@@ -84,6 +84,7 @@ import { AppConfigService } from "./app-config.service";
 import { NavigationGuardService } from './logbook/core/navigation-guard-service';
 import { TaskComponent } from './logbook/core/task/task.component';
 import { ResizedDirective } from '@shared/directives/resized.directive';
+import { OverviewTableComponent } from './overview/overview-table.component';
 
 const appConfigInitializerFn = (appConfig: AppConfigService) => {
     return () => appConfig.loadAppConfig();
@@ -129,7 +130,7 @@ const appConfigInitializerFn = (appConfig: AppConfigService) => {
         SearchComponent,
         SearchWindowComponent,
         TaskComponent,
-        ResizedDirective
+        ResizedDirective,
     ],
     imports: [
         BrowserModule,
@@ -170,7 +171,8 @@ const appConfigInitializerFn = (appConfig: AppConfigService) => {
         MatTabsModule,
         UiScrollModule,
         MatProgressBarModule,
-        MatSnackBarModule
+        MatSnackBarModule,
+        OverviewTableComponent
     ],
     providers: [
         AppConfigService,
