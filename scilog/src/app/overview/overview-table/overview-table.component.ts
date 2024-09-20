@@ -3,11 +3,11 @@ import { MatTableDataSource } from '@angular/material/table';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatSort } from '@angular/material/sort';
 import { CdkDragDrop, moveItemInArray } from '@angular/cdk/drag-drop';
-import { Logbooks } from '../core/model/logbooks';
-import { WidgetItemConfig } from '../core/model/config';
-import { LogbookDataService } from '../core/remote-data.service';
+import { Logbooks } from '../../core/model/logbooks';
+import { WidgetItemConfig } from '../../core/model/config';
+import { LogbookDataService } from '../../core/remote-data.service';
 import { Router } from '@angular/router';
-import { IsAllowedService } from './is-allowed.service';
+import { IsAllowedService } from '../is-allowed.service';
 
 @Component({
   selector: 'overview-table',
@@ -25,11 +25,11 @@ export class OverviewTableComponent implements OnInit {
   displayedColumns = ['name', 'description', 'ownerGroup', 'createdAt', 'thumbnail', 'actions'];
 
   constructor(
-    private dataService: LogbookDataService, 
+    private dataService: LogbookDataService,
     private router: Router,
     protected isActionAllowed: IsAllowedService,
-  ) {}
-  
+  ) { }
+
   ngOnInit() {
     this.getDatasets();
   }
@@ -69,9 +69,9 @@ export class OverviewTableComponent implements OnInit {
     moveItemInArray(this.displayedColumns, event.previousIndex, event.currentIndex);
   }
 
-  getImage(thumbnailId: string | undefined){
+  getImage(thumbnailId: string | undefined) {
     if (!thumbnailId) return;
-    return`${this.dataService.imagesLocation}/${thumbnailId}`;
+    return `${this.dataService.imagesLocation}/${thumbnailId}`;
   }
 
   editLogbook(logbook: Logbooks) {

@@ -84,7 +84,7 @@ import { AppConfigService } from "./app-config.service";
 import { NavigationGuardService } from './logbook/core/navigation-guard-service';
 import { TaskComponent } from './logbook/core/task/task.component';
 import { ResizedDirective } from '@shared/directives/resized.directive';
-import { OverviewTableComponent } from './overview/overview-table.component';
+import { OverviewTableComponent } from './overview/overview-table/overview-table.component';
 import { MatPaginatorModule } from '@angular/material/paginator';
 import { MatSortModule } from '@angular/material/sort';
 
