@@ -135,7 +135,7 @@ export class SnippetComponent implements OnInit {
     } else {
       this.content = this.snippet?.textcontent;
     }
-    this.content = this.sanitizer.sanitize(SecurityContext.HTML, this.content);
+    // this.content = this.sanitizer.sanitize(SecurityContext.HTML, this.content);
 
     if (!this.config.view.hideMetadata) {
       if ((typeof this.snippet?.tags == 'undefined') || (this.snippet.tags.length == 0)) {
