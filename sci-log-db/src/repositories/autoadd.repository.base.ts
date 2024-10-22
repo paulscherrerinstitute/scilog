@@ -86,31 +86,29 @@ export class AutoAddRepository<
       accessGroups?: string[];
     },
   ) {
-    const emptyAcls = this.acls.filter(acl => !data[acl as keyof Basesnippet]);
-    if (emptyAcls) {
-      const parent = await this.getParent(data);
-      if (data.snippetType === 'location')
-        await this.addToACLIfNotEmpty(
-          emptyAcls,
-          data,
-          this.defaultLocationACL.bind(this),
-        );
-      else if (data.snippetType === 'logbook') {
-        const users = await this.getUnxGroupsEmail(
-          (parent as Location).location ?? '',
-        );
-        await this.addToACLIfNotEmpty(
-          emptyAcls,
-          data,
-          _.partial(this.defaultLogbookACL.bind(this), users),
-        );
-      } else
-        await this.addToACLIfNotEmpty(
-          emptyAcls,
-          data,
-          _.partial(this.defaultAllButLocationLogbookACL.bind(this), parent),
-        );
-    }
+    const parent = await this.getParent(data);
+    const acls = [...this.acls];
+    if (data.snippetType === 'location')
+      await this.addToACLIfNotEmpty(
+        acls,
+        data,
+        this.defaultLocationACL.bind(this),
+      );
+    else if (data.snippetType === 'logbook') {
+      const users = await this.getUnxGroupsEmail(
+        (parent as Location).location ?? '',
+      );
+      await this.addToACLIfNotEmpty(
+        acls,
+        data,
+        _.partial(this.defaultLogbookACL.bind(this), users),
+      );
+    } else
+      await this.addToACLIfNotEmpty(
+        acls,
+        data,
+        _.partial(this.defaultAllButLocationLogbookACL.bind(this), parent),
+      );
     delete data.ownerGroup;
     delete data.accessGroups;
   }
@@ -126,8 +124,13 @@ export class AutoAddRepository<
           await callableFunction(k, data),
           [],
         ) as string[];
-        if (aclValue.length > 0)
-          (data[k as keyof Basesnippet] as string[]) = aclValue;
+        if (aclValue.length > 0) {
+          const keyWithType = k as keyof Basesnippet;
+          (data[keyWithType] as string[]) = arrayOfUniqueFrom(
+            data[keyWithType],
+            aclValue,
+          );
+        }
       }),
     );
   }
