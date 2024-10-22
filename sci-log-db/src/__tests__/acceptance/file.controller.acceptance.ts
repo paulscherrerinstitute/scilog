@@ -2,6 +2,7 @@ import {Client, expect} from '@loopback/testlab';
 import {Suite} from 'mocha';
 import {SciLogDbApplication} from '../..';
 import {clearDatabase, createUserToken, setupApplication} from './test-helper';
+import _ from 'lodash';
 
 describe('File controller services', function (this: Suite) {
   this.timeout(1000);
@@ -50,8 +51,12 @@ describe('File controller services', function (this: Suite) {
       .expect(200)
       .then(
         result => (
-          expect(result.body).to.containEql(fileSnippet),
+          expect(result.body).to.containEql(_.omit(fileSnippet, 'updateACL')),
           expect(result.body.snippetType).to.be.eql('image'),
+          expect(result.body.updateACL).to.be.eql([
+            'filesnippetAcceptance',
+            'test@loopback.io',
+          ]),
           (fileSnippetId = result.body.id)
         ),
       )
@@ -95,7 +100,13 @@ describe('File controller services', function (this: Suite) {
       .then(
         result => (
           expect(result.body.length).to.be.eql(1),
-          expect(result.body[0]).to.containEql(fileSnippet)
+          expect(result.body[0]).to.containEql(
+            _.omit(fileSnippet, 'updateACL'),
+          ),
+          expect(result.body[0].updateACL).to.be.eql([
+            'filesnippetAcceptance',
+            'test@loopback.io',
+          ])
         ),
       )
       .catch(err => {
@@ -116,7 +127,15 @@ describe('File controller services', function (this: Suite) {
       .set('Authorization', 'Bearer ' + token)
       .set('Content-Type', 'application/json')
       .expect(200)
-      .then(result => expect(result.body).to.containEql(fileSnippet))
+      .then(
+        result => (
+          expect(result.body).to.containEql(_.omit(fileSnippet, 'updateACL')),
+          expect(result.body.updateACL).to.be.eql([
+            'filesnippetAcceptance',
+            'test@loopback.io',
+          ])
+        ),
+      )
       .catch(err => {
         throw err;
       });

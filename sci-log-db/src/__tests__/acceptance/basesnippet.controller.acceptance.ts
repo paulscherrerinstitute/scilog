@@ -4,10 +4,13 @@ import {SciLogDbApplication} from '../..';
 import {
   clearDatabase,
   createAdminToken,
+  createAUser,
+  createToken,
   createUserToken,
   setupApplication,
 } from './test-helper';
 import _ from 'lodash';
+import {arrayOfUniqueFrom} from '../../utils/misc';
 
 describe('Basesnippet', function (this: Suite) {
   this.timeout(5000);
@@ -16,7 +19,6 @@ describe('Basesnippet', function (this: Suite) {
   let token: string;
   let adminToken: string;
   let baseSnippetId: string;
-  let nonVisibleSnippetId: string;
   const baseSnippet = {
     ownerGroup: 'basesnippetAcceptance',
     createACL: ['basesnippetAcceptance'],
@@ -60,11 +62,14 @@ describe('Basesnippet', function (this: Suite) {
       .expect(200)
       .then(
         result => (
-          expect(result.body).to.containEql(baseSnippet),
+          expect(result.body).to.containEql(_.omit(baseSnippet, 'updateACL')),
           expect(result.body.snippetType).to.be.eql('base'),
           expect(result.body.readACL).to.be.eql(['basesnippetAcceptance']),
           expect(result.body.createACL).to.be.eql(['basesnippetAcceptance']),
-          expect(result.body.updateACL).to.be.eql(['basesnippetAcceptance']),
+          expect(result.body.updateACL).to.be.eql([
+            'basesnippetAcceptance',
+            'test@loopback.io',
+          ]),
           expect(result.body.deleteACL).to.be.eql(['basesnippetAcceptance']),
           expect(result.body.adminACL).to.be.eql(['admin']),
           (baseSnippetId = result.body.id)
@@ -110,7 +115,13 @@ describe('Basesnippet', function (this: Suite) {
       .then(
         result => (
           expect(result.body.length).to.be.eql(1),
-          expect(result.body[0]).to.containEql(baseSnippet)
+          expect(result.body[0]).to.containEql(
+            _.omit(baseSnippet, 'updateACL'),
+          ),
+          expect(result.body[0].updateACL).to.be.eql([
+            'basesnippetAcceptance',
+            'test@loopback.io',
+          ])
         ),
       )
       .catch(err => {
@@ -131,7 +142,15 @@ describe('Basesnippet', function (this: Suite) {
       .set('Authorization', 'Bearer ' + token)
       .set('Content-Type', 'application/json')
       .expect(200)
-      .then(result => expect(result.body).to.containEql(baseSnippet))
+      .then(
+        result => (
+          expect(result.body).to.containEql(_.omit(baseSnippet, 'updateACL')),
+          expect(result.body.updateACL).to.be.eql([
+            'basesnippetAcceptance',
+            'test@loopback.io',
+          ])
+        ),
+      )
       .catch(err => {
         throw err;
       });
@@ -461,11 +480,16 @@ describe('Basesnippet', function (this: Suite) {
       .expect(200)
       .then(
         result => (
-          expect(result.body).to.containEql(_.omit(baseSnippet, 'ownerGroup')),
+          expect(result.body).to.containEql(
+            _.omit(baseSnippet, ['ownerGroup', 'updateACL']),
+          ),
           expect(result.body.snippetType).to.be.eql('base'),
           expect(result.body.readACL).to.be.eql(['basesnippetAcceptance']),
           expect(result.body.createACL).to.be.eql(['basesnippetAcceptance']),
-          expect(result.body.updateACL).to.be.eql(['basesnippetAcceptance']),
+          expect(result.body.updateACL).to.be.eql([
+            'basesnippetAcceptance',
+            'test@loopback.io',
+          ]),
           expect(result.body.deleteACL).to.be.eql(['basesnippetAcceptance']),
           expect(result.body.shareACL).to.be.eql(['basesnippetAcceptance']),
           expect(result.body.adminACL).to.be.eql(['admin'])
@@ -494,7 +518,7 @@ describe('Basesnippet', function (this: Suite) {
       .expect(404);
   });
 
-  it('post a basesnippet with authentication and parentId from existing snippet should return 200 and have ownergroup with priority on parent ACLS', async () => {
+  it('post a basesnippet with authentication and parentId from existing snippet should return 200 and append to parentACL', async () => {
     await client
       .post('/basesnippets')
       .set('Authorization', 'Bearer ' + token)
@@ -503,11 +527,19 @@ describe('Basesnippet', function (this: Suite) {
       .expect(200)
       .then(
         result => (
-          expect(result.body).to.containEql(baseSnippet),
+          expect(result.body).to.containEql(
+            _.omit(baseSnippet, ['createACL', 'updateACL']),
+          ),
           expect(result.body.snippetType).to.be.eql('base'),
           expect(result.body.readACL).to.be.eql(['basesnippetAcceptance']),
-          expect(result.body.createACL).to.be.eql(['basesnippetAcceptance']),
-          expect(result.body.updateACL).to.be.eql(['basesnippetAcceptance']),
+          expect(result.body.createACL).to.be.eql([
+            'basesnippetAcceptance',
+            'aNewCreateACL',
+          ]),
+          expect(result.body.updateACL).to.be.eql([
+            'basesnippetAcceptance',
+            'test@loopback.io',
+          ]),
           expect(result.body.deleteACL).to.be.eql(['basesnippetAcceptance']),
           expect(result.body.shareACL).to.be.eql(['basesnippetAcceptance']),
           expect(result.body.adminACL).to.be.eql(['admin'])
@@ -518,7 +550,7 @@ describe('Basesnippet', function (this: Suite) {
       });
   });
 
-  it('post a basesnippet with authentication and parentId from existing snippet setting explict ACLS should return 200 and have set ACLS with priority on ownergroup and parentACLs', async () => {
+  it('post a basesnippet with authentication and parentId from existing snippet setting explict ACLS should return 200 and have set ACLS merging parent and child', async () => {
     await client
       .post('/basesnippets')
       .set('Authorization', 'Bearer ' + token)
@@ -533,17 +565,31 @@ describe('Basesnippet', function (this: Suite) {
       .then(
         result => (
           expect(result.body).to.containEql({
-            ..._.omit(baseSnippet, ['ownerGroup', 'readACL', 'updateACL']),
+            ..._.omit(baseSnippet, [
+              'ownerGroup',
+              'readACL',
+              'updateACL',
+              'createACL',
+            ]),
             ownerGroup: 'aReadACL',
           }),
           expect(result.body.snippetType).to.be.eql('base'),
-          expect(result.body.readACL).to.be.eql(['aReadACL']),
-          expect(result.body.createACL).to.be.eql(['basesnippetAcceptance']),
-          expect(result.body.updateACL).to.be.eql(['anUpdateACL']),
+          expect(result.body.readACL).to.be.eql([
+            'aReadACL',
+            'basesnippetAcceptance',
+          ]),
+          expect(result.body.createACL).to.be.eql([
+            'basesnippetAcceptance',
+            'aNewCreateACL',
+          ]),
+          expect(result.body.updateACL).to.be.eql([
+            'anUpdateACL',
+            'basesnippetAcceptance',
+            'test@loopback.io',
+          ]),
           expect(result.body.deleteACL).to.be.eql(['basesnippetAcceptance']),
           expect(result.body.shareACL).to.be.eql(['basesnippetAcceptance']),
-          expect(result.body.adminACL).to.be.eql(['admin']),
-          (nonVisibleSnippetId = result.body.id)
+          expect(result.body.adminACL).to.be.eql(['admin'])
         ),
       )
       .catch(err => {
@@ -552,11 +598,18 @@ describe('Basesnippet', function (this: Suite) {
   });
 
   it('get snippet with ID with token having changed readACL should return 404', async () => {
+    const unAuthUser = await createAUser(app, ['unAuthorised'], {
+      email: 'unauth.com',
+      firstName: 'un',
+      lastName: 'Auth',
+      roles: [],
+    });
+    const unAuthToken = await createToken(client, unAuthUser);
     await client
-      .get(`/basesnippets/${nonVisibleSnippetId}`)
-      .set('Authorization', 'Bearer ' + token)
+      .get(`/basesnippets/${baseSnippetId}`)
+      .set('Authorization', 'Bearer ' + unAuthToken)
       .set('Content-Type', 'application/json')
-      .expect(404);
+      .expect(403);
   });
 
   it('get snippet with token and ownerGroup filter should be greater than one', async () => {
@@ -750,14 +803,20 @@ describe('Basesnippet', function (this: Suite) {
           .then(
             result => (
               expect(result.body.ownerGroup).to.be.eql('basesnippetAcceptance'),
-              expect(result.body.accessGroups).to.be.eql([
-                'basesnippetAcceptance',
-                'someNew',
-              ]),
-              expect(result.body.readACL).to.be.eql([
-                'basesnippetAcceptance',
-                'someNew',
-              ])
+              expect(result.body.accessGroups).to.be.eql(
+                arrayOfUniqueFrom(
+                  'basesnippetAcceptance',
+                  'someNew',
+                  t.input.accessGroups,
+                ),
+              ),
+              expect(result.body.readACL).to.be.eql(
+                arrayOfUniqueFrom(
+                  'basesnippetAcceptance',
+                  'someNew',
+                  t.input.accessGroups,
+                ),
+              )
             ),
           )
           .catch(err => {
@@ -821,26 +880,6 @@ describe('Basesnippet', function (this: Suite) {
           throw err;
         });
     });
-  });
-
-  it(`patch snippet by id with non-authorised user should return 404`, async () => {
-    const bs = await client
-      .post('/basesnippets')
-      .set('Authorization', 'Bearer ' + token)
-      .set('Content-Type', 'application/json')
-      .send({
-        ..._.omit(baseSnippet, 'updateACL'),
-        updateACL: ['nonAuthorised'],
-      });
-    await client
-      .patch(`/basesnippets/${bs.body.id}`)
-      .set('Authorization', 'Bearer ' + token)
-      .set('Content-Type', 'application/json')
-      .send({name: 'something'})
-      .expect(404)
-      .catch(err => {
-        throw err;
-      });
   });
 
   [404, 204].forEach(t => {
