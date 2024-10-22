@@ -85,6 +85,7 @@ export class AutoAddRepository<
       ownerGroup?: string;
       accessGroups?: string[];
     },
+    isNewInstance = true,
   ) {
     const emptyAcls = this.acls.filter(acl => !data[acl as keyof Basesnippet]);
     if (emptyAcls) {
@@ -108,8 +109,14 @@ export class AutoAddRepository<
         await this.addToACLIfNotEmpty(
           emptyAcls,
           data,
-          _.partial(this.defaultAllButLocationLogbookACL.bind(this), parent),
-        );
+          _.partial(
+            this.defaultAllButLocationLogbookACL.bind(this),
+            parent,
+            _,
+            _,
+            isNewInstance,
+          ),
+      );
     }
     delete data.ownerGroup;
     delete data.accessGroups;
@@ -173,12 +180,18 @@ export class AutoAddRepository<
   private defaultAllButLocationLogbookACL(
     parent: Basesnippet,
     aclType: string,
-    data: {accessGroups?: string[]},
+    data: {
+      accessGroups?: string[];
+      createdBy?: string[];
+    },
+    isNewInstance = true,
   ) {
     if (aclType === 'shareACL')
       return arrayOfUniqueFrom(parent.shareACL, parent.readACL);
     if (aclType === 'readACL')
       return arrayOfUniqueFrom(parent.readACL, data.accessGroups);
+    if (aclType === 'updateACL' && isNewInstance)
+      return arrayOfUniqueFrom(parent.updateACL, data.createdBy);
     return parent[aclType as keyof Basesnippet];
   }
 
