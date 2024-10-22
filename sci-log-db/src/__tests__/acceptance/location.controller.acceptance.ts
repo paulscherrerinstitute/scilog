@@ -61,8 +61,17 @@ describe('Location', function (this: Suite) {
       .expect(200)
       .then(
         result => (
-          expect(result.body).to.containEql(locationSnippet),
-          expect(result.body.readACL).to.be.eql([locationSnippet.ownerGroup]),
+          expect(result.body).to.containEql(
+            _.omit(locationSnippet, ['readACL', 'deleteACL']),
+          ),
+          expect(result.body.readACL).to.be.eql([
+            locationSnippet.ownerGroup,
+            'any-authenticated-user',
+          ]),
+          expect(result.body.deleteACL).to.be.eql([
+            locationSnippet.ownerGroup,
+            'admin',
+          ]),
           (locationSnippetId = result.body.id)
         ),
       )
@@ -106,7 +115,17 @@ describe('Location', function (this: Suite) {
       .then(
         result => (
           expect(result.body.length).to.be.eql(1),
-          expect(result.body[0]).to.containEql(locationSnippet)
+          expect(result.body[0]).to.containEql(
+            _.omit(locationSnippet, ['readACL', 'deleteACL']),
+          ),
+          expect(result.body[0].readACL).to.be.eql([
+            locationSnippet.ownerGroup,
+            'any-authenticated-user',
+          ]),
+          expect(result.body[0].deleteACL).to.be.eql([
+            locationSnippet.ownerGroup,
+            'admin',
+          ])
         ),
       )
       .catch(err => {
@@ -127,7 +146,21 @@ describe('Location', function (this: Suite) {
       .set('Authorization', 'Bearer ' + token)
       .set('Content-Type', 'application/json')
       .expect(200)
-      .then(result => expect(result.body).to.containEql(locationSnippet))
+      .then(
+        result => (
+          expect(result.body).to.containEql(
+            _.omit(locationSnippet, ['readACL', 'deleteACL']),
+          ),
+          expect(result.body.readACL).to.be.eql([
+            locationSnippet.ownerGroup,
+            'any-authenticated-user',
+          ]),
+          expect(result.body.deleteACL).to.be.eql([
+            locationSnippet.ownerGroup,
+            'admin',
+          ])
+        ),
+      )
       .catch(err => {
         throw err;
       });

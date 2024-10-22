@@ -82,7 +82,7 @@ export async function createAUser(
   return newUser;
 }
 
-async function createToken(client: Client, user: User) {
+export async function createToken(client: Client, user: User) {
   const loginResponse = await client
     .post('/users/login')
     .send({principal: user.email, password: userPassword});
