@@ -2,6 +2,7 @@ import {Client, expect} from '@loopback/testlab';
 import {Suite} from 'mocha';
 import {SciLogDbApplication} from '../..';
 import {clearDatabase, createUserToken, setupApplication} from './test-helper';
+import _ from 'lodash';
 
 describe('TaskRepositorySnippet', function (this: Suite) {
   this.timeout(5000);
@@ -49,8 +50,12 @@ describe('TaskRepositorySnippet', function (this: Suite) {
       .expect(200)
       .then(
         result => (
-          expect(result.body).to.containEql(taskSnippet),
+          expect(result.body).to.containEql(_.omit(taskSnippet, 'updateACL')),
           expect(result.body.snippetType).to.containEql('task'),
+          expect(result.body.updateACL).to.be.eql([
+            'taskAcceptance',
+            'test@loopback.io',
+          ]),
           (taskSnippetId = result.body.id)
         ),
       )
@@ -94,7 +99,13 @@ describe('TaskRepositorySnippet', function (this: Suite) {
       .then(
         result => (
           expect(result.body.length).to.be.eql(1),
-          expect(result.body[0]).to.containEql(taskSnippet)
+          expect(result.body[0]).to.containEql(
+            _.omit(taskSnippet, 'updateACL'),
+          ),
+          expect(result.body[0].updateACL).to.be.eql([
+            'taskAcceptance',
+            'test@loopback.io',
+          ])
         ),
       )
       .catch(err => {
@@ -115,7 +126,15 @@ describe('TaskRepositorySnippet', function (this: Suite) {
       .set('Authorization', 'Bearer ' + token)
       .set('Content-Type', 'application/json')
       .expect(200)
-      .then(result => expect(result.body).to.containEql(taskSnippet))
+      .then(
+        result => (
+          expect(result.body).to.containEql(_.omit(taskSnippet, 'updateACL')),
+          expect(result.body.updateACL).to.be.eql([
+            'taskAcceptance',
+            'test@loopback.io',
+          ])
+        ),
+      )
       .catch(err => {
         throw err;
       });

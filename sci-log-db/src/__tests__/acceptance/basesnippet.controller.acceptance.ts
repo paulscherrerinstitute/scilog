@@ -62,11 +62,14 @@ describe('Basesnippet', function (this: Suite) {
       .expect(200)
       .then(
         result => (
-          expect(result.body).to.containEql(baseSnippet),
+          expect(result.body).to.containEql(_.omit(baseSnippet, 'updateACL')),
           expect(result.body.snippetType).to.be.eql('base'),
           expect(result.body.readACL).to.be.eql(['basesnippetAcceptance']),
           expect(result.body.createACL).to.be.eql(['basesnippetAcceptance']),
-          expect(result.body.updateACL).to.be.eql(['basesnippetAcceptance']),
+          expect(result.body.updateACL).to.be.eql([
+            'basesnippetAcceptance',
+            'test@loopback.io',
+          ]),
           expect(result.body.deleteACL).to.be.eql(['basesnippetAcceptance']),
           expect(result.body.adminACL).to.be.eql(['admin']),
           (baseSnippetId = result.body.id)
@@ -112,7 +115,13 @@ describe('Basesnippet', function (this: Suite) {
       .then(
         result => (
           expect(result.body.length).to.be.eql(1),
-          expect(result.body[0]).to.containEql(baseSnippet)
+          expect(result.body[0]).to.containEql(
+            _.omit(baseSnippet, 'updateACL'),
+          ),
+          expect(result.body[0].updateACL).to.be.eql([
+            'basesnippetAcceptance',
+            'test@loopback.io',
+          ])
         ),
       )
       .catch(err => {
@@ -133,7 +142,15 @@ describe('Basesnippet', function (this: Suite) {
       .set('Authorization', 'Bearer ' + token)
       .set('Content-Type', 'application/json')
       .expect(200)
-      .then(result => expect(result.body).to.containEql(baseSnippet))
+      .then(
+        result => (
+          expect(result.body).to.containEql(_.omit(baseSnippet, 'updateACL')),
+          expect(result.body.updateACL).to.be.eql([
+            'basesnippetAcceptance',
+            'test@loopback.io',
+          ])
+        ),
+      )
       .catch(err => {
         throw err;
       });
@@ -463,11 +480,16 @@ describe('Basesnippet', function (this: Suite) {
       .expect(200)
       .then(
         result => (
-          expect(result.body).to.containEql(_.omit(baseSnippet, 'ownerGroup')),
+          expect(result.body).to.containEql(
+            _.omit(baseSnippet, ['ownerGroup', 'updateACL']),
+          ),
           expect(result.body.snippetType).to.be.eql('base'),
           expect(result.body.readACL).to.be.eql(['basesnippetAcceptance']),
           expect(result.body.createACL).to.be.eql(['basesnippetAcceptance']),
-          expect(result.body.updateACL).to.be.eql(['basesnippetAcceptance']),
+          expect(result.body.updateACL).to.be.eql([
+            'basesnippetAcceptance',
+            'test@loopback.io',
+          ]),
           expect(result.body.deleteACL).to.be.eql(['basesnippetAcceptance']),
           expect(result.body.shareACL).to.be.eql(['basesnippetAcceptance']),
           expect(result.body.adminACL).to.be.eql(['admin'])
@@ -505,14 +527,19 @@ describe('Basesnippet', function (this: Suite) {
       .expect(200)
       .then(
         result => (
-          expect(result.body).to.containEql(_.omit(baseSnippet, 'createACL')),
+          expect(result.body).to.containEql(
+            _.omit(baseSnippet, ['createACL', 'updateACL']),
+          ),
           expect(result.body.snippetType).to.be.eql('base'),
           expect(result.body.readACL).to.be.eql(['basesnippetAcceptance']),
           expect(result.body.createACL).to.be.eql([
             'basesnippetAcceptance',
             'aNewCreateACL',
           ]),
-          expect(result.body.updateACL).to.be.eql(['basesnippetAcceptance']),
+          expect(result.body.updateACL).to.be.eql([
+            'basesnippetAcceptance',
+            'test@loopback.io',
+          ]),
           expect(result.body.deleteACL).to.be.eql(['basesnippetAcceptance']),
           expect(result.body.shareACL).to.be.eql(['basesnippetAcceptance']),
           expect(result.body.adminACL).to.be.eql(['admin'])
@@ -558,6 +585,7 @@ describe('Basesnippet', function (this: Suite) {
           expect(result.body.updateACL).to.be.eql([
             'anUpdateACL',
             'basesnippetAcceptance',
+            'test@loopback.io',
           ]),
           expect(result.body.deleteACL).to.be.eql(['basesnippetAcceptance']),
           expect(result.body.shareACL).to.be.eql(['basesnippetAcceptance']),
@@ -852,26 +880,6 @@ describe('Basesnippet', function (this: Suite) {
           throw err;
         });
     });
-  });
-
-  it(`patch snippet by id with non-authorised user should return 404`, async () => {
-    const bs = await client
-      .post('/basesnippets')
-      .set('Authorization', 'Bearer ' + token)
-      .set('Content-Type', 'application/json')
-      .send({
-        ..._.omit(baseSnippet, 'updateACL'),
-        updateACL: ['nonAuthorised'],
-      });
-    await client
-      .patch(`/basesnippets/${bs.body.id}`)
-      .set('Authorization', 'Bearer ' + token)
-      .set('Content-Type', 'application/json')
-      .send({name: 'something'})
-      .expect(404)
-      .catch(err => {
-        throw err;
-      });
   });
 
   [404, 204].forEach(t => {
