@@ -116,7 +116,7 @@ export class AutoAddRepository<
             _,
             isNewInstance,
           ),
-      );
+        );
     }
     delete data.ownerGroup;
     delete data.accessGroups;
