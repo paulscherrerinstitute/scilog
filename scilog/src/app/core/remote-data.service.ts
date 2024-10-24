@@ -132,6 +132,14 @@ export class RemoteDataService {
     };
   }
 
+  async getCount(config: any) {
+    let filter = this._prepareFilters(config);
+    console.log(filter);
+    let params = new HttpParams();
+    params = params.set('where', JSON.stringify(filter["where"]));
+    return this.getSnippets<Count>('basesnippets/count', { params: params }).toPromise()
+  }
+
 }
 
 @Injectable({
@@ -208,16 +216,6 @@ export class LogbookItemDataService extends RemoteDataService {
     params = params.set('filter', JSON.stringify(httpFilter));
 
     return this.getSnippets<Basesnippets>('basesnippets/' + id, { headers: headers, params: params }).toPromise();
-  }
-
-  async getCount(config: any) {
-    let filter = this._prepareFilters(config);
-    // let whereFilter = filter["where"];
-    console.log(filter);
-    let params = new HttpParams();
-    params = params.set('where', JSON.stringify(filter["where"]));
-    // let count:Count = await this.getSnippets<Count>('basesnippets/count', {params:params}).toPromise();
-    return this.getSnippets<Count>('basesnippets/count', { params: params }).toPromise()
   }
 
   async getIndex(id: string, config: any) {
@@ -372,9 +370,20 @@ export class LogbookDataService extends RemoteDataService {
     headers = headers.set('Content-Type', 'application/json; charset=utf-8');
     this._searchString = this._searchString.trim();
 
+    let httpFilter: Object = this._prepareFilters(config, index, count);
+    let params = new HttpParams();
+    params = params.set('filter', JSON.stringify(httpFilter))
 
+    if (this._searchString.length == 0) {
+      return this.getSnippets<any[]>('basesnippets', { headers: headers, params: params }).toPromise();
+    } else {
+      return this.getSnippets<any[]>('basesnippets/search=' + this._searchString, { headers: headers, params: params }).toPromise();
+    }
+  }
+
+  protected _prepareFilters(config: WidgetItemConfig, index: number = 0, count: number = Infinity): Object {
     let httpFilter: Object = {};
-    httpFilter["order"] = ["defaultOrder DESC"];
+    httpFilter["order"] = config.view.order ?? ["defaultOrder DESC"];
 
     let whereFilter: Object[] = [];
     whereFilter.push({ "snippetType": "logbook", deleted: false });
@@ -391,16 +400,8 @@ export class LogbookDataService extends RemoteDataService {
     if (this._searchString.length > 0) {
       httpFilter["include"] = [{ "relation": "subsnippets" }];
     }
-    let params = new HttpParams();
-    params = params.set('filter', JSON.stringify(httpFilter))
-
-    if (this._searchString.length == 0) {
-      return this.getSnippets<any[]>('basesnippets', { headers: headers, params: params }).toPromise();
-    } else {
-      return this.getSnippets<any[]>('basesnippets/search=' + this._searchString, { headers: headers, params: params }).toPromise();
-    }
+    return httpFilter;
   }
-
 }
 
 @Injectable({
