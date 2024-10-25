@@ -12,6 +12,7 @@ import { LogbookDataService } from '@shared/remote-data.service';
 import { LogbookIconScrollService } from './logbook-icon-scroll-service.service';
 import { ResizedEvent } from '@shared/directives/resized.directive';
 import { animate, style, transition, trigger } from '@angular/animations';
+import { OverviewTableComponent } from './overview-table/overview-table.component';
 
 enum ContentType {
   COLLECTION = 'collection',
@@ -47,6 +48,7 @@ export class OverviewComponent implements OnInit {
   subscriptions: Subscription[] = [];
   _matCardSide = { 'logbook-module': 352, 'logbook-headline': 47 };
   @ViewChild('logbookContainer', { static: true }) logbookContainer: ElementRef<HTMLElement>;
+  @ViewChild(OverviewTableComponent) overviewTable: OverviewTableComponent
   matCardType: MatCardType = 'logbook-module';
 
 
@@ -73,17 +75,8 @@ export class OverviewComponent implements OnInit {
         this.logbookSubscription.unsubscribe();
       }
       this.config = this._prepareConfig();
-      this.logbookIconScrollService.groupSize = this.groupSize(this.logbookContainer.nativeElement.clientWidth);
       this.logbookIconScrollService.initialize(this.config);
     }));
-  }
-
-
-  reInitScrollAfterToggle(matCardType: MatCardType) {
-    this.matCardType = matCardType;
-    const newSize = this.groupSize(this.logbookContainer.nativeElement[this.clientSide]);
-    this.logbookIconScrollService.groupSize = newSize;
-    this.logbookIconScrollService.initialize(this.config);
   }
 
   @HostListener('window:resize')
@@ -93,7 +86,7 @@ export class OverviewComponent implements OnInit {
     const newSize = this.groupSize(event.newRect[side]);
     if (newSize === this.logbookIconScrollService.groupSize) return
     this.logbookIconScrollService.groupSize = newSize;
-    if (event.newRect[side] > 2 * event.oldRect[side] || event.oldRect[side] > 2 * event.newRect[side]) {
+    if (event.newRect?.[side] > 2 * event.oldRect?.[side] || event.oldRect?.[side] > 2 * event.newRect?.[side]) {
       this.logbookIconScrollService.initialize(this.config);
     }
     else
@@ -152,8 +145,15 @@ export class OverviewComponent implements OnInit {
 
     this.subscriptions.push(dialogRef.afterClosed().subscribe(async result => {
       console.log("Dialog result:", result);
-      await this.logbookIconScrollService.reload();
+      await this.reloadData('edit');
     }));
+  }
+
+  private async reloadData(action: 'edit' | 'add') {
+    const overviewMethod = action === 'edit'? 'getLogbooks': 'resetSortAndReload';
+    this.matCardType === 'logbook-module'
+      ? await this.logbookIconScrollService.reload()
+      : await this.overviewTable[overviewMethod]();
   }
 
   async deleteLogbook(logbookId: string) {
@@ -179,7 +179,7 @@ export class OverviewComponent implements OnInit {
     }
     this.subscriptions.push(dialogRef.afterClosed().subscribe(async result => {
       if (typeof result != "undefined") {
-        await this.logbookIconScrollService.reload();
+        await this.reloadData('add');
       }
     }));
   }

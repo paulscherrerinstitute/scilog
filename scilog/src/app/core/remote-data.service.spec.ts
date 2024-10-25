@@ -289,12 +289,21 @@ describe('LogbookDataService', () => {
     expect(spyGetSnippets.calls.mostRecent().args[0]).toEqual("logbooks/1");
   });
 
-
   it('should call getSnippets with list of ids', () => {
     const spyGetSnippets = spyOn<LogbookDataService, any>(service, "getSnippets").and.returnValue(of([]));
     service.getLogbooksInfo(["1", "2", "3"]);
     expect(spyGetSnippets.calls.mostRecent().args[1]["params"].toString()).
     toEqual("filter=%7B%22where%22:%7B%22id%22:%7B%22inq%22:%5B%221%22,%222%22,%223%22%5D%7D%7D%7D");
+  });
+
+  it('should test _prepareFilters', () => {
+    const filters = service['_prepareFilters']({ general: {}, filter: {}, view: {} }, 10, 20);
+    expect(filters).toEqual({
+      order: ['defaultOrder DESC'],
+      where: {and: [{snippetType: 'logbook', deleted: false}]},
+      limit: 20,
+      skip: 10
+    });
   });
 
 });
