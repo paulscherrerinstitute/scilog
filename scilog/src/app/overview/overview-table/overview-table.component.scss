@@ -1,6 +1,14 @@
 table {
   width: 100%;
+  table-layout: fixed;
 }
+
+table th, 
+table td {
+  white-space: nowrap;
+  overflow: scroll;
+}
+
 
 .logbooks:hover {
   background-color: var(--main-background)!important;
@@ -10,7 +18,7 @@ table {
 }
 
 .logbooks {
-  height: 60px;
+  height: 65px;
 }
 
 .logbooks img {
@@ -21,10 +29,12 @@ table {
 .mat-fab-top-right {
   text-align: right;
   width: 2px;
+  padding-right: 40px!important;
+  overflow: hidden!important;
 }
 
 .scrollable-container {
-  max-height: 73vh;
+  max-height: 65px * 11;
   width: 100%;
   overflow: auto;
 }
