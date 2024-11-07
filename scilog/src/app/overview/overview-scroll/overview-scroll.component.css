@@ -1,0 +1,20 @@
+cdk-virtual-scroll-viewport {
+    height: 400px;
+    width: 100%;
+    border: 1px solid #ccc;
+}
+
+.logbook-container {
+    overflow: scroll;
+    height: calc(100vh - 250px);
+    width: calc(100vw - 20px);
+    border-color: transparent;
+}
+
+.logbook-content > .logbook-inline {
+    padding: 7px;
+}
+
+.logbook-inline {
+    display: inline-block;
+}

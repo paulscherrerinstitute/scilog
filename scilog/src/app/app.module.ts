@@ -87,6 +87,7 @@ import { ResizedDirective } from '@shared/directives/resized.directive';
 import { OverviewTableComponent } from './overview/overview-table/overview-table.component';
 import { MatPaginatorModule } from '@angular/material/paginator';
 import { MatSortModule } from '@angular/material/sort';
+import { OverviewScrollComponent } from './overview/overview-scroll/overview-scroll.component';
 
 const appConfigInitializerFn = (appConfig: AppConfigService) => {
     return () => appConfig.loadAppConfig();
@@ -133,7 +134,8 @@ const appConfigInitializerFn = (appConfig: AppConfigService) => {
         SearchWindowComponent,
         TaskComponent,
         ResizedDirective,
-        OverviewTableComponent
+        OverviewTableComponent,
+        OverviewScrollComponent
     ],
     imports: [
         BrowserModule,

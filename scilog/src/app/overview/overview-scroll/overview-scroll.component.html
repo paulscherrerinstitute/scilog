@@ -1,0 +1,10 @@
+<cdk-virtual-scroll-viewport [itemSize]="itemSize" class="logbook-container" (scrolledIndexChange)="onScroll($event)"
+  (resized)="onResized($event)" #viewPort>
+  <div *cdkVirtualFor="let logbookGroup of logbooks; trackBy: trackByGroupId" class="logbook-content">
+    <span *ngFor="let logbook of logbookGroup" class="logbook-inline">
+      <app-logbook-cover [logbook]="logbook" (logbookEdit)="editLogbook($event)"
+        (logbookSelection)="logbookSelected($event)" (logbookDelete)="deleteLogbook($event)">
+      </app-logbook-cover>
+    </span>
+  </div>
+</cdk-virtual-scroll-viewport>
