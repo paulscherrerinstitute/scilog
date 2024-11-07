@@ -1,70 +1,13 @@
-<div [ngSwitch]="matView">
-  <div *ngSwitchCase="'logbook-headline'">
-    <ng-container *ngTemplateOutlet="logbookHeadline"></ng-container>
-  </div>
-  <div *ngSwitchCase="'logbook-module'">
-    <ng-container *ngTemplateOutlet="logbookModule"></ng-container>
-  </div>
-</div>
-
-<ng-template #logbookModule>
-  <mat-card [ngClass]="matView">
-    <mat-card-header>
-      <mat-card-title #cardHeader style="font-size: 18px;">{{ logbook?.name }}</mat-card-title>
-      <mat-card-subtitle>{{ logbook?.ownerGroup }}</mat-card-subtitle>
-      <button mat-icon-button [matMenuTriggerFor]="menu" aria-label="Example icon-button with a menu"
-        class="mat-fab-top-right" [disabled]="isActionAllowed.tooltips.edit"
-        matTooltip="{{ isActionAllowed.tooltips.edit }}">
-        <mat-icon>more_vert</mat-icon>
-      </button>
-      <mat-menu #menu="matMenu">
-        <span [matTooltip]="isActionAllowed.tooltips.update">
-          <button mat-menu-item (click)="editLogbook()" [disabled]="isActionAllowed.tooltips.update">
-            <mat-icon>edit</mat-icon>
-            <span>Edit</span>
-          </button>
-        </span>
-        <span [matTooltip]="isActionAllowed.tooltips.delete">
-          <button mat-menu-item (click)="deleteLogbook()" [disabled]="isActionAllowed.tooltips.delete">
-            <mat-icon>delete</mat-icon>
-            <span>Delete</span>
-          </button>
-        </span>
-      </mat-menu>
-    </mat-card-header>
-    <div class="image-container">
-      <img (click)="selection($event)" [src]="imageToShow" alt="" [routerLink]="['/logbooks', logbook?.id, 'dashboard']"
-        *ngIf=" !isImageLoading">
-    </div>
-    <mat-card-content>
-      <p>
-        {{ logbook?.description }}
-      </p>
-    </mat-card-content>
-    <mat-divider></mat-divider>
-    <mat-card-actions class="mat-card-actions">
-      <button mat-button (click)="selection()" [routerLink]="['/logbooks', logbook?.id, 'dashboard']">
-        Open
-      </button>
-    </mat-card-actions>
-  </mat-card>
-</ng-template>
-
-<ng-template #logbookHeadline>
-  <mat-card [ngClass]="matView">
-    <div (dblclick)="selectOnDoubleClick()" class="card-container">
-      <mat-card-content class="title">{{ logbook?.name }}</mat-card-content>
-      <mat-card-content class="description">{{ logbook?.description }}</mat-card-content>
-      <mat-card-content class="owner">{{ logbook?.ownerGroup }}</mat-card-content>
-      <mat-card-content class="date">{{ logbook?.createdAt | date }}</mat-card-content>
-      <img [src]="imageToShow" alt="" *ngIf=" !isImageLoading">
-    </div>
-    <button mat-icon-button [matMenuTriggerFor]="menuHeadline" aria-label="Example icon-button with a menu"
+<mat-card class="logbook-module">
+  <mat-card-header>
+    <mat-card-title #cardHeader style="font-size: 18px;">{{ logbook?.name }}</mat-card-title>
+    <mat-card-subtitle>{{ logbook?.ownerGroup }}</mat-card-subtitle>
+    <button mat-icon-button [matMenuTriggerFor]="menu" aria-label="Example icon-button with a menu"
       class="mat-fab-top-right" [disabled]="isActionAllowed.tooltips.edit"
       matTooltip="{{ isActionAllowed.tooltips.edit }}">
       <mat-icon>more_vert</mat-icon>
     </button>
-    <mat-menu #menuHeadline="matMenu">
+    <mat-menu #menu="matMenu">
       <span [matTooltip]="isActionAllowed.tooltips.update">
         <button mat-menu-item (click)="editLogbook()" [disabled]="isActionAllowed.tooltips.update">
           <mat-icon>edit</mat-icon>
@@ -78,5 +21,20 @@
         </button>
       </span>
     </mat-menu>
-  </mat-card>
-</ng-template>
+  </mat-card-header>
+  <div class="image-container">
+    <img (click)="selection($event)" [src]="imageToShow" alt="" [routerLink]="['/logbooks', logbook?.id, 'dashboard']"
+      *ngIf=" !isImageLoading">
+  </div>
+  <mat-card-content>
+    <p>
+      {{ logbook?.description }}
+    </p>
+  </mat-card-content>
+  <mat-divider></mat-divider>
+  <mat-card-actions class="mat-card-actions">
+    <button mat-button (click)="selection()" [routerLink]="['/logbooks', logbook?.id, 'dashboard']">
+      Open
+    </button>
+  </mat-card-actions>
+</mat-card>
