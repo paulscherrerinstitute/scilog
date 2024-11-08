@@ -13,6 +13,7 @@ import { LogbookIconScrollService } from './logbook-icon-scroll-service.service'
 import { ResizedEvent } from '@shared/directives/resized.directive';
 import { animate, style, transition, trigger } from '@angular/animations';
 import { OverviewTableComponent } from './overview-table/overview-table.component';
+import { OverviewScrollComponent } from './overview-scroll/overview-scroll.component';
 
 enum ContentType {
   COLLECTION = 'collection',
@@ -48,7 +49,8 @@ export class OverviewComponent implements OnInit {
   subscriptions: Subscription[] = [];
   _matCardSide = { 'logbook-module': 352, 'logbook-headline': 47 };
   @ViewChild('logbookContainer', { static: true }) logbookContainer: ElementRef<HTMLElement>;
-  @ViewChild(OverviewTableComponent) overviewTable: OverviewTableComponent
+  @ViewChild(OverviewTableComponent) overviewTable: OverviewTableComponent;
+  @ViewChild(OverviewScrollComponent) overviewSroll: OverviewScrollComponent;
   matCardType: MatCardType = 'logbook-module';
 
 
@@ -152,13 +154,13 @@ export class OverviewComponent implements OnInit {
   private async reloadData(action: 'edit' | 'add') {
     const overviewMethod = action === 'edit'? 'getLogbooks': 'resetSortAndReload';
     this.matCardType === 'logbook-module'
-      ? await this.logbookIconScrollService.reload()
+      ? await this.overviewSroll.reloadLogbooks()
       : await this.overviewTable[overviewMethod]();
   }
 
   async deleteLogbook(logbookId: string) {
     await this.dataService.deleteLogbook(logbookId);
-    await this.logbookIconScrollService.reload();
+    await this.overviewSroll.reloadLogbooks();
     console.log("deleted logbook ", logbookId);
   }
 

@@ -7,20 +7,10 @@
       <mat-button-toggle value="logbook-headline"><mat-icon>view_headline</mat-icon></mat-button-toggle>
     </mat-button-toggle-group>
     <button (click)='addCollectionLogbook("logbook")'>Add logbook</button><br>
-    <mat-spinner *ngIf="!logbookIconScrollService.isLoaded" [@spinner] class="spinner"></mat-spinner>
+    <!-- <mat-spinner *ngIf="!logbookIconScrollService.isLoaded" [@spinner] class="spinner"></mat-spinner> -->
     <overview-table *ngIf="matCardType === 'logbook-headline'" [config]="config" (logbookEdit)="editLogbook($event)"
       (logbookDelete)="deleteLogbook($event)"></overview-table>
-    <div class="logbook-container" (resized)="onResized($event)" #logbookContainer
-      *ngIf="matCardType === 'logbook-module'">
-      <div *uiScroll="let logbookGroup of logbookIconScrollService.datasource">
-        <span *ngFor="let logbook of logbookGroup">
-          <app-logbook-cover [logbook]="logbook" (logbookEdit)="editLogbook($event)"
-            (logbookSelection)="logbookSelected($event)" (logbookDelete)="deleteLogbook($event)" [matView]="matCardType"
-            [ngClass]="matCardType">
-          </app-logbook-cover>
-        </span>
-      </div>
-    </div>
-
+    <overview-scroll *ngIf="matCardType === 'logbook-module'" [config]="config" (logbookEdit)="editLogbook($event)"
+      (logbookDelete)="deleteLogbook($event)" (logbookSelection)="logbookSelected($event)"></overview-scroll>
   </div>
 </div>
