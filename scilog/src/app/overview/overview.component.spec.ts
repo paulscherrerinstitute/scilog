@@ -8,9 +8,8 @@ import { CookieService } from 'ngx-cookie-service';
 import { LogbookDataService } from '@shared/remote-data.service';
 import { of } from 'rxjs';
 import { RouterTestingModule } from '@angular/router/testing';
-import { ResizedEvent } from '@shared/directives/resized.directive';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
-import { LogbookIconScrollService } from './logbook-icon-scroll-service.service';
+import { OverviewScrollComponent } from './overview-scroll/overview-scroll.component';
 
 class UserPreferencesMock {
   userInfo = {
@@ -37,7 +36,7 @@ describe('OverviewComponent', () => {
   cookiesSpy = jasmine.createSpyObj("CookieService", ["lastLogbook"]);
   cookiesSpy.lastLogbook.and.returnValue([]);
   const tableSpy = jasmine.createSpyObj("OverviewTableComponent", ['getLogbooks', 'resetSortAndReload']);
-  const logbookIconSpy = jasmine.createSpyObj("logbookIconScrollService", ['reload', 'initialize']);
+  const scrollSpy = jasmine.createSpyObj("OverviewScrollComponent", ['reloadLogbooks']);
   
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
@@ -49,8 +48,6 @@ describe('OverviewComponent', () => {
         {provide: UserPreferencesService, useClass: UserPreferencesMock},
         {provide: CookieService},
         {provide: LogbookDataService, useValue: logbookDataSpy},
-        {provide: LogbookIconScrollService, useValue: logbookIconSpy},
-
       ]
     })
     .compileComponents();
@@ -60,8 +57,8 @@ describe('OverviewComponent', () => {
     fixture = TestBed.createComponent(OverviewComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
-    component.logbookIconScrollService.groupSize = 3;
     component.overviewTable = tableSpy;
+    component.overviewSroll = scrollSpy;
   });
 
   it('should create', () => {
@@ -69,78 +66,7 @@ describe('OverviewComponent', () => {
   });
 
   [
-    {},
-    undefined,
-    {clientWidth: 0, clientHeight: 0},
-    {clientWidth: 10, clientHeight: 20},
-  ].forEach((t, i) => {
-    [['logbook-module', 10], ['logbook-headline', 20]].forEach(st => {
-      it(`should test get matCardSide ${i}:${st[0]}`, () => {
-        spyOn<any>(component, 'getFirstVisibleElement').and.returnValue(t);
-        component.matCardType = st[0] as MatCardType;
-        const expected = st[0] === 'logbook-module' ? 352 : 47;
-        expect(component.matCardSide).toEqual(i === 3 ? st[1] as number : expected);
-      });
-    });
-  });
-
-  [[1, 1], [800, 2]].forEach(t => {
-    it(`should test groupSize ${t[0]}`, () => {
-      expect(component.groupSize(t[0])).toEqual(t[1]);
-    });
-  });
-
-  [
-    [{newRect: {width: 1056}}, [0, 0]], 
-    [{newRect: {width: 700}, oldRect: {width: 300}}, [1, 0]], 
-    [{newRect: {width: 100}, oldRect: {width: 300}}, [1, 0]],
-    [{newRect: {width: 200}, oldRect: {width: 300}}, [0, 1]],
-    [{newRect: {width: 400}, oldRect: {width: 300}}, [0, 1]],
-  ].forEach((t, i) => {
-    it(`should test onResized ${i}:logbook-module`, () => {
-      logbookIconSpy.initialize.calls.reset();
-      logbookIconSpy.reload.calls.reset();
-      component.onResized(t[0] as ResizedEvent);
-      expect(logbookIconSpy.initialize).toHaveBeenCalledTimes(t[1][0]);
-      expect(logbookIconSpy.reload).toHaveBeenCalledTimes(t[1][1]);
-    });
-  });
-
-  [
-    [{newRect: {height: 147}}, [0, 0]],
-    [{newRect: {height: 700}, oldRect: {height: 300}}, [1, 0]],
-    [{newRect: {height: 100}, oldRect: {height: 300}}, [1, 0]],
-    [{newRect: {height: 200}, oldRect: {height: 300}}, [0, 1]],
-    [{newRect: {height: 400}, oldRect: {height: 300}}, [0, 1]],
-  ].forEach((t, i) => {
-    it(`should test onResized ${i}:logbook-headline`, () => {
-      logbookIconSpy.initialize.calls.reset();
-      logbookIconSpy.reload.calls.reset();
-      component.matCardType = 'logbook-headline';
-      component.onResized(t[0] as ResizedEvent);
-      expect(logbookIconSpy.initialize).toHaveBeenCalledTimes(t[1][0]);
-      expect(logbookIconSpy.reload).toHaveBeenCalledTimes(t[1][1]);
-    });
-  });
-
-  [
-    ['logbook-module', 'clientWidth'],
-    ['logbook-headline', 'clientHeight']
-  ].forEach(t => {
-    it(`should test clientSide ${t[0]}`, () => {
-      component.matCardType = t[0] as MatCardType;
-      expect(component.clientSide).toEqual(t[1]);
-    });
-  });
-
-  it('should trigger onResized on window resize', () => {
-    const onResizedSpy = spyOn(component, 'onResized');
-    window.dispatchEvent(new Event('resize'));
-    expect(onResizedSpy).toHaveBeenCalled();
-  });
-
-  [
-    ['logbook-module', logbookIconSpy.reload, 'add'],
+    ['logbook-module', scrollSpy.reloadLogbooks, 'add'],
     ['logbook-headline', tableSpy.getLogbooks, 'edit'],
     ['logbook-headline', tableSpy.resetSortAndReload, 'add'],
   ].forEach((t, i) => {
