@@ -1,11 +1,11 @@
-import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
+import { ComponentFixture, fakeAsync, TestBed, waitForAsync } from '@angular/core/testing';
 import { LogbookDataService } from 'src/app/core/remote-data.service';
 import { UserPreferencesService } from 'src/app/core/user-preferences.service';
 import { Logbooks } from 'src/app/core/model/logbooks';
 import { OverviewScrollComponent } from './overview-scroll.component';
 import { ResizedEvent } from 'src/app/core/directives/resized.directive';
-import { LogbookWidgetComponent } from '../logbook-cover/logbook-cover.component';
 import { ElementRef, QueryList } from '@angular/core';
+import { ScrollingModule } from '@angular/cdk/scrolling';
 
 class UserPreferencesMock {
   userInfo = { roles: ["roles"] };
@@ -20,14 +20,14 @@ describe('OverviewScrollComponent', () => {
   );
   logbookDataSpy.getDataBuffer.and.returnValue([{ abc: 1 }, {def: 2}, {ghi: 3}, {jkl: 4}]);
 
-
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      declarations: [OverviewScrollComponent, LogbookWidgetComponent],
+      declarations: [OverviewScrollComponent],
       providers: [
         { provide: LogbookDataService, useValue: logbookDataSpy },
         { provide: UserPreferencesService, useClass: UserPreferencesMock },
-      ]
+      ],
+      imports: [ScrollingModule]
     })
       .compileComponents();
   }));
@@ -39,7 +39,7 @@ describe('OverviewScrollComponent', () => {
     component.config = { general: {}, filter: {}, view: {} };
     component['groupSize'] = 3;
     component['pageSize'] = 20;
-    component.logbooks = [];
+    component['endOfData'] = false;
   });
 
   it('should create', () => {
@@ -85,15 +85,18 @@ describe('OverviewScrollComponent', () => {
     expect(logbookDataSpy.getDataBuffer).toHaveBeenCalledOnceWith(0, 20, { general: {}, filter: {}, view: {} });
   });
   
-  it('should test getAndGroupLogbooks', async () => {
+  it('should test getAndGroupLogbooks', fakeAsync(async () => {
+    logbookDataSpy.getDataBuffer.and.returnValue([{ abc: 1 }, {def: 2}, {ghi: 3}, {jkl: 4}]);
     const logbooks = await component['getAndGroupLogbooks']();
+
     expect(component['currentPage']).toEqual(1);
     expect(logbooks).toEqual([[{ abc: 1 }, {def: 2}, {ghi: 3}], [{jkl: 4}]]);
-  });
+    expect(component['endOfData']).toEqual(true);
+  }));
 
   [
-    {sizes: [3, 19], spy: 'getAndGroupLogbooks'},
-    {sizes: [7, 20], spy: 'getAndGroupLogbooks'},
+    {sizes: [3, 19], spy: 'reshapeOnResize'},
+    {sizes: [7, 20], spy: 'reshapeOnResize'},
     {sizes: [5, 21], spy: 'regroupLogbooks'},
   ].forEach((t, i) => {
     it(`should test refreshLogbooks ${i}`, async () => {
@@ -113,6 +116,7 @@ describe('OverviewScrollComponent', () => {
 
   it('should test onScroll', async () => {
     const getLogbooksSpy = spyOn<any>(component, 'getLogbooks').and.resolveTo([]);
+    await component.onScroll(0);
     await component.onScroll(1);
     expect(getLogbooksSpy).toHaveBeenCalledTimes(1);
   });
@@ -134,8 +138,31 @@ describe('OverviewScrollComponent', () => {
     component.logbookWidgetComponent = [1, 2, 3] as unknown as QueryList<ElementRef>;
     expect(component.logbookWidgetComponent.length).toEqual(3);
     component.ngAfterViewChecked();
-    expect(component['_updateSizes']).toEqual(false);
+    expect(component['updateSizes']).toEqual(false);
     expect(compareAndRefreshSizesSpy).toHaveBeenCalledTimes(1);
   });
+
+  [
+    {pageSize: 18, spyCalls: 1, logbooks: [[1,2,3],[4,5,6],[7,8,9]]},
+    {pageSize: 22, logbooks: [[1,2,3],[4,5]]},
+    {endOfData: true, logbooks: [[1,2,3],[4,5,6],[7]]}
+  ].forEach((t, i) => {
+    it(`should test reshapeOnResize ${i}`, async () => {
+      const getLogbooksSpy = spyOn<any>(component, 'getLogbooks').and.resolveTo([8,9]);
+      component.logbooks = [[1,2,3], [4,5,6], [7]] as Logbooks[][];
+      await component['reshapeOnResize'](t.pageSize);
+      expect(getLogbooksSpy).toHaveBeenCalledTimes(t.spyCalls ?? 0);
+      if (t.spyCalls) expect(getLogbooksSpy).toHaveBeenCalledOnceWith(t.pageSize, 2);
+      expect(component.logbooks).toEqual(t.logbooks as Logbooks[][]);
+    });
+  });
+
+  it('should test reloadLogbooks', fakeAsync(async () => {
+    spyOn<any>(component, 'getAndGroupLogbooks');
+    const scrollToOffset = spyOn(component.viewPort, 'scrollToOffset');
+    await component.reloadLogbooks();
+    expect(scrollToOffset).toHaveBeenCalledOnceWith(0);
+    expect(component['currentPage']).toEqual(0);
+  }));
 
 })
