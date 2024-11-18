@@ -167,7 +167,7 @@ describe('OverviewScrollComponent', () => {
       await component.reloadLogbooks(t && true);
       if (typeof t === 'string')
         component['dataService'].searchString === 'abc';
-      expect(scrollToOffset).toHaveBeenCalledTimes(t? 1: 0);
+      expect(scrollToOffset).toHaveBeenCalledTimes(1);
     }));
   });
 
@@ -175,7 +175,7 @@ describe('OverviewScrollComponent', () => {
     const reloadSpy = spyOn(component, 'reloadLogbooks');
     await component.deleteLogbook('123');
     expect(logbookDataSpy.deleteLogbook).toHaveBeenCalledOnceWith('123');
-    expect(reloadSpy).toHaveBeenCalledOnceWith(false);
+    expect(reloadSpy).toHaveBeenCalledTimes(1);
   });
 
 })

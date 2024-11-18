@@ -126,11 +126,9 @@ export class OverviewScrollComponent {
 
   async reloadLogbooks(resetSort = true, search?: string) {
     if (search !== null && search !== undefined) this.dataService.searchString = search;
-    if (resetSort) {
-      this.viewPort.scrollToOffset(0);
-      this.currentPage = 0;
-      this.endOfData = false;
-    }
+    this.viewPort.scrollToOffset(0);
+    this.currentPage = 0;
+    this.endOfData = false;
     this.logbooks = await this.getAndGroupLogbooks();
   }
 
@@ -163,15 +161,9 @@ export class OverviewScrollComponent {
     this.logbookEdit.emit(logbook);
   }
 
-  afterLogbookEdit(logbook: Logbooks) {
-    const logbooks = this.logbooks.flat();
-    logbooks.forEach((log, i) => {if (log.id === logbook.id) logbooks[i] = logbook});
-    this.logbooks = this.splitIntoGroups(logbooks);
-  }
-
   async deleteLogbook(logbookId: string) {
     await this.dataService.deleteLogbook(logbookId);
-    await this.reloadLogbooks(false);
+    await this.reloadLogbooks();
   }
 
   logbookSelected(logbookId: string) {
