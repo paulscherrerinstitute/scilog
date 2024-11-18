@@ -1,0 +1,18 @@
+<button class="mat-fab-top-right" mat-icon-button aria-label="Actions" [matMenuTriggerFor]="menu"
+    [disabled]="isAllowedService.tooltips.edit" matTooltip="{{ isAllowedService.tooltips.edit }}">
+    <mat-icon>more_vert</mat-icon>
+</button>
+<mat-menu #menu="matMenu">
+    <span [matTooltip]="isAllowedService.tooltips.update">
+        <button mat-menu-item (click)="editLogbook()" [disabled]="isAllowedService.tooltips.update">
+            <mat-icon>edit</mat-icon>
+            Edit
+        </button>
+    </span>
+    <span [matTooltip]="isAllowedService.tooltips.delete">
+        <button mat-menu-item (click)="deleteLogbook()" [disabled]="isAllowedService.tooltips.delete">
+            <mat-icon>delete</mat-icon>
+            Delete
+        </button>
+    </span>
+</mat-menu>

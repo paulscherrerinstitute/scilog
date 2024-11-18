@@ -4,7 +4,6 @@ import { LogbookItemDataService } from '@shared/remote-data.service';
 import { UserPreferencesService } from '@shared/user-preferences.service';
 import { LogbookInfoService } from '@shared/logbook-info.service';
 import { of } from 'rxjs';
-import { MatLegacyMenuModule as MatMenuModule } from '@angular/material/legacy-menu';
 import { Logbooks } from '@model/logbooks';
 
 class UserPreferencesMock {
@@ -54,7 +53,6 @@ describe('LogbookWidgetComponent', () => {
         {provide: UserPreferencesService, useClass: UserPreferencesMock},
         {provide: LogbookItemDataService, useValue: logbookItemDataSpy},
       ],
-      imports: [MatMenuModule],
       declarations: [ LogbookWidgetComponent ]
     })
     .compileComponents();
@@ -70,12 +68,6 @@ describe('LogbookWidgetComponent', () => {
 
   it('should create', () => {
     expect(component).toBeTruthy();
-  });
-
-  it('should test enableActions', () => {
-    const isAnyEditAllowedSpy = spyOn(component['isActionAllowed'], 'isAnyEditAllowed');
-    component['enableActions']();
-    expect(isAnyEditAllowedSpy).toHaveBeenCalledTimes(1);
   });
 
 });
