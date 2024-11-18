@@ -16,5 +16,5 @@ cdk-virtual-scroll-viewport {
 }
 
 .logbook-inline {
-    display: inline-block;
+    display: inline-flex;
 }
