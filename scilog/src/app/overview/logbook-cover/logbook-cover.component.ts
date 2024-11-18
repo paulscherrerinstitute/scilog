@@ -2,15 +2,12 @@ import { Component, OnInit, EventEmitter, Output, Input, ViewChild, ElementRef }
 import { Logbooks } from '@model/logbooks';
 import { LogbookInfoService } from '@shared/logbook-info.service';
 import { LogbookItemDataService } from '@shared/remote-data.service';
-import { IsAllowedService } from '../is-allowed.service';
 import { Router } from '@angular/router';
-import { MatCardType } from '../overview.component';
 
 @Component({
   selector: 'app-logbook-cover',
   templateUrl: './logbook-cover.component.html',
   styleUrls: ['./logbook-cover.component.css'],
-  providers: [IsAllowedService]
 })
 export class LogbookWidgetComponent implements OnInit {
 
@@ -29,19 +26,12 @@ export class LogbookWidgetComponent implements OnInit {
   constructor(
     private logbookItemDataService: LogbookItemDataService,
     private logbookInfo: LogbookInfoService,
-    protected isActionAllowed: IsAllowedService,
     private router: Router) { }
 
   ngOnInit(): void {
     if (this.logbook?.thumbnail) {
       this.getImageFromService();
     }
-    this.enableActions();
-  }
-
-  private enableActions() {
-    this.isActionAllowed.snippet = this.logbook;
-    this.isActionAllowed.isAnyEditAllowed();
   }
 
   ngAfterViewInit() {

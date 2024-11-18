@@ -7,13 +7,11 @@ import { Logbooks } from '../../core/model/logbooks';
 import { WidgetItemConfig } from '../../core/model/config';
 import { LogbookDataService } from '../../core/remote-data.service';
 import { Router } from '@angular/router';
-import { IsAllowedService } from '../is-allowed.service';
 
 @Component({
   selector: 'overview-table',
   templateUrl: './overview-table.component.html',
   styleUrls: ['./overview-table.component.scss'],
-  providers: [IsAllowedService],
 })
 export class OverviewTableComponent implements OnInit {
 
@@ -34,7 +32,6 @@ export class OverviewTableComponent implements OnInit {
   constructor(
     private dataService: LogbookDataService,
     private router: Router,
-    protected isActionAllowed: IsAllowedService,
   ) {}
 
   ngOnInit() {
