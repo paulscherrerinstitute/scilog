@@ -3,8 +3,8 @@
     (cdkDropListDropped)="drop($event)" (matSortChange)="onSortChange()">
     <ng-container matColumnDef="name">
       <th mat-header-cell cdkDrag *matHeaderCellDef mat-sort-header>Title </th>
-      <td mat-cell *matCellDef="let row"> 
-        <div class="scrollable-text"> 
+      <td mat-cell *matCellDef="let row">
+        <div class="scrollable-text">
           {{row.name}}
         </div>
       </td>
@@ -12,27 +12,27 @@
 
     <ng-container matColumnDef="description">
       <th mat-header-cell cdkDrag *matHeaderCellDef mat-sort-header>Description </th>
-      <td mat-cell *matCellDef="let row"> 
-        <div class="scrollable-text"> 
-          {{row.description}} 
+      <td mat-cell *matCellDef="let row">
+        <div class="scrollable-text">
+          {{row.description}}
         </div>
       </td>
     </ng-container>
 
     <ng-container matColumnDef="ownerGroup">
       <th mat-header-cell cdkDrag *matHeaderCellDef mat-sort-header>ownerGroup </th>
-      <td mat-cell *matCellDef="let row"> 
-        <div class="scrollable-text"> 
-          {{row.ownerGroup}} 
+      <td mat-cell *matCellDef="let row">
+        <div class="scrollable-text">
+          {{row.ownerGroup}}
         </div>
       </td>
     </ng-container>
 
     <ng-container matColumnDef="createdAt">
       <th mat-header-cell cdkDrag *matHeaderCellDef mat-sort-header>Date </th>
-      <td mat-cell *matCellDef="let row"> 
-        <div class="scrollable-text"> 
-          {{row.createdAt | date}} 
+      <td mat-cell *matCellDef="let row">
+        <div class="scrollable-text">
+          {{row.createdAt | date}}
         </div>
       </td>
     </ng-container>
@@ -40,8 +40,8 @@
     <ng-container matColumnDef="thumbnail">
       <th mat-header-cell cdkDrag *matHeaderCellDef>Thumbnail </th>
       <td mat-cell *matCellDef="let row">
-        <div class="scrollable-text"> 
-          <img [src]="getImage(row.thumbnail)"/>
+        <div class="scrollable-text">
+          <img [src]="getImage(row.thumbnail)" />
         </div>
       </td>
     </ng-container>
@@ -49,7 +49,8 @@
     <ng-container matColumnDef="actions">
       <th mat-header-cell *matHeaderCellDef class="mat-fab-top-right"></th>
       <td mat-cell *matCellDef="let row">
-        <actions-menu [logbook]="row" (logbookEdit)="editLogbook()" (logbookDelete)="deleteLogbook()"></actions-menu>
+        <actions-menu [logbook]="row" (logbookEdit)="editLogbook($event)"
+          (logbookDelete)="deleteLogbook($event)"></actions-menu>
       </td>
     </ng-container>
 
@@ -59,5 +60,5 @@
 
 </section>
 
-<mat-paginator [length]="totalItems" [pageSize]="10" [pageSizeOptions]="[10, 20, 50, 100]" (page)="onPageChange()" 
+<mat-paginator [length]="totalItems" [pageSize]="10" [pageSizeOptions]="[10, 20, 50, 100]" (page)="onPageChange()"
   showFirstLastButtons></mat-paginator>
