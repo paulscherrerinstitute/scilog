@@ -21,9 +21,6 @@ export class LogbookWidgetComponent implements OnInit {
   @Input()
   logbook: Logbooks;
 
-  @Input()
-  matView: MatCardType;
-
   @ViewChild('cardHeader') cardHeader: ElementRef;
 
   imageToShow: any;

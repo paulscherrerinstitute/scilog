@@ -12,7 +12,7 @@
     </button>
   </div>
   <div *ngIf='showSearch' class="searchWindow">
-    <search-window #searchWindow [configsArray]='config' [searched]="searched" (close)="closeSearch()" (overviewSearch)="overviewSearch($event)"></search-window>
+    <search-window #searchWindow [configsArray]='config' [searched]="searched" (close)="closeSearch()" (overviewSearch)="setSearch($event)"></search-window>
   </div>
   <div class="flexExpand">
     <button mat-icon-button class='searchButton' (click)="openSearch()" *ngIf="!showMenuIcon">

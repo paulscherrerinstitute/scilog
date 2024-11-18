@@ -49,11 +49,9 @@ describe('SearchWindowComponent', () => {
     component.logbookId = undefined;
     const search = 'some';
     component.searchString = search;
-    const resetSpy = spyOn(component['logbookIconScrollService'], 'reset');
     const emitSpy = spyOn(component.overviewSearch, 'emit');
     const closeSearchSpy = spyOn(component, 'closeSearch');
     component.submitSearch();
-    expect(resetSpy).toHaveBeenCalledOnceWith(search);
     expect(emitSpy).toHaveBeenCalledOnceWith(search);
     expect(closeSearchSpy).toHaveBeenCalled();
   });

@@ -6,7 +6,6 @@ import { LogbookInfoService } from '@shared/logbook-info.service';
 import { of } from 'rxjs';
 import { MatLegacyMenuModule as MatMenuModule } from '@angular/material/legacy-menu';
 import { Logbooks } from '@model/logbooks';
-import { MatCardType } from '../overview.component';
 
 class UserPreferencesMock {
   userInfo = {
@@ -77,24 +76,6 @@ describe('LogbookWidgetComponent', () => {
     const isAnyEditAllowedSpy = spyOn(component['isActionAllowed'], 'isAnyEditAllowed');
     component['enableActions']();
     expect(isAnyEditAllowedSpy).toHaveBeenCalledTimes(1);
-  });
-
-  ['logbook-module', 'logbook-headline'].forEach(t => {
-    it(`should test ng-template: ${t}`, () => {
-      component.matView = t as MatCardType;
-      fixture.detectChanges();
-      expect(fixture.debugElement.nativeElement.querySelector(`.${t}`)).toEqual(jasmine.anything());
-    })
-  })
-
-  it('should test on doubleClick', () => {
-    component.matView = 'logbook-headline';
-    const selectOnDoubleClickSpy = spyOn(component, 'selectOnDoubleClick');
-    fixture.detectChanges();
-    const cardContainer = fixture.debugElement.nativeElement.querySelector('.card-container');
-    cardContainer.dispatchEvent(new Event('click'));
-    cardContainer.dispatchEvent(new Event('dblclick'));
-    expect(selectOnDoubleClickSpy).toHaveBeenCalledTimes(1);
   });
 
 });

@@ -33,7 +33,7 @@ describe('ToolbarComponent', () => {
     expect(component).toBeTruthy();
   });
 
-  it('should overviewSearch', () => {
+  it('should setSearch', () => {
     component.showSearch = true;
     fixture.detectChanges();
     fixture.debugElement.query(
