@@ -5,7 +5,6 @@ import { UserPreferencesService } from '@shared/user-preferences.service';
 import { LogbookInfoService } from '@shared/logbook-info.service';
 import { TagService } from '@shared/tag.service';
 import { Hotkeys } from '@shared/hotkeys.service';
-import { LogbookIconScrollService } from 'src/app/overview/logbook-icon-scroll-service.service';
 import { SearchScrollService } from 'src/app/core/search-scroll.service';
 
 @Component({
@@ -41,7 +40,6 @@ export class SearchWindowComponent implements OnInit {
     private logbookInfo: LogbookInfoService,
     private tagService: TagService,
     private hotkeys: Hotkeys,
-    private logbookIconScrollService: LogbookIconScrollService,
     private searchScrollService: SearchScrollService,
   ) { }
 
@@ -72,7 +70,6 @@ export class SearchWindowComponent implements OnInit {
       this.searchScrollService.reset(this.concatSearchStrings());
       return
     }
-    this.logbookIconScrollService.reset(this.searchString);
     this.overviewSearch.emit(this.searchString);
     this.closeSearch();
   }

@@ -20,7 +20,7 @@ export class OverviewTableComponent implements OnInit {
   @Input() config: WidgetItemConfig;
 
   @Output() logbookEdit = new EventEmitter<Logbooks>();
-  @Output() logbookDelete = new EventEmitter<string>();
+  @Output() logbookSelection = new EventEmitter<string>();
 
   @ViewChild(MatPaginator) paginator!: MatPaginator;
   @ViewChild(MatSort) sort!: MatSort;
@@ -29,6 +29,7 @@ export class OverviewTableComponent implements OnInit {
   totalItems: number;
   displayedColumns = ['name', 'description', 'ownerGroup', 'createdAt', 'thumbnail', 'actions'];
   private _config: WidgetItemConfig;
+  isLoaded: boolean;
 
   constructor(
     private dataService: LogbookDataService,
@@ -47,7 +48,7 @@ export class OverviewTableComponent implements OnInit {
 
   onSortChange(): void {
     this.paginator.pageIndex = 0;
-    this._config.view.order = [`${this.sort.active} ${this.sort.direction || 'DESC'}`];
+    this._config.view.order = [`${this.sort.active || 'defaultOrder'} ${this.sort.direction || 'DESC'}`];
     this.getLogbooks();
   };
 
@@ -60,16 +61,21 @@ export class OverviewTableComponent implements OnInit {
   }
 
   async getLogbooks() {
+    this.isLoaded = false;
     const data = await this.dataService.getDataBuffer(this.paginator.pageIndex * this.paginator.pageSize, this.paginator.pageSize, this._config);
+    this.isLoaded = true;
     this.dataSource = new MatTableDataSource<Logbooks>(data);
   }
 
-  async resetSortAndReload() {
-    this.sort.active = '';
-    this.sort.direction = '';
-    this.sort.sort({ id: '', start: 'asc', disableClear: false });
-    this.paginator.pageIndex = 0;
-    this._config = JSON.parse(JSON.stringify(this.config));
+  async reloadLogbooks(resetSort = true, search?: string) {
+    if (search !== null && search !== undefined) this.dataService.searchString = search;
+    if (resetSort) {
+      this.sort.active = '';
+      this.sort.direction = '';
+      this.sort.sort({ id: '', start: 'asc', disableClear: false });
+      this.paginator.pageIndex = 0;
+      this._config = JSON.parse(JSON.stringify(this.config));
+    }
     await this.getLogbooks();
   }
 
@@ -90,8 +96,13 @@ export class OverviewTableComponent implements OnInit {
     this.logbookEdit.emit(logbook);
   }
 
-  deleteLogbook(logbookId: string) {
-    this.logbookDelete.emit(logbookId);
+  async deleteLogbook(logbookId: string) {
+    await this.dataService.deleteLogbook(logbookId);
+    await this.reloadLogbooks(false);
+  }
+
+  logbookSelected(logbookId: string) {
+    this.logbookSelection.emit(logbookId);
   }
 
 }

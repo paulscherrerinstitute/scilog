@@ -5,6 +5,7 @@ import { Logbooks } from "src/app/core/model/logbooks";
 import { LogbookDataService } from "src/app/core/remote-data.service";
 import { LogbookWidgetComponent } from "../logbook-cover/logbook-cover.component";
 import { CdkVirtualScrollViewport } from "@angular/cdk/scrolling";
+import { Subscription } from "rxjs";
 
 type Sizes = {
   width: number,
@@ -21,13 +22,13 @@ export class OverviewScrollComponent {
   @Input() config: WidgetItemConfig;
 
   @Output() logbookEdit = new EventEmitter<Logbooks>();
-  @Output() logbookDelete = new EventEmitter<string>();
   @Output() logbookSelection = new EventEmitter<string>();
 
   @ViewChild(CdkVirtualScrollViewport) viewPort: CdkVirtualScrollViewport;
   @ViewChildren(LogbookWidgetComponent, { read: ElementRef }) logbookWidgetComponent: QueryList<ElementRef>;
 
   logbooks: Logbooks[][] = [];
+  isLoaded: boolean;
   private contentSize: Sizes = {width: 332, height: 432};
   private minPageSize = 20;
   private currentPage = 0;
@@ -35,15 +36,15 @@ export class OverviewScrollComponent {
   private groupSize: number;
   private updateSizes = true;
   private endOfData = false;
+  private renderedRangeSubscription: Subscription;
 
   constructor(private dataService: LogbookDataService, private changeRef: ChangeDetectorRef) {}
 
   async ngAfterViewInit() {
     this.setGroupSize(this.elementSize(this.viewPort.elementRef));
     this.logbooks = await this.getAndGroupLogbooks();
-    this.viewPort.renderedRangeStream.subscribe(async ({start, end}) => {
-      await this.onScroll(end);
-    })
+    this.renderedRangeSubscription = this.viewPort.renderedRangeStream.subscribe(
+      async ({start, end}) => await this.onScroll(end))
   }
 
   ngAfterViewChecked() {
@@ -57,11 +58,12 @@ export class OverviewScrollComponent {
   }
 
   get itemSize() {
-    return this.contentSize.height * 0.9;
+    return this.contentSize.height;
   }
 
   private setPageSize(pageSize: number) {
     const minSize = this.minPageSize;
+    if (this.pageSize && this.pageSize % this.groupSize === 0) return
     this.pageSize = pageSize > minSize? pageSize: Math.ceil(minSize /  this.groupSize) * this.groupSize;
   }
 
@@ -92,12 +94,14 @@ export class OverviewScrollComponent {
   }
 
   private async getAndGroupLogbooks() {
+    this.isLoaded = false;
     const logbooks = await this.getLogbooks();
     if (
       logbooks.length < this.pageSize ||
       logbooks.length === 0
     ) this.endOfData = true
     this.currentPage++;
+    this.isLoaded = true;
     return this.splitIntoGroups(logbooks);
   }
 
@@ -110,19 +114,24 @@ export class OverviewScrollComponent {
     else this.logbooks = this.regroupLogbooks();
   }
   
-  private async reshapeOnResize(oldPageSize: number) {
+  private async reshapeOnResize(oldPageSize: number, logbooks: Logbooks[] = undefined) {
     const pageDiff = this.pageSize - oldPageSize;
-    const logbooks = this.logbooks.flat();
-    pageDiff > 0 ?
-      logbooks.push(...(await this.getLogbooks(oldPageSize, pageDiff))) :
-      !this.endOfData && logbooks.splice(pageDiff, -pageDiff);
-    this.logbooks = this.splitIntoGroups(logbooks);
+    const _logbooks = logbooks ?? this.logbooks.flat();
+    if (!this.endOfData)
+      pageDiff > 0 ?
+        _logbooks.push(...(await this.getLogbooks(oldPageSize, pageDiff))) :
+        _logbooks.splice(pageDiff, -pageDiff);
+    this.logbooks = this.splitIntoGroups(_logbooks);
   }
 
-  async reloadLogbooks() {
+  async reloadLogbooks(resetSort = true, search?: string) {
+    if (search !== null && search !== undefined) this.dataService.searchString = search;
+    if (resetSort) {
+      this.viewPort.scrollToOffset(0);
+      this.currentPage = 0;
+      this.endOfData = false;
+    }
     this.logbooks = await this.getAndGroupLogbooks();
-    this.viewPort.scrollToOffset(0);
-    this.currentPage = 0;
   }
 
   private async compareAndRefreshSizes(containerSizes: Sizes) {
@@ -154,12 +163,25 @@ export class OverviewScrollComponent {
     this.logbookEdit.emit(logbook);
   }
 
-  deleteLogbook(logbookId: string) {
-    this.logbookDelete.emit(logbookId);
+  afterLogbookEdit(logbook: Logbooks) {
+    const logbooks = this.logbooks.flat();
+    logbooks.forEach((log, i) => {if (log.id === logbook.id) logbooks[i] = logbook});
+    this.logbooks = this.splitIntoGroups(logbooks);
+  }
+
+  async deleteLogbook(logbookId: string) {
+    await this.dataService.deleteLogbook(logbookId);
+    await this.reloadLogbooks(false);
   }
 
   logbookSelected(logbookId: string) {
     this.logbookSelection.emit(logbookId);
+  }
+
+  ngOnDestroy() {
+    if (this.renderedRangeSubscription) {
+      this.renderedRangeSubscription.unsubscribe();
+    }
   }
 
 }

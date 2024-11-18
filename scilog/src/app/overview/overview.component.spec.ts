@@ -9,7 +9,6 @@ import { LogbookDataService } from '@shared/remote-data.service';
 import { of } from 'rxjs';
 import { RouterTestingModule } from '@angular/router/testing';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
-import { OverviewScrollComponent } from './overview-scroll/overview-scroll.component';
 
 class UserPreferencesMock {
   userInfo = {
@@ -35,12 +34,12 @@ describe('OverviewComponent', () => {
 
   cookiesSpy = jasmine.createSpyObj("CookieService", ["lastLogbook"]);
   cookiesSpy.lastLogbook.and.returnValue([]);
-  const tableSpy = jasmine.createSpyObj("OverviewTableComponent", ['getLogbooks', 'resetSortAndReload']);
+  const tableSpy = jasmine.createSpyObj("OverviewTableComponent", ['reloadLogbooks']);
   const scrollSpy = jasmine.createSpyObj("OverviewScrollComponent", ['reloadLogbooks']);
   
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      declarations: [ OverviewComponent],
+      declarations: [OverviewComponent],
       imports: [MatDialogModule, RouterTestingModule, BrowserAnimationsModule],
       providers: [
         {provide: MAT_DIALOG_DATA, useValue: {}},
@@ -66,15 +65,28 @@ describe('OverviewComponent', () => {
   });
 
   [
-    ['logbook-module', scrollSpy.reloadLogbooks, 'add'],
-    ['logbook-headline', tableSpy.getLogbooks, 'edit'],
-    ['logbook-headline', tableSpy.resetSortAndReload, 'add'],
+    ['logbook-module', scrollSpy, 'add', true],
+    ['logbook-module', scrollSpy, 'edit', false],
+    ['logbook-headline', tableSpy, 'add', true],
+    ['logbook-headline', tableSpy, 'edit', false],
   ].forEach((t, i) => {
-    it(`should test reloadData ${i}`, async() => {
-      t[1].calls.reset();
+    it(`should test reloadData ${i}`, async () => {
+      t[1].reloadLogbooks.calls.reset();
       component.matCardType = t[0] as MatCardType;
       await component['reloadData'](t[2] as 'edit' | 'add');
-      expect(t[1]).toHaveBeenCalledTimes(1);
+      expect(t[1].reloadLogbooks).toHaveBeenCalledOnceWith(t[3]);
+    });
+  });
+
+  [
+    ['logbook-module', scrollSpy],
+    ['logbook-headline', tableSpy],
+  ].forEach((t, i) => {
+    it(`should test setSearch ${i}`, async () => {
+      t[1].reloadLogbooks.calls.reset();
+      component.matCardType = t[0] as MatCardType;
+      await component.setSearch('abc');
+      expect(t[1].reloadLogbooks).toHaveBeenCalledOnceWith(true, 'abc');
     });
   });
 

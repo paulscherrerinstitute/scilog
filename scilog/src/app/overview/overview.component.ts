@@ -1,6 +1,6 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { Logbooks } from '@model/logbooks';
-import { Subscription } from 'rxjs';
+import { from, Subscription, switchMap } from 'rxjs';
 import { UserPreferencesService } from '@shared/user-preferences.service';
 import { CollectionConfig, WidgetItemConfig } from '@model/config';
 import { MatLegacyDialog as MatDialog, MatLegacyDialogConfig as MatDialogConfig } from '@angular/material/legacy-dialog';
@@ -8,7 +8,6 @@ import { AddCollectionComponent } from './add-collection/add-collection.componen
 import { AddLogbookComponent } from './add-logbook/add-logbook.component';
 import { LogbookInfoService } from '@shared/logbook-info.service';
 import { CookiesService } from '@shared/cookies.service';
-import { LogbookDataService } from '@shared/remote-data.service';
 import { animate, style, transition, trigger } from '@angular/animations';
 import { OverviewTableComponent } from './overview-table/overview-table.component';
 import { OverviewScrollComponent } from './overview-scroll/overview-scroll.component';
@@ -48,13 +47,11 @@ export class OverviewComponent implements OnInit {
   @ViewChild(OverviewScrollComponent) overviewSroll: OverviewScrollComponent;
   matCardType: MatCardType = 'logbook-module';
 
-
   constructor(
     private userPreferences: UserPreferencesService,
     public dialog: MatDialog,
     private logbookInfo: LogbookInfoService,
-    private cookie: CookiesService,
-    private dataService: LogbookDataService) {}
+    private cookie: CookiesService) {}
 
   ngOnInit(): void {
     this.logbookInfo.logbookInfo = null;
@@ -69,6 +66,12 @@ export class OverviewComponent implements OnInit {
       }
       this.config = this._prepareConfig();
     }));
+  }
+
+  get overviewComponent() {
+    return this.matCardType === 'logbook-module'
+      ? this.overviewSroll:
+      this.overviewTable;
   }
 
   collectionSelected(collection: CollectionConfig) {
@@ -99,23 +102,13 @@ export class OverviewComponent implements OnInit {
     let dialogRef: any;
     dialogRef = this.dialog.open(AddLogbookComponent, dialogConfig);
 
-    this.subscriptions.push(dialogRef.afterClosed().subscribe(async result => {
-      console.log("Dialog result:", result);
-      await this.reloadData('edit');
-    }));
+    this.subscriptions.push(dialogRef.afterClosed().pipe(
+      switchMap(() => from(this.reloadData('edit')))
+    ).subscribe());
   }
 
   private async reloadData(action: 'edit' | 'add') {
-    const overviewMethod = action === 'edit'? 'getLogbooks': 'resetSortAndReload';
-    this.matCardType === 'logbook-module'
-      ? await this.overviewSroll.reloadLogbooks()
-      : await this.overviewTable[overviewMethod]();
-  }
-
-  async deleteLogbook(logbookId: string) {
-    await this.dataService.deleteLogbook(logbookId);
-    await this.overviewSroll.reloadLogbooks();
-    console.log("deleted logbook ", logbookId);
+    await this.overviewComponent.reloadLogbooks(!(action === 'edit'));
   }
 
   addCollectionLogbook(contentType: string) {
@@ -158,6 +151,10 @@ export class OverviewComponent implements OnInit {
       }
     }
     return _config;
+  }
+
+  async setSearch(search: string) {
+    await this.overviewComponent.reloadLogbooks(true, search);
   }
 
   ngOnDestroy(): void {

@@ -16,7 +16,7 @@ describe('OverviewTableComponent', () => {
   let fixture: ComponentFixture<OverviewTableComponent>;
   const logbookDataSpy = jasmine.createSpyObj(
     'LogbookDataService',
-    ['getDataBuffer', 'getCount'],
+    ['getDataBuffer', 'getCount', 'deleteLogbook'],
     { imagesLocation: 'server/images' }
   );
   logbookDataSpy.getCount.and.returnValue({ count: 1 });
@@ -62,6 +62,7 @@ describe('OverviewTableComponent', () => {
     await component.getLogbooks();
     expect(logbookDataSpy.getDataBuffer).toHaveBeenCalledOnceWith(0, 5, component.config);
     expect(component.dataSource.data).toEqual([{ abc: 1 } as Logbooks]);
+    expect(component.isLoaded).toEqual(true);
   });
 
   it('should test openLogbook', () => {
@@ -95,11 +96,27 @@ describe('OverviewTableComponent', () => {
     expect(getDatasetsSpy).toHaveBeenCalledTimes(1);
   });
 
-  it('should test resetSortAndReload', async () => {
-    await component.resetSortAndReload();
-    expect(component.sort.active).toEqual('');
-    expect(component.sort.direction).toEqual('');
-    expect(component['_config']).toEqual({ general: {}, filter: {}, view: {} });
+  [true, false, 'abc']
+  .forEach((t, i) => {
+    it(`should test reloadLogbooks ${i}`, async () => {
+      const getLogbooksSpy = spyOn(component, 'getLogbooks');
+      await component.reloadLogbooks();
+      expect(getLogbooksSpy).toHaveBeenCalledTimes(1);
+      if (typeof t === 'string')
+        component['dataService'].searchString === 'abc';
+      else if (t) {
+        expect(component.sort.active).toEqual('');
+        expect(component.sort.direction).toEqual('');
+        expect(component['_config']).toEqual({ general: {}, filter: {}, view: {} });
+      }
+    });
+  });
+
+  it('should test deleteLogbook', async () => {
+    const reloadSpy = spyOn(component, 'reloadLogbooks');
+    await component.deleteLogbook('123');
+    expect(logbookDataSpy.deleteLogbook).toHaveBeenCalledOnceWith('123');
+    expect(reloadSpy).toHaveBeenCalledOnceWith(false);
   });
 
 })

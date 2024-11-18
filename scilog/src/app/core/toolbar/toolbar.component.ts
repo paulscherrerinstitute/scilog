@@ -10,7 +10,6 @@ import { UserInfo } from '@model/user-info';
 import { Views } from '@model/views';
 import { SettingsComponent } from '@shared/settings/settings.component'
 import { WidgetConfig } from '@model/config';
-import { SearchWindowComponent } from '@shared/search-window/search-window.component';
 import { AppConfigService, AppConfig } from 'src/app/app-config.service';
 import { CookiesService } from '../cookies.service';
 
@@ -37,6 +36,7 @@ export class ToolbarComponent implements OnInit {
   config: WidgetConfig[];
 
   @Output() openMenu = new EventEmitter<any>();
+  @Output() overviewSearch = new EventEmitter<string>();
   
   private logbookTitleRef: ElementRef;
   @ViewChild('logbookTitle', { static: false }) set content(content: ElementRef) {
@@ -93,8 +93,9 @@ export class ToolbarComponent implements OnInit {
     console.log(this.showVersionInfo)
   }
 
-  overviewSearch($event) {
-    this.searched = $event
+  setSearch(search: string) {
+    this.searched = search;
+    this.overviewSearch.emit(search);
   }
 
   logout() {

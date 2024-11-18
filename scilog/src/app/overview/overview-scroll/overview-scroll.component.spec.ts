@@ -16,7 +16,7 @@ describe('OverviewScrollComponent', () => {
   let fixture: ComponentFixture<OverviewScrollComponent>;
   const logbookDataSpy = jasmine.createSpyObj(
     'LogbookDataService',
-    ['getDataBuffer'],
+    ['getDataBuffer', 'deleteLogbook'],
   );
   logbookDataSpy.getDataBuffer.and.returnValue([{ abc: 1 }, {def: 2}, {ghi: 3}, {jkl: 4}]);
 
@@ -47,11 +47,13 @@ describe('OverviewScrollComponent', () => {
   });
 
   it('should test itemsCount', () => {
-    expect(component.itemSize).toEqual(388.8);
+    expect(component.itemSize).toEqual(432);
   });
 
   it('should test setPageSize', () => {
     component['setPageSize'](2);
+    expect(component['pageSize']).toEqual(21);
+    component['setPageSize'](3);
     expect(component['pageSize']).toEqual(21);
   });
 
@@ -59,7 +61,7 @@ describe('OverviewScrollComponent', () => {
     component['groupSize'] = 3;
     component['setGroupSize']({width: 332 * 2.6, height: 432 * 6});
     expect(component['groupSize']).toEqual(2);
-    expect(component['pageSize']).toEqual(24);
+    expect(component['pageSize']).toEqual(20);
   });
 
   it('should test elementSize', () => {
@@ -88,10 +90,10 @@ describe('OverviewScrollComponent', () => {
   it('should test getAndGroupLogbooks', fakeAsync(async () => {
     logbookDataSpy.getDataBuffer.and.returnValue([{ abc: 1 }, {def: 2}, {ghi: 3}, {jkl: 4}]);
     const logbooks = await component['getAndGroupLogbooks']();
-
     expect(component['currentPage']).toEqual(1);
     expect(logbooks).toEqual([[{ abc: 1 }, {def: 2}, {ghi: 3}], [{jkl: 4}]]);
     expect(component['endOfData']).toEqual(true);
+    expect(component.isLoaded).toEqual(true);
   }));
 
   [
@@ -157,12 +159,23 @@ describe('OverviewScrollComponent', () => {
     });
   });
 
-  it('should test reloadLogbooks', fakeAsync(async () => {
-    spyOn<any>(component, 'getAndGroupLogbooks');
-    const scrollToOffset = spyOn(component.viewPort, 'scrollToOffset');
-    await component.reloadLogbooks();
-    expect(scrollToOffset).toHaveBeenCalledOnceWith(0);
-    expect(component['currentPage']).toEqual(0);
-  }));
+  [true, false, 'abc']
+  .forEach((t, i) => {
+    it(`should test reloadLogbooks ${i}`, fakeAsync(async () => {
+      spyOn<any>(component, 'getAndGroupLogbooks');
+      const scrollToOffset = spyOn(component.viewPort, 'scrollToOffset');
+      await component.reloadLogbooks(t && true);
+      if (typeof t === 'string')
+        component['dataService'].searchString === 'abc';
+      expect(scrollToOffset).toHaveBeenCalledTimes(t? 1: 0);
+    }));
+  });
+
+  it('should test deleteLogbook', async () => {
+    const reloadSpy = spyOn(component, 'reloadLogbooks');
+    await component.deleteLogbook('123');
+    expect(logbookDataSpy.deleteLogbook).toHaveBeenCalledOnceWith('123');
+    expect(reloadSpy).toHaveBeenCalledOnceWith(false);
+  });
 
 })

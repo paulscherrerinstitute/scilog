@@ -622,7 +622,7 @@ export class SearchDataService extends RemoteDataService {
     return this._searchString;
   }
   public set searchString(value: string) {
-    this._searchString = value;
+    this._searchString = value ?? '';
   }
 
   protected addIncludeScope(): Object {
