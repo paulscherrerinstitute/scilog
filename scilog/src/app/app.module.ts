@@ -58,7 +58,6 @@ import { AddLogbookComponent } from './overview/add-logbook/add-logbook.componen
 import { AddCollectionComponent } from './overview/add-collection/add-collection.component';
 import { MatLegacySlideToggleModule as MatSlideToggleModule } from '@angular/material/legacy-slide-toggle';
 import { MatLegacyAutocompleteModule as MatAutocompleteModule } from '@angular/material/legacy-autocomplete';
-import { LogbookSearchPipe } from './overview/logbook-search.pipe';
 import { NavigationButtonComponent } from './logbook/navigation-button/navigation-button.component';
 import { SnippetContentComponent } from '@shared/snippet/snippet-content/snippet-content.component';
 import { CookieService } from 'ngx-cookie-service';
@@ -117,7 +116,6 @@ const appConfigInitializerFn = (appConfig: AppConfigService) => {
         CollectionWidgetComponent,
         AddLogbookComponent,
         AddCollectionComponent,
-        LogbookSearchPipe,
         NavigationButtonComponent,
         SnippetContentComponent,
         SnippetViewerComponent,
