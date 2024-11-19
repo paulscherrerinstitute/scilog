@@ -1,6 +1,6 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { Logbooks } from '@model/logbooks';
-import { from, Subscription, switchMap } from 'rxjs';
+import { Subscription } from 'rxjs';
 import { UserPreferencesService } from '@shared/user-preferences.service';
 import { CollectionConfig, WidgetItemConfig } from '@model/config';
 import { MatLegacyDialog as MatDialog, MatLegacyDialogConfig as MatDialogConfig } from '@angular/material/legacy-dialog';
@@ -102,13 +102,16 @@ export class OverviewComponent implements OnInit {
     let dialogRef: any;
     dialogRef = this.dialog.open(AddLogbookComponent, dialogConfig);
 
-    this.subscriptions.push(dialogRef.afterClosed().pipe(
-      switchMap(() => from(this.reloadData('edit')))
-    ).subscribe());
+    this.subscriptions.push(dialogRef.afterClosed()
+    .subscribe(async (result: Logbooks) => {
+      await this.reloadData(result, 'edit');
+    }));
   }
 
-  private async reloadData(action: 'edit' | 'add') {
-    await this.overviewComponent.reloadLogbooks(!(action === 'edit'));
+  async reloadData(logbook: Logbooks, action: 'edit' | 'add') {
+    if (!logbook) return
+    if (action === 'edit') await this.overviewComponent.afterLogbookEdit(logbook);
+    if (action === 'add') await this.overviewComponent.reloadLogbooks();
   }
 
   addCollectionLogbook(contentType: string) {
@@ -126,10 +129,8 @@ export class OverviewComponent implements OnInit {
       default:
         break;
     }
-    this.subscriptions.push(dialogRef.afterClosed().subscribe(async result => {
-      if (typeof result != "undefined") {
-        await this.reloadData('add');
-      }
+    this.subscriptions.push(dialogRef.afterClosed().subscribe(async (result: Logbooks) => {
+      await this.reloadData(result, 'add');
     }));
   }
 

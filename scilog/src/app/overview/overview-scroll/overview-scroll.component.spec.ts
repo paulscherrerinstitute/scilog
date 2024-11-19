@@ -171,11 +171,34 @@ describe('OverviewScrollComponent', () => {
     }));
   });
 
-  it('should test deleteLogbook', async () => {
-    const reloadSpy = spyOn(component, 'reloadLogbooks');
-    await component.deleteLogbook('123');
-    expect(logbookDataSpy.deleteLogbook).toHaveBeenCalledOnceWith('123');
-    expect(reloadSpy).toHaveBeenCalledTimes(1);
+  it('should test deleteLogbook', fakeAsync(async () => {
+    const reshapeOnResizeSpy = spyOn<any>(component, 'reshapeOnResize').and.callThrough();
+    spyOn<any>(component, 'getLogbooks').and.returnValue([{id: '5'}]);
+    component.logbooks = [
+      [{id: '1'},{id: '2'}, {id: '3'}],
+      [{id: '4'}]
+    ];
+    component['pageSize'] = 3;
+    component['endOfData'] = false;
+    await component.deleteLogbook('3');
+    expect(reshapeOnResizeSpy).toHaveBeenCalledOnceWith(
+      2,
+      [{id: '1'}, {id: '2'}, {id: '4'}]
+    );
+    expect(component.logbooks).toEqual([
+      [{id: '1'}, {id: '2'}, {id: '4'}], [{id: '5'}]])
+  }));
+
+  it('should test afterLogbookEdit', async () => {
+    component.logbooks = [
+      [{id: '1'},{id: '2'},{id: '3'}], 
+      [{id: '4'},{id: '5'},{id: '6'}]
+    ];
+    component.afterLogbookEdit({id: '4', name: '9'} as unknown as Logbooks)
+    expect(component.logbooks).toEqual([
+      [{id: '1'},{id: '2'},{id: '3'}], 
+      [{id: '4', name: '9'},{id: '5'},{id: '6'}]
+    ]);
   });
 
 })

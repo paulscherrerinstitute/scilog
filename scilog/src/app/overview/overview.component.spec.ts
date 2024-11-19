@@ -34,8 +34,8 @@ describe('OverviewComponent', () => {
 
   cookiesSpy = jasmine.createSpyObj("CookieService", ["lastLogbook"]);
   cookiesSpy.lastLogbook.and.returnValue([]);
-  const tableSpy = jasmine.createSpyObj("OverviewTableComponent", ['reloadLogbooks']);
-  const scrollSpy = jasmine.createSpyObj("OverviewScrollComponent", ['reloadLogbooks']);
+  const tableSpy = jasmine.createSpyObj("OverviewTableComponent", ['reloadLogbooks', 'afterLogbookEdit']);
+  const scrollSpy = jasmine.createSpyObj("OverviewScrollComponent", ['reloadLogbooks', 'afterLogbookEdit']);
   
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
@@ -65,16 +65,16 @@ describe('OverviewComponent', () => {
   });
 
   [
-    ['logbook-module', scrollSpy, 'add', true],
-    ['logbook-module', scrollSpy, 'edit', false],
-    ['logbook-headline', tableSpy, 'add', true],
-    ['logbook-headline', tableSpy, 'edit', false],
+    ['logbook-module', scrollSpy.reloadLogbooks, 'add', true],
+    ['logbook-module', scrollSpy.afterLogbookEdit, 'edit', false],
+    ['logbook-headline', tableSpy.reloadLogbooks, 'add', true],
+    ['logbook-headline', tableSpy.afterLogbookEdit, 'edit', false],
   ].forEach((t, i) => {
     it(`should test reloadData ${i}`, async () => {
-      t[1].reloadLogbooks.calls.reset();
-      component.matCardType = t[0] as MatCardType;
-      await component['reloadData'](t[2] as 'edit' | 'add');
-      expect(t[1].reloadLogbooks).toHaveBeenCalledOnceWith(t[3]);
+      t[1].calls.reset();
+      component.matCardType = t[0];
+      await component['reloadData']({id: '1'}, t[2]);
+      expect(t[1]).toHaveBeenCalledTimes(1);
     });
   });
 

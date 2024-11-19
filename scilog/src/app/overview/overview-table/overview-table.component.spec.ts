@@ -119,4 +119,10 @@ describe('OverviewTableComponent', () => {
     expect(reloadSpy).toHaveBeenCalledOnceWith(false);
   });
 
+  it('should test afterLogbookEdit', async () => {
+    const reloadSpy = spyOn(component, 'reloadLogbooks');
+    await component.afterLogbookEdit();
+    expect(reloadSpy).toHaveBeenCalledOnceWith(false);
+  });
+
 })
