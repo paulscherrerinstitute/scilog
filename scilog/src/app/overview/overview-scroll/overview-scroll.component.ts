@@ -116,7 +116,7 @@ export class OverviewScrollComponent {
   
   private async reshapeOnResize(oldPageSize: number, logbooks: Logbooks[] = undefined) {
     const pageDiff = this.pageSize - oldPageSize;
-    const _logbooks = logbooks ?? this.logbooks.flat();
+    const _logbooks = [...(logbooks ?? this.logbooks.flat())];
     if (!this.endOfData)
       pageDiff > 0 ?
         _logbooks.push(...(await this.getLogbooks(oldPageSize, pageDiff))) :
@@ -161,9 +161,17 @@ export class OverviewScrollComponent {
     this.logbookEdit.emit(logbook);
   }
 
+  afterLogbookEdit(logbook: Logbooks) {
+    this.logbooks.forEach(group => 
+      group.forEach((log, i) => {if (log.id === logbook.id) group[i] = logbook})
+    );
+  }
+
   async deleteLogbook(logbookId: string) {
     await this.dataService.deleteLogbook(logbookId);
-    await this.reloadLogbooks();
+    const logbooks = this.logbooks.flat().filter(logbook => logbook.id !== logbookId);
+    await this.reshapeOnResize(
+      this.pageSize - 1, logbooks);
   }
 
   logbookSelected(logbookId: string) {

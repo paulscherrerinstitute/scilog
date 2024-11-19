@@ -93,6 +93,10 @@ export class OverviewTableComponent implements OnInit {
     this.logbookEdit.emit(logbook);
   }
 
+  async afterLogbookEdit() {
+    await this.reloadLogbooks(false);
+  }
+
   async deleteLogbook(logbookId: string) {
     await this.dataService.deleteLogbook(logbookId);
     await this.reloadLogbooks(false);
