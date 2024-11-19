@@ -35,7 +35,10 @@ Setting the compose profiles spins up the matching services. To create all of th
 
 ```bash
 docker compose --profile '*' up -d
+or
+docker compose --profile 'prox' up -d
 ```
+Using the `prox` profile will start additionaly a reverse proxy to be able to serve also to other hosts than localhost.
 
 You can then go to `http://localhost` to access the UI and `http://localhost:3000/explorer` to access the backend Swagger UI (including the openAPI specs). To login use:
 

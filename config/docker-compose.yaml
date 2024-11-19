@@ -1,5 +1,16 @@
 version: "3.9"
 services:
+  reverse-proxy:
+    image: traefik:3.2
+    command: --api.insecure=true --providers.docker=true --entrypoints.web.address=:80
+    ports:
+      - "80:80"
+#      - "8080:8080"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    profiles:
+      - prox
+
   mongodb:
     image: mongo:4.2
     volumes:
@@ -11,6 +22,7 @@ services:
       interval: 5s
     profiles:
       - be
+      - prox
 
   mongodb_seed:
     image: mongo:4.2
@@ -29,6 +41,7 @@ services:
     restart: on-failure
     profiles:
       - be
+      - prox
 
   backend:
     image: ghcr.io/paulscherrerinstitute/scilog/be
@@ -47,18 +60,31 @@ services:
       CHROME_PATH: /usr/lib/chromium/
     profiles:
       - be
-    ports:
-      - 3000:3000
+      - prox
+    #ports:
+    #  - 3000:3000
+    labels:
+      - "traefik.http.routers.backend.rule=PathPrefix(`/api`)||PathPrefix(`/explorer`)||PathPrefix(`/users`)||PathPrefix(`/locations`)"
+      - "traefik.http.routers.backend.entrypoints=web"
+      - "traefik.http.routers.backend.middlewares=backend-stripprefix"
+      - "traefik.http.middlewares.backend-stripprefix.stripprefix.prefixes=/api"
+      - "traefik.http.middlewares.backend-stripprefix.stripprefix.forceSlash=false"
 
   frontend:
     image: ghcr.io/paulscherrerinstitute/scilog/fe
-    # volumes:
+    volumes:
     #   uncomment to enable the oidc form
-    #   - ./fe/config.json:/usr/share/nginx/html/assets/config.json
+    #  - ./fe/config.json:/usr/share/nginx/html/assets/config.json
+    #   uncomment to enable use on non-localhost accesst to demo login
+       - ./fe/simple_config.json:/usr/share/nginx/html/assets/config.json
     profiles:
       - fe
-    ports:
-      - 80:80
+      - prox
+    #ports:
+    #  - 80:80
+    labels:
+      - "traefik.http.routers.frontend.rule=PathPrefix(`/`)"
+      - "traefik.http.routers.frontend.entrypoints=web"
 
 volumes:
   mongodb_data:
