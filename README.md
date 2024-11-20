@@ -37,7 +37,7 @@ Setting the compose profiles spins up the matching services. To create all of th
 docker compose --profile '*' up -d
 ```
 
-You can then go to `http://localhost` to access the UI and `http://localhost:3000/explorer` to access the backend Swagger UI (including the openAPI specs). To login use:
+You can then go to `http://localhost` to access the UI and `http://localhost/api/v1/explorer` to access the backend Swagger UI (including the openAPI specs). To login use:
 
 | Username         | Password      |
 | ---------------- | ------------- |

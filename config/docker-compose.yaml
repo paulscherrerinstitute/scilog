@@ -1,5 +1,12 @@
-version: "3.9"
 services:
+  reverse-proxy:
+    image: traefik:3.2
+    command: --api.insecure=true --providers.docker=true --entrypoints.web.address=:80
+    ports:
+      - 80:80
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+
   mongodb:
     image: mongo:4.2
     volumes:
@@ -45,20 +52,23 @@ services:
       JWT_SECRET: jwt_secret
       CHROME_BIN: /usr/bin/chromium
       CHROME_PATH: /usr/lib/chromium/
+      BASE_PATH: /api/v1
     profiles:
       - be
-    ports:
-      - 3000:3000
+    labels:
+      - traefik.http.routers.backend.rule=PathPrefix(`/api/v1`)
 
   frontend:
     image: ghcr.io/paulscherrerinstitute/scilog/fe
-    # volumes:
-    #   uncomment to enable the oidc form
+    volumes:
+    # replace simple_config.json volume mount 
+    # with the one below to enable the oidc form
     #   - ./fe/config.json:/usr/share/nginx/html/assets/config.json
+      - ./fe/simple_config.json:/usr/share/nginx/html/assets/config.json
     profiles:
       - fe
-    ports:
-      - 80:80
+    labels:
+      - traefik.http.routers.frontend.rule=PathPrefix(`/`)
 
 volumes:
   mongodb_data:
