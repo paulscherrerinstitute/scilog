@@ -291,11 +291,7 @@ export class ExportService {
     this.authorizationHeader = authorizationHeader;
     const browser = await puppeteerLaunc({
       executablePath: process.env.CHROME_BIN,
-      args: [
-        '--no-sandbox',
-        '--disable-setuid-sandbox',
-        '--no-zygote',
-      ],
+      args: ['--no-sandbox', '--disable-setuid-sandbox', '--no-zygote'],
     });
     const exportFile = exportPath.exportFile;
     const chunks = Math.ceil(snippets.length / this.batchSize);
