@@ -330,23 +330,28 @@ export class AutoAddRepository<
           ctx.instance.defaultOrder =
             ctx.instance.defaultOrder ?? Date.now() * 1000;
           // only admin may override createdAt/updateAt etc fields
-          if (currentUser.roles.includes('admin')) {
-            ctx.instance.createdAt = ctx.instance.createdAt ?? new Date();
-            ctx.instance.createdBy =
-              ctx.instance.createdBy ??
-              currentUser?.email ??
-              'unknown@domain.org';
-            ctx.instance.updatedAt = ctx.instance.updatedAt ?? new Date();
-            ctx.instance.updatedBy =
-              ctx.instance.updatedBy ??
-              currentUser?.email ??
-              'unknown@domain.org';
-          } else {
-            ctx.instance.createdAt = new Date();
-            ctx.instance.createdBy = currentUser?.email ?? 'unknown@domain.org';
-            ctx.instance.updatedAt = new Date();
-            ctx.instance.updatedBy = currentUser?.email ?? 'unknown@domain.org';
-          }
+          ctx.instance.createdAt = ctx.instance.createdAt ?? new Date();
+          ctx.instance.createdBy =
+            ctx.instance.createdBy ??
+            currentUser?.email ??
+            'unknown@domain.org';
+          ctx.instance.updatedAt = ctx.instance.updatedAt ?? new Date();
+          ctx.instance.updatedBy =
+            ctx.instance.updatedBy ??
+            currentUser?.email ??
+            'unknown@domain.org';
+          await this.aclDefaultOnCreation(ctx.instance);
+          if (
+            currentUser.roles.some(
+              (role: string) =>
+                role === 'admin' || ctx.instance.adminACL?.includes(role),
+            )
+          )
+            return;
+          ctx.instance.createdAt = new Date();
+          ctx.instance.createdBy = currentUser?.email ?? 'unknown@domain.org';
+          ctx.instance.updatedAt = new Date();
+          ctx.instance.updatedBy = currentUser?.email ?? 'unknown@domain.org';
 
           if (typeof ctx.instance.expiresAt == 'undefined') {
             // default expiration time is 3 days
@@ -355,7 +360,6 @@ export class AutoAddRepository<
               ctx.instance.expiresAt.getDate() + 3,
             );
           }
-          await this.aclDefaultOnCreation(ctx.instance);
           if (
             ctx.instance.snippetType === 'logbook' &&
             ctx.instance.readACL?.includes('any-authenticated-user')

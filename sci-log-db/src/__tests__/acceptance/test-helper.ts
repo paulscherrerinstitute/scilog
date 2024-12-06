@@ -93,8 +93,9 @@ export async function createUserToken(
   app: SciLogDbApplication,
   client: Client,
   additionalRoles: string[] = [],
+  userD = userData,
 ) {
-  const user = await createAUser(app, additionalRoles);
+  const user = await createAUser(app, additionalRoles, userD);
   const token = await createToken(client, user);
   return token;
 }
