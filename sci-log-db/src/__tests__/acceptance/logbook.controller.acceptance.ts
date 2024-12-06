@@ -432,6 +432,18 @@ describe('Logbook', function (this: Suite) {
   });
 
   it('post a logbook with authentication and should create default ACLS from parent', async () => {
+    const unxUser = {
+      email: 'unx@loopback.io',
+      firstName: 'ExampleUnx',
+      lastName: 'UserUnx',
+      roles: ['any-authenticated-user', 'aUnxGroup'],
+    };
+    const unxToken = await createUserToken(
+      app,
+      client,
+      ['logbookAcceptance'],
+      unxUser,
+    );
     const locationSnippet = {
       isPrivate: true,
       defaultOrder: 0,
@@ -451,12 +463,14 @@ describe('Logbook', function (this: Suite) {
 
     await client
       .post('/logbooks')
-      .set('Authorization', 'Bearer ' + token)
+      .set('Authorization', 'Bearer ' + unxToken)
       .set('Content-Type', 'application/json')
       .send({
-        ..._.omit(logbookSnippet, 'location'),
+        ...logbookSnippet,
         accessGroups: ['anAccessGroups'],
         location: locationResponse.body.id,
+        createdBy: 'testuser1@loopback.io',
+        createdAt: '1999-10-10T14:04:19.522Z',
       })
       .expect(200)
       .then(
@@ -491,7 +505,9 @@ describe('Logbook', function (this: Suite) {
             adminUser.email,
             adminUser.unxGroup,
           ]),
-          expect(result.body.adminACL).to.be.eql(['admin', adminUser.unxGroup])
+          expect(result.body.adminACL).to.be.eql(['admin', adminUser.unxGroup]),
+          expect(result.body.createdBy).to.be.eql('testuser1@loopback.io'),
+          expect(result.body.createdAt).to.be.eql('1999-10-10T14:04:19.522Z')
         ),
       )
       .catch(err => {

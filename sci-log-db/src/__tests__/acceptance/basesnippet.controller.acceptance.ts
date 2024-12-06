@@ -67,6 +67,7 @@ describe('Basesnippet', function (this: Suite) {
           expect(result.body.updateACL).to.be.eql(['basesnippetAcceptance']),
           expect(result.body.deleteACL).to.be.eql(['basesnippetAcceptance']),
           expect(result.body.adminACL).to.be.eql(['admin']),
+          expect(result.body.createdBy).to.be.eql('test@loopback.io'),
           (baseSnippetId = result.body.id)
         ),
       )
