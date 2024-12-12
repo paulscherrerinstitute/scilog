@@ -342,17 +342,16 @@ export class AutoAddRepository<
             'unknown@domain.org';
           await this.aclDefaultOnCreation(ctx.instance);
           if (
-            currentUser.roles.some(
+            !currentUser.roles.some(
               (role: string) =>
                 role === 'admin' || ctx.instance.adminACL?.includes(role),
             )
-          )
-            return;
-          ctx.instance.createdAt = new Date();
-          ctx.instance.createdBy = currentUser?.email ?? 'unknown@domain.org';
-          ctx.instance.updatedAt = new Date();
-          ctx.instance.updatedBy = currentUser?.email ?? 'unknown@domain.org';
-
+          ) {
+            ctx.instance.createdAt = new Date();
+            ctx.instance.createdBy = currentUser?.email ?? 'unknown@domain.org';
+            ctx.instance.updatedAt = new Date();
+            ctx.instance.updatedBy = currentUser?.email ?? 'unknown@domain.org';
+          }
           if (typeof ctx.instance.expiresAt == 'undefined') {
             // default expiration time is 3 days
             ctx.instance.expiresAt = new Date();
