@@ -48,6 +48,7 @@ services:
       JWT_SECRET: jwt_secret
       CHROME_BIN: /usr/bin/chromium
       CHROME_PATH: /usr/lib/chromium/
+      BASE_PATH: /api/v1
     command: /bin/sh -c "while true; do sleep 600; done"
     profiles:
       - be
@@ -63,7 +64,7 @@ services:
       CHROME_PATH: /usr/lib/chromium/
     volumes:
       - ./scilog:/frontend
-      - ./config/fe/config.json:/frontend/src/assets/config.json
+      - ./config/fe/config.dev.json:/frontend/src/assets/config.json
       - /frontend/node_modules
       - /frontend/dist
     command: /bin/sh -c "apk add --no-cache chromium && while true; do sleep 600; done"
