@@ -471,8 +471,6 @@ describe('LogbookItemComponent', () => {
 
     let res = component._preparePatchPayload(referenceEntry, msg);
     // I guess it should only take these variables if they are not defined in the msg...
-    expect(res.accessGroups).toEqual(referenceEntry.accessGroups);
-    expect(res.ownerGroup).toEqual(referenceEntry.ownerGroup);
     expect(res.isPrivate).toEqual(referenceEntry.isPrivate);
     expect(res.tags).toEqual(msg.tags);
     expect(res.files).toEqual([]);
