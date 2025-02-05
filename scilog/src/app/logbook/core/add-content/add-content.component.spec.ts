@@ -394,7 +394,6 @@ describe('AddContentComponent', () => {
       linkType: 'paragraph',
       files: [],
     });
-
   });
 
   function combineHtmlFigureHash(figureMock: string[], hash: string) {
