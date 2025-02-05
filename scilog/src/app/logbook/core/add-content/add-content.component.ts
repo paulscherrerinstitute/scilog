@@ -166,9 +166,17 @@ export class AddContentComponent implements OnInit {
       this.notification.snippetType = 'paragraph';
     localStorage.removeItem(`${this.message?.id}_message`);
     localStorage.removeItem(`${this.message?.id}_tags`);
+    if (this.dialogTitle === 'Modify data snippet')
+      return this.sendEditMessage();
     this.prepareMessage(this.data);
     this.sendMessage();
   };
+
+  private sendEditMessage() {
+    const notification = extractNotificationMessage(this.data, this.message?.files ? this.message.files : []);
+    notification.id = this.notification.id;
+    this.sendMessage(notification);
+  }
 
   onChange({ editor }: ChangeEvent) {
     localStorage.setItem(`${this.message.id}_message`, editor.getData());
@@ -224,9 +232,9 @@ export class AddContentComponent implements OnInit {
     }
   }
 
-  sendMessage() {
+  sendMessage(message: ChangeStreamNotification = undefined) {
     console.log(this.notification);
-    this.dataService.changeMessage(this.notification);
+    this.dataService.changeMessage(message ?? this.notification);
   }
 
   adjustContentForEditor() {

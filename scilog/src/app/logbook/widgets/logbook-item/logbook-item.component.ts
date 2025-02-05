@@ -474,13 +474,9 @@ export class LogbookItemComponent implements OnInit {
     // in the future, this should be extended to support inserting snippets below/above other snippets
     // for now, I just take the last array entry
     let referenceEntry: ChangeStreamNotification = {};
-    // if (this.childSnippets.toArray().length == 0) {
     referenceEntry.ownerGroup = this.logbookInfo.logbookInfo.ownerGroup;
     referenceEntry.accessGroups = this.logbookInfo.logbookInfo.accessGroups;
     referenceEntry.isPrivate = this.logbookInfo.logbookInfo.isPrivate;
-    // } else {
-    //   referenceEntry = this.childSnippets.toArray()[this.childSnippets.toArray().length - 1].snippet;
-    // }
     if (msg.snippetType === "edit") {
     // POST -- EDIT SNIPPET
       let payload: ChangeStreamNotification = this._prepareEditPostPayload(referenceEntry, msg);
@@ -513,8 +509,6 @@ export class LogbookItemComponent implements OnInit {
     // I guess it should only take these variables if they are not defined in the msg...
     console.log("referenceEntry: ", referenceEntry)
     let payload: ChangeStreamNotification = {
-      ownerGroup: referenceEntry.ownerGroup,
-      accessGroups: referenceEntry.accessGroups,
       isPrivate: referenceEntry.isPrivate,
       tags: msg.tags,
       snippetType: "paragraph",

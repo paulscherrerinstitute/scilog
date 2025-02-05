@@ -136,11 +136,13 @@ describe('AddContentComponent', () => {
     component.editor = jasmine.createSpyObj("component.editor", ["getData"])
     component.notification.snippetType = 'edit';
     component.contentChanged = true;
+    const sendEditMessageSpy = spyOn<any>(component, 'sendEditMessage');
     const setFromLocalStorageSpy = spyOn<any>(component, 'setFromLocalStorage');
     component.addContent("");
     expect(component.editor.getData).toHaveBeenCalled();
     expect(component.notification.snippetType).toEqual('paragraph');
     expect(setFromLocalStorageSpy).toHaveBeenCalledTimes(0);
+    expect(sendEditMessageSpy).toHaveBeenCalledTimes(0);
   });
 
   it('should prepare quote', () => {
@@ -379,6 +381,19 @@ describe('AddContentComponent', () => {
     const localStorageSpy = spyOn(localStorage, 'setItem');
     component.onChange({editor: editor});
     expect(localStorageSpy).toHaveBeenCalledOnceWith('123_message', 'edit');
+  });
+
+  it('should test sendEditMessage', () => {
+    component.notification = notificationMock;
+    component.data = 'abc';
+    const sendMessageSpy = spyOn(component, 'sendMessage');
+    component['sendEditMessage']();
+    expect(sendMessageSpy).toHaveBeenCalledOnceWith({
+      textcontent: 'abc',
+      id: '6061d9a13587f37b851694d5',
+      linkType: 'paragraph',
+      files: [],
+    });
   });
 
   function combineHtmlFigureHash(figureMock: string[], hash: string) {
