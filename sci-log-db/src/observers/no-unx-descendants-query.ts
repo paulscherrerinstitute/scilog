@@ -35,12 +35,24 @@ export function noUnxDescendantsQuery(locationId: string, unxGroup: string) {
         },
       },
     },
-    {
-      $project: {
-        'descendants._id': 1,
-      },
-    },
     {$unwind: '$descendants'},
     {$replaceRoot: {newRoot: '$descendants'}},
+    {
+      $match: {
+        $or: [
+          {createACL: {$ne: unxGroup}},
+          {readACL: {$ne: unxGroup}},
+          {shareACL: {$ne: unxGroup}},
+          {updateACL: {$ne: unxGroup}},
+          {deleteACL: {$ne: unxGroup}},
+          {adminACL: {$ne: unxGroup}},
+        ],
+      },
+    },
+    {
+      $project: {
+        _id: 1,
+      },
+    },
   ];
 }
