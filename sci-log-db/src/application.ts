@@ -55,6 +55,7 @@ import {OIDCAuthentication} from './authentication-strategies';
 import {UserServiceBindings} from './keys';
 
 import {ExpressRequestHandlersProvider} from './express-handlers/middleware-sequence';
+import {CreateFunctionalAccountsObserver} from './observers';
 
 export {ApplicationConfig};
 
@@ -231,6 +232,10 @@ export class SciLogDbApplication extends BootMixin(
   async migrateSchema(options?: SchemaMigrationOptions): Promise<void> {
     const paragraphRepo = await this.getRepository(ParagraphRepository);
     await paragraphRepo.migrateHtmlTexcontent();
+
+    const createFunctionalAccountsObserver: CreateFunctionalAccountsObserver =
+      await this.get('lifeCycleObservers.CreateFunctionalAccountsObserver');
+    await createFunctionalAccountsObserver.migrateUnxGroup();
 
     await super.migrateSchema(options);
 

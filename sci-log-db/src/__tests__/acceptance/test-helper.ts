@@ -13,8 +13,8 @@ import {BasesnippetRepository, TaskRepository} from '../../repositories';
 import {FileRepository} from '../../repositories/file.repository';
 import {JobRepository} from '../../repositories/job.repository';
 
-export interface AppWithClient {
-  app: SciLogDbApplication;
+export interface AppWithClient<T> {
+  app: T;
   client: Client;
 }
 
@@ -46,16 +46,17 @@ export const oidcOptions = {
   postLogoutRedirectUri: 'aRedirectUrl',
 };
 
-export async function setupApplication(
+export async function setupApplication<T extends SciLogDbApplication>(
   options: ApplicationConfig = {},
-): Promise<AppWithClient> {
-  const app = new SciLogDbApplication({
+  appClass = SciLogDbApplication,
+): Promise<AppWithClient<T>> {
+  const app = new appClass({
     rest: givenHttpServerConfig(),
-    databaseSeeding: false,
     ...options,
-  });
+  }) as T;
   await app.boot();
   app.dataSource(testdb);
+  if (!options.dirtyDb) await clearDatabase(app);
   await app.start();
   const client = createRestAppClient(app);
   return {app, client};
