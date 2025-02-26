@@ -10,7 +10,6 @@ import {clearDatabase, createUserToken, setupApplication} from './test-helper';
 import {BasesnippetRepository} from '../../repositories';
 import fs from 'fs';
 import {Basesnippet, Location, Logbook, Paragraph} from '../../models';
-import {CreateFunctionalAccountsObserver} from '../../observers';
 
 class TestFunctionalAccountsApp extends SciLogDbApplication {
   locations = ['location1', 'location2'];
@@ -181,11 +180,12 @@ describe('CreateFunctionalAccountsObserver', function (this: Suite) {
   });
 
   it('migrateUnxGroup', async () => {
-    const createFunctionalAccountsObserver: CreateFunctionalAccountsObserver =
-      await app.get('lifeCycleObservers.CreateFunctionalAccountsObserver');
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const createFunctionalAccountsObserver: any = await app.get(
+      'lifeCycleObservers.CreateFunctionalAccountsObserver',
+    );
     const addAclsToExistingSnippetsFromAccountSpy = sandbox.spy(
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      createFunctionalAccountsObserver as any,
+      createFunctionalAccountsObserver,
       'addAclsToExistingSnippetsFromAccount',
     );
     await createFunctionalAccountsObserver.migrateUnxGroup();
@@ -198,5 +198,16 @@ describe('CreateFunctionalAccountsObserver', function (this: Suite) {
       unxGroup: 'unxGroup2',
       location: 'location2',
     });
+    const updateAllSpy = sandbox.spy(
+      createFunctionalAccountsObserver.basesnippetRepository,
+      'updateAll',
+    );
+    const updateDescendantsAclsSpy = sandbox.spy(
+      createFunctionalAccountsObserver,
+      'updateDescendantsAcls',
+    );
+    await createFunctionalAccountsObserver.migrateUnxGroup();
+    expect(updateDescendantsAclsSpy.callCount).to.eql(1);
+    expect(updateAllSpy.callCount).to.eql(0);
   });
 });
