@@ -24,7 +24,14 @@ describe('UserController', () => {
     email: 'test@loopback.io',
     firstName: 'Example',
     lastName: 'User',
-    roles: [],
+    roles: [] as string[],
+  };
+
+  const adminUserData = {
+    email: 'admin@loopback.io',
+    firstName: 'Example',
+    lastName: 'User',
+    roles: ['admin'],
   };
 
   const userDataReturned = {
@@ -54,8 +61,18 @@ describe('UserController', () => {
   });
 
   it('creates new user when POST /users is invoked', async () => {
-    const res = await client
+    const newUser = await createAUser(adminUserData);
+
+    let res = await client
+      .post('/users/login')
+      .send({principal: newUser.email, password: userPassword})
+      .expect(200);
+
+    const token = res.body.token;
+
+    res = await client
       .post('/users')
+      .set('Authorization', 'Bearer ' + token)
       .send({...userData, password: userPassword})
       .expect(200);
 
@@ -70,20 +87,66 @@ describe('UserController', () => {
   it('creates a new user with the given id', async () => {
     // This test verifies the scenario described in our docs, see
     // https://loopback.io/doc/en/lb4/Authentication-Tutorial.html
-    const res = await client.post('/users').send({
-      id: '5dd6acee242760334f6aef65',
-      ...userData,
-      password: userPassword,
-    });
+    const newUser = await createAUser(adminUserData);
+
+    let res = await client
+      .post('/users/login')
+      .send({principal: newUser.email, password: userPassword})
+      .expect(200);
+
+    const token = res.body.token;
+
+    res = await client
+      .post('/users')
+      .set('Authorization', 'Bearer ' + token)
+      .send({
+        id: '5dd6acee242760334f6aef65',
+        ...userData,
+        password: userPassword,
+      });
     expect(res.body).to.deepEqual({
       id: '5dd6acee242760334f6aef65',
       ...userDataReturned,
     });
   });
 
-  it('throws error for POST /users with a missing email', async () => {
-    const res = await client
+  it('throws 403 Forbidden for POST /users when not authenticated as admin', async () => {
+    const newUser = await createAUser(userData); // non-admin user
+
+    let res = await client
+      .post('/users/login')
+      .send({principal: newUser.email, password: userPassword})
+      .expect(200);
+
+    const token = res.body.token;
+
+    res = await client
       .post('/users')
+      .set('Authorization', 'Bearer ' + token)
+      .send({
+        email: 'test@scilog.com',
+        username: 'test',
+        password: 'p4ssw0rd',
+        firstName: 'Example',
+        lastName: 'User',
+      })
+      .expect(403);
+  });
+
+  it('throws error for POST /users with a missing email', async () => {
+    const newUser = await createAUser(adminUserData);
+
+    let res = await client
+      .post('/users/login')
+      .send({principal: newUser.email, password: userPassword})
+      .expect(200);
+
+    const token = res.body.token;
+    expect(token).to.not.be.empty();
+
+    res = await client
+      .post('/users')
+      .set('Authorization', 'Bearer ' + token)
       .send({
         password: 'p4ssw0rd',
         firstName: 'Example',
@@ -98,8 +161,18 @@ describe('UserController', () => {
   });
 
   it('throws error for POST /users with an invalid email', async () => {
-    const res = await client
+    const newUser = await createAUser(adminUserData);
+
+    let res = await client
+      .post('/users/login')
+      .send({principal: newUser.email, password: userPassword})
+      .expect(200);
+
+    const token = res.body.token;
+
+    res = await client
       .post('/users')
+      .set('Authorization', 'Bearer ' + token)
       .send({
         email: 'test@loop&back.io',
         password: 'p4ssw0rd',
@@ -137,12 +210,23 @@ describe('UserController', () => {
   });
 
   it('throws error for POST /users with an existing email', async () => {
+    const newUser = await createAUser(adminUserData);
+
+    let res = await client
+      .post('/users/login')
+      .send({principal: newUser.email, password: userPassword})
+      .expect(200);
+
+    const token = res.body.token;
+
     await client
       .post('/users')
+      .set('Authorization', 'Bearer ' + token)
       .send({...userData, password: userPassword})
       .expect(200);
-    const res = await client
+    res = await client
       .post('/users')
+      .set('Authorization', 'Bearer ' + token)
       .send({...userData, password: userPassword})
       .expect(409);
 
@@ -261,9 +345,9 @@ describe('UserController', () => {
     await app.migrateSchema();
   }
 
-  async function createAUser() {
+  async function createAUser(newUserData = userData) {
     const encryptedPassword = await passwordHasher.hashPassword(userPassword);
-    const newUser = await userRepo.create(userData);
+    const newUser = await userRepo.create(newUserData);
     // MongoDB returns an id object we need to convert to string
     newUser.id = newUser.id.toString();
 

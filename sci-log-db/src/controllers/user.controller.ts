@@ -56,6 +56,7 @@ export class UserController {
   ) {}
 
   @post('/users', {
+    security: OPERATION_SECURITY_SPEC,
     responses: {
       '200': {
         description: 'User',
@@ -68,6 +69,11 @@ export class UserController {
         },
       },
     },
+  })
+  @authenticate('jwt')
+  @authorize({
+    allowedRoles: ['admin'],
+    voters: [basicAuthorization],
   })
   async create(
     @requestBody({
