@@ -9,7 +9,7 @@
       <mat-tab-group mat-stretch-tabs="false" mat-align-tabs="center" fitInkBarToContent>
         <mat-tab label="{{oAuth2Endpoint.displayText}}" *ngIf="oAuth2Endpoint">
           <ng-template mat-tab-label>
-            <label matTooltip="{{ oAuth2Endpoint.toolTipText }}" matTooltipClass="example-tooltip-red1" [matTooltipPosition]="'above'">
+            <label matTooltip="{{ oAuth2Endpoint.tooltipText }}" matTooltipClass="example-tooltip-red1" [matTooltipPosition]="'above'">
               {{oAuth2Endpoint.displayText}}
             </label>
           </ng-template>

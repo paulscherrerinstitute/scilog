@@ -15,10 +15,12 @@ import { ViewSettingsComponent } from '@shared/settings/view-settings/view-setti
 import { ProfileSettingsComponent } from '@shared/settings/profile-settings/profile-settings.component';
 import { DownloadComponent } from '@shared/download/download.component';
 import { NavigationGuardService } from './logbook/core/navigation-guard-service';
+import { AuthCallbackComponent } from './auth-callback/auth-callback.component';
 
 const routes: Routes = [
   { path: '', redirectTo: '/login', pathMatch: 'full' },
   { path: 'login', component: LoginComponent },
+  { path: 'auth-callback', component: AuthCallbackComponent },
   { path: 'overview', component: OverviewComponent },
   { path: 'download/:fileId', component: DownloadComponent },
   { path: 'logbooks/:logbookId', component: LogbookComponent,
