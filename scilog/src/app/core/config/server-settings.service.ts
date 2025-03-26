@@ -14,6 +14,14 @@ export class ServerSettingsService {
     return this.appConfigService.getConfig().lbBaseURL ?? 'http://[::1]:3000/';
   }
 
+  getSciCatServerAddress() : string | undefined {
+    return this.appConfigService.getConfig().scicatLbBaseURL;
+  }
+
+  getScicatFrontendBaseUrl() : string | undefined {
+    return this.appConfigService.getConfig().scicatFrontendBaseURL;
+  }
+
   getSocketAddress(){
     const lbBaseURL = this.appConfigService.getConfig().lbBaseURL ?? 'http://localhost:3000/';
     if (!lbBaseURL.startsWith('http')) throw new Error('BaseURL must use the http or https protocol');
