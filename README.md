@@ -46,3 +46,5 @@ You can then go to `http://localhost` to access the UI and `http://localhost/api
 After that, you can start creating logbooks (`Add logbook`) and play around.
 
 To change configuration options or check the default ones, have a look at the files referenced by the [docker compose file](./config/docker-compose.yaml) and their content inside the [config](./config) folder.
+
+For questions or support, email us at: [scilog-help@lists.psi.ch](mailto:scilog-help@lists.psi.ch)
