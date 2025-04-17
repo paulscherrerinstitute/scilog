@@ -31,6 +31,7 @@ export class AuthService {
   logout() {
       localStorage.removeItem("id_token");
       localStorage.removeItem('id_session');
+      localStorage.removeItem('scicat_token');
       sessionStorage.removeItem('scilog-auto-selection-logbook');
       this.forceReload=true;
   }

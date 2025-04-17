@@ -12,6 +12,8 @@ export interface AppConfig {
   lbBaseURL?: string;
   oAuth2Endpoint?: Oauth2Endpoint;
   help?: string;
+  scicatLbBaseURL?: string;
+  scicatFrontendBaseURL?: string;
 }
 
 @Injectable()
@@ -24,7 +26,7 @@ export class AppConfigService {
       try {
         this.appConfig = await this.http.get("/assets/config.json").toPromise();
       } catch (err) {
-        console.error("No config provided, applying defaults");
+        console.error("No config provided, applying defaults", err);
       }
   }
 

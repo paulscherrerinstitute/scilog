@@ -88,6 +88,8 @@ import { MatPaginatorModule } from '@angular/material/paginator';
 import { MatSortModule } from '@angular/material/sort';
 import { OverviewScrollComponent } from './overview/overview-scroll/overview-scroll.component';
 import { ActionsMenuComponent } from './overview/actions-menu/actions-menu.component';
+import { ScicatViewerComponent } from './logbook/widgets/scicat-viewer/scicat-viewer.component';
+import { AuthCallbackComponent } from './auth-callback/auth-callback.component';
 
 const appConfigInitializerFn = (appConfig: AppConfigService) => {
     return () => appConfig.loadAppConfig();
@@ -135,7 +137,9 @@ const appConfigInitializerFn = (appConfig: AppConfigService) => {
         ResizedDirective,
         OverviewTableComponent,
         OverviewScrollComponent,
-        ActionsMenuComponent
+        ActionsMenuComponent,
+        ScicatViewerComponent,
+        AuthCallbackComponent
     ],
     imports: [
         BrowserModule,

@@ -1,0 +1,62 @@
+<div *ngIf="scicatUser; else unauthenticated">
+  <p>Your SciCat userId is {{ scicatUser.id }}.</p>
+</div>
+<ng-template #unauthenticated>
+  <p>Not authenticated with SciCat, showing only public datasets:</p>
+</ng-template>
+<div>
+  <mat-form-field
+    ><mat-label for="dataset-select">Select Dataset:</mat-label>
+    <mat-select id="dataset-select" (selectionChange)="onDatasetSelect($event)">
+      <mat-option
+        *ngFor="let dataset of datasetSummary"
+        [value]="dataset.pid"
+        >{{ dataset.datasetName }}</mat-option
+      >
+    </mat-select></mat-form-field
+  >
+</div>
+
+<div *ngIf="selectedDataset">
+  <mat-card appearance="outlined">
+    <div>
+      <mat-card-title>{{ selectedDataset.datasetName }}</mat-card-title>
+      <mat-card-subtitle>{{ selectedDataset.pid }}</mat-card-subtitle>
+    </div>
+    <mat-card-content id="dataset-details">
+      <p>{{ selectedDataset.description }}</p>
+      <table>
+        <tr>
+          <th>Creation time</th>
+          <td>
+            {{ selectedDataset.creationTime | date : "dd.MM.yyyy HH:mm" }}
+          </td>
+        </tr>
+        <tr>
+          <th>Creation location</th>
+          <td>{{ selectedDataset.creationLocation }}</td>
+        </tr>
+        <tr>
+          <th>Owner</th>
+          <td>{{ selectedDataset.owner }}</td>
+        </tr>
+        <tr>
+          <th>Principal investigators</th>
+          <td>{{ selectedDataset.principalInvestigator }}</td>
+        </tr>
+        <tr>
+          <th>Size</th>
+          <td>{{ selectedDataset.size }}</td>
+        </tr>
+      </table>
+    </mat-card-content>
+    <mat-card-actions>
+      <a mat-button [href]="scicatDatasetUrl" target="_blank"
+        >Open in SciCat <mat-icon>open_in_new</mat-icon></a
+      >
+    </mat-card-actions>
+  </mat-card>
+</div>
+<div *ngIf="datasetFetching">
+  <mat-spinner></mat-spinner>
+</div>
