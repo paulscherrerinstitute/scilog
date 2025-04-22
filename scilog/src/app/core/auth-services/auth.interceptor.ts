@@ -52,9 +52,8 @@ export class AuthInterceptor implements HttpInterceptor {
               if (!this.isRequestToSciCatBackend(err.url)) {
                 logout();
               } else {
-                window.location.href = `${this.serverSettingsService.getSciCatServerAddress()}/api/v3/auth/oidc?client=scilog&returnURL=${
-                  window.location.pathname + window.location.search
-                }`;
+                const returnURL = window.location.pathname + window.location.search;
+                window.location.href = this.serverSettingsService.getScicatLoginUrl(returnURL);
               }
             }
           }

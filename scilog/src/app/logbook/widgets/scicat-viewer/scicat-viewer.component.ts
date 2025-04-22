@@ -1,6 +1,5 @@
 import { Component, OnInit } from '@angular/core';
 import { MatLegacySelectChange } from '@angular/material/legacy-select';
-import { ServerSettingsService } from '@shared/config/server-settings.service';
 import {
   type Dataset,
   DatasetService,
@@ -14,10 +13,7 @@ import {
   styleUrls: ['./scicat-viewer.component.css'],
 })
 export class ScicatViewerComponent implements OnInit {
-  constructor(
-    private datasetService: DatasetService,
-    private serverSettingsService: ServerSettingsService
-  ) {}
+  constructor(private datasetService: DatasetService) {}
 
   scicatUser: ScicatUser | null = null;
   datasetSummary: DatasetSummary[] = [];
@@ -35,18 +31,14 @@ export class ScicatViewerComponent implements OnInit {
     });
 
     this.datasetService.getDatasets().subscribe((data: DatasetSummary[]) => {
-      this.datasetSummary = data.sort(
-        (a, b) =>
-          new Date(b.creationTime).getTime() -
-          new Date(a.creationTime).getTime()
-      );
+      this.datasetSummary = data;
     });
   }
 
   get scicatDatasetUrl(): string {
-    return `${this.serverSettingsService.getScicatFrontendBaseUrl()}/datasets/${encodeURIComponent(
+    return this.datasetService.getDatasetDetailPageUrl(
       this.selectedDataset?.pid
-    )}`;
+    );
   }
 
   onDatasetSelect(event: MatLegacySelectChange): void {

@@ -8,12 +8,17 @@ export interface Oauth2Endpoint {
   displayImage?: string,
   tooltipText?: string,
 }
+export interface ScicatSettings {
+  scicatWidgetEnabled: boolean;
+  lbBaseURL: string;
+  frontendBaseURL: string;
+}
+
 export interface AppConfig {
   lbBaseURL?: string;
   oAuth2Endpoint?: Oauth2Endpoint;
   help?: string;
-  scicatLbBaseURL?: string;
-  scicatFrontendBaseURL?: string;
+  scicat?: ScicatSettings;
 }
 
 @Injectable()
@@ -32,5 +37,9 @@ export class AppConfigService {
 
   getConfig(): AppConfig {
     return this.appConfig as AppConfig;
+  }
+
+  getScicatSettings(): ScicatSettings | undefined {
+    return (this.appConfig as AppConfig).scicat;
   }
 }

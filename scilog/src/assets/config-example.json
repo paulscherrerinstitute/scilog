@@ -5,6 +5,9 @@
         "displayText": "keycloak",
         "toolTipText": "text to display on top of OIDC login button"
     },
-    "scicatLbBaseURL": "http://backend.localhost",
-    "scicatFrontendBaseURL": "http://localhost"
+    "scicat": {
+        "scicatWidgetEnabled": true,
+        "lbBaseURL": "http://backend.localhost",
+        "frontendBaseURL": "http://localhost"
+    }
 }

@@ -1,5 +1,5 @@
 <div *ngIf="scicatUser; else unauthenticated">
-  <p>Your SciCat userId is {{ scicatUser.id }}.</p>
+  <p>Hello, {{ scicatUser.username }}!</p>
 </div>
 <ng-template #unauthenticated>
   <p>Not authenticated with SciCat, showing only public datasets:</p>

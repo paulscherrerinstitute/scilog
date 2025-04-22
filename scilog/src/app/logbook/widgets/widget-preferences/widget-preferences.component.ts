@@ -14,6 +14,7 @@ import { Logbooks } from '@model/logbooks';
 import { CdkTextareaAutosize } from '@angular/cdk/text-field';
 import { WidgetPreferencesDataService, LogbookDataService } from '@shared/remote-data.service';
 import { WidgetItemConfig } from '@model/config';
+import { AppConfigService } from 'src/app/app-config.service';
 
 @Component({
   selector: 'widget-preferences',
@@ -63,6 +64,7 @@ export class WidgetPreferencesComponent implements OnInit {
   @ViewChild('logbookInput') logbookInput: ElementRef<HTMLInputElement>;
 
   readonly separatorKeysCodes: number[] = [ENTER, COMMA, SPACE];
+  scicatWidgetEnabled: boolean;
 
   constructor(
     fb: UntypedFormBuilder,
@@ -73,7 +75,8 @@ export class WidgetPreferencesComponent implements OnInit {
     private logbookDataService: LogbookDataService,
     @Inject(MAT_DIALOG_DATA) data,
     private _ngZone: NgZone,
-    protected changeDetectorRef: ChangeDetectorRef) {
+    protected changeDetectorRef: ChangeDetectorRef,
+    private appConfigService: AppConfigService) {
     this.data = data.config;
     this.options = fb.group({
       hideRequired: this.hideRequiredControl,
@@ -85,7 +88,7 @@ export class WidgetPreferencesComponent implements OnInit {
       logbook: new UntypedFormControl(''),
       description: new UntypedFormControl({ value: "", disabled: true })
     });
-
+    this.scicatWidgetEnabled = this.appConfigService.getScicatSettings()?.scicatWidgetEnabled || false;
   }
 
   ngOnInit(): void {

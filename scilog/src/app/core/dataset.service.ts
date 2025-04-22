@@ -30,6 +30,7 @@ export class DatasetService {
         params: {
           filter: JSON.stringify({
             fields: ['pid', 'datasetName', 'creationTime'],
+            limits: { limit: 100, order: 'creationTime:desc' },
           }),
         },
       }
@@ -48,5 +49,11 @@ export class DatasetService {
     return this.httpClient.get<ScicatUser>(
       `${this.serverSettingsService.getSciCatServerAddress()}/api/v3/users/my/self`
     );
+  }
+
+  getDatasetDetailPageUrl(pid: string): string {
+    return `${this.serverSettingsService.getScicatFrontendBaseUrl()}/datasets/${encodeURIComponent(
+      pid
+    )}`;
   }
 }

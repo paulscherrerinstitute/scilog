@@ -7,13 +7,13 @@ import { AppConfigService } from 'src/app/app-config.service';
 describe('ScicatViewerComponent', () => {
   let component: ScicatViewerComponent;
   let fixture: ComponentFixture<ScicatViewerComponent>;
-  const getConfig = () => ({});
+  const returnEmpty = () => ({});
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
       imports: [HttpClientTestingModule],
       declarations: [ScicatViewerComponent],
-      providers: [{ provide: AppConfigService, useValue: { getConfig } }],
+      providers: [{ provide: AppConfigService, useValue: { getConfig: returnEmpty, getScicatSettings: returnEmpty } }],
     }).compileComponents();
 
     fixture = TestBed.createComponent(ScicatViewerComponent);
