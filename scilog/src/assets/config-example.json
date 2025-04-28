@@ -4,5 +4,10 @@
         "authURL": "auth/keycloak",
         "displayText": "keycloak",
         "toolTipText": "text to display on top of OIDC login button"
+    },
+    "scicat": {
+        "scicatWidgetEnabled": true,
+        "lbBaseURL": "http://backend.localhost",
+        "frontendBaseURL": "http://localhost"
     }
 }

@@ -9,6 +9,7 @@ import { WidgetPreferencesDataService, LogbookDataService } from '@shared/remote
 import { of } from 'rxjs';
 import { CdkTextareaAutosize } from '@angular/cdk/text-field';
 import { MatLegacyAutocompleteModule as MatAutocompleteModule } from '@angular/material/legacy-autocomplete';
+import { AppConfigService } from 'src/app/app-config.service';
 
 
 class UserPreferencesMock {
@@ -24,6 +25,7 @@ describe('WidgetPreferencesComponent', () => {
   let logbookSpy: any;
   let logbookDataSpy: any;
   let widgetPreferencesSpy: any;
+  const returnEmpty = () => ({});
 
 
   logbookSpy = jasmine.createSpyObj("LogbookInfoService", ["logbookInfo", "getAvailLogbooks"]);
@@ -38,39 +40,45 @@ describe('WidgetPreferencesComponent', () => {
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      declarations: [WidgetPreferencesComponent, CdkTextareaAutosize,],
+      declarations: [WidgetPreferencesComponent, CdkTextareaAutosize],
       imports: [MatDialogModule, MatAutocompleteModule],
       providers: [
         UntypedFormBuilder,
         { provide: MatDialogRef, useValue: MatDialogRef },
         {
-          provide: MAT_DIALOG_DATA, useValue: {
+          provide: MAT_DIALOG_DATA,
+          useValue: {
             config: {
               general: {
                 type: 'logbook',
                 title: 'Logbook view',
               },
               filter: {
-                targetId: "12345parentID",
+                targetId: '12345parentID',
                 additionalLogbooks: [],
-                tags: []
+                tags: [],
               },
               view: {
                 order: ['defaultOrder ASC'],
                 hideMetadata: false,
-                showSnippetHeader: false
-              }
-            }
-          }
+                showSnippetHeader: false,
+              },
+            },
+          },
         },
         { provide: LogbookInfoService, useValue: logbookSpy },
         { provide: LogbookDataService, useValue: logbookDataSpy },
         { provide: UserPreferencesService, useClass: UserPreferencesMock },
-        { provide: WidgetPreferencesDataService, useValue: widgetPreferencesSpy },
-
-      ]
-    })
-      .compileComponents();
+        {
+          provide: WidgetPreferencesDataService,
+          useValue: widgetPreferencesSpy,
+        },
+        {
+          provide: AppConfigService,
+          useValue: { getConfig: returnEmpty, getScicatSettings: returnEmpty },
+        },
+      ],
+    }).compileComponents();
   }));
 
   beforeEach(() => {

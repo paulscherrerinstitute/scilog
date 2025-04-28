@@ -2,22 +2,32 @@ import { Injectable } from '@angular/core';
 import { AppConfigService } from "../../app-config.service";
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class ServerSettingsService {
+  constructor(private appConfigService: AppConfigService) {}
 
-  constructor(
-    private appConfigService: AppConfigService,
-  ) { }
-
-  getServerAddress(){
+  getServerAddress() {
     return this.appConfigService.getConfig().lbBaseURL ?? 'http://[::1]:3000/';
   }
 
-  getSocketAddress(){
-    const lbBaseURL = this.appConfigService.getConfig().lbBaseURL ?? 'http://localhost:3000/';
-    if (!lbBaseURL.startsWith('http')) throw new Error('BaseURL must use the http or https protocol');
-    return `ws${lbBaseURL.substring(4)}`;
+  getSciCatServerAddress(): string | undefined {
+    return this.appConfigService.getScicatSettings()?.lbBaseURL;
   }
 
+  getScicatLoginUrl(returnURL: string): string {
+    return `${this.getSciCatServerAddress()}/api/v3/auth/oidc?client=scilog&returnURL=${returnURL}`;
+  }
+
+  getScicatFrontendBaseUrl(): string | undefined {
+    return this.appConfigService.getScicatSettings()?.frontendBaseURL;
+  }
+
+  getSocketAddress() {
+    const lbBaseURL =
+      this.appConfigService.getConfig().lbBaseURL ?? 'http://localhost:3000/';
+    if (!lbBaseURL.startsWith('http'))
+      throw new Error('BaseURL must use the http or https protocol');
+    return `ws${lbBaseURL.substring(4)}`;
+  }
 }
