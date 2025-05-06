@@ -115,6 +115,7 @@ export class ToolbarComponent implements OnInit {
     dialogConfig.autoFocus = false;
     dialogConfig.disableClose = true;
     dialogConfig.data = "profileSettings";
+    dialogConfig.panelClass = "app-full-bleed-dialog";
     const dialogRef = this.dialog.open(SettingsComponent, dialogConfig);
     this.subscriptions.push(dialogRef.afterClosed().subscribe(data => {
       console.log(data);
@@ -126,6 +127,7 @@ export class ToolbarComponent implements OnInit {
     dialogConfig.autoFocus = false;
     dialogConfig.disableClose = true;
     dialogConfig.data = "viewSettings";
+    dialogConfig.panelClass = "app-full-bleed-dialog";
     const dialogRef = this.dialog.open(SettingsComponent, dialogConfig);
     this.subscriptions.push(dialogRef.afterClosed().subscribe(data => {
       console.log(data);
