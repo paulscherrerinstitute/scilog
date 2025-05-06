@@ -1,11 +1,9 @@
 // @import '../theme.scss';
 
-::ng-deep .mat-toolbar {
+mat-toolbar {
   z-index: 998;
   position: fixed;
   height: 50px;
-  background-color: var(--toolbar-color);
-  color: #ffffff;
   box-shadow: 0 1px 4px 0 rgba(0, 0, 0, 0.2), 0 2px 8px 0 rgba(0, 0, 0, 0.14), 0 4px 8px -1px rgba(0, 0, 0, 0.12);
 }
 
