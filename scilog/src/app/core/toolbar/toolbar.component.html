@@ -45,7 +45,7 @@
           <span [ngStyle]="{'font-weight':view.id == currentView ? 'bold' : 'normal' }">{{ view.name }}</span>
         </button>
       </ng-container>
-      <button mat-menu-item (click)="openViewSettings()">
+      <button mat-menu-item (click)="openSettings('viewSettings')">
         <mat-icon>save</mat-icon>
         <span>Save/Edit</span>
       </button>
@@ -62,7 +62,7 @@
       </span>
     </button>
     <mat-menu #menu="matMenu">
-      <button mat-menu-item (click)="openSettings()">
+      <button mat-menu-item (click)="openSettings('profileSettings')">
         <mat-icon>settings</mat-icon>
         <span>Settings</span>
       </button>
