@@ -1,5 +1,5 @@
 import { NgModule } from '@angular/core';
-import { RouterModule, Routes } from '@angular/router';
+import { mapToCanDeactivate, RouterModule, Routes } from '@angular/router';
 
 import { DashboardComponent } from './logbook/dashboard/dashboard.component';
 import { TodosComponent } from './logbook/widgets/todos/todos.component';
@@ -25,13 +25,13 @@ const routes: Routes = [
   { path: 'download/:fileId', component: DownloadComponent },
   { path: 'logbooks/:logbookId', component: LogbookComponent,
       children: [
-        { path: 'dashboard', component: DashboardComponent, canDeactivate: [NavigationGuardService] },
+        { path: 'dashboard', component: DashboardComponent, canDeactivate: mapToCanDeactivate([NavigationGuardService]) },
         { path: 'todos', component: TodosComponent },
         { path: 'logbook', component: LogbookItemComponent },
         { path: 'snippetViewer', component: SnippetViewerComponent },
         { path: 'chat', component: ChatComponent },
         { path: 'graph', component: ChartComponent },
-        { path: 'dashboard-item', component: DashboardItemComponent, canDeactivate: [NavigationGuardService] },
+        { path: 'dashboard-item', component: DashboardItemComponent, canDeactivate: mapToCanDeactivate([NavigationGuardService]) },
         { path: '**', redirectTo: '/overview', pathMatch: 'full' },
       ]},
   { path: 'viewSettings', component: ViewSettingsComponent, outlet: 'settings' },
@@ -42,6 +42,7 @@ const routes: Routes = [
 
 @NgModule({
   imports: [RouterModule.forRoot(routes, { canceledNavigationResolution: 'computed' })],
+  providers: [NavigationGuardService],
   exports: [RouterModule]
 })
 export class AppRoutingModule { }
