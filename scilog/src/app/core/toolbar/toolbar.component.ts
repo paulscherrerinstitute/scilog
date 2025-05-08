@@ -110,26 +110,15 @@ export class ToolbarComponent implements OnInit {
     this.openMenu.emit();
   }
 
-  openSettings() {
+  openSettings(settingsType: "profileSettings" | "viewSettings") {
     const dialogConfig = new MatDialogConfig();
     dialogConfig.autoFocus = false;
     dialogConfig.disableClose = true;
-    dialogConfig.data = "profileSettings";
+    dialogConfig.data = settingsType;
+    dialogConfig.panelClass = "app-full-bleed-dialog";
     const dialogRef = this.dialog.open(SettingsComponent, dialogConfig);
     this.subscriptions.push(dialogRef.afterClosed().subscribe(data => {
       console.log(data);
-    }));
-  }
-
-  openViewSettings() {
-    const dialogConfig = new MatDialogConfig();
-    dialogConfig.autoFocus = false;
-    dialogConfig.disableClose = true;
-    dialogConfig.data = "viewSettings";
-    const dialogRef = this.dialog.open(SettingsComponent, dialogConfig);
-    this.subscriptions.push(dialogRef.afterClosed().subscribe(data => {
-      console.log(data);
-      console.log(this.views)
     }));
   }
 

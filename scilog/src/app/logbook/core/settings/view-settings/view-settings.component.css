@@ -17,11 +17,6 @@
 
 }
 
-::ng-deep .mat-dialog-container{
-padding: 0px;
-border-radius: 8px;
-}
-
 .main-content {
 
     /* padding-bottom: 60px; */
