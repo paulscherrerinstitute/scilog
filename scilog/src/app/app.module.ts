@@ -189,7 +189,6 @@ const appConfigInitializerFn = (appConfig: AppConfigService) => {
     ],
     providers: [
         AppConfigService,
-        NavigationGuardService,
         {
             provide: APP_INITIALIZER,
             useFactory: appConfigInitializerFn,
