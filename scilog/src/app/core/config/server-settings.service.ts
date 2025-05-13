@@ -15,8 +15,8 @@ export class ServerSettingsService {
     return this.appConfigService.getScicatSettings()?.lbBaseURL;
   }
 
-  getScicatLoginUrl(returnURL: string): string {
-    return `${this.getSciCatServerAddress()}/api/v3/auth/oidc?client=scilog&returnURL=${returnURL}`;
+  getScicatLoginUrl(returnUrl: string): string {
+    return `${this.getSciCatServerAddress()}/api/v3/auth/oidc?client=scilog&returnUrl=${returnUrl}`;
   }
 
   getScicatFrontendBaseUrl(): string | undefined {
