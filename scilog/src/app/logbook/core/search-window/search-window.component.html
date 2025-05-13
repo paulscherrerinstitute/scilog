@@ -31,7 +31,7 @@
             <div>
                 Created by (prepend "-" to negate):
                 <button class="suggestion-button" (click)="addToSearch('@' + _sample_user)">
-                    @{{_sample_user}}
+                    &#64;{{_sample_user}}
                 </button>
             </div>
             <div *ngIf="tags[0]">
@@ -48,7 +48,7 @@
             <div>
                 Search everywhere for entries created by "{{_sample_user}}" that contain the word "alignment" {{tags[0]? "and have a tag \"" + tags[0] + "\"": ""}}:
                 <button class="suggestion-button" (click)="addToSearch('#' + tags[0] + ' @' + _sample_user + ' alignment')">
-                    {{tags[0]? "#" + tags[0]: ""}} @{{_sample_user}} alignment
+                    {{tags[0]? "#" + tags[0]: ""}} &#64;{{_sample_user}} alignment
                 </button>
             </div>
         </div>

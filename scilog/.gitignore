@@ -65,3 +65,4 @@ typings/
 *.tsbuildinfo
 
 .vscode
+src/assets/config.json
