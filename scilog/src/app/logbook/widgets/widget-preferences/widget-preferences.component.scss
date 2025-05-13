@@ -25,11 +25,11 @@
     width: 50vw;
 }
 
-.preferences-container .mat-form-field + .mat-form-field {
+.preferences-container .mat-mdc-form-field + .mat-form-field {
     margin-left: 8px;
   }
   
-  .preferences-container .mat-form-field {
+  .preferences-container .mat-mdc-form-field {
     width: 30%;
   }
   
@@ -54,13 +54,13 @@
         width: auto !important;
 }
 
-.filterOperator .mat-form-field {
+.filterOperator .mat-mdc-form-field {
     width: auto !important;
     margin-left: 8px;
 }
 
 
-.filterOperator .mat-select {
+.filterOperator .mat-mdc-select {
         max-width: 100%;
         width: auto;
         display: flex;

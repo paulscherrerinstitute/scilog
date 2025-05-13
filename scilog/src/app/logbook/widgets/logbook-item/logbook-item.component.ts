@@ -4,7 +4,7 @@ import { ChangeStreamNotification } from '@shared/changestreamnotification.model
 import { HttpClient } from '@angular/common/http';
 import { AddContentComponent } from '@shared/add-content/add-content.component';
 import { AddContentService } from '@shared/add-content.service';
-import { MatLegacyDialogConfig as MatDialogConfig, MatLegacyDialog as MatDialog } from '@angular/material/legacy-dialog';
+import { MatDialogConfig, MatDialog } from '@angular/material/dialog';
 import { v4 as uuid } from 'uuid';
 import {
   trigger,

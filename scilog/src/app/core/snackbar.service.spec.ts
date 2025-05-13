@@ -1,7 +1,7 @@
 import { TestBed } from '@angular/core/testing';
 
 import { SnackbarService } from './snackbar.service';
-import { MatLegacySnackBarModule as MatSnackBarModule } from '@angular/material/legacy-snack-bar';
+import { MatSnackBarModule } from '@angular/material/snack-bar';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 
 describe('SnackbarService', () => {

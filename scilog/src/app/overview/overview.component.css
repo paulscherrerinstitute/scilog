@@ -33,6 +33,7 @@
   flex: 1 1 auto;
 }
 
+/* TODO(mdc-migration): The following rule targets internal classes of button that may no longer apply for the MDC version. */
 mat-button-toggle-group {
   float: right;
   transform: scale(75%) translate(18px, -50%);

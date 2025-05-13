@@ -9,11 +9,12 @@
     color: var(--toolbar-text-color);
 }
 
+/* TODO(mdc-migration): The following rule targets internal classes of form-field that may no longer apply for the MDC version. */
 :host ::ng-deep .mat-form-field-appearance-legacy .mat-form-field-label {
     color: var(--toolbar-text-color);
 }
 
-:host ::ng-deep .mat-form-field {
+:host ::ng-deep .mat-mdc-form-field {
     width: 100% !important;
 }
 
