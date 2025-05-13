@@ -1,0 +1,93 @@
+services:
+  reverse-proxy:
+    image: traefik:3.2
+    command: --api.insecure=true --providers.docker=true --entrypoints.web.address=:80
+    ports:
+      - 80:80
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+
+  scilogmongodb:
+    image: mongo:4.2
+    volumes:
+      - mongodb_data:/data/db
+      - ./mongo/rs-init.sh:/rs-init.sh:ro
+    command: [ "--replSet", "rs0", "--bind_ip_all" ]
+    healthcheck:
+      test: ./rs-init.sh
+      interval: 5s
+    networks:
+      - scicatlive
+    profiles:
+      - be
+
+  scilogmongodb_seed:
+    image: mongo:4.2
+    volumes:
+      - ./seed_db/seed:/seed
+      - ./seed_db/mongo_import.sh:/mnt/mongo_import.sh
+    command:
+      - "sh"
+      - "-c"
+      - "chmod u+x /mnt/mongo_import.sh && /mnt/mongo_import.sh"
+    user: "0:0"
+    depends_on:
+      - scilogmongodb
+    environment:
+      - DATABASE=scilog
+    restart: on-failure
+    networks:
+      - scicatlive
+    profiles:
+      - be
+
+  scilogbackend:
+    # image: ghcr.io/paulscherrerinstitute/scilog/be
+    build:
+      context:
+        ../sci-log-db/.
+    # depends_on:
+      #  scilogmongodb:
+      #  condition: service_healthy
+    volumes:
+      # uncomment and edit the ./be/oidc.json to enable oidc
+      # for keycloak get your config values from: YOURKC_URL/realms/YOUR_REALM/.well-known/openid-configuration or YOURKC_URL/auth/realms/YOUR_REALM/.well-known/openid-configuration for older keycloak versions
+      - ./be/oidc.json:/home/node/app/oidc.json
+      - ./be/datasource.json:/home/node/app/datasource.json
+      - ./be/functionalAccounts.json:/home/node/app/functionalAccounts.json
+    environment:
+      JWT_SECRET: jwt_secret
+      CHROME_BIN: /usr/bin/chromium
+      CHROME_PATH: /usr/lib/chromium/
+      BASE_PATH: /api/v1
+    profiles:
+      - be
+    labels:
+      - traefik.http.routers.scilogbackend.rule=PathPrefix(`/api/v1`)
+    networks:
+      - scicatlive
+    external_links:
+      - keycloak:keycloak.localhost
+    # ports:
+    #   - 3001:3000
+
+  frontend:
+    image: ghcr.io/paulscherrerinstitute/scilog/fe
+    volumes:
+    # replace simple_config.json volume mount 
+    # with the one below to enable the oidc form
+    #   - ./fe/config.json:/usr/share/nginx/html/assets/config.json
+      - ./fe/simple_config.json:/usr/share/nginx/html/assets/config.json
+    profiles:
+      - fe
+    labels:
+      - traefik.http.routers.frontend.rule=PathPrefix(`/`)
+
+volumes:
+  mongodb_data:
+    driver: local
+
+networks:
+  scicatlive:
+    name: scicatlive_default
+    external: true

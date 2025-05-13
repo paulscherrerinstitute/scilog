@@ -1,5 +1,5 @@
 <div>
-    <mat-card class="task-mat-card">
+    <mat-card appearance="outlined" class="task-mat-card">
         <mat-card-content class="task-content">
             <mat-checkbox (change)="toggleTaskIsDone()" [checked]="task.isDone"
                 [disabled]="isActionAllowed.tooltips.update" matTooltip="{{ isActionAllowed.tooltips.update }}">

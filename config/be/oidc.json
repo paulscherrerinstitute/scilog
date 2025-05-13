@@ -1,0 +1,19 @@
+{
+    "session": false,
+    "provider": "oidc",
+    "authScheme": "openid connect",
+    "module": "passport-openidconnect",
+    "failureFlash": true,
+    "issuer": "http://keycloak.localhost/realms/facility",
+    "authorizationURL": "http://keycloak.localhost/realms/facility/protocol/openid-connect/auth",
+    "tokenURL": "http://keycloak.localhost/realms/facility/protocol/openid-connect/token",
+    "userInfoURL": "http://keycloak.localhost/realms/facility/protocol/openid-connect/userinfo",
+    "clientID": "scilog",
+    "clientSecret": "JanbSOEkniMYk6C4xPi0luYLmpiIuly3",
+    "callbackURL": "http://scilogbackend.localhost/api/v1/auth/keycloak/callback",
+    "scope": ["email", "profile", "openid"],
+    "successRedirect": "http://localhost:4200/login",
+    "skipUserProfile": false,
+    "endSessionEndpoint": "http://keycloak.localhost/realms/facility/protocol/openid-connect/logout",
+    "postLogoutRedirectUri": "http://localhost:4200/login"
+}
