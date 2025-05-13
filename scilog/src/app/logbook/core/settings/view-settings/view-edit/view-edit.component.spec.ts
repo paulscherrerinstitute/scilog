@@ -27,7 +27,8 @@ describe('ViewEditComponent', () => {
         {provide: UserPreferencesService, useClass: UserPreferencesMock},
         {provide: ViewDataService, useValue: viewDataServiceSpy}
       ],
-      declarations: [ ViewEditComponent, MatAutocomplete ]
+      imports: [ MatAutocomplete ],
+      declarations: [ ViewEditComponent ]
     })
     .compileComponents();
   }));
