@@ -12,7 +12,6 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatSidenavModule } from '@angular/material/sidenav';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
-import { ScrollingModule as ExperimentalScrollingModule } from '@angular/cdk-experimental/scrolling';
 import { CdkDrag, CdkDropList, DragDropModule } from '@angular/cdk/drag-drop';
 import { ScrollingModule } from '@angular/cdk/scrolling';
 import { HttpClientModule } from '@angular/common/http';
@@ -156,7 +155,6 @@ const appConfigInitializerFn = (appConfig: AppConfigService) => {
         HttpClientModule,
         ScrollingModule,
         DragDropModule,
-        ExperimentalScrollingModule,
         MatMenuModule,
         MatChipsModule,
         MatFormFieldModule,
