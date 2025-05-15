@@ -50,8 +50,8 @@
         <span>Save/Edit</span>
       </button>
     </mat-menu>
-    <button mat-icon-button *ngIf="!showMenuIcon">
-      <mat-icon matTooltip="Help" (click)="openHelp()">help</mat-icon>
+    <button mat-icon-button (click)="openHelp()" *ngIf="!showMenuIcon">
+      <mat-icon matTooltip="Help" >help</mat-icon>
     </button>
     <button mat-icon-button [matMenuTriggerFor]="menu">
       <span class="avatar-block">
