@@ -1,12 +1,13 @@
 import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 import { MatDialogModule, MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
-import { HttpClientTestingModule } from '@angular/common/http/testing'
+import { provideHttpClientTesting } from '@angular/common/http/testing'
 import { AddContentComponent, extractNotificationMessage } from './add-content.component';
 import { AddContentService } from '@shared/add-content.service';
 import { of } from 'rxjs';
 import { ChangeStreamNotification } from '@shared/changestreamnotification.model';
 import { LinkType, Paragraphs } from '@model/paragraphs';
 import { AppConfigService } from 'src/app/app-config.service';
+import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http';
 
 class AddContentServiceMock {
   currentMessage = of({});
@@ -65,15 +66,17 @@ describe('AddContentComponent', () => {
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      imports: [MatDialogModule, HttpClientTestingModule],
-      providers: [
+    declarations: [AddContentComponent],
+    imports: [MatDialogModule],
+    providers: [
         { provide: MAT_DIALOG_DATA, useValue: {} },
         { provide: MatDialogRef, useValue: {} },
         { provide: AddContentService, useClass: AddContentServiceMock },
         { provide: AppConfigService, useValue: { getConfig } },
-      ],
-      declarations: [AddContentComponent]
-    })
+        provideHttpClient(withInterceptorsFromDi()),
+        provideHttpClientTesting(),
+    ]
+})
       .compileComponents();
   }));
 

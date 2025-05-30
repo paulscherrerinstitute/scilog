@@ -1,9 +1,10 @@
-import { HttpClientTestingModule } from '@angular/common/http/testing';
+import { provideHttpClientTesting } from '@angular/common/http/testing';
 import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 import { RouterTestingModule } from '@angular/router/testing';
 import { AppConfigService } from '../app-config.service';
 
 import { LogbookComponent } from './logbook.component';
+import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http';
 
 const getConfig = () => ({});
 
@@ -13,10 +14,10 @@ describe('LogbookComponent', () => {
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      declarations: [ LogbookComponent ],
-      imports: [RouterTestingModule, HttpClientTestingModule],
-      providers: [{ provide: AppConfigService, useValue: { getConfig } }],
-    })
+    declarations: [LogbookComponent],
+    imports: [RouterTestingModule],
+    providers: [{ provide: AppConfigService, useValue: { getConfig } }, provideHttpClient(withInterceptorsFromDi()), provideHttpClientTesting()]
+})
     .compileComponents();
   }));
 

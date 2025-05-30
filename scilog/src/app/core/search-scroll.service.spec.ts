@@ -2,7 +2,8 @@ import { TestBed } from '@angular/core/testing';
 import { AppConfigService } from '../app-config.service';
 
 import { SearchScrollService } from './search-scroll.service';
-import { HttpClientTestingModule } from '@angular/common/http/testing';
+import { provideHttpClientTesting } from '@angular/common/http/testing';
+import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http';
 
 const getConfig = () => ({});
 
@@ -11,12 +12,14 @@ describe('SearchScrollService', () => {
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      imports: [HttpClientTestingModule],
-      providers: [
+    imports: [],
+    providers: [
         { provide: AppConfigService, useValue: { getConfig } },
-        SearchScrollService
-      ],
-    });
+        SearchScrollService,
+        provideHttpClient(withInterceptorsFromDi()),
+        provideHttpClientTesting()
+    ]
+});
     service = TestBed.inject(SearchScrollService);
   });
 
