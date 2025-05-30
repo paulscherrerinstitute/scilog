@@ -6,8 +6,9 @@ import { TasksService } from '@shared/tasks.service';
 import { of } from 'rxjs';
 import { ChangeStreamService } from '@shared/change-stream.service';
 import { AppConfigService } from 'src/app/app-config.service';
-import { HttpClientTestingModule } from '@angular/common/http/testing';
+import { provideHttpClientTesting } from '@angular/common/http/testing';
 import { ViewsService } from '@shared/views.service';
+import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http';
 
 class ChangeStreamServiceMock {
   getNotification(id:string){
@@ -51,16 +52,18 @@ describe('TodosComponent', () => {
     isActionAllowedServiceSpy = jasmine.createSpyObj("IsAllowedService", ["canUpdate", "canDelete"]);
     isActionAllowedServiceSpy.tooltips = {update: '', delete: ''};  
     TestBed.configureTestingModule({
-      providers:[
-        {provide: LogbookInfoService, useClass: LogbookInfoMock},
-        {provide: TasksService, useClass: TasksServiceMock},
+    declarations: [TodosComponent],
+    imports: [],
+    providers: [
+        { provide: LogbookInfoService, useClass: LogbookInfoMock },
+        { provide: TasksService, useClass: TasksServiceMock },
         { provide: ChangeStreamService, useClass: ChangeStreamServiceMock },
         { provide: AppConfigService, useValue: { getConfig } },
         { provide: ViewsService, useClass: ViewsServiceMock },
-      ],
-      imports: [HttpClientTestingModule],
-      declarations: [ TodosComponent ]
-    })
+        provideHttpClient(withInterceptorsFromDi()),
+        provideHttpClientTesting(),
+    ]
+})
     .compileComponents();
   }));
 

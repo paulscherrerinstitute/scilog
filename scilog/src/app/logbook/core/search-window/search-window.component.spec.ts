@@ -1,4 +1,4 @@
-import { HttpClientTestingModule } from '@angular/common/http/testing';
+import { provideHttpClientTesting } from '@angular/common/http/testing';
 import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 import { MatDialog } from '@angular/material/dialog';
 import { LogbookInfoService } from '@shared/logbook-info.service';
@@ -7,6 +7,7 @@ import { AppConfigService } from 'src/app/app-config.service';
 import { SearchWindowComponent } from './search-window.component';
 import { WidgetItemConfig } from 'src/app/core/model/config';
 import { TagService } from '../tag.service';
+import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http';
 
 const getConfig = () => ({});
 
@@ -16,13 +17,15 @@ describe('SearchWindowComponent', () => {
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      providers: [
+    imports: [],
+    providers: [
         { provide: AppConfigService, useValue: { getConfig } },
         { provide: MatDialog, useValue: {} },
-        { provide: LogbookInfoService, useValue: { logbookInfo: {id: 'id'} } },
-      ],
-      imports: [HttpClientTestingModule],
-    })
+        { provide: LogbookInfoService, useValue: { logbookInfo: { id: 'id' } } },
+        provideHttpClient(withInterceptorsFromDi()),
+        provideHttpClientTesting(),
+    ]
+})
     .compileComponents();
   }));
 
