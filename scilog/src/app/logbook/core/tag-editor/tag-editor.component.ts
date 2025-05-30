@@ -31,7 +31,6 @@ export class TagEditorComponent implements OnInit {
 
   tag: Tags[] = [];
   lastTags: Tags[] = [];
-  selectable = true;
   removable = true;
   addOnBlur = true;
   readonly separatorKeysCodes: number[] = [ENTER, COMMA, SPACE];

@@ -56,11 +56,11 @@
             <tag-editor [ngStyle]="{'width': '100%'}" #tagEditor [tagIn]="tag" [configIndex]="configIndex"></tag-editor>
           </span>
             <span class="addButton">
-              <button mat-mini-fab (click)="addContent()">
-                <mat-icon matTooltip="Send">send</mat-icon>
+              <button mat-mini-fab (click)="addContent()" matTooltip="Send">
+                <mat-icon>send</mat-icon>
               </button>
-              <button mat-mini-fab (click)="addMessage()" *ngIf="messagesEnabled">
-                <mat-icon matTooltip="Send as message">message</mat-icon>
+              <button mat-mini-fab (click)="addMessage()" *ngIf="messagesEnabled" matTooltip="Send as message">
+                <mat-icon>message</mat-icon>
               </button>
           </span>
         </div>

@@ -1,16 +1,13 @@
 <div class='windowContainer'>
-    <mat-toolbar class='searchBarTop'>
+    <div class='searchBarTop'>
         <span class="searchInput">
-            <mat-form-field *ngIf="searchStringFromConfig" class="searchConfigField" floatLabel="never">
+            <mat-form-field *ngIf="searchStringFromConfig" class="searchConfigField">
                 <input matInput class="searchConfig" 
                     [ngModel]="searchStringFromConfig" disabled="true" 
                     matTooltip="Remove from widget preferences">
             </mat-form-field>
-            <mat-form-field floatLabel="never">
-                <mat-label>
-                    Search <mat-icon>search</mat-icon>
-                </mat-label>
-                <input #searchSnippets matInput type="text" [(ngModel)]="searchString">
+            <mat-form-field subscriptSizing="dynamic">
+                <input placeholder="Search" #searchSnippets matInput type="text" [(ngModel)]="searchString">
             </mat-form-field>
         </span>
         <span>
@@ -22,7 +19,7 @@
             </button>
         </span>
 
-    </mat-toolbar>
+    </div>
     <search *ngIf="logbookId && searched" [config]="config" (close)="closeSearch()"></search>
     <div class="searchHelp" *ngIf="!logbookId || !searched ">
         <mat-divider></mat-divider>

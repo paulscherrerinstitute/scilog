@@ -22,13 +22,6 @@
   width: calc(100vw - 20px);
 }
 
-::ng-deep .mat-toolbar {
-  z-index: 998;
-  position: fixed;
-  height: 50px;
-  flex: 1 1 auto;
-}
-
 .flexExpand {
   flex: 1 1 auto;
 }

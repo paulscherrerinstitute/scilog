@@ -3,13 +3,13 @@
 
     <mat-sidenav #sidenav [(mode)]="sidenavOver" [(opened)]="sidenavOpened" class="left-sidenav">
       <div class="divButtons">
-        <button mat-fab color="primary" [routerLink]="['/overview']" class="divButtons-button" (click)="deactivateLogbook()">
-          <mat-icon matTooltip="Logbooks">arrow_back</mat-icon>
+        <button mat-fab color="primary" [routerLink]="['/overview']" class="divButtons-button" (click)="deactivateLogbook()" matTooltip="Logbooks">
+          <mat-icon>arrow_back</mat-icon>
         </button>
       </div>
       <div class="divButtons">
-        <button mat-fab color="primary" [routerLink]="['/logbooks', logbookId, 'dashboard']" class="divButtons-button">
-          <mat-icon matTooltip="Dashboard">dashboard</mat-icon>
+        <button mat-fab color="primary" [routerLink]="['/logbooks', logbookId, 'dashboard']" class="divButtons-button" matTooltip="Dashboard">
+          <mat-icon>dashboard</mat-icon>
         </button>
       </div>
       <mat-divider></mat-divider>

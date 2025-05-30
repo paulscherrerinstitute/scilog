@@ -1,12 +1,13 @@
 <mat-card appearance="outlined" class="logbook-module">
   <mat-card-header>
-    <mat-card-title #cardHeader style="font-size: 18px;">{{ logbook?.name }}</mat-card-title>
+    <mat-card-title #cardHeader style="font-size: 18px;" [matTooltip]="isOverflowing ? logbook?.name : ''"
+      [matTooltipDisabled]="!isOverflowing">{{ logbook?.name }}</mat-card-title>
     <mat-card-subtitle>{{ logbook?.ownerGroup }}</mat-card-subtitle>
     <actions-menu class="mat-fab-top-right" [logbook]="logbook" (logbookEdit)="editLogbook()"
       (logbookDelete)="deleteLogbook()"></actions-menu>
   </mat-card-header>
   <div class="image-container">
-    <img (click)="selection($event)" [src]="imageToShow" alt="" [routerLink]="['/logbooks', logbook?.id, 'dashboard']"
+    <img (click)="selection()" [src]="imageToShow" alt="" [routerLink]="['/logbooks', logbook?.id, 'dashboard']"
       *ngIf="!isImageLoading">
   </div>
   <mat-card-content>

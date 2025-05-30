@@ -1,11 +1,13 @@
-<div *ngIf="inProgress">
-  <mat-progress-bar mode="query" [color]="'accent'"></mat-progress-bar>
-</div>
-<div class="exportDialog-container">
-  <h2>Export to PDF</h2>
-  <div class="button">
-    <button mat-button (click)="close()">Cancel</button>
-    <button mat-button (click)="exportData()">Export data</button>
+<mat-dialog-content>
+  <div *ngIf="inProgress">
+    <mat-progress-bar mode="query" [color]="'accent'"></mat-progress-bar>
   </div>
-</div>
-<a class="download-link" #downloadLink></a>
+  <div class="exportDialog-container">
+    <h2>Export to PDF</h2>
+    <div>
+      <button mat-button (click)="close()">Cancel</button>
+      <button mat-button (click)="exportData()">Export data</button>
+    </div>
+  </div>
+  <a class="download-link" #downloadLink></a>
+</mat-dialog-content>
