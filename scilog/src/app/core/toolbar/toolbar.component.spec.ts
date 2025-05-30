@@ -1,4 +1,4 @@
-import { HttpClientTestingModule } from '@angular/common/http/testing';
+import { provideHttpClientTesting } from '@angular/common/http/testing';
 import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 import { MatDialogModule } from '@angular/material/dialog';
 import { RouterTestingModule } from '@angular/router/testing';
@@ -7,6 +7,7 @@ import { MatMenuModule } from '@angular/material/menu';
 import { ToolbarComponent } from './toolbar.component';
 import { AppConfigService } from 'src/app/app-config.service';
 import { By } from '@angular/platform-browser';
+import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http';
 
 const getConfig = () => ({});
 
@@ -16,10 +17,10 @@ describe('ToolbarComponent', () => {
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      declarations: [ ToolbarComponent ],
-      imports: [RouterTestingModule, HttpClientTestingModule, MatDialogModule, MatMenuModule],
-      providers: [{provide: AppConfigService, useValue: { getConfig }},]
-    })
+    declarations: [ToolbarComponent],
+    imports: [RouterTestingModule, MatDialogModule, MatMenuModule],
+    providers: [{ provide: AppConfigService, useValue: { getConfig } }, provideHttpClient(withInterceptorsFromDi()), provideHttpClientTesting(),]
+})
     .compileComponents();
   }));
 

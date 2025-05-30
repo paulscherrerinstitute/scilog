@@ -1,10 +1,11 @@
-import { HttpClientTestingModule } from '@angular/common/http/testing';
+import { provideHttpClientTesting } from '@angular/common/http/testing';
 import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 import { UntypedFormBuilder } from '@angular/forms';
 import { RouterTestingModule } from '@angular/router/testing';
 import { AppConfigService, Oauth2Endpoint } from '../app-config.service';
 
 import { LoginComponent } from './login.component';
+import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http';
 
 const getConfig = () => ({});
 
@@ -14,14 +15,13 @@ describe('LoginComponent', () => {
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      declarations: [ LoginComponent ],
-      providers: [UntypedFormBuilder, {
-        provide: AppConfigService,
-        useValue: { getConfig },
-      },
-],
-      imports: [HttpClientTestingModule, RouterTestingModule]
-    })
+    declarations: [LoginComponent],
+    imports: [RouterTestingModule],
+    providers: [UntypedFormBuilder, {
+            provide: AppConfigService,
+            useValue: { getConfig },
+        }, provideHttpClient(withInterceptorsFromDi()), provideHttpClientTesting(),]
+})
     .compileComponents();
   }));
 
