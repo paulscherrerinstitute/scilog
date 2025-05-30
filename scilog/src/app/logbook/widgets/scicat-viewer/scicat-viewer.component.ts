@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { MatLegacySelectChange } from '@angular/material/legacy-select';
+import { MatSelectChange } from '@angular/material/select';
 import {
   type Dataset,
   DatasetService,
@@ -41,7 +41,7 @@ export class ScicatViewerComponent implements OnInit {
     );
   }
 
-  onDatasetSelect(event: MatLegacySelectChange): void {
+  onDatasetSelect(event: MatSelectChange): void {
     const selectedPid = event.value;
     this.datasetFetching = true;
     this.selectedDataset = null;

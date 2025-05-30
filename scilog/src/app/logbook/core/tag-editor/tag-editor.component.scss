@@ -5,22 +5,14 @@
 .tagContainer {
     width: 100%;
 }
-:host ::ng-deep .mat-form-field-appearance-legacy .mat-form-field-underline {
-    display: none;
+
+:host ::ng-deep .mat-mdc-form-field {
+    width: 80%;
+}
+:host ::ng-deep .mat-mdc-form-field-infix {
+    padding: 0;
 }
 
-:host ::ng-deep .mat-form-field-appearance-legacy .mat-form-field-wrapper {
-    padding-bottom: 0px;
-}
-
-:host ::ng-deep .mat-form-field-infix{
-    width: 50%;
-    border-top-width: 0px;
-}
-
-:host ::ng-deep .mat-form-field{
-    max-width: 80%;
-}
 .tag {
     background-color: #e0e0e0;
     color: rgba(0, 0, 0, 0.87);
@@ -31,18 +23,6 @@
     margin: 1px;
 }
 
-:host ::ng-deep .mat-chip-list-wrapper {
-    margin: -6px;
-}
-
-:host ::ng-deep .mat-chip-list-wrapper input.mat-input-element{
-    padding: 0px;
-}
-
-:host ::ng-deep .mat-chip-list-wrapper input.mat-input-element,
-.mat-chip-list-wrapper .mat-standard-chip {
-    padding-top: 2px;
-}
 .renewButton {
     border: none;
     background-color: var(--ck-toolbar-color-background);

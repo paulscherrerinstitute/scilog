@@ -6,13 +6,13 @@
                 <img src="../../assets/logo.png" alt="SciLog" width="50" height="50" />
             </div>
             <div class="divButtons">
-                <button mat-fab [routerLink]="[{outlets: {'settings': ['profileSettings']}}]">
-                    <mat-icon matTooltip="Profile">account_circle</mat-icon>
+                <button mat-fab [routerLink]="[{outlets: {'settings': ['profileSettings']}}]" matTooltip="Profile">
+                    <mat-icon>account_circle</mat-icon>
                 </button>
             </div>
             <div class="divButtons">
-                <button mat-fab [routerLink]="[{outlets: {'settings': ['viewSettings']}}]">
-                    <mat-icon matTooltip="Views">preview</mat-icon>
+                <button mat-fab [routerLink]="[{outlets: {'settings': ['viewSettings']}}]" matTooltip="Views">
+                    <mat-icon>preview</mat-icon>
                 </button>
             </div>
             <!-- <div class="divButtons">
@@ -24,8 +24,8 @@
 
         </mat-sidenav>
         <mat-sidenav-content class="main-content">
-                <button mat-mini-fab (click)="close()" class="dialog-footer">
-                    <mat-icon matTooltip="Close">close</mat-icon>
+                <button mat-mini-fab (click)="close()" class="dialog-footer" matTooltip="Close">
+                    <mat-icon>close</mat-icon>
                 </button>
             <router-outlet name='settings'></router-outlet>
         </mat-sidenav-content>

@@ -1,5 +1,5 @@
 import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
-import { MatLegacyDialogModule as MatDialogModule } from '@angular/material/legacy-dialog';
+import { MatDialogModule } from '@angular/material/dialog';
 import { ActivatedRoute, RouterModule } from '@angular/router';
 import {RouterTestingModule} from '@angular/router/testing'
 import { DashboardItemComponent } from './dashboard-item.component';

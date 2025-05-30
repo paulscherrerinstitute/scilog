@@ -4,7 +4,7 @@ import { ViewEditComponent } from './view-edit.component';
 import { UntypedFormBuilder } from '@angular/forms';
 import { UserPreferencesService } from '@shared/user-preferences.service';
 import { ViewDataService } from '@shared/remote-data.service';
-import { MatLegacyAutocomplete as MatAutocomplete } from '@angular/material/legacy-autocomplete';
+import { MatAutocomplete } from '@angular/material/autocomplete';
 
 
 class UserPreferencesMock {
@@ -27,7 +27,8 @@ describe('ViewEditComponent', () => {
         {provide: UserPreferencesService, useClass: UserPreferencesMock},
         {provide: ViewDataService, useValue: viewDataServiceSpy}
       ],
-      declarations: [ ViewEditComponent, MatAutocomplete ]
+      imports: [ MatAutocomplete ],
+      declarations: [ ViewEditComponent ]
     })
     .compileComponents();
   }));

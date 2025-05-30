@@ -1,5 +1,5 @@
 import { Component, EventEmitter, Input, OnInit, Output, OnDestroy, ElementRef, ViewChild } from '@angular/core';
-import { MatLegacyDialog as MatDialog, MatLegacyDialogConfig as MatDialogConfig } from '@angular/material/legacy-dialog';
+import { MatDialog, MatDialogConfig } from '@angular/material/dialog';
 import { Subscription } from 'rxjs';
 import { AuthService } from '../auth-services/auth.service';
 import { Hotkeys } from '../hotkeys.service';
