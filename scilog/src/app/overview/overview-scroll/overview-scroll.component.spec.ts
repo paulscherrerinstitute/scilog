@@ -47,7 +47,7 @@ describe('OverviewScrollComponent', () => {
   });
 
   it('should test itemsCount', () => {
-    expect(component.itemSize).toEqual(432);
+    expect(component.itemSize).toEqual(400);
   });
 
   it('should test setPageSize', () => {
