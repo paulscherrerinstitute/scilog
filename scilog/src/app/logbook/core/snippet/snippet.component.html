@@ -1,4 +1,4 @@
-<mat-card appearance="outlined" #snippetContainer [ngClass]="styleClass" (click)="selectSnippet($event)" [@highlightSnippet]="highlightState">
+<mat-card appearance="raised" #snippetContainer [ngClass]="styleClass" (click)="selectSnippet($event)" [@highlightSnippet]="highlightState">
   <!-- [ngStyle]="{'border':isSelected ? '2px solid #26677a' : '2px solid #ffffff' }"> -->
   <mat-icon class="mat-fab-top-right-star" *ngIf="isHighlighted">star</mat-icon>
   <!-- <mat-icon class="mat-fab-top-right-user" *ngIf="!enableEdit" matTooltip="Another user is currently editing this snippet.">account_circle</mat-icon> -->
@@ -64,7 +64,7 @@
     </span>
   </span>
 
-  <mat-card-content class="mat-card-content">
+  <mat-card-content class="card-content">
     <div *ngFor="let snippet of snippet?.subsnippets; let i = index">
       <ng-container *ngIf="snippet?.linkType=='quote'">
         <snippet [snippet]="snippet" [updatedAt]="snippet?.updatedAt" [index]=i [hideMetadata]='hideMetadata'></snippet>

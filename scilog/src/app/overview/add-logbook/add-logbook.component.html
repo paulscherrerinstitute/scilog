@@ -1,10 +1,10 @@
-<div class="header">
+<div matDialogTitle>
   <span class="headerTitle">
     New logbook
   </span>
-
 </div>
-<div class="logbook-container">
+
+<mat-dialog-content class="logbook-container">
   <gridster [options]="optionsGrid" class="gridster-container">
     <gridster-item [item]="{cols: 1, rows: 1, y: 0, x: 0}" class="gridster-item">
       <form [formGroup]="optionsFormGroup">
@@ -102,7 +102,7 @@
       </div>
     </gridster-item>
   </gridster>
-</div>
+</mat-dialog-content>
 
 
 <!-- <div class="logbook-container">

@@ -1,4 +1,4 @@
-import { ChangeDetectorRef, Component, ElementRef, EventEmitter, HostListener, Input, Output, QueryList, ViewChild, ViewChildren } from "@angular/core";
+import { ChangeDetectorRef, Component, ElementRef, EventEmitter, HostListener, Input, Output, QueryList, ViewChild, ViewChildren, AfterViewInit, AfterViewChecked, OnDestroy } from "@angular/core";
 import { ResizedEvent } from "src/app/core/directives/resized.directive";
 import { WidgetItemConfig } from "src/app/core/model/config";
 import { Logbooks } from "src/app/core/model/logbooks";
@@ -17,7 +17,7 @@ type Sizes = {
   templateUrl: './overview-scroll.component.html',
   styleUrls: ['./overview-scroll.component.css']
 })
-export class OverviewScrollComponent {
+export class OverviewScrollComponent implements AfterViewInit, AfterViewChecked, OnDestroy {
 
   @Input() config: WidgetItemConfig;
 
@@ -29,7 +29,7 @@ export class OverviewScrollComponent {
 
   logbooks: Logbooks[][] = [];
   isLoaded: boolean;
-  private contentSize: Sizes = {width: 332, height: 432};
+  private contentSize: Sizes = {width: 300, height: 400};
   private minPageSize = 20;
   private currentPage = 0;
   private pageSize: number;

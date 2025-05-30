@@ -1,18 +1,5 @@
-@import '../../../../styles/slide-toggle';
-
-@include slide-toggle;
-
-.header {
-    display: flex;
-  }
-  .flexExpand {
-    flex: 1 1 auto;
-    /* padding:50px; */
-}
 .headerTitle{
   color: var(--header-color);
-  // mat-color($scilog-colors,500);
-  /* padding: 5px; */
   opacity: 0.9;
   font-weight: bold;
 }

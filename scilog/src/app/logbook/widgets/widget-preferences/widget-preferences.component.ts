@@ -44,7 +44,6 @@ export class WidgetPreferencesComponent implements OnInit {
   additionalLogbooksCtrl = new UntypedFormControl();
 
   visible = true;
-  selectable = true;
   removable = true;
   addOnBlur = true;
 

@@ -12,6 +12,7 @@
 }
 
 .searchContainer {
+    font-size: initial;
     overflow: scroll;
     height: calc(50vh - 140px);
 }

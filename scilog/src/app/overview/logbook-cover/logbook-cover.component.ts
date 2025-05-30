@@ -1,4 +1,4 @@
-import { Component, OnInit, EventEmitter, Output, Input, ViewChild, ElementRef } from '@angular/core';
+import { Component, OnInit, EventEmitter, Output, Input, ViewChild, ElementRef, AfterViewInit } from '@angular/core';
 import { Logbooks } from '@model/logbooks';
 import { LogbookInfoService } from '@shared/logbook-info.service';
 import { LogbookItemDataService } from '@shared/remote-data.service';
@@ -9,7 +9,7 @@ import { Router } from '@angular/router';
   templateUrl: './logbook-cover.component.html',
   styleUrls: ['./logbook-cover.component.css'],
 })
-export class LogbookWidgetComponent implements OnInit {
+export class LogbookWidgetComponent implements OnInit, AfterViewInit {
 
   @Output() logbookSelection = new EventEmitter<string>();
   @Output() logbookEdit = new EventEmitter<Logbooks>();
@@ -22,6 +22,7 @@ export class LogbookWidgetComponent implements OnInit {
 
   imageToShow: any;
   isImageLoading: boolean;
+  isOverflowing = false;
 
   constructor(
     private logbookItemDataService: LogbookItemDataService,
@@ -35,7 +36,10 @@ export class LogbookWidgetComponent implements OnInit {
   }
 
   ngAfterViewInit() {
-    this.adjustHeaderFontSize(this.cardHeader);
+    setTimeout(() => {
+      this.isOverflowing = this.isOverflown(this.cardHeader);
+    });
+
   }
 
   createImageFromBlob(image: Blob) {
@@ -71,23 +75,7 @@ export class LogbookWidgetComponent implements OnInit {
   }
 
   isOverflown(element: ElementRef) {
-    return element.nativeElement.scrollHeight > element.nativeElement.clientHeight || element.nativeElement.scrollWidth > element.nativeElement.clientWidth;
-  }
-
-  adjustHeaderFontSize(element: ElementRef) {
-    if (!element) return
-    let fontSize = parseInt(element.nativeElement.style.fontSize);
-    for (let i = fontSize; i >= 0; i--) {
-      let overflow = this.isOverflown(element);
-      if (overflow) {
-        fontSize--;
-        element.nativeElement.style.fontSize = fontSize + "px";
-      }
-    }
-  }
-
-  ngOnDestroy(): void {
-
+    return element.nativeElement.scrollWidth > element.nativeElement.clientWidth;
   }
 
   selectOnDoubleClick() {

@@ -1,9 +1,10 @@
-<div class="header">
+<div mat-dialog-title>
   <span class="headerTitle">
     Widget preferences
   </span>
 
 </div>
+<mat-dialog-content>
 <div class="preferences-container">
 
   <form [formGroup]="options">
@@ -74,9 +75,9 @@
         <header class="subSubHeader">
           Additional logbooks
         </header>
-        <mat-form-field [floatLabel]="'never'" class="chipList">
+        <mat-form-field [floatLabel]="'auto'" class="chipList">
           <mat-chip-grid #chipListLogbook aria-label="Logbook selection">
-            <mat-chip-row *ngFor="let logbookItem of additionalLogbooks" [selectable]="selectable" [removable]="removable"
+            <mat-chip-row *ngFor="let logbookItem of additionalLogbooks" [removable]="removable"
               (removed)="removeLogbook(logbookItem)" [value]="logbookItem"
               [matTooltip]="'Group: ' + logbookItem.ownerGroup + '; Description: ' + logbookItem.description">
               {{ logbookItem.name }}
@@ -99,13 +100,13 @@
           Data must include the following tags
         </header>
         <div class="chips">
-          <mat-chip-grid #chipList aria-label="Tag selection">
-            <mat-chip-row *ngFor="let tagItem of tag" [selectable]="selectable" [removable]="removable"
+          <mat-chip-grid #chipList1 aria-label="Tag selection">
+            <mat-chip-row *ngFor="let tagItem of tag" [removable]="removable"
               (removed)="removeTag(tagItem)">
               {{ tagItem.name }}
               <mat-icon matChipRemove *ngIf="removable">cancel</mat-icon>
             </mat-chip-row>
-            <input placeholder="Add tags" [matChipInputFor]="chipList"
+            <input placeholder="Add tags" [matChipInputFor]="chipList1"
               [matChipInputSeparatorKeyCodes]="separatorKeysCodes" [matChipInputAddOnBlur]="addOnBlur"
               (matChipInputTokenEnd)="addTag($event)">
           </mat-chip-grid>
@@ -114,13 +115,13 @@
           Data must NOT include the following tags
         </header>
         <div class="chips">
-          <mat-chip-grid #chipList aria-label="Tag selection">
-            <mat-chip-row *ngFor="let tagItem of excludeTag" [selectable]="selectable" [removable]="removable"
+          <mat-chip-grid #chipList2 aria-label="Tag selection">
+            <mat-chip-row *ngFor="let tagItem of excludeTag" [removable]="removable"
               (removed)="removeExcludeTag(tagItem)">
               {{ tagItem.name }}
               <mat-icon matChipRemove *ngIf="removable">cancel</mat-icon>
             </mat-chip-row>
-            <input placeholder="Add tags" [matChipInputFor]="chipList"
+            <input placeholder="Add tags" [matChipInputFor]="chipList2"
               [matChipInputSeparatorKeyCodes]="separatorKeysCodes" [matChipInputAddOnBlur]="addOnBlur"
               (matChipInputTokenEnd)="addExcludeTag($event)">
           </mat-chip-grid>
@@ -174,6 +175,7 @@
     </div>
   </form>
 </div>
+</mat-dialog-content>
 <mat-dialog-actions align="end">
   <button mat-button (click)="close()">Cancel</button>
   <button mat-button (click)="applyChanges($event)" [disabled]="filterBasics.get('logbook').invalid">Apply</button>

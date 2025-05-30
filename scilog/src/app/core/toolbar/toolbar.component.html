@@ -28,12 +28,12 @@
     </button>
   </div>
 
-  <span>
-    <span class="version-info" *ngIf="showVersionInfo" matTooltip="v0.9">
+  <div style="display: flex; align-items: center;">
+    <div class="version-info" *ngIf="showVersionInfo" matTooltip="v0.9">
       {{ versionInfo }}
-    </span>
-    <button mat-icon-button *ngIf="showMenuIcon && isLogbookOpen" (click)="openSearch()">
-      <mat-icon matTooltip="Search">search</mat-icon>
+    </div>
+    <button mat-icon-button *ngIf="showMenuIcon && isLogbookOpen" (click)="openSearch()" matTooltip="Search">
+      <mat-icon>search</mat-icon>
     </button>
     <button mat-icon-button [matMenuTriggerFor]="menuViews" *ngIf="isLogbookOpen">
       <mat-icon>preview</mat-icon>
@@ -50,8 +50,8 @@
         <span>Save/Edit</span>
       </button>
     </mat-menu>
-    <button mat-icon-button (click)="openHelp()" *ngIf="!showMenuIcon">
-      <mat-icon matTooltip="Help" >help</mat-icon>
+    <button mat-icon-button (click)="openHelp()" *ngIf="!showMenuIcon" matTooltip="Help">
+      <mat-icon>help</mat-icon>
     </button>
     <button mat-icon-button [matMenuTriggerFor]="menu">
       <span class="avatar-block">
@@ -72,5 +72,5 @@
         <span>Logout</span>
       </button>
     </mat-menu>
-  </span>
+  </div>
 </mat-toolbar>
