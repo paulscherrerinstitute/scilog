@@ -13,9 +13,10 @@ type Sizes = {
 }
 
 @Component({
-  selector: 'overview-scroll',
-  templateUrl: './overview-scroll.component.html',
-  styleUrls: ['./overview-scroll.component.css']
+    selector: 'overview-scroll',
+    templateUrl: './overview-scroll.component.html',
+    styleUrls: ['./overview-scroll.component.css'],
+    standalone: false
 })
 export class OverviewScrollComponent implements AfterViewInit, AfterViewChecked, OnDestroy {
 

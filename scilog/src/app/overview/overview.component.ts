@@ -20,17 +20,18 @@ enum ContentType {
 export type MatCardType = 'logbook-module' | 'logbook-headline';
 
 @Component({
-  selector: 'app-overview',
-  templateUrl: './overview.component.html',
-  styleUrls: ['./overview.component.css'],
-  animations: [
-    trigger('spinner', [
-      transition(':enter', [
-        style({opacity: 0}), 
-        animate('1ms 0.2s ease-out', style({opacity: 1}))
-      ])
-    ]),
-  ]
+    selector: 'app-overview',
+    templateUrl: './overview.component.html',
+    styleUrls: ['./overview.component.css'],
+    animations: [
+        trigger('spinner', [
+            transition(':enter', [
+                style({ opacity: 0 }),
+                animate('1ms 0.2s ease-out', style({ opacity: 1 }))
+            ])
+        ]),
+    ],
+    standalone: false
 })
 export class OverviewComponent implements OnInit {
 

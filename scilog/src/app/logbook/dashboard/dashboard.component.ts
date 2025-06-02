@@ -8,9 +8,10 @@ import { Hotkeys } from '@shared/hotkeys.service';
 import { ComponentCanDeactivate } from '../core/navigation-guard-service';
 
 @Component({
-  selector: 'dashboard',
-  templateUrl: './dashboard.component.html',
-  styleUrls: ['./dashboard.component.scss']
+    selector: 'dashboard',
+    templateUrl: './dashboard.component.html',
+    styleUrls: ['./dashboard.component.scss'],
+    standalone: false
 })
 export class DashboardComponent implements OnInit, ComponentCanDeactivate {
 

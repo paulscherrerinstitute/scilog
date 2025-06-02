@@ -3,9 +3,10 @@ import { LogbookItemDataService } from '@shared/remote-data.service';
 import {CollectionConfig} from '@model/config';
 
 @Component({
-  selector: 'app-collection-widget',
-  templateUrl: './collection-widget.component.html',
-  styleUrls: ['./collection-widget.component.css']
+    selector: 'app-collection-widget',
+    templateUrl: './collection-widget.component.html',
+    styleUrls: ['./collection-widget.component.css'],
+    standalone: false
 })
 export class CollectionWidgetComponent implements OnInit {
 

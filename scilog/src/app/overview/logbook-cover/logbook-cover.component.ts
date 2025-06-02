@@ -5,9 +5,10 @@ import { LogbookItemDataService } from '@shared/remote-data.service';
 import { Router } from '@angular/router';
 
 @Component({
-  selector: 'app-logbook-cover',
-  templateUrl: './logbook-cover.component.html',
-  styleUrls: ['./logbook-cover.component.css'],
+    selector: 'app-logbook-cover',
+    templateUrl: './logbook-cover.component.html',
+    styleUrls: ['./logbook-cover.component.css'],
+    standalone: false
 })
 export class LogbookWidgetComponent implements OnInit, AfterViewInit {
 

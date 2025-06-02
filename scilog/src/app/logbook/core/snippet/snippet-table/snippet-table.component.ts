@@ -3,9 +3,10 @@ import { ChangeStreamNotification } from '@shared/changestreamnotification.model
 import { DomSanitizer, SafeResourceUrl, SafeUrl } from '@angular/platform-browser';
 
 @Component({
-  selector: 'snippet-table',
-  templateUrl: './snippet-table.component.html',
-  styleUrls: ['./snippet-table.component.css']
+    selector: 'snippet-table',
+    templateUrl: './snippet-table.component.html',
+    styleUrls: ['./snippet-table.component.css'],
+    standalone: false
 })
 export class SnippetTableComponent implements OnInit {
 

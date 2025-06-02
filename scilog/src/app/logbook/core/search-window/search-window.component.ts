@@ -8,9 +8,10 @@ import { Hotkeys } from '@shared/hotkeys.service';
 import { SearchScrollService } from 'src/app/core/search-scroll.service';
 
 @Component({
-  selector: 'search-window',
-  templateUrl: './search-window.component.html',
-  styleUrls: ['./search-window.component.css'],
+    selector: 'search-window',
+    templateUrl: './search-window.component.html',
+    styleUrls: ['./search-window.component.css'],
+    standalone: false
 })
 export class SearchWindowComponent implements OnInit {
 

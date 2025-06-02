@@ -7,9 +7,10 @@ import { Subscription } from 'rxjs';
 import { ViewsService } from '@shared/views.service';
 
 @Component({
-  selector: 'todos',
-  templateUrl: './todos.component.html',
-  styleUrls: ['./todos.component.scss']
+    selector: 'todos',
+    templateUrl: './todos.component.html',
+    styleUrls: ['./todos.component.scss'],
+    standalone: false
 })
 export class TodosComponent implements OnInit {
 

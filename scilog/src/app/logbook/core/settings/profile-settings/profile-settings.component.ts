@@ -3,9 +3,10 @@ import { UserPreferencesService } from '@shared/user-preferences.service';
 import { UntypedFormBuilder, UntypedFormGroup, UntypedFormControl } from '@angular/forms';
 
 @Component({
-  selector: 'app-profile-settings',
-  templateUrl: './profile-settings.component.html',
-  styleUrls: ['./profile-settings.component.css']
+    selector: 'app-profile-settings',
+    templateUrl: './profile-settings.component.html',
+    styleUrls: ['./profile-settings.component.css'],
+    standalone: false
 })
 export class ProfileSettingsComponent implements OnInit {
 

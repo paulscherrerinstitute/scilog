@@ -10,9 +10,10 @@ import { WidgetItemConfig } from '@model/config';
 import { ComponentCanDeactivate } from '../../core/navigation-guard-service';
 
 @Component({
-  selector: 'dashboard-item',
-  templateUrl: './dashboard-item.component.html',
-  styleUrls: ['./dashboard-item.component.scss']
+    selector: 'dashboard-item',
+    templateUrl: './dashboard-item.component.html',
+    styleUrls: ['./dashboard-item.component.scss'],
+    standalone: false
 })
 export class DashboardItemComponent implements OnInit, ComponentCanDeactivate {
 

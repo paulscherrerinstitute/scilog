@@ -8,9 +8,10 @@ import { PlotDataService } from '@shared/remote-data.service';
 import { WidgetConfig, WidgetItemConfig } from '@model/config';
 
 @Component({
-  selector: 'chart',
-  templateUrl: './chart.component.html',
-  styleUrls: ['./chart.component.css']
+    selector: 'chart',
+    templateUrl: './chart.component.html',
+    styleUrls: ['./chart.component.css'],
+    standalone: false
 })
 export class ChartComponent implements OnInit {
 

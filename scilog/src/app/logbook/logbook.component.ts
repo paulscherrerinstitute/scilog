@@ -11,11 +11,11 @@ import { ViewsService } from '@shared/views.service';
 import { TagService } from '@shared/tag.service';
 
 @Component({
-  selector: 'logbook',
-  templateUrl: './logbook.component.html',
-  styleUrls: ['./logbook.component.scss'],
-  providers: [ChangeStreamService]
-
+    selector: 'logbook',
+    templateUrl: './logbook.component.html',
+    styleUrls: ['./logbook.component.scss'],
+    providers: [ChangeStreamService],
+    standalone: false
 })
 
 export class LogbookComponent implements OnInit {

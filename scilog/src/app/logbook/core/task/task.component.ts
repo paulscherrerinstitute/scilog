@@ -4,10 +4,11 @@ import { TasksService } from '@shared/tasks.service';
 import { IsAllowedService } from 'src/app/overview/is-allowed.service';
 
 @Component({
-  selector: 'task',
-  templateUrl: './task.component.html',
-  styleUrls: ['./task.component.scss'],
-  providers: [IsAllowedService],
+    selector: 'task',
+    templateUrl: './task.component.html',
+    styleUrls: ['./task.component.scss'],
+    providers: [IsAllowedService],
+    standalone: false
 })
 export class TaskComponent implements OnInit {
 

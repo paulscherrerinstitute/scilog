@@ -11,9 +11,10 @@ import { ViewsService } from '@shared/views.service';
 import { WidgetItemConfig } from '@model/config';
 
 @Component({
-  selector: 'tag-editor',
-  templateUrl: './tag-editor.component.html',
-  styleUrls: ['./tag-editor.component.scss']
+    selector: 'tag-editor',
+    templateUrl: './tag-editor.component.html',
+    styleUrls: ['./tag-editor.component.scss'],
+    standalone: false
 })
 export class TagEditorComponent implements OnInit {
 

@@ -3,9 +3,10 @@ import { MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { AppConfigService } from 'src/app/app-config.service';
 
 @Component({
-  selector: 'app-hotkeys',
-  templateUrl: './hotkeys.component.html',
-  styleUrls: ['./hotkeys.component.css']
+    selector: 'app-hotkeys',
+    templateUrl: './hotkeys.component.html',
+    styleUrls: ['./hotkeys.component.css'],
+    standalone: false
 })
 export class HotkeysComponent implements OnInit {
 

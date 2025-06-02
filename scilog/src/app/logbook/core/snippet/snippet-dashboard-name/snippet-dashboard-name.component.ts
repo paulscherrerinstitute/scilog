@@ -6,9 +6,10 @@ import { Basesnippets } from '@model/basesnippets';
 import { LogbookItemDataService } from '@shared/remote-data.service';
 
 @Component({
-  selector: 'snippet-dashboard-name',
-  templateUrl: './snippet-dashboard-name.component.html',
-  styleUrls: ['./snippet-dashboard-name.component.css']
+    selector: 'snippet-dashboard-name',
+    templateUrl: './snippet-dashboard-name.component.html',
+    styleUrls: ['./snippet-dashboard-name.component.css'],
+    standalone: false
 })
 export class SnippetDashboardNameComponent implements OnInit {
 

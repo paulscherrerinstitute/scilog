@@ -5,9 +5,10 @@ import { Basesnippets } from '@model/basesnippets';
 
 
 @Component({
-  selector: 'snippet-info-section',
-  templateUrl: './snippet-info-section.component.html',
-  styleUrls: ['./snippet-info-section.component.css']
+    selector: 'snippet-info-section',
+    templateUrl: './snippet-info-section.component.html',
+    styleUrls: ['./snippet-info-section.component.css'],
+    standalone: false
 })
 export class SnippetInfoSectionComponent implements OnInit {
 

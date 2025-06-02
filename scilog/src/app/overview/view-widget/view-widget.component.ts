@@ -2,9 +2,10 @@ import { Component, OnInit, EventEmitter, Output, Input } from '@angular/core';
 import {Views} from '@model/views';
 
 @Component({
-  selector: 'app-view-widget',
-  templateUrl: './view-widget.component.html',
-  styleUrls: ['./view-widget.component.css']
+    selector: 'app-view-widget',
+    templateUrl: './view-widget.component.html',
+    styleUrls: ['./view-widget.component.css'],
+    standalone: false
 })
 export class ViewWidgetComponent implements OnInit {
 

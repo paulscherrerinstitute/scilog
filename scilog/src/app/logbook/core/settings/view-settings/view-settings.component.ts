@@ -53,9 +53,10 @@ export function accessGroupsMemberValidator(groups: string[], chips: string[]): 
 
 
 @Component({
-  selector: 'app-view-settings',
-  templateUrl: './view-settings.component.html',
-  styleUrls: ['./view-settings.component.css']
+    selector: 'app-view-settings',
+    templateUrl: './view-settings.component.html',
+    styleUrls: ['./view-settings.component.css'],
+    standalone: false
 })
 export class ViewSettingsComponent implements OnInit {
 
