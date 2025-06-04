@@ -5,6 +5,8 @@ import { UserPreferencesService } from '@shared/user-preferences.service';
 import { LogbookInfoService } from '@shared/logbook-info.service';
 import { of } from 'rxjs';
 import { Logbooks } from '@model/logbooks';
+import { provideRouter } from '@angular/router';
+import { Component } from '@angular/core';
 
 class UserPreferencesMock {
   userInfo = {
@@ -12,6 +14,9 @@ class UserPreferencesMock {
 
   }
 }
+
+@Component({})
+class DummyComponent {}
 
 describe('LogbookWidgetComponent', () => {
   let component: LogbookWidgetComponent;
@@ -53,6 +58,7 @@ describe('LogbookWidgetComponent', () => {
         { provide: LogbookInfoService, useValue: logbookSpy },
         { provide: UserPreferencesService, useClass: UserPreferencesMock },
         { provide: LogbookItemDataService, useValue: logbookItemDataSpy },
+        provideRouter([{path: '', component: DummyComponent}])
     ]
 })
     .compileComponents();

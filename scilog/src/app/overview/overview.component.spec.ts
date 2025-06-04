@@ -7,8 +7,15 @@ import { UserPreferencesService } from '@shared/user-preferences.service';
 import { CookieService } from 'ngx-cookie-service';
 import { LogbookDataService } from '@shared/remote-data.service';
 import { of } from 'rxjs';
-import { RouterTestingModule } from '@angular/router/testing';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import { AppConfigService } from '../app-config.service';
+import { provideHttpClientTesting } from '@angular/common/http/testing';
+import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http';
+import { Component, Input } from '@angular/core';
+import { ToolbarComponent } from '@shared/toolbar/toolbar.component';
+import { OverviewScrollComponent } from './overview-scroll/overview-scroll.component';
+import { WidgetItemConfig } from '@model/config';
+import { provideRouter } from '@angular/router';
 
 class UserPreferencesMock {
   userInfo = {
@@ -16,6 +23,14 @@ class UserPreferencesMock {
 
   }
   currentCollectionsConfig = of({});
+}
+
+@Component({ selector: 'app-toolbar', template: '' })
+class ToolbarStubComponent {}
+
+@Component({ selector: 'overview-scroll', template: '' })
+class OverviewScrollStubComponent {
+  @Input() config: WidgetItemConfig;
 }
 
 describe('OverviewComponent', () => {
@@ -36,19 +51,36 @@ describe('OverviewComponent', () => {
   cookiesSpy.lastLogbook.and.returnValue([]);
   const tableSpy = jasmine.createSpyObj("OverviewTableComponent", ['reloadLogbooks', 'afterLogbookEdit']);
   const scrollSpy = jasmine.createSpyObj("OverviewScrollComponent", ['reloadLogbooks', 'afterLogbookEdit']);
+
+  const returnEmpty = () => ({});
   
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-    imports: [MatDialogModule, RouterTestingModule, BrowserAnimationsModule, OverviewComponent],
-    providers: [
+      imports: [
+        MatDialogModule,
+        BrowserAnimationsModule,
+        OverviewComponent,
+      ],
+      providers: [
         { provide: MAT_DIALOG_DATA, useValue: {} },
         { provide: LogbookInfoService, useValue: logbookInfoSpy },
         { provide: UserPreferencesService, useClass: UserPreferencesMock },
         { provide: CookieService },
         { provide: LogbookDataService, useValue: logbookDataSpy },
-    ]
-})
-    .compileComponents();
+        {
+          provide: AppConfigService,
+          useValue: { getConfig: returnEmpty, getScicatSettings: returnEmpty },
+        },
+        provideRouter([{path: '', component: ToolbarStubComponent}]),
+        provideHttpClient(withInterceptorsFromDi()),
+        provideHttpClientTesting(),
+      ],
+    })
+      .overrideComponent(OverviewComponent, {
+        remove: { imports: [ToolbarComponent, OverviewScrollComponent] },
+        add: { imports: [ToolbarStubComponent, OverviewScrollStubComponent] },
+      })
+      .compileComponents();
   }));
 
   beforeEach(() => {

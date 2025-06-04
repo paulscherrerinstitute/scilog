@@ -64,6 +64,7 @@ describe('OverviewScrollComponent', () => {
   });
 
   it('should test elementSize', () => {
+    fixture.detectChanges();
     expect(component['elementSize'](
       {nativeElement: {getBoundingClientRect: () => ({width: 10, height: 20})}})
     ).toEqual({width: 10, height: 20})
