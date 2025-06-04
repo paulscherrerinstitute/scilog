@@ -7,7 +7,8 @@ describe('AppComponent', () => {
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
     imports: [
-        RouterTestingModule
+        RouterTestingModule,
+        AppComponent
     ],
     providers: [
         {
@@ -15,7 +16,6 @@ describe('AppComponent', () => {
             useValue: { logbookInfo: { id: 'id' } }
         }
     ],
-    declarations: [AppComponent],
 }).compileComponents();
   }));
 
