@@ -1,14 +1,17 @@
 import { Component, ElementRef, Inject, OnInit, ViewChild } from '@angular/core';
-import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
+import { MatDialogRef, MAT_DIALOG_DATA, MatDialogContent } from '@angular/material/dialog';
 import { LogbookItemDataService } from '@shared/remote-data.service';
-import { DatePipe } from '@angular/common';
+import { DatePipe, NgIf } from '@angular/common';
+import { CdkScrollable } from '@angular/cdk/scrolling';
+import { MatProgressBar } from '@angular/material/progress-bar';
+import { MatButton } from '@angular/material/button';
 
 @Component({
     selector: 'app-export-dialog',
     templateUrl: './export-dialog.component.html',
     styleUrls: ['./export-dialog.component.css'],
     providers: [DatePipe],
-    standalone: false
+    imports: [CdkScrollable, MatDialogContent, NgIf, MatProgressBar, MatButton]
 })
 export class ExportDialogComponent implements OnInit {
 

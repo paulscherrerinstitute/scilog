@@ -4,8 +4,10 @@ import { WidgetItemConfig } from "src/app/core/model/config";
 import { Logbooks } from "src/app/core/model/logbooks";
 import { LogbookDataService } from "src/app/core/remote-data.service";
 import { LogbookWidgetComponent } from "../logbook-cover/logbook-cover.component";
-import { CdkVirtualScrollViewport } from "@angular/cdk/scrolling";
+import { CdkVirtualScrollViewport, CdkFixedSizeVirtualScroll, CdkVirtualForOf } from "@angular/cdk/scrolling";
 import { Subscription } from "rxjs";
+import { ResizedDirective } from "../../core/directives/resized.directive";
+import { NgFor } from "@angular/common";
 
 type Sizes = {
   width: number,
@@ -16,7 +18,7 @@ type Sizes = {
     selector: 'overview-scroll',
     templateUrl: './overview-scroll.component.html',
     styleUrls: ['./overview-scroll.component.css'],
-    standalone: false
+    imports: [CdkVirtualScrollViewport, CdkFixedSizeVirtualScroll, ResizedDirective, CdkVirtualForOf, NgFor, LogbookWidgetComponent]
 })
 export class OverviewScrollComponent implements AfterViewInit, AfterViewChecked, OnDestroy {
 

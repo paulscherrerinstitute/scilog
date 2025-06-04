@@ -12,13 +12,13 @@ describe('HotkeysComponent', () => {
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      providers: [
+    imports: [HotkeysComponent],
+    providers: [
         { provide: MAT_DIALOG_DATA, useValue: {} },
         { provide: MatDialog, useValue: {} },
-        {provide: AppConfigService, useValue: { getConfig }},
-      ],
-      declarations: [ HotkeysComponent ]
-    })
+        { provide: AppConfigService, useValue: { getConfig } },
+    ]
+})
     .compileComponents();
   }));
 

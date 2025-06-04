@@ -28,14 +28,14 @@ describe('SnippetViewerComponent', () => {
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      providers:[
-        {provide: LogbookInfoService, useValue: logbookInfoSpy},
-        {provide: ViewsService, useClass: ViewsServiceMock},
-        {provide: SnippetViewerDataService, useValue: snippetViewerDataSpy},
+    imports: [SnippetViewerComponent],
+    providers: [
+        { provide: LogbookInfoService, useValue: logbookInfoSpy },
+        { provide: ViewsService, useClass: ViewsServiceMock },
+        { provide: SnippetViewerDataService, useValue: snippetViewerDataSpy },
         { provide: ChangeStreamService, useValue: changestreamSpy },
-      ],
-      declarations: [ SnippetViewerComponent ]
-    })
+    ]
+})
     .compileComponents();
   }));
 

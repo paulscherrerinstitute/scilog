@@ -22,13 +22,12 @@ describe('OverviewScrollComponent', () => {
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      declarations: [OverviewScrollComponent],
-      providers: [
+    providers: [
         { provide: LogbookDataService, useValue: logbookDataSpy },
         { provide: UserPreferencesService, useClass: UserPreferencesMock },
-      ],
-      imports: [ScrollingModule]
-    })
+    ],
+    imports: [ScrollingModule, OverviewScrollComponent]
+})
       .compileComponents();
   }));
 

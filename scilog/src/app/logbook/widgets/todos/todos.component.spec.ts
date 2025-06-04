@@ -52,8 +52,7 @@ describe('TodosComponent', () => {
     isActionAllowedServiceSpy = jasmine.createSpyObj("IsAllowedService", ["canUpdate", "canDelete"]);
     isActionAllowedServiceSpy.tooltips = {update: '', delete: ''};  
     TestBed.configureTestingModule({
-    declarations: [TodosComponent],
-    imports: [],
+    imports: [TodosComponent],
     providers: [
         { provide: LogbookInfoService, useClass: LogbookInfoMock },
         { provide: TasksService, useClass: TasksServiceMock },

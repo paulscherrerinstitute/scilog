@@ -1,8 +1,8 @@
 import { Component, OnInit, Inject, ViewChild, NgZone, ElementRef, ChangeDetectorRef } from '@angular/core';
-import { UntypedFormArray, UntypedFormBuilder, UntypedFormControl, UntypedFormGroup } from '@angular/forms';
-import { MatChipInputEvent } from '@angular/material/chips';
+import { UntypedFormArray, UntypedFormBuilder, UntypedFormControl, UntypedFormGroup, FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { MatChipInputEvent, MatChipGrid, MatChipRow, MatChipRemove, MatChipInput } from '@angular/material/chips';
 import { COMMA, ENTER, SPACE } from '@angular/cdk/keycodes';
-import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
+import { MatDialogRef, MAT_DIALOG_DATA, MatDialogTitle, MatDialogContent, MatDialogActions } from '@angular/material/dialog';
 import { Tags } from '@model/metadata'
 import { Observable, Subscription } from 'rxjs';
 import { Basesnippets } from '@model/basesnippets';
@@ -15,12 +15,23 @@ import { CdkTextareaAutosize } from '@angular/cdk/text-field';
 import { WidgetPreferencesDataService, LogbookDataService } from '@shared/remote-data.service';
 import { WidgetItemConfig } from '@model/config';
 import { AppConfigService } from 'src/app/app-config.service';
+import { CdkScrollable } from '@angular/cdk/scrolling';
+import { MatDivider } from '@angular/material/divider';
+import { MatFormField, MatLabel } from '@angular/material/form-field';
+import { MatInput } from '@angular/material/input';
+import { MatSelect, MatOption } from '@angular/material/select';
+import { NgIf, NgSwitch, NgSwitchCase, NgFor, AsyncPipe } from '@angular/common';
+import { MatSlideToggle } from '@angular/material/slide-toggle';
+import { MatTooltip } from '@angular/material/tooltip';
+import { MatAutocompleteTrigger, MatAutocomplete } from '@angular/material/autocomplete';
+import { MatIcon } from '@angular/material/icon';
+import { MatButton } from '@angular/material/button';
 
 @Component({
     selector: 'widget-preferences',
     templateUrl: './widget-preferences.component.html',
     styleUrls: ['./widget-preferences.component.scss'],
-    standalone: false
+    imports: [MatDialogTitle, CdkScrollable, MatDialogContent, FormsModule, ReactiveFormsModule, MatDivider, MatFormField, MatLabel, MatInput, MatSelect, MatOption, NgIf, NgSwitch, NgSwitchCase, MatSlideToggle, MatTooltip, CdkTextareaAutosize, MatAutocompleteTrigger, MatAutocomplete, NgFor, MatChipGrid, MatChipRow, MatIcon, MatChipRemove, MatChipInput, MatDialogActions, MatButton, AsyncPipe]
 })
 export class WidgetPreferencesComponent implements OnInit {
 

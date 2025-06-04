@@ -13,13 +13,13 @@ describe('SettingsComponent', () => {
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      declarations: [ SettingsComponent ],
-      providers: [
+    imports: [SettingsComponent],
+    providers: [
         { provide: MatDialogRef, useValue: {} },
         { provide: MAT_DIALOG_DATA, useValue: {} },
-        {provide: Router, useValue:routerSpy},
-      ]
-    })
+        { provide: Router, useValue: routerSpy },
+    ]
+})
     .compileComponents();
   }));
 

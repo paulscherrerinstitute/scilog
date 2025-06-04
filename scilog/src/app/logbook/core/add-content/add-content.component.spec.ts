@@ -66,8 +66,7 @@ describe('AddContentComponent', () => {
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-    declarations: [AddContentComponent],
-    imports: [MatDialogModule],
+    imports: [MatDialogModule, AddContentComponent],
     providers: [
         { provide: MAT_DIALOG_DATA, useValue: {} },
         { provide: MatDialogRef, useValue: {} },

@@ -14,15 +14,15 @@ describe('DashboardItemComponent', () => {
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      providers: [
-        {provide: ViewsService, useClass: ViewsServiceMock}
-      ],
-
-      declarations: [ DashboardItemComponent ],
-      imports: [
+    providers: [
+        { provide: ViewsService, useClass: ViewsServiceMock }
+    ],
+    imports: [
         MatDialogModule,
-        RouterTestingModule]
-    })
+        RouterTestingModule,
+        DashboardItemComponent
+    ]
+})
     .compileComponents();
   }));
 

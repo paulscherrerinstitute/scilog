@@ -7,8 +7,7 @@ import { By } from '@angular/platform-browser';
 @Component({
     template: `<div style="width: 10px" (resized)="hasBeenResized()"></div>`,
     imports: [ResizedDirective],
-    standalone: false,
-  })
+})
 class TestComponent {
   isResized = false;
   hasBeenResized() {
@@ -23,8 +22,8 @@ describe('resizedDirective', () => {
 
   beforeEach(() => {
     fixture = TestBed.configureTestingModule({
-        declarations: [ResizedDirective, TestComponent],
-    }).createComponent(TestComponent);
+    imports: [ResizedDirective, TestComponent],
+}).createComponent(TestComponent);
     component = fixture.componentInstance;
     divElement = fixture.debugElement.query(By.css('div'));
     fixture.detectChanges();

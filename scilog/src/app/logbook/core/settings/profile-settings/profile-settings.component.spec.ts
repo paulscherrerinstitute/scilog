@@ -21,13 +21,13 @@ describe('ProfileSettingsComponent', () => {
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      providers:[
+    imports: [ProfileSettingsComponent],
+    providers: [
         UntypedFormBuilder,
-        {provide: UserPreferencesService, useClass: UserPreferencesMock},
-        {provide: AppConfigService, useValue: { getConfig }}
-      ],
-      declarations: [ ProfileSettingsComponent ]
-    })
+        { provide: UserPreferencesService, useClass: UserPreferencesMock },
+        { provide: AppConfigService, useValue: { getConfig } }
+    ]
+})
     .compileComponents();
   }));
 

@@ -1,15 +1,20 @@
 import { Component, Inject, OnInit } from '@angular/core';
-import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
+import { MatDialogRef, MAT_DIALOG_DATA, MatDialogTitle, MatDialogContent, MatDialogActions } from '@angular/material/dialog';
 import { Subscription } from 'rxjs';
 import { ChangeStreamNotification } from '../../changestreamnotification.model';
 import { Basesnippets } from '@model/basesnippets';
 import { LogbookItemDataService } from '@shared/remote-data.service';
+import { CdkScrollable } from '@angular/cdk/scrolling';
+import { MatFormField, MatLabel } from '@angular/material/form-field';
+import { MatInput } from '@angular/material/input';
+import { FormsModule } from '@angular/forms';
+import { MatButton } from '@angular/material/button';
 
 @Component({
     selector: 'snippet-dashboard-name',
     templateUrl: './snippet-dashboard-name.component.html',
     styleUrls: ['./snippet-dashboard-name.component.css'],
-    standalone: false
+    imports: [MatDialogTitle, CdkScrollable, MatDialogContent, MatFormField, MatLabel, MatInput, FormsModule, MatDialogActions, MatButton]
 })
 export class SnippetDashboardNameComponent implements OnInit {
 

@@ -22,13 +22,12 @@ describe('NavigationButtonComponent', () => {
  };
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      providers:[
+    imports: [NavigationButtonComponent],
+    providers: [
         { provide: ActivatedRoute, useValue: activatedRouteMock },
-        { provide: Router, useValue: routerSpy},
-      ],
-
-      declarations: [ NavigationButtonComponent ]
-    })
+        { provide: Router, useValue: routerSpy },
+    ]
+})
     .compileComponents();
   }));
 

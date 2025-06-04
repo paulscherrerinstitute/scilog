@@ -20,12 +20,12 @@ describe('TagEditorComponent', () => {
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      declarations: [ TagEditorComponent ],
-      imports: [MatAutocompleteModule],
-      providers: [
-        {provide: TagService, useValue: tagServiceSpy},
-        {provide: ViewsService, useValue: viewSpy}],
-    })
+    imports: [MatAutocompleteModule, TagEditorComponent],
+    providers: [
+        { provide: TagService, useValue: tagServiceSpy },
+        { provide: ViewsService, useValue: viewSpy }
+    ],
+})
     .compileComponents();
   }));
 

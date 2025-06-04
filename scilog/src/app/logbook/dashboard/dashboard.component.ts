@@ -1,17 +1,23 @@
 import { Component, HostListener, OnInit } from '@angular/core';
-import { CompactType, DisplayGrid, GridsterConfig, GridsterItemComponent, GridType } from 'angular-gridster2';
+import { CompactType, DisplayGrid, GridsterConfig, GridsterItemComponent, GridType, GridsterComponent } from 'angular-gridster2';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Subscription } from 'rxjs';
 import { ViewsService } from '@shared/views.service';
 import { WidgetConfig } from '@model/config';
 import { Hotkeys } from '@shared/hotkeys.service';
 import { ComponentCanDeactivate } from '../core/navigation-guard-service';
+import { ResizedDirective } from '../../core/directives/resized.directive';
+import { NgIf, NgStyle, NgClass, NgFor } from '@angular/common';
+import { MatIconButton, MatButton, MatMiniFabButton } from '@angular/material/button';
+import { MatTooltip } from '@angular/material/tooltip';
+import { MatIcon } from '@angular/material/icon';
+import { DashboardItemComponent } from './dashboard-item/dashboard-item.component';
 
 @Component({
     selector: 'dashboard',
     templateUrl: './dashboard.component.html',
     styleUrls: ['./dashboard.component.scss'],
-    standalone: false
+    imports: [ResizedDirective, NgIf, MatIconButton, MatTooltip, MatIcon, MatButton, NgStyle, GridsterComponent, NgClass, NgFor, GridsterItemComponent, DashboardItemComponent, MatMiniFabButton]
 })
 export class DashboardComponent implements OnInit, ComponentCanDeactivate {
 

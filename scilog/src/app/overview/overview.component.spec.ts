@@ -39,16 +39,15 @@ describe('OverviewComponent', () => {
   
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      declarations: [OverviewComponent],
-      imports: [MatDialogModule, RouterTestingModule, BrowserAnimationsModule],
-      providers: [
-        {provide: MAT_DIALOG_DATA, useValue: {}},
-        {provide: LogbookInfoService, useValue: logbookInfoSpy},
-        {provide: UserPreferencesService, useClass: UserPreferencesMock},
-        {provide: CookieService},
-        {provide: LogbookDataService, useValue: logbookDataSpy},
-      ]
-    })
+    imports: [MatDialogModule, RouterTestingModule, BrowserAnimationsModule, OverviewComponent],
+    providers: [
+        { provide: MAT_DIALOG_DATA, useValue: {} },
+        { provide: LogbookInfoService, useValue: logbookInfoSpy },
+        { provide: UserPreferencesService, useClass: UserPreferencesMock },
+        { provide: CookieService },
+        { provide: LogbookDataService, useValue: logbookDataSpy },
+    ]
+})
     .compileComponents();
   }));
 

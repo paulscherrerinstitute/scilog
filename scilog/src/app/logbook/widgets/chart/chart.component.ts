@@ -6,12 +6,13 @@ import { Basesnippets } from '@model/basesnippets';
 import { ViewsService } from '@shared/views.service';
 import { PlotDataService } from '@shared/remote-data.service';
 import { WidgetConfig, WidgetItemConfig } from '@model/config';
+import { NgChartsModule } from 'ng2-charts';
 
 @Component({
     selector: 'chart',
     templateUrl: './chart.component.html',
     styleUrls: ['./chart.component.css'],
-    standalone: false
+    imports: [NgChartsModule]
 })
 export class ChartComponent implements OnInit {
 

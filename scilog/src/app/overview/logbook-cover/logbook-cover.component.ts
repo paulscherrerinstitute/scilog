@@ -2,13 +2,19 @@ import { Component, OnInit, EventEmitter, Output, Input, ViewChild, ElementRef, 
 import { Logbooks } from '@model/logbooks';
 import { LogbookInfoService } from '@shared/logbook-info.service';
 import { LogbookItemDataService } from '@shared/remote-data.service';
-import { Router } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
+import { MatCard, MatCardHeader, MatCardTitle, MatCardSubtitle, MatCardContent, MatCardActions } from '@angular/material/card';
+import { MatTooltip } from '@angular/material/tooltip';
+import { ActionsMenuComponent } from '../actions-menu/actions-menu.component';
+import { NgIf } from '@angular/common';
+import { MatDivider } from '@angular/material/divider';
+import { MatButton } from '@angular/material/button';
 
 @Component({
     selector: 'app-logbook-cover',
     templateUrl: './logbook-cover.component.html',
     styleUrls: ['./logbook-cover.component.css'],
-    standalone: false
+    imports: [MatCard, MatCardHeader, MatCardTitle, MatTooltip, MatCardSubtitle, ActionsMenuComponent, NgIf, RouterLink, MatCardContent, MatDivider, MatCardActions, MatButton]
 })
 export class LogbookWidgetComponent implements OnInit, AfterViewInit {
 

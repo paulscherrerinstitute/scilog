@@ -39,19 +39,18 @@ describe('AddLogbookComponent', () => {
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      declarations: [AddLogbookComponent],
-      imports: [MatDialogModule, MatAutocompleteModule],
-      providers: [
+    imports: [MatDialogModule, MatAutocompleteModule, AddLogbookComponent],
+    providers: [
         UntypedFormBuilder,
-        {provide: MatDialogRef, useValue: mockDialogRef},
-        {provide: MAT_DIALOG_DATA, useValue: null},
-        {provide: LogbookItemDataService, useValue: logbookItemDataServiceSpy},
-        {provide: UserPreferencesService, useClass: UserPreferencesMock},
-        {provide: LogbookDataService, useValue: logbookDataSpy},
-        {provide: SnackbarService, useValue: snackBarSpy},
-        {provide: IsAllowedService, useClass: isActionAllowedService}
-      ],
-    })
+        { provide: MatDialogRef, useValue: mockDialogRef },
+        { provide: MAT_DIALOG_DATA, useValue: null },
+        { provide: LogbookItemDataService, useValue: logbookItemDataServiceSpy },
+        { provide: UserPreferencesService, useClass: UserPreferencesMock },
+        { provide: LogbookDataService, useValue: logbookDataSpy },
+        { provide: SnackbarService, useValue: snackBarSpy },
+        { provide: IsAllowedService, useClass: isActionAllowedService }
+    ],
+})
       .compileComponents();
   }));
 

@@ -48,13 +48,13 @@ describe('LogbookWidgetComponent', () => {
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      providers: [
-        {provide: LogbookInfoService, useValue: logbookSpy},
-        {provide: UserPreferencesService, useClass: UserPreferencesMock},
-        {provide: LogbookItemDataService, useValue: logbookItemDataSpy},
-      ],
-      declarations: [ LogbookWidgetComponent ]
-    })
+    imports: [LogbookWidgetComponent],
+    providers: [
+        { provide: LogbookInfoService, useValue: logbookSpy },
+        { provide: UserPreferencesService, useClass: UserPreferencesMock },
+        { provide: LogbookItemDataService, useValue: logbookItemDataSpy },
+    ]
+})
     .compileComponents();
   }));
 

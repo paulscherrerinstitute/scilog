@@ -13,8 +13,7 @@ describe('TaskComponent', () => {
 
     beforeEach(waitForAsync(() => {
       TestBed.configureTestingModule({
-    declarations: [TaskComponent],
-    imports: [],
+    imports: [TaskComponent],
     providers: [
         { provide: AppConfigService, useValue: { getConfig } },
         provideHttpClient(withInterceptorsFromDi()),

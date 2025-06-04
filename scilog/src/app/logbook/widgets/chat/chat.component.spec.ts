@@ -11,8 +11,7 @@ describe('ChatComponent', () => {
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-    declarations: [ChatComponent],
-    imports: [],
+    imports: [ChatComponent],
     providers: [ChangeStreamService, provideHttpClient(withInterceptorsFromDi()), provideHttpClientTesting()]
 })
     .compileComponents();

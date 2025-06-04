@@ -5,8 +5,7 @@ import { Subscription } from 'rxjs';
 @Component({
     selector: 'app-auth-callback',
     template: '',
-    styles: [],
-    standalone: false
+    styles: []
 })
 export class AuthCallbackComponent implements OnInit, OnDestroy {
   constructor(private route: ActivatedRoute, private router: Router) {}

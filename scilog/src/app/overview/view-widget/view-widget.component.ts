@@ -4,8 +4,7 @@ import {Views} from '@model/views';
 @Component({
     selector: 'app-view-widget',
     templateUrl: './view-widget.component.html',
-    styleUrls: ['./view-widget.component.css'],
-    standalone: false
+    styleUrls: ['./view-widget.component.css']
 })
 export class ViewWidgetComponent implements OnInit {
 

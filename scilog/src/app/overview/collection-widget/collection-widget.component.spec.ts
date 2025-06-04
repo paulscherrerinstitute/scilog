@@ -13,8 +13,7 @@ describe('CollectionWidgetComponent', () => {
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-    declarations: [CollectionWidgetComponent],
-    imports: [],
+    imports: [CollectionWidgetComponent],
     providers: [{ provide: AppConfigService, useValue: { getConfig } }, provideHttpClient(withInterceptorsFromDi()), provideHttpClientTesting()]
 })
     .compileComponents();

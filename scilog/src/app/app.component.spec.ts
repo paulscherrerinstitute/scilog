@@ -6,19 +6,17 @@ import { LogbookInfoService } from './core/logbook-info.service';
 describe('AppComponent', () => {
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      imports: [
+    imports: [
         RouterTestingModule
-      ],
-      providers: [
+    ],
+    providers: [
         {
-          provide: LogbookInfoService, 
-          useValue: { logbookInfo: {id: 'id'} }
+            provide: LogbookInfoService,
+            useValue: { logbookInfo: { id: 'id' } }
         }
-      ],
-      declarations: [
-        AppComponent
-      ],
-    }).compileComponents();
+    ],
+    declarations: [AppComponent],
+}).compileComponents();
   }));
 
   it('should create the app', () => {

@@ -32,13 +32,12 @@ describe('DownloadComponent', () => {
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      providers:[
-      { provide: ActivatedRoute, useValue: activatedRouteMock },
-      { provide: LogbookItemDataService, useValue: logbookItemDataServiceSpy },
-
-      ],
-      declarations: [ DownloadComponent ]
-    })
+    imports: [DownloadComponent],
+    providers: [
+        { provide: ActivatedRoute, useValue: activatedRouteMock },
+        { provide: LogbookItemDataService, useValue: logbookItemDataServiceSpy },
+    ]
+})
     .compileComponents();
   }));
 

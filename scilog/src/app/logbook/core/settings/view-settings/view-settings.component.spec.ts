@@ -36,16 +36,16 @@ describe('ViewSettingsComponent', () => {
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      providers:[
+    imports: [ViewSettingsComponent],
+    providers: [
         UntypedFormBuilder,
-        {provide: LogbookInfoService, useValue: logbookSpy},
-        {provide: UserPreferencesService, useClass: UserPreferencesMock},
-        {provide: LogbookDataService, useValue: logbookDataSpy},
-        {provide: ViewDataService, useValue: viewDataSpy},
-        {provide: ViewsService, useValue: viewSpy},
-      ],
-      declarations: [ ViewSettingsComponent ]
-    })
+        { provide: LogbookInfoService, useValue: logbookSpy },
+        { provide: UserPreferencesService, useClass: UserPreferencesMock },
+        { provide: LogbookDataService, useValue: logbookDataSpy },
+        { provide: ViewDataService, useValue: viewDataSpy },
+        { provide: ViewsService, useValue: viewSpy },
+    ]
+})
     .compileComponents();
   }));
 

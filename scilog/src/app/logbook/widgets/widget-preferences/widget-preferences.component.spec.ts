@@ -40,45 +40,44 @@ describe('WidgetPreferencesComponent', () => {
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      declarations: [WidgetPreferencesComponent],
-      imports: [MatDialogModule, MatAutocompleteModule, CdkTextareaAutosize],
-      providers: [
+    imports: [MatDialogModule, MatAutocompleteModule, CdkTextareaAutosize, WidgetPreferencesComponent],
+    providers: [
         UntypedFormBuilder,
         { provide: MatDialogRef, useValue: MatDialogRef },
         {
-          provide: MAT_DIALOG_DATA,
-          useValue: {
-            config: {
-              general: {
-                type: 'logbook',
-                title: 'Logbook view',
-              },
-              filter: {
-                targetId: '12345parentID',
-                additionalLogbooks: [],
-                tags: [],
-              },
-              view: {
-                order: ['defaultOrder ASC'],
-                hideMetadata: false,
-                showSnippetHeader: false,
-              },
+            provide: MAT_DIALOG_DATA,
+            useValue: {
+                config: {
+                    general: {
+                        type: 'logbook',
+                        title: 'Logbook view',
+                    },
+                    filter: {
+                        targetId: '12345parentID',
+                        additionalLogbooks: [],
+                        tags: [],
+                    },
+                    view: {
+                        order: ['defaultOrder ASC'],
+                        hideMetadata: false,
+                        showSnippetHeader: false,
+                    },
+                },
             },
-          },
         },
         { provide: LogbookInfoService, useValue: logbookSpy },
         { provide: LogbookDataService, useValue: logbookDataSpy },
         { provide: UserPreferencesService, useClass: UserPreferencesMock },
         {
-          provide: WidgetPreferencesDataService,
-          useValue: widgetPreferencesSpy,
+            provide: WidgetPreferencesDataService,
+            useValue: widgetPreferencesSpy,
         },
         {
-          provide: AppConfigService,
-          useValue: { getConfig: returnEmpty, getScicatSettings: returnEmpty },
+            provide: AppConfigService,
+            useValue: { getConfig: returnEmpty, getScicatSettings: returnEmpty },
         },
-      ],
-    }).compileComponents();
+    ],
+}).compileComponents();
   }));
 
   beforeEach(() => {

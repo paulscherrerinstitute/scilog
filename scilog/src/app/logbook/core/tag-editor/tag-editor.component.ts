@@ -1,20 +1,26 @@
 import { Component, EventEmitter, Input, OnInit, Output, ViewChild, ElementRef, SimpleChange } from '@angular/core';
-import { MatChipInputEvent } from '@angular/material/chips';
+import { MatChipInputEvent, MatChipGrid, MatChipRow, MatChipRemove, MatChipInput } from '@angular/material/chips';
 import { Tags } from '@model/metadata';
 import { COMMA, ENTER, SPACE } from '@angular/cdk/keycodes';
 import { TagService } from '../tag.service';
-import { UntypedFormControl } from '@angular/forms';
-import { MatAutocompleteSelectedEvent } from '@angular/material/autocomplete';
+import { UntypedFormControl, FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { MatAutocompleteSelectedEvent, MatAutocompleteTrigger, MatAutocomplete } from '@angular/material/autocomplete';
 import { Observable, Subscription } from 'rxjs';
 import { startWith, map } from 'rxjs/operators';
 import { ViewsService } from '@shared/views.service';
 import { WidgetItemConfig } from '@model/config';
+import { MatTooltip } from '@angular/material/tooltip';
+import { MatIcon } from '@angular/material/icon';
+import { MatFormField } from '@angular/material/form-field';
+import { NgFor, NgIf, AsyncPipe } from '@angular/common';
+import { MatInput } from '@angular/material/input';
+import { MatOption } from '@angular/material/select';
 
 @Component({
     selector: 'tag-editor',
     templateUrl: './tag-editor.component.html',
     styleUrls: ['./tag-editor.component.scss'],
-    standalone: false
+    imports: [MatTooltip, MatIcon, MatFormField, MatChipGrid, NgFor, MatChipRow, NgIf, MatChipRemove, MatInput, FormsModule, MatAutocompleteTrigger, MatChipInput, ReactiveFormsModule, MatAutocomplete, MatOption, AsyncPipe]
 })
 export class TagEditorComponent implements OnInit {
 

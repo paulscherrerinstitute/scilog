@@ -1,5 +1,5 @@
 import { Component, OnInit, Inject, HostListener } from '@angular/core';
-import { MAT_DIALOG_DATA } from '@angular/material/dialog';
+import { MAT_DIALOG_DATA, MatDialogTitle, MatDialogContent, MatDialogActions, MatDialogClose } from '@angular/material/dialog';
 import * as ClassicEditor from '../ckeditor/ckeditor5/build/ckeditor';
 import { ChangeEvent } from '../ckeditor/ckeditor5/build/ckeditor';
 import { AddContentService } from "../add-content.service";
@@ -12,6 +12,12 @@ import { CK5ImageUploadAdapter } from '../ckeditor/ck5-image-upload-adapter';
 import { Basesnippets, Filecontainer } from '@model/basesnippets';
 import { v4 as uuid } from 'uuid';
 import { CKeditorConfig } from '../ckeditor/ckeditor-config';
+import { CdkScrollable } from '@angular/cdk/scrolling';
+import { CKEditorModule } from '@ckeditor/ckeditor5-angular';
+import { TagEditorComponent } from '../tag-editor/tag-editor.component';
+import { MatTooltip } from '@angular/material/tooltip';
+import { NgIf } from '@angular/common';
+import { MatButton } from '@angular/material/button';
 
 interface editorDataInput {
   snippet: ChangeStreamNotification,
@@ -24,7 +30,7 @@ interface editorDataInput {
     selector: 'add-content',
     templateUrl: './add-content.component.html',
     styleUrls: ['./add-content.component.css'],
-    standalone: false
+    imports: [MatDialogTitle, CdkScrollable, MatDialogContent, CKEditorModule, TagEditorComponent, MatTooltip, MatDialogActions, NgIf, MatButton, MatDialogClose]
 })
 export class AddContentComponent implements OnInit {
 

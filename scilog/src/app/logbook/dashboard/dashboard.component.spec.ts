@@ -14,8 +14,7 @@ describe('DashboardComponent', () => {
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-    declarations: [DashboardComponent],
-    imports: [RouterTestingModule],
+    imports: [RouterTestingModule, DashboardComponent],
     providers: [
         { provide: AppConfigService, useValue: { getConfig } },
         { provide: MatDialog, useValue: {} },

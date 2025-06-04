@@ -1,12 +1,14 @@
 import { Component, Inject, OnInit } from '@angular/core';
-import { MAT_DIALOG_DATA } from '@angular/material/dialog';
+import { MAT_DIALOG_DATA, MatDialogContent } from '@angular/material/dialog';
 import { AppConfigService } from 'src/app/app-config.service';
+import { CdkScrollable } from '@angular/cdk/scrolling';
+import { NgFor } from '@angular/common';
 
 @Component({
     selector: 'app-hotkeys',
     templateUrl: './hotkeys.component.html',
     styleUrls: ['./hotkeys.component.css'],
-    standalone: false
+    imports: [CdkScrollable, MatDialogContent, NgFor]
 })
 export class HotkeysComponent implements OnInit {
 

@@ -1,17 +1,23 @@
 import { Component, OnInit } from '@angular/core';
-import { MatSelectChange } from '@angular/material/select';
+import { MatSelectChange, MatSelect, MatOption } from '@angular/material/select';
 import {
   type Dataset,
   DatasetService,
   type ScicatUser,
   type DatasetSummary,
 } from '@shared/dataset.service';
+import { NgIf, NgFor, DatePipe } from '@angular/common';
+import { MatFormField, MatLabel } from '@angular/material/form-field';
+import { MatCard, MatCardHeader, MatCardTitle, MatCardSubtitle, MatCardContent, MatCardActions } from '@angular/material/card';
+import { MatAnchor } from '@angular/material/button';
+import { MatIcon } from '@angular/material/icon';
+import { MatProgressSpinner } from '@angular/material/progress-spinner';
 
 @Component({
     selector: 'scicat-viewer',
     templateUrl: './scicat-viewer.component.html',
     styleUrls: ['./scicat-viewer.component.css'],
-    standalone: false
+    imports: [NgIf, MatFormField, MatLabel, MatSelect, NgFor, MatOption, MatCard, MatCardHeader, MatCardTitle, MatCardSubtitle, MatCardContent, MatCardActions, MatAnchor, MatIcon, MatProgressSpinner, DatePipe]
 })
 export class ScicatViewerComponent implements OnInit {
   constructor(private datasetService: DatasetService) {}

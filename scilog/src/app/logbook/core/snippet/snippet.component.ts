@@ -15,6 +15,13 @@ import { WidgetItemConfig } from '@model/config';
 import { Edits } from 'src/app/core/model/edits';
 import { Basesnippets } from 'src/app/core/model/basesnippets';
 import { IsAllowedService } from 'src/app/overview/is-allowed.service';
+import { MatCard, MatCardContent } from '@angular/material/card';
+import { NgClass, NgIf, NgFor, DatePipe } from '@angular/common';
+import { MatIcon } from '@angular/material/icon';
+import { NgxJdenticonModule } from 'ngx-jdenticon';
+import { MatTooltip } from '@angular/material/tooltip';
+import { MatIconButton } from '@angular/material/button';
+import { MatMenuTrigger, MatMenu, MatMenuItem } from '@angular/material/menu';
 
 
 @Component({
@@ -30,7 +37,7 @@ import { IsAllowedService } from 'src/app/overview/is-allowed.service';
         ])
     ],
     providers: [IsAllowedService],
-    standalone: false
+    imports: [MatCard, NgClass, NgIf, MatIcon, NgxJdenticonModule, MatTooltip, MatIconButton, MatMenuTrigger, MatMenu, MatMenuItem, MatCardContent, NgFor, SnippetContentComponent, DatePipe]
 })
 export class SnippetComponent implements OnInit {
 

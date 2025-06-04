@@ -15,8 +15,7 @@ describe('LoginComponent', () => {
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-    declarations: [LoginComponent],
-    imports: [RouterTestingModule],
+    imports: [RouterTestingModule, LoginComponent],
     providers: [UntypedFormBuilder, {
             provide: AppConfigService,
             useValue: { getConfig },

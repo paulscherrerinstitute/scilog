@@ -2,13 +2,17 @@ import { CdkTextareaAutosize } from '@angular/cdk/text-field';
 import { Component, Input, NgZone, OnInit, ViewChild } from '@angular/core';
 import { take } from 'rxjs/operators';
 import { Basesnippets } from '@model/basesnippets';
+import { NgFor } from '@angular/common';
+import { MatFormField, MatLabel } from '@angular/material/form-field';
+import { MatInput } from '@angular/material/input';
+import { FormsModule } from '@angular/forms';
 
 
 @Component({
     selector: 'snippet-info-section',
     templateUrl: './snippet-info-section.component.html',
     styleUrls: ['./snippet-info-section.component.css'],
-    standalone: false
+    imports: [NgFor, MatFormField, MatLabel, MatInput, CdkTextareaAutosize, FormsModule]
 })
 export class SnippetInfoSectionComponent implements OnInit {
 

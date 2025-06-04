@@ -1,8 +1,8 @@
 import { COMMA, ENTER, SPACE } from '@angular/cdk/keycodes';
 import { Component, ElementRef, Input, OnInit, ViewChild } from '@angular/core';
-import { UntypedFormBuilder, UntypedFormControl, UntypedFormGroup, ValidatorFn, Validators } from '@angular/forms';
-import { MatAutocomplete, MatAutocompleteSelectedEvent } from '@angular/material/autocomplete';
-import { MatChipInputEvent } from '@angular/material/chips';
+import { UntypedFormBuilder, UntypedFormControl, UntypedFormGroup, ValidatorFn, Validators, FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { MatAutocomplete, MatAutocompleteSelectedEvent, MatAutocompleteTrigger } from '@angular/material/autocomplete';
+import { MatChipInputEvent, MatChipGrid, MatChipRow, MatChipRemove, MatChipInput } from '@angular/material/chips';
 import { Observable } from 'rxjs';
 import { UserPreferencesService } from '@shared/user-preferences.service';
 import { Basesnippets } from '@model/basesnippets';
@@ -11,12 +11,20 @@ import { Views } from '@model/views';
 import { map, startWith } from 'rxjs/operators';
 import {accessGroupsMemberValidator, ownerGroupMemberValidator} from '../view-settings.component';
 import { ViewDataService } from '@shared/remote-data.service';
+import { MatFormField, MatLabel, MatError } from '@angular/material/form-field';
+import { MatSelect, MatOption } from '@angular/material/select';
+import { NgFor, NgIf, AsyncPipe } from '@angular/common';
+import { MatDivider } from '@angular/material/divider';
+import { MatInput } from '@angular/material/input';
+import { MatIcon } from '@angular/material/icon';
+import { MatSlideToggle } from '@angular/material/slide-toggle';
+import { MatButton } from '@angular/material/button';
 
 @Component({
     selector: 'view-edit',
     templateUrl: './view-edit.component.html',
     styleUrls: ['./view-edit.component.css'],
-    standalone: false
+    imports: [FormsModule, ReactiveFormsModule, MatFormField, MatLabel, MatSelect, NgFor, MatOption, MatDivider, MatInput, NgIf, MatError, MatAutocompleteTrigger, MatAutocomplete, MatChipGrid, MatChipRow, MatIcon, MatChipRemove, MatChipInput, MatSlideToggle, MatButton, AsyncPipe]
 })
 export class ViewEditComponent implements OnInit {
 

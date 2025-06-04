@@ -7,12 +7,14 @@ import { Basesnippets } from '@model/basesnippets';
 import { SnippetComponent } from '@shared/snippet/snippet.component';
 import { SnippetViewerDataService } from '@shared/remote-data.service';
 import { WidgetItemConfig, WidgetConfig } from '@model/config';
+import { NgFor } from '@angular/common';
+import { SnippetComponent as SnippetComponent_1 } from '../../core/snippet/snippet.component';
 
 @Component({
     selector: 'snippet-viewer',
     templateUrl: './snippet-viewer.component.html',
     styleUrls: ['./snippet-viewer.component.css'],
-    standalone: false
+    imports: [NgFor, SnippetComponent_1]
 })
 export class SnippetViewerComponent implements OnInit {
 

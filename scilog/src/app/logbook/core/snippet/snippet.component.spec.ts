@@ -47,19 +47,19 @@ describe('SnippetComponent', () => {
   }
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      imports: [
+    imports: [
         MatDialogModule,
         MatMenuModule,
-        BrowserAnimationsModule
-      ],
-      providers: [
+        BrowserAnimationsModule,
+        SnippetComponent
+    ],
+    providers: [
         { provide: MAT_DIALOG_DATA, useValue: {} },
         { provide: MatDialogRef, useValue: {} },
         { provide: LogbookItemDataService, useValue: logbookItemDataServiceSpy },
         { provide: UserPreferencesService, useValue: userPreferencesServiceSpy },
-      ],
-      declarations: [SnippetComponent]
-    })
+    ]
+})
       .compileComponents();
   }));
 

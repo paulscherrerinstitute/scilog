@@ -12,12 +12,20 @@ import { SettingsComponent } from '@shared/settings/settings.component'
 import { WidgetConfig } from '@model/config';
 import { AppConfigService, AppConfig } from 'src/app/app-config.service';
 import { CookiesService } from '../cookies.service';
+import { NgIf, NgClass, NgFor, NgStyle } from '@angular/common';
+import { MatToolbar } from '@angular/material/toolbar';
+import { MatIconButton } from '@angular/material/button';
+import { MatIcon } from '@angular/material/icon';
+import { SearchWindowComponent } from '../../logbook/core/search-window/search-window.component';
+import { MatTooltip } from '@angular/material/tooltip';
+import { MatMenuTrigger, MatMenu, MatMenuItem } from '@angular/material/menu';
+import { NgxJdenticonModule } from 'ngx-jdenticon';
 
 @Component({
     selector: 'app-toolbar',
     templateUrl: './toolbar.component.html',
     styleUrls: ['./toolbar.component.scss'],
-    standalone: false
+    imports: [NgIf, MatToolbar, NgClass, MatIconButton, MatIcon, SearchWindowComponent, MatTooltip, MatMenuTrigger, MatMenu, NgFor, MatMenuItem, NgStyle, NgxJdenticonModule]
 })
 export class ToolbarComponent implements OnInit {
 

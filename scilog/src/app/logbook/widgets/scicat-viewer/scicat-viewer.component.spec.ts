@@ -12,8 +12,7 @@ describe('ScicatViewerComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-    declarations: [ScicatViewerComponent],
-    imports: [],
+    imports: [ScicatViewerComponent],
     providers: [{ provide: AppConfigService, useValue: { getConfig: returnEmpty, getScicatSettings: returnEmpty } }, provideHttpClient(withInterceptorsFromDi()), provideHttpClientTesting()]
 }).compileComponents();
 
