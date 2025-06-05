@@ -32,7 +32,7 @@
     <div class="version-info" *ngIf="showVersionInfo" matTooltip="v0.9">
       {{ versionInfo }}
     </div>
-    <button mat-icon-button *ngIf="showMenuIcon && isLogbookOpen" (click)="openSearch()" matTooltip="Search">
+    <button mat-icon-button *ngIf="showMenuIcon && isLogbookOpen" (click)="openSearch()" matTooltip="Search" aria-label="Search">
       <mat-icon>search</mat-icon>
     </button>
     <button mat-icon-button [matMenuTriggerFor]="menuViews" *ngIf="isLogbookOpen">
@@ -50,7 +50,7 @@
         <span>Save/Edit</span>
       </button>
     </mat-menu>
-    <button mat-icon-button (click)="openHelp()" *ngIf="!showMenuIcon" matTooltip="Help">
+    <button mat-icon-button (click)="openHelp()" *ngIf="!showMenuIcon" matTooltip="Help" aria-label="Help">
       <mat-icon>help</mat-icon>
     </button>
     <button mat-icon-button [matMenuTriggerFor]="menu">
