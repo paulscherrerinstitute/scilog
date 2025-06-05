@@ -8,6 +8,8 @@ import { ChangeStreamNotification } from '@shared/changestreamnotification.model
 import { LinkType, Paragraphs } from '@model/paragraphs';
 import { AppConfigService } from 'src/app/app-config.service';
 import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http';
+import { Component } from '@angular/core';
+import { TagEditorComponent } from '@shared/tag-editor/tag-editor.component';
 
 class AddContentServiceMock {
   currentMessage = of({});
@@ -64,18 +66,25 @@ describe('AddContentComponent', () => {
     ]
   };
 
+  @Component({selector:'tag-editor', template: ''})
+  class TagEditorStub {}
+
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-    imports: [MatDialogModule, AddContentComponent],
-    providers: [
+      imports: [MatDialogModule, TagEditorStub, AddContentComponent],
+      providers: [
         { provide: MAT_DIALOG_DATA, useValue: {} },
         { provide: MatDialogRef, useValue: {} },
         { provide: AddContentService, useClass: AddContentServiceMock },
         { provide: AppConfigService, useValue: { getConfig } },
         provideHttpClient(withInterceptorsFromDi()),
         provideHttpClientTesting(),
-    ]
-})
+      ],
+    })
+      .overrideComponent(AddContentComponent, {
+        add: { imports: [TagEditorStub] },
+        remove: { imports: [TagEditorComponent] },
+      })
       .compileComponents();
   }));
 

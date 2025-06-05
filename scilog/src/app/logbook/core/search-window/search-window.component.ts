@@ -71,7 +71,7 @@ export class SearchWindowComponent implements OnInit {
     //Called after ngAfterContentInit when the component's view has been initialized. Applies to components only.
     //Add 'implements AfterViewInit' to the class.
 
-    this.searchSnippets.nativeElement.focus();
+    setTimeout(() => this.searchSnippets.nativeElement.focus());
   }
 
   submitSearch() {
