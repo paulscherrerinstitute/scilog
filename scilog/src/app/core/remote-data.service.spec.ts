@@ -1,11 +1,12 @@
 import { TestBed } from '@angular/core/testing';
 
 import { RemoteDataService } from '@shared/remote-data.service';
-import { HttpClientTestingModule } from '@angular/common/http/testing';
+import { provideHttpClientTesting } from '@angular/common/http/testing';
 import { AppConfigService } from '../app-config.service';
 import { LogbookDataService, LogbookItemDataService, SearchDataService } from './remote-data.service';
 import { of } from 'rxjs';
 import { WidgetItemConfig } from './model/config';
+import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http';
 
 const getConfig = () => ({});
 
@@ -14,9 +15,9 @@ describe('RemoteDataService', () => {
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      imports: [HttpClientTestingModule],
-      providers: [{ provide: AppConfigService, useValue: { getConfig } }],
-    });
+    imports: [],
+    providers: [{ provide: AppConfigService, useValue: { getConfig } }, provideHttpClient(withInterceptorsFromDi()), provideHttpClientTesting()]
+});
     service = TestBed.inject(RemoteDataService);
   });
 
@@ -62,9 +63,9 @@ describe('LogbookItemDataService', () => {
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      imports: [HttpClientTestingModule],
-      providers: [{ provide: AppConfigService, useValue: { getConfig } }],
-    });
+    imports: [],
+    providers: [{ provide: AppConfigService, useValue: { getConfig } }, provideHttpClient(withInterceptorsFromDi()), provideHttpClientTesting()]
+});
     service = TestBed.inject(LogbookItemDataService);
   });
 
@@ -273,9 +274,9 @@ describe('LogbookDataService', () => {
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      imports: [HttpClientTestingModule],
-      providers: [{ provide: AppConfigService, useValue: { getConfig } }],
-    });
+    imports: [],
+    providers: [{ provide: AppConfigService, useValue: { getConfig } }, provideHttpClient(withInterceptorsFromDi()), provideHttpClientTesting()]
+});
     service = TestBed.inject(LogbookDataService);
   });
 
@@ -313,9 +314,9 @@ describe('SearchDataService', () => {
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      imports: [HttpClientTestingModule],
-      providers: [{ provide: AppConfigService, useValue: { getConfig } }],
-    });
+    imports: [],
+    providers: [{ provide: AppConfigService, useValue: { getConfig } }, provideHttpClient(withInterceptorsFromDi()), provideHttpClientTesting()]
+});
     service = TestBed.inject(SearchDataService);
   });
 

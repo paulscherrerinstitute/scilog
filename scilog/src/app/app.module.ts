@@ -14,7 +14,7 @@ import { MatSidenavModule } from '@angular/material/sidenav';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { CdkDrag, CdkDropList, DragDropModule } from '@angular/cdk/drag-drop';
 import { ScrollingModule } from '@angular/cdk/scrolling';
-import { HttpClientModule } from '@angular/common/http';
+import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http';
 import { CKEditorModule } from '@ckeditor/ckeditor5-angular';
 import { AddContentComponent } from '@shared/add-content/add-content.component';
 import { MatMenuModule } from '@angular/material/menu';
@@ -94,8 +94,7 @@ const appConfigInitializerFn = (appConfig: AppConfigService) => {
     return () => appConfig.loadAppConfig();
 };
 
-@NgModule({
-    declarations: [
+@NgModule({ declarations: [
         AppComponent,
         SnippetComponent,
         AddContentComponent,
@@ -140,8 +139,7 @@ const appConfigInitializerFn = (appConfig: AppConfigService) => {
         ScicatViewerComponent,
         AuthCallbackComponent
     ],
-    imports: [
-        BrowserModule,
+    bootstrap: [AppComponent], imports: [BrowserModule,
         AppRoutingModule,
         MatButtonModule,
         MatCardModule,
@@ -152,7 +150,6 @@ const appConfigInitializerFn = (appConfig: AppConfigService) => {
         MatSidenavModule,
         BrowserAnimationsModule,
         CKEditorModule,
-        HttpClientModule,
         ScrollingModule,
         DragDropModule,
         MatMenuModule,
@@ -183,9 +180,7 @@ const appConfigInitializerFn = (appConfig: AppConfigService) => {
         MatPaginatorModule,
         MatSortModule,
         CdkDrag,
-        CdkDropList,
-    ],
-    providers: [
+        CdkDropList], providers: [
         AppConfigService,
         {
             provide: APP_INITIALIZER,
@@ -214,8 +209,7 @@ const appConfigInitializerFn = (appConfig: AppConfigService) => {
                 },
                 backColor: '#222',
             },
-        }
-    ],
-    bootstrap: [AppComponent]
-})
+        },
+        provideHttpClient(withInterceptorsFromDi())
+    ] })
 export class AppModule { }

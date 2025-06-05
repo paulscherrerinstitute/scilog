@@ -1,8 +1,9 @@
-import { HttpClientTestingModule } from '@angular/common/http/testing';
+import { provideHttpClientTesting } from '@angular/common/http/testing';
 import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 import { AppConfigService } from 'src/app/app-config.service';
 
 import { CollectionWidgetComponent } from './collection-widget.component';
+import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http';
 
 const getConfig = () => ({});
 
@@ -12,10 +13,10 @@ describe('CollectionWidgetComponent', () => {
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      declarations: [ CollectionWidgetComponent ],
-      imports: [HttpClientTestingModule],
-      providers: [{ provide: AppConfigService, useValue: { getConfig } }],
-    })
+    declarations: [CollectionWidgetComponent],
+    imports: [],
+    providers: [{ provide: AppConfigService, useValue: { getConfig } }, provideHttpClient(withInterceptorsFromDi()), provideHttpClientTesting()]
+})
     .compileComponents();
   }));
 

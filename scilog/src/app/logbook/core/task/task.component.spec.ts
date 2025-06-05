@@ -1,8 +1,9 @@
 import { ComponentFixture, TestBed, waitForAsync } from "@angular/core/testing";
 import { TaskComponent } from "./task.component";
-import { HttpClientTestingModule } from "@angular/common/http/testing";
+import { provideHttpClientTesting } from "@angular/common/http/testing";
 import { AppConfigService } from "src/app/app-config.service";
 import { Tasks } from "src/app/core/model/tasks";
+import { provideHttpClient, withInterceptorsFromDi } from "@angular/common/http";
 
 const getConfig = () => ({});
 
@@ -12,12 +13,14 @@ describe('TaskComponent', () => {
 
     beforeEach(waitForAsync(() => {
       TestBed.configureTestingModule({
-        imports: [HttpClientTestingModule],
-        providers: [
-          { provide: AppConfigService, useValue: { getConfig } },
-        ],
-        declarations: [TaskComponent]
-      })
+    declarations: [TaskComponent],
+    imports: [],
+    providers: [
+        { provide: AppConfigService, useValue: { getConfig } },
+        provideHttpClient(withInterceptorsFromDi()),
+        provideHttpClientTesting(),
+    ]
+})
         .compileComponents();
     }));
   

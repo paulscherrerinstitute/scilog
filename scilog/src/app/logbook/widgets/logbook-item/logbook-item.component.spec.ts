@@ -1,5 +1,5 @@
 import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
-import { HttpClientTestingModule } from '@angular/common/http/testing';
+import { provideHttpClientTesting } from '@angular/common/http/testing';
 import { MatDialogModule, MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { LogbookItemComponent } from './logbook-item.component';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
@@ -22,6 +22,7 @@ import { LogbookDataService } from '@shared/remote-data.service';
 import { LogbookScrollService } from '@shared/logbook-scroll.service';
 import { AppConfigService } from 'src/app/app-config.service';
 import { Renderer2 } from '@angular/core';
+import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http';
 
 class ChangeStreamServiceMock {
 
@@ -210,12 +211,10 @@ describe('LogbookItemComponent', () => {
 
 
     TestBed.configureTestingModule({
-      imports: [
-        HttpClientTestingModule,
-        MatDialogModule,
-        BrowserAnimationsModule,
-      ],
-      providers: [MatSnackBarModule,
+    declarations: [LogbookItemComponent],
+    imports: [MatDialogModule,
+        BrowserAnimationsModule],
+    providers: [MatSnackBarModule,
         { provide: MAT_DIALOG_DATA, useValue: {} },
         { provide: MatDialogRef, useValue: {} },
         { provide: ChangeStreamService, useClass: ChangeStreamServiceMock },
@@ -227,11 +226,8 @@ describe('LogbookItemComponent', () => {
         { provide: Datasource, useClass: DatasourceMock },
         { provide: LogbookDataService, useValue: logbookItemDataServiceSpy },
         { provide: LogbookScrollService, useValue: scrollServiceSpy },
-        { provide: AppConfigService, useValue: { getConfig } },
-      ],
-      declarations: [LogbookItemComponent]
-
-    })
+        { provide: AppConfigService, useValue: { getConfig } }, provideHttpClient(withInterceptorsFromDi()), provideHttpClientTesting(),]
+})
       .compileComponents();
   }));
 
