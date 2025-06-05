@@ -1,17 +1,5 @@
 @import '../../../../styles/shadows';
 
-.logbook {
-  margin-bottom: 1px;
-  margin-left: 20px;
-  margin-right: 20px;
-  margin-top: 1px;
-  min-height: 100%;
-  text-align: left;
-  border-radius: 2px;
-  padding: 20px 0px;
-  @include default-shadow;
-}
-
 .snippet {
   margin-bottom: 0px;
   margin-left: 20px;
@@ -74,7 +62,7 @@
   margin-bottom: 1px;
   margin-left: -25px;
   margin-right: -5px;
-  margin-top: -8px;
+  margin-top: -12px;
   min-height: 100%;
   text-align: left;
   border-radius: 2px;
@@ -133,10 +121,11 @@
   border-radius: 50%
 }
 
-.mat-card-content {
-  /* margin-bottom: 2px; */
+.card-content {
   padding-left: 20px;
   padding-right: 20px;
+  padding-bottom: 0;
+  padding-top: 4px;
   margin-right: 20px;
   margin-left: 8px;
 }

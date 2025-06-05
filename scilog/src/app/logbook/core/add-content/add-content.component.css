@@ -1,4 +1,4 @@
-.mat-dialog-content {
+.mat-mdc-dialog-content {
   max-height: 60vh;
   padding: 15px;
   margin: 10px;
@@ -24,7 +24,7 @@
 }
 
 
-::ng-deep .mat-dialog-container {
+::ng-deep .mat-mdc-dialog-container {
   width: 120vh;
 }
 

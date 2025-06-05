@@ -1,12 +1,12 @@
 <div class="background-image"></div>
 <div class="login-form-flex">
-  <mat-card class='mat-card'>
+  <mat-card appearance="raised" class='card'>
 
-    <mat-card-title>
-      <img src="assets/scilog_logo.png" alt="SciLog" width="120" height="120">
+    <mat-card-title class="card-title">
+      <img mat-card-image src="assets/scilog_logo.png" alt="SciLog" width="120" height="120">
     </mat-card-title>
-    <mat-card-content class="content-container">
-      <mat-tab-group mat-stretch-tabs="false" mat-align-tabs="center" fitInkBarToContent>
+    <mat-card-content>
+      <mat-tab-group mat-align-tabs="center" dynamicHeight="true">
         <mat-tab label="{{oAuth2Endpoint.displayText}}" *ngIf="oAuth2Endpoint">
           <ng-template mat-tab-label>
             <label matTooltip="{{ oAuth2Endpoint.tooltipText }}" matTooltipClass="example-tooltip-red1" [matTooltipPosition]="'above'">
@@ -27,13 +27,13 @@
               Admin
             </label>
           </ng-template>
-          <form [formGroup]="form" (keyup.enter)="login()">
-            <mat-form-field appearance="outline" class="mat-form-field">
+          <form [formGroup]="form" (keyup.enter)="login()" style="padding-top: 20px;">
+            <mat-form-field appearance="outline" class="form-field">
               <mat-label>User name</mat-label>
               <input matInput [type]="'text'" formControlName="email">
             </mat-form-field>
             <br />
-            <mat-form-field appearance="outline" class="mat-form-field">
+            <mat-form-field appearance="outline" class="form-field">
               <mat-label>Enter your password</mat-label>
               <input matInput [type]="hide ? 'password' : 'text'" formControlName="password">
               <button mat-icon-button matSuffix (mousedown)="hide = !hide" [attr.aria-label]="'Hide password'"
@@ -45,9 +45,9 @@
               {{ loginMessage }}
             </div>
           </form>
-          <mat-card-actions class="mat-card-actions">
+          <div class="card-actions">
             <button mat-raised-button color="primary" (click)="login()">Login</button>
-          </mat-card-actions>
+          </div>
         </mat-tab>
       </mat-tab-group>
     </mat-card-content>

@@ -4,14 +4,16 @@
     </span>
     <span class="flexExpand"></span>
     <span>
-        <button mat-icon-button aria-label="Export"  (click)='exportLogbook()' *ngIf="config?.general.type=='logbook'">
-            <mat-icon matTooltip="Export logbook">save_alt</mat-icon>
+        <button mat-icon-button aria-label="Export" (click)='exportLogbook()' *ngIf="config?.general.type=='logbook'"
+            matTooltip="Export logbook">
+            <mat-icon>save_alt</mat-icon>
         </button>
-        <button mat-icon-button aria-label="Edit"  (click)='requestFullscreen()' *ngIf="dashboardView">
-            <mat-icon matTooltip="Switch to full screen mode">fullscreen</mat-icon>
+        <button mat-icon-button aria-label="Edit" (click)='requestFullscreen()' *ngIf="dashboardView"
+            matTooltip="Switch to full screen mode">
+            <mat-icon>fullscreen</mat-icon>
         </button>
-        <button mat-icon-button aria-label="Edit" (click)='openPreferences()'>
-            <mat-icon matTooltip="Open widget preferences">settings</mat-icon>
+        <button mat-icon-button aria-label="Edit" (click)='openPreferences()' matTooltip="Open widget preferences">
+            <mat-icon>settings</mat-icon>
         </button>
     </span>
 

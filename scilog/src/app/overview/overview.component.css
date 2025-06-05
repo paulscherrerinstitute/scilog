@@ -22,17 +22,11 @@
   width: calc(100vw - 20px);
 }
 
-::ng-deep .mat-toolbar {
-  z-index: 998;
-  position: fixed;
-  height: 50px;
-  flex: 1 1 auto;
-}
-
 .flexExpand {
   flex: 1 1 auto;
 }
 
+/* TODO(mdc-migration): The following rule targets internal classes of button that may no longer apply for the MDC version. */
 mat-button-toggle-group {
   float: right;
   transform: scale(75%) translate(18px, -50%);

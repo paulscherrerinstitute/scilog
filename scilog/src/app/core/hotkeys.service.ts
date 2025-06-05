@@ -2,7 +2,7 @@ import { Injectable, Inject } from '@angular/core';
 import { EventManager } from '@angular/platform-browser';
 import { Observable } from 'rxjs';
 import { DOCUMENT } from "@angular/common";
-import { MatLegacyDialog as MatDialog } from '@angular/material/legacy-dialog';
+import { MatDialog } from '@angular/material/dialog';
 import { HotkeysComponent } from './hotkeys/hotkeys.component';
 
 export type HotkeyOptions = {

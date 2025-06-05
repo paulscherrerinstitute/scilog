@@ -19,10 +19,10 @@
 
 <div *ngIf="selectedDataset">
   <mat-card appearance="outlined">
-    <div>
+    <mat-card-header>
       <mat-card-title>{{ selectedDataset.datasetName }}</mat-card-title>
       <mat-card-subtitle>{{ selectedDataset.pid }}</mat-card-subtitle>
-    </div>
+    </mat-card-header>
     <mat-card-content id="dataset-details">
       <p>{{ selectedDataset.description }}</p>
       <table>
