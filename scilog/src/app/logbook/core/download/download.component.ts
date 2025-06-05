@@ -3,9 +3,10 @@ import { ActivatedRoute } from '@angular/router';
 import { LogbookItemDataService } from '@shared/remote-data.service';
 
 @Component({
-  selector: 'app-download',
-  templateUrl: './download.component.html',
-  styleUrls: ['./download.component.css']
+    selector: 'app-download',
+    templateUrl: './download.component.html',
+    styleUrls: ['./download.component.css'],
+    standalone: false
 })
 export class DownloadComponent implements OnInit {
 

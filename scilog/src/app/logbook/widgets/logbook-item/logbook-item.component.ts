@@ -38,54 +38,55 @@ import { LinkType } from 'src/app/core/model/paragraphs';
 
 
 @Component({
-  selector: 'logbook-item',
-  templateUrl: './logbook-item.component.html',
-  styleUrls: ['./logbook-item.component.scss'],
-  providers: [ChangeStreamService, LogbookScrollService],
-  animations: [
-    trigger('rotatedState', [
-      state('default', style({ transform: 'rotate(0)' })),
-      state('rotated', style({ transform: 'rotate(225deg)' })),
-      transition('rotated => default', animate('200ms ease-out')),
-      transition('default => rotated', animate('200ms ease-in'))
-    ]),
-    trigger('buttonEdit', [
-      state('start', style({ bottom: '-50px', right: '15px', opacity: '0', transform: 'translateY(-100%)' })),
-      state('end', style({ bottom: '90px', right: '15px', opacity: '1' })),
-      transition('start => end', animate('200ms ease-out')),
-      transition('end => start', animate('200ms ease-in'))
-    ]),
-    trigger('buttonPhoto', [
-      state('start', style({ bottom: '-50px', right: '15px', opacity: '0', transform: 'translateY(-100%)' })),
-      state('end', style({ bottom: '170px', right: '15px', opacity: '1' })),
-      transition('start => end', animate('200ms ease-out')),
-      transition('end => start', animate('200ms ease-in'))
-    ]),
-    trigger('buttonTask', [
-      state('start', style({ bottom: '-50px', right: '15px', opacity: '0', transform: 'translateY(-100%)' })),
-      state('end', style({ bottom: '250px', right: '15px', opacity: '1' })),
-      transition('start => end', animate('200ms ease-out')),
-      transition('end => start', animate('200ms ease-in'))
-    ]),
-    trigger('buttonFile', [
-      state('start', style({ bottom: '-50px', right: '15px', opacity: '0', transform: 'translateY(-100%)' })),
-      state('end', style({ bottom: '330px', right: '15px', opacity: '1' })),
-      transition('start => end', animate('200ms ease-out')),
-      transition('end => start', animate('200ms ease-in'))
-    ]),
-    trigger('searchExpand', [
-      state('start', style({ height: '10px' })),
-      state('end', style({ height: '50vh' })),
-      transition('start => end', animate('200ms ease-in')),
-      transition('end => start', animate('200ms ease-in'))
-    ]),
-    trigger('scrollButton', [
-      transition(':enter', [
-        style({opacity: 0}), 
-        animate('1ms 0.2s ease-out', style({opacity: 0.4}))
-      ])
-    ]),
-  ]
+    selector: 'logbook-item',
+    templateUrl: './logbook-item.component.html',
+    styleUrls: ['./logbook-item.component.scss'],
+    providers: [ChangeStreamService, LogbookScrollService],
+    animations: [
+        trigger('rotatedState', [
+            state('default', style({ transform: 'rotate(0)' })),
+            state('rotated', style({ transform: 'rotate(225deg)' })),
+            transition('rotated => default', animate('200ms ease-out')),
+            transition('default => rotated', animate('200ms ease-in'))
+        ]),
+        trigger('buttonEdit', [
+            state('start', style({ bottom: '-50px', right: '15px', opacity: '0', transform: 'translateY(-100%)' })),
+            state('end', style({ bottom: '90px', right: '15px', opacity: '1' })),
+            transition('start => end', animate('200ms ease-out')),
+            transition('end => start', animate('200ms ease-in'))
+        ]),
+        trigger('buttonPhoto', [
+            state('start', style({ bottom: '-50px', right: '15px', opacity: '0', transform: 'translateY(-100%)' })),
+            state('end', style({ bottom: '170px', right: '15px', opacity: '1' })),
+            transition('start => end', animate('200ms ease-out')),
+            transition('end => start', animate('200ms ease-in'))
+        ]),
+        trigger('buttonTask', [
+            state('start', style({ bottom: '-50px', right: '15px', opacity: '0', transform: 'translateY(-100%)' })),
+            state('end', style({ bottom: '250px', right: '15px', opacity: '1' })),
+            transition('start => end', animate('200ms ease-out')),
+            transition('end => start', animate('200ms ease-in'))
+        ]),
+        trigger('buttonFile', [
+            state('start', style({ bottom: '-50px', right: '15px', opacity: '0', transform: 'translateY(-100%)' })),
+            state('end', style({ bottom: '330px', right: '15px', opacity: '1' })),
+            transition('start => end', animate('200ms ease-out')),
+            transition('end => start', animate('200ms ease-in'))
+        ]),
+        trigger('searchExpand', [
+            state('start', style({ height: '10px' })),
+            state('end', style({ height: '50vh' })),
+            transition('start => end', animate('200ms ease-in')),
+            transition('end => start', animate('200ms ease-in'))
+        ]),
+        trigger('scrollButton', [
+            transition(':enter', [
+                style({ opacity: 0 }),
+                animate('1ms 0.2s ease-out', style({ opacity: 0.4 }))
+            ])
+        ]),
+    ],
+    standalone: false
 })
 export class LogbookItemComponent implements OnInit {
 

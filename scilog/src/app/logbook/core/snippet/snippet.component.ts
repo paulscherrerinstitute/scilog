@@ -18,18 +18,19 @@ import { IsAllowedService } from 'src/app/overview/is-allowed.service';
 
 
 @Component({
-  selector: 'snippet',
-  templateUrl: './snippet.component.html',
-  styleUrls: ['./snippet.component.scss'],
-  animations: [
-    trigger('highlightSnippet', [
-      state('default', style({ backgroundColor: 'var(--snippet-color)' })),
-      state('highlight', style({ backgroundColor: '#efefef' })),
-      transition('highlight => default', animate('2000ms ease-out')),
-      transition('default => highlight', animate('200ms ease-in'))
-    ])
-  ],
-  providers: [IsAllowedService],
+    selector: 'snippet',
+    templateUrl: './snippet.component.html',
+    styleUrls: ['./snippet.component.scss'],
+    animations: [
+        trigger('highlightSnippet', [
+            state('default', style({ backgroundColor: 'var(--snippet-color)' })),
+            state('highlight', style({ backgroundColor: '#efefef' })),
+            transition('highlight => default', animate('2000ms ease-out')),
+            transition('default => highlight', animate('200ms ease-in'))
+        ])
+    ],
+    providers: [IsAllowedService],
+    standalone: false
 })
 export class SnippetComponent implements OnInit {
 

@@ -4,9 +4,10 @@ import { Subscription } from 'rxjs';
 import { WidgetConfig } from '@model/config';
 
 @Component({
-  selector: 'app-navigation-button',
-  templateUrl: './navigation-button.component.html',
-  styleUrls: ['./navigation-button.component.scss']
+    selector: 'app-navigation-button',
+    templateUrl: './navigation-button.component.html',
+    styleUrls: ['./navigation-button.component.scss'],
+    standalone: false
 })
 export class NavigationButtonComponent implements OnInit {
 

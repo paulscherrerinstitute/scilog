@@ -1,5 +1,5 @@
 import { BrowserModule } from '@angular/platform-browser';
-import { APP_INITIALIZER, NgModule } from "@angular/core";
+import { NgModule, inject, provideAppInitializer } from "@angular/core";
 
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
@@ -182,12 +182,10 @@ const appConfigInitializerFn = (appConfig: AppConfigService) => {
         CdkDrag,
         CdkDropList], providers: [
         AppConfigService,
-        {
-            provide: APP_INITIALIZER,
-            useFactory: appConfigInitializerFn,
-            multi: true,
-            deps: [AppConfigService],
-        },
+        provideAppInitializer(() => {
+        const initializerFn = (appConfigInitializerFn)(inject(AppConfigService));
+        return initializerFn();
+      }),
         {
             provide: HTTP_INTERCEPTORS,
             useClass: AuthInterceptor,

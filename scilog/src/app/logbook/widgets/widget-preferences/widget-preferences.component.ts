@@ -17,9 +17,10 @@ import { WidgetItemConfig } from '@model/config';
 import { AppConfigService } from 'src/app/app-config.service';
 
 @Component({
-  selector: 'widget-preferences',
-  templateUrl: './widget-preferences.component.html',
-  styleUrls: ['./widget-preferences.component.scss']
+    selector: 'widget-preferences',
+    templateUrl: './widget-preferences.component.html',
+    styleUrls: ['./widget-preferences.component.scss'],
+    standalone: false
 })
 export class WidgetPreferencesComponent implements OnInit {
 

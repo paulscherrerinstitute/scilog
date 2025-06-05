@@ -3,9 +3,10 @@ import { IsAllowedService } from '../is-allowed.service';
 import { Logbooks } from 'src/app/core/model/logbooks';
 
 @Component({
-  selector: 'actions-menu',
-  templateUrl: './actions-menu.component.html',
-  providers: [IsAllowedService],
+    selector: 'actions-menu',
+    templateUrl: './actions-menu.component.html',
+    providers: [IsAllowedService],
+    standalone: false
 })
 export class ActionsMenuComponent implements OnInit {
 

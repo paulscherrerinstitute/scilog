@@ -9,9 +9,10 @@ import { SnippetViewerDataService } from '@shared/remote-data.service';
 import { WidgetItemConfig, WidgetConfig } from '@model/config';
 
 @Component({
-  selector: 'snippet-viewer',
-  templateUrl: './snippet-viewer.component.html',
-  styleUrls: ['./snippet-viewer.component.css']
+    selector: 'snippet-viewer',
+    templateUrl: './snippet-viewer.component.html',
+    styleUrls: ['./snippet-viewer.component.css'],
+    standalone: false
 })
 export class SnippetViewerComponent implements OnInit {
 

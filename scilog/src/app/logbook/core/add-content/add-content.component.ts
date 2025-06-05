@@ -21,9 +21,10 @@ interface editorDataInput {
 }
 
 @Component({
-  selector: 'add-content',
-  templateUrl: './add-content.component.html',
-  styleUrls: ['./add-content.component.css']
+    selector: 'add-content',
+    templateUrl: './add-content.component.html',
+    styleUrls: ['./add-content.component.css'],
+    standalone: false
 })
 export class AddContentComponent implements OnInit {
 

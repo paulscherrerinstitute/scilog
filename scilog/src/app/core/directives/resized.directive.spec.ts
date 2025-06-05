@@ -7,6 +7,7 @@ import { By } from '@angular/platform-browser';
 @Component({
     template: `<div style="width: 10px" (resized)="hasBeenResized()"></div>`,
     imports: [ResizedDirective],
+    standalone: false,
   })
 class TestComponent {
   isResized = false;

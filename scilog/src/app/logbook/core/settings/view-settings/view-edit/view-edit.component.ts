@@ -13,9 +13,10 @@ import {accessGroupsMemberValidator, ownerGroupMemberValidator} from '../view-se
 import { ViewDataService } from '@shared/remote-data.service';
 
 @Component({
-  selector: 'view-edit',
-  templateUrl: './view-edit.component.html',
-  styleUrls: ['./view-edit.component.css']
+    selector: 'view-edit',
+    templateUrl: './view-edit.component.html',
+    styleUrls: ['./view-edit.component.css'],
+    standalone: false
 })
 export class ViewEditComponent implements OnInit {
 

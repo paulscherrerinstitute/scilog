@@ -8,9 +8,10 @@ import {
 } from '@shared/dataset.service';
 
 @Component({
-  selector: 'scicat-viewer',
-  templateUrl: './scicat-viewer.component.html',
-  styleUrls: ['./scicat-viewer.component.css'],
+    selector: 'scicat-viewer',
+    templateUrl: './scicat-viewer.component.html',
+    styleUrls: ['./scicat-viewer.component.css'],
+    standalone: false
 })
 export class ScicatViewerComponent implements OnInit {
   constructor(private datasetService: DatasetService) {}

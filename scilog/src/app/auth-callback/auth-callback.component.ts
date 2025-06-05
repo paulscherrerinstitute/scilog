@@ -3,9 +3,10 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { Subscription } from 'rxjs';
 
 @Component({
-  selector: 'app-auth-callback',
-  template: '',
-  styles: [],
+    selector: 'app-auth-callback',
+    template: '',
+    styles: [],
+    standalone: false
 })
 export class AuthCallbackComponent implements OnInit, OnDestroy {
   constructor(private route: ActivatedRoute, private router: Router) {}

@@ -9,9 +9,10 @@ import { LogbookDataService } from '../../core/remote-data.service';
 import { Router } from '@angular/router';
 
 @Component({
-  selector: 'overview-table',
-  templateUrl: './overview-table.component.html',
-  styleUrls: ['./overview-table.component.scss'],
+    selector: 'overview-table',
+    templateUrl: './overview-table.component.html',
+    styleUrls: ['./overview-table.component.scss'],
+    standalone: false
 })
 export class OverviewTableComponent implements OnInit {
 

@@ -5,17 +5,18 @@ import { WidgetItemConfig } from 'src/app/core/model/config';
 import { animate, style, transition, trigger } from '@angular/animations';
 
 @Component({
-  selector: 'search',
-  templateUrl: './search.component.html',
-  styleUrls: ['./search.component.css'],
-  animations: [
-    trigger('spinner', [
-      transition(':enter', [
-        style({ opacity: 0 }),
-        animate('1ms 0.2s ease-out', style({ opacity: 1 }))
-      ])
-    ]),
-  ]
+    selector: 'search',
+    templateUrl: './search.component.html',
+    styleUrls: ['./search.component.css'],
+    animations: [
+        trigger('spinner', [
+            transition(':enter', [
+                style({ opacity: 0 }),
+                animate('1ms 0.2s ease-out', style({ opacity: 1 }))
+            ])
+        ]),
+    ],
+    standalone: false
 })
 export class SearchComponent implements OnInit {
 

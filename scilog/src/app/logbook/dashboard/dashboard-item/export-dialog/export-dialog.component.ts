@@ -4,10 +4,11 @@ import { LogbookItemDataService } from '@shared/remote-data.service';
 import { DatePipe } from '@angular/common';
 
 @Component({
-  selector: 'app-export-dialog',
-  templateUrl: './export-dialog.component.html',
-  styleUrls: ['./export-dialog.component.css'],
-  providers: [DatePipe]
+    selector: 'app-export-dialog',
+    templateUrl: './export-dialog.component.html',
+    styleUrls: ['./export-dialog.component.css'],
+    providers: [DatePipe],
+    standalone: false
 })
 export class ExportDialogComponent implements OnInit {
 

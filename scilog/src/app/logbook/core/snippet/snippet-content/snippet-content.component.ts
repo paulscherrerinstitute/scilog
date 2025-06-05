@@ -5,9 +5,10 @@ import { Filecontainer } from 'src/app/core/model/basesnippets';
 import { PrismService } from '../../prism.service';
 
 @Component({
-  selector: 'snippet-content',
-  templateUrl: './snippet-content.component.html',
-  styleUrls: ['./snippet-content.component.css']
+    selector: 'snippet-content',
+    templateUrl: './snippet-content.component.html',
+    styleUrls: ['./snippet-content.component.css'],
+    standalone: false
 })
 export class SnippetContentComponent implements OnInit {
 
