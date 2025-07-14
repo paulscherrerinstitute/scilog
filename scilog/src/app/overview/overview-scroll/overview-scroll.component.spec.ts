@@ -1,4 +1,4 @@
-import { ComponentFixture, fakeAsync, TestBed, waitForAsync } from '@angular/core/testing';
+import { ComponentFixture, fakeAsync, flush, TestBed, waitForAsync } from '@angular/core/testing';
 import { LogbookDataService } from 'src/app/core/remote-data.service';
 import { UserPreferencesService } from 'src/app/core/user-preferences.service';
 import { Logbooks } from 'src/app/core/model/logbooks';
@@ -134,15 +134,16 @@ describe('OverviewScrollComponent', () => {
     expect(_id).toEqual('123456789');
   });
 
-  it('should test ngAfterViewChecked', () => {
+  it('should test afterNextRender', waitForAsync(async () => {
     spyOn<any>(component, 'elementSize');
     const compareAndRefreshSizesSpy = spyOn<any>(component, 'compareAndRefreshSizes');
     component.logbookWidgetComponent = [1, 2, 3] as unknown as QueryList<ElementRef>;
     expect(component.logbookWidgetComponent.length).toEqual(3);
-    component.ngAfterViewChecked();
+    fixture.detectChanges();
+    await fixture.whenStable();
     expect(component['updateSizes']).toEqual(false);
     expect(compareAndRefreshSizesSpy).toHaveBeenCalledTimes(1);
-  });
+  }));
 
   [
     {pageSize: 18, spyCalls: 1, logbooks: [[1,2,3],[4,5,6],[7,8,9]]},

@@ -1,4 +1,4 @@
-import { ChangeDetectorRef, Component, ElementRef, EventEmitter, HostListener, Input, Output, QueryList, ViewChild, ViewChildren, AfterViewInit, AfterViewChecked, OnDestroy } from "@angular/core";
+import { ChangeDetectorRef, Component, ElementRef, EventEmitter, HostListener, Input, Output, QueryList, ViewChild, ViewChildren, AfterViewInit, OnDestroy, afterNextRender } from "@angular/core";
 import { ResizedEvent } from "src/app/core/directives/resized.directive";
 import { WidgetItemConfig } from "src/app/core/model/config";
 import { Logbooks } from "src/app/core/model/logbooks";
@@ -20,7 +20,7 @@ type Sizes = {
     styleUrls: ['./overview-scroll.component.css'],
     imports: [CdkVirtualScrollViewport, CdkFixedSizeVirtualScroll, ResizedDirective, CdkVirtualForOf, NgFor, LogbookWidgetComponent]
 })
-export class OverviewScrollComponent implements AfterViewInit, AfterViewChecked, OnDestroy {
+export class OverviewScrollComponent implements AfterViewInit, OnDestroy {
 
   @Input() config: WidgetItemConfig;
 
@@ -41,23 +41,21 @@ export class OverviewScrollComponent implements AfterViewInit, AfterViewChecked,
   private endOfData = false;
   private renderedRangeSubscription: Subscription;
 
-  constructor(private dataService: LogbookDataService, private changeRef: ChangeDetectorRef) {}
+  constructor(private dataService: LogbookDataService, private changeRef: ChangeDetectorRef) {
+    afterNextRender({
+      read: () => {
+        if (!this.updateSizes) return;
+        this.updateSizes = false;
+        this.compareAndRefreshSizes(this.elementSize(this.viewPort.elementRef));
+      },
+    });
+  }
 
   async ngAfterViewInit() {
     this.setGroupSize(this.elementSize(this.viewPort.elementRef));
     this.logbooks = await this.getAndGroupLogbooks();
     this.renderedRangeSubscription = this.viewPort.renderedRangeStream.subscribe(
       async ({start, end}) => await this.onScroll(end))
-  }
-
-  ngAfterViewChecked() {
-    if (!this.updateSizes) return;
-    this.logbookWidgetComponent.some(logbookWidget => {
-      this.contentSize = this.elementSize(logbookWidget);
-      this.updateSizes = false;
-      this.compareAndRefreshSizes(this.elementSize(this.viewPort.elementRef));
-      return true;
-    })
   }
 
   get itemSize() {

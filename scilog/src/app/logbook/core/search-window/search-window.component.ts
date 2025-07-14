@@ -1,4 +1,4 @@
-import { Component, OnInit, Output, EventEmitter, Input, ElementRef, ViewChild, afterRender } from '@angular/core';
+import { Component, OnInit, Output, EventEmitter, Input, ElementRef, ViewChild, afterNextRender } from '@angular/core';
 import { WidgetConfig, WidgetItemConfig } from '@model/config';
 import { Subscription } from 'rxjs';
 import { UserPreferencesService } from '@shared/user-preferences.service';
@@ -52,7 +52,7 @@ export class SearchWindowComponent implements OnInit {
     private hotkeys: Hotkeys,
     private searchScrollService: SearchScrollService,
   ) { 
-    afterRender(() => this.searchSnippets.nativeElement.focus());
+    afterNextRender({ read: () => this.searchSnippets.nativeElement.focus() });
   }
 
   async ngOnInit(): Promise<void> {
