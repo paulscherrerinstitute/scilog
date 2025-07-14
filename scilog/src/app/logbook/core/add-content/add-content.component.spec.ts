@@ -10,6 +10,7 @@ import { AppConfigService } from 'src/app/app-config.service';
 import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http';
 import { Component } from '@angular/core';
 import { TagEditorComponent } from '@shared/tag-editor/tag-editor.component';
+import { CKEditorModule } from '@ckeditor/ckeditor5-angular';
 
 class AddContentServiceMock {
   currentMessage = of({});
@@ -69,6 +70,9 @@ describe('AddContentComponent', () => {
   @Component({selector:'tag-editor', template: ''})
   class TagEditorStub {}
 
+  @Component({selector:'ckeditor', template: ''})
+  class CKEditorStub {}
+
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       imports: [MatDialogModule, TagEditorStub, AddContentComponent],
@@ -82,8 +86,8 @@ describe('AddContentComponent', () => {
       ],
     })
       .overrideComponent(AddContentComponent, {
-        add: { imports: [TagEditorStub] },
-        remove: { imports: [TagEditorComponent] },
+        add: { imports: [TagEditorStub, CKEditorStub] },
+        remove: { imports: [TagEditorComponent, CKEditorModule] },
       })
       .compileComponents();
   }));
