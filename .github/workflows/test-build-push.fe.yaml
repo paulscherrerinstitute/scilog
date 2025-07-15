@@ -2,7 +2,6 @@ name: Test && Build && Push
 
 on:
   pull_request:
-    branches: [main]
     paths: 
       - scilog/**
       - .github/workflows/test-build-push.fe.yaml
@@ -13,9 +12,6 @@ on:
       - .github/workflows/test-build-push.fe.yaml
   release:
     types: [published]
-    paths: 
-      - scilog/**
-      - .github/workflows/test-build-push.fe.yaml
 
 env:
   CONTAINER_REGISTRY: ghcr.io
@@ -24,7 +20,7 @@ env:
 
 jobs:
   test:
-    name: Test and build image on PR
+    name: Lint, test and build image on PR
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
