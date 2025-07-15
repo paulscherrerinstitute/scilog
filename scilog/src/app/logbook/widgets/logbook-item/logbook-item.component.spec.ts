@@ -21,8 +21,9 @@ import { ChangeStreamNotification } from '@shared/changestreamnotification.model
 import { LogbookDataService } from '@shared/remote-data.service';
 import { LogbookScrollService } from '@shared/logbook-scroll.service';
 import { AppConfigService } from 'src/app/app-config.service';
-import { Renderer2 } from '@angular/core';
+import { Component, Renderer2 } from '@angular/core';
 import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http';
+import { CKEditorModule } from '@ckeditor/ckeditor5-angular';
 
 class ChangeStreamServiceMock {
 
@@ -194,6 +195,10 @@ describe('LogbookItemComponent', () => {
     }
   }];
 
+  // eslint-disable-next-line @angular-eslint/component-selector
+  @Component({selector:'ckeditor', template: ''})
+  class CKEditorStubComponent {}
+
   const activatedRouteMock = {
     parent: { url: of(queryParams) },
     snapshot: { queryParams: { id: '1234' } }
@@ -226,7 +231,10 @@ describe('LogbookItemComponent', () => {
         { provide: LogbookDataService, useValue: logbookItemDataServiceSpy },
         { provide: LogbookScrollService, useValue: scrollServiceSpy },
         { provide: AppConfigService, useValue: { getConfig } }, provideHttpClient(withInterceptorsFromDi()), provideHttpClientTesting(),]
-})
+    }).overrideComponent(LogbookItemComponent, {
+      add: { imports: [CKEditorStubComponent] },
+      remove: { imports: [CKEditorModule] }
+    })
       .compileComponents();
   }));
 

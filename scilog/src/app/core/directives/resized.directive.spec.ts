@@ -31,7 +31,7 @@ describe('resizedDirective', () => {
 
   it('should respond to resize event', () => {
     expect(component.isResized).toEqual(false);
-    divElement.triggerEventHandler('resized');
+    divElement.triggerEventHandler('appResized');
     expect(component.isResized).toEqual(true);
   });
 });
