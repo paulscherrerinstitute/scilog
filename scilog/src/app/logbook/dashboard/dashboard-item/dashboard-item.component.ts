@@ -19,7 +19,7 @@ import { SnippetViewerComponent } from '../../widgets/snippet-viewer/snippet-vie
 import { ScicatViewerComponent } from '../../widgets/scicat-viewer/scicat-viewer.component';
 
 @Component({
-    selector: 'dashboard-item',
+    selector: 'app-dashboard-item',
     templateUrl: './dashboard-item.component.html',
     styleUrls: ['./dashboard-item.component.scss'],
     imports: [NgStyle, NgIf, MatIconButton, MatTooltip, MatIcon, NgSwitch, NgSwitchCase, LogbookItemComponent, ChatComponent, ChartComponent, TodosComponent, SnippetViewerComponent, ScicatViewerComponent, NgSwitchDefault]

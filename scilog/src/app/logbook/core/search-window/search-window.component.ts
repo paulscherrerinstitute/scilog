@@ -17,7 +17,7 @@ import { SearchComponent } from '../search/search.component';
 import { MatDivider } from '@angular/material/divider';
 
 @Component({
-    selector: 'search-window',
+    selector: 'app-search-window',
     templateUrl: './search-window.component.html',
     styleUrls: ['./search-window.component.css'],
     imports: [NgIf, MatFormField, MatInput, FormsModule, MatTooltip, MatIconButton, MatIcon, SearchComponent, MatDivider, NgFor]
@@ -32,7 +32,7 @@ export class SearchWindowComponent implements OnInit, OnDestroy {
 
   config: WidgetItemConfig;
 
-  @Output() close = new EventEmitter<void>();
+  @Output() closed = new EventEmitter<void>();
   @Output() overviewSearch = new EventEmitter<string>();
 
   @ViewChild('searchSnippets') searchSnippets: ElementRef;
@@ -113,7 +113,7 @@ export class SearchWindowComponent implements OnInit, OnDestroy {
 
   closeSearch() {
     this.reset();
-    this.close.emit();
+    this.closed.emit();
   }
 
   set searchString(searchString: string) {

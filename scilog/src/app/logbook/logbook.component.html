@@ -1,7 +1,7 @@
-<app-toolbar [showMenuIcon]='mobile' (openMenu)="openMenu()" (resized)="onResized()"></app-toolbar>
+<app-toolbar [showMenuIcon]='mobile' (openMenu)="openMenu()" (appResized)="onResized()"></app-toolbar>
 <mat-sidenav-container>
 
-    <mat-sidenav #sidenav [(mode)]="sidenavOver" [(opened)]="sidenavOpened" class="left-sidenav">
+    <mat-sidenav #sidenav [mode]="sidenavOver" [(opened)]="sidenavOpened" class="left-sidenav">
       <div class="divButtons">
         <button mat-fab color="primary" [routerLink]="['/overview']" class="divButtons-button" (click)="deactivateLogbook()" matTooltip="Logbooks">
           <mat-icon>arrow_back</mat-icon>

@@ -1,4 +1,4 @@
-import { Component, ElementRef, Inject, OnInit, ViewChild } from '@angular/core';
+import { Component, ElementRef, Inject, ViewChild } from '@angular/core';
 import { MatDialogRef, MAT_DIALOG_DATA, MatDialogContent } from '@angular/material/dialog';
 import { LogbookItemDataService } from '@shared/remote-data.service';
 import { DatePipe, NgIf } from '@angular/common';
@@ -13,7 +13,7 @@ import { MatButton } from '@angular/material/button';
     providers: [DatePipe],
     imports: [CdkScrollable, MatDialogContent, NgIf, MatProgressBar, MatButton]
 })
-export class ExportDialogComponent implements OnInit {
+export class ExportDialogComponent {
 
   config:any;
   inProgress = false;
@@ -28,10 +28,6 @@ export class ExportDialogComponent implements OnInit {
     this.config = data;
 
    }
-
-  ngOnInit() { 
-
-  }
 
   close() {
     this.dialogRef.close();

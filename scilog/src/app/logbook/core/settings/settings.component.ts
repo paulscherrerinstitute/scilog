@@ -7,7 +7,7 @@ import { MatTooltip } from '@angular/material/tooltip';
 import { MatIcon } from '@angular/material/icon';
 
 @Component({
-    selector: 'settings',
+    selector: 'app-settings',
     templateUrl: './settings.component.html',
     styleUrls: ['./settings.component.css'],
     imports: [MatSidenavContainer, MatSidenav, MatFabButton, MatTooltip, RouterLink, MatIcon, MatSidenavContent, MatMiniFabButton, RouterOutlet]

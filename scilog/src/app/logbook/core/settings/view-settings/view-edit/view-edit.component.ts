@@ -21,7 +21,7 @@ import { MatSlideToggle } from '@angular/material/slide-toggle';
 import { MatButton } from '@angular/material/button';
 
 @Component({
-    selector: 'view-edit',
+    selector: 'app-view-edit',
     templateUrl: './view-edit.component.html',
     styleUrls: ['./view-edit.component.css'],
     imports: [FormsModule, ReactiveFormsModule, MatFormField, MatLabel, MatSelect, NgFor, MatOption, MatDivider, MatInput, NgIf, MatError, MatAutocompleteTrigger, MatAutocomplete, MatChipGrid, MatChipRow, MatIcon, MatChipRemove, MatChipInput, MatSlideToggle, MatButton, AsyncPipe]

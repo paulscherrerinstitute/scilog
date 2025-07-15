@@ -14,7 +14,7 @@ import { MatIcon } from '@angular/material/icon';
 import { DashboardItemComponent } from './dashboard-item/dashboard-item.component';
 
 @Component({
-    selector: 'dashboard',
+    selector: 'app-dashboard',
     templateUrl: './dashboard.component.html',
     styleUrls: ['./dashboard.component.scss'],
     imports: [ResizedDirective, NgIf, MatIconButton, MatTooltip, MatIcon, MatButton, NgStyle, GridsterComponent, NgClass, NgFor, GridsterItemComponent, DashboardItemComponent, MatMiniFabButton]

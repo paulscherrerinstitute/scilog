@@ -1,7 +1,7 @@
 <ng-container>
     <div class="messages-container">
         <div *ngFor="let snippet of array; let i = index">
-              <snippet [snippet]="snippet" [isLogbook]=false [updatedAt]="snippet.updatedAt" [index]=i+1></snippet>
+              <app-snippet [snippet]="snippet" [isLogbook]=false [updatedAt]="snippet.updatedAt" [index]=i+1></app-snippet>
         </div>
     </div>
     <div class='input'>

@@ -11,7 +11,7 @@ import { ActionsMenuComponent } from '../actions-menu/actions-menu.component';
 import { DatePipe } from '@angular/common';
 
 @Component({
-    selector: 'overview-table',
+    selector: 'app-overview-table',
     templateUrl: './overview-table.component.html',
     styleUrls: ['./overview-table.component.scss'],
     imports: [MatTable, MatSort, CdkDropList, MatColumnDef, MatHeaderCellDef, MatHeaderCell, CdkDrag, MatSortHeader, MatCellDef, MatCell, ActionsMenuComponent, MatHeaderRowDef, MatHeaderRow, MatRowDef, MatRow, MatPaginator, DatePipe]

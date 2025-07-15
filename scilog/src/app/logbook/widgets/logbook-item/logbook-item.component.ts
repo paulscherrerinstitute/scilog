@@ -47,7 +47,7 @@ import { TagEditorComponent as TagEditorComponent_1 } from '../../core/tag-edito
 
 
 @Component({
-    selector: 'logbook-item',
+    selector: 'app-logbook-item',
     templateUrl: './logbook-item.component.html',
     styleUrls: ['./logbook-item.component.scss'],
     providers: [ChangeStreamService, LogbookScrollService],
@@ -174,7 +174,7 @@ export class LogbookItemComponent implements OnInit, AfterViewInit, OnDestroy {
   constructor(private data: AddContentService,
     private notificationService: ChangeStreamService,
     public dialog: MatDialog,
-    private logbookInfo: LogbookInfoService,
+    public logbookInfo: LogbookInfoService,
     private route: ActivatedRoute,
     private views: ViewsService,
     private renderer: Renderer2,
@@ -840,7 +840,7 @@ export class LogbookItemComponent implements OnInit, AfterViewInit, OnDestroy {
     this.searchStringSubject.next();
   }
 
-  private _indexOrder(i: number) {
+  _indexOrder(i: number) {
     if (this.isDescending) {
       return this.logbookCount - i
     }

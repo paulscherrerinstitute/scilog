@@ -5,7 +5,7 @@ import { Filecontainer } from 'src/app/core/model/basesnippets';
 import { PrismService } from '../../prism.service';
 
 @Component({
-    selector: 'snippet-content',
+    selector: 'app-snippet-content',
     templateUrl: './snippet-content.component.html',
     styleUrls: ['./snippet-content.component.css']
 })

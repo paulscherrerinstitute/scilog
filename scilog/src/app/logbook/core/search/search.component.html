@@ -5,9 +5,9 @@
   <mat-spinner *ngIf="!searchScrollService.isLoaded" [@spinner] class="spinner"></mat-spinner>
   <div class="searchContainer">
     <div *uiScroll="let snippet of searchScrollService.datasource; let i = index">
-      <snippet [snippet]="snippet" [updatedAt]="snippet.updatedAt" [index]=i+1 [config]="config"
+      <app-snippet [snippet]="snippet" [updatedAt]="snippet.updatedAt" [index]=i+1 [config]="config"
         [showEditButtonsMenu]="false" (selected)="selectedSnippet($event)">
-      </snippet>
+      </app-snippet>
     </div>
   </div>
 </div>

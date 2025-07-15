@@ -5,7 +5,7 @@ import { ResizedDirective } from './resized.directive';
 import { By } from '@angular/platform-browser';
 
 @Component({
-    template: `<div style="width: 10px" (resized)="hasBeenResized()"></div>`,
+    template: `<div style="width: 10px" (appResized)="hasBeenResized()"></div>`,
     imports: [ResizedDirective],
 })
 class TestComponent {

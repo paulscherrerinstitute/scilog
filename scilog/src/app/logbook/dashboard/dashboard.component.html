@@ -1,4 +1,4 @@
-<div class="gridster-container" (resized)="onResized()">
+<div class="gridster-container" (appResized)="onResized()">
     <div class="dashboard-edit">
         <button mat-icon-button (click)="addItemToDashboard()" *ngIf="editMode" matTooltip="Add widget">
             <mat-icon>add</mat-icon>
@@ -8,7 +8,7 @@
     <gridster [options]="editMode? optionsEdit : options" [ngClass]="editMode? 'gridster-edit' : 'gridster'">
       <gridster-item [item]="item" *ngFor="let item of dashboard; let i = index" class="gridster-item">
         <div class="dashboard-item" *ngIf="!editMode">
-            <dashboard-item [configIndex]="i" (openFullscreen)="openFullscreen($event)"></dashboard-item>
+            <app-dashboard-item [configIndex]="i" (openFullscreen)="openFullscreen($event)"></app-dashboard-item>
         </div>
         <button mat-mini-fab color="primary" (mousedown)="removeItem($event, item)"
                 (touchstart)="removeItem($event, item)" *ngIf="editMode" matTooltip="Remove widget">

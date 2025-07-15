@@ -1,4 +1,4 @@
-import { Component, OnInit, EventEmitter, Output, Input } from '@angular/core';
+import { Component, EventEmitter, Output, Input } from '@angular/core';
 import {Views} from '@model/views';
 
 @Component({
@@ -6,7 +6,7 @@ import {Views} from '@model/views';
     templateUrl: './view-widget.component.html',
     styleUrls: ['./view-widget.component.css']
 })
-export class ViewWidgetComponent implements OnInit {
+export class ViewWidgetComponent {
 
   @Output() viewSelection = new EventEmitter<string>();
 
@@ -14,9 +14,6 @@ export class ViewWidgetComponent implements OnInit {
   view: Views;
 
   constructor() { }
-
-  ngOnInit(): void {
-  }
 
   selection() {
     this.viewSelection.emit(this.view.id);

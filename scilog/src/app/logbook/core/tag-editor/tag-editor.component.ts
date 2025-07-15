@@ -17,7 +17,7 @@ import { MatInput } from '@angular/material/input';
 import { MatOption } from '@angular/material/select';
 
 @Component({
-    selector: 'tag-editor',
+    selector: 'app-tag-editor',
     templateUrl: './tag-editor.component.html',
     styleUrls: ['./tag-editor.component.scss'],
     imports: [MatTooltip, MatIcon, MatFormField, MatChipGrid, NgFor, MatChipRow, NgIf, MatChipRemove, MatInput, FormsModule, MatAutocompleteTrigger, MatChipInput, ReactiveFormsModule, MatAutocomplete, MatOption, AsyncPipe]

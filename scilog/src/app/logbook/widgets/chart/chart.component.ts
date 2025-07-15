@@ -9,7 +9,7 @@ import { WidgetConfig, WidgetItemConfig } from '@model/config';
 import { NgChartsModule } from 'ng2-charts';
 
 @Component({
-    selector: 'chart',
+    selector: 'app-chart',
     templateUrl: './chart.component.html',
     styleUrls: ['./chart.component.css'],
     imports: [NgChartsModule]

@@ -12,7 +12,7 @@ import { FormsModule } from '@angular/forms';
 import { TaskComponent } from '../../core/task/task.component';
 
 @Component({
-    selector: 'todos',
+    selector: 'app-todos',
     templateUrl: './todos.component.html',
     styleUrls: ['./todos.component.scss'],
     imports: [NgIf, MatFormField, MatInput, FormsModule, NgFor, TaskComponent]

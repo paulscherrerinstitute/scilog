@@ -11,7 +11,7 @@ import { ViewsService } from '@shared/views.service';
 import { TagService } from '@shared/tag.service';
 import { ToolbarComponent } from '../core/toolbar/toolbar.component';
 import { ResizedDirective } from '../core/directives/resized.directive';
-import { MatSidenavContainer, MatSidenav, MatSidenavContent } from '@angular/material/sidenav';
+import { MatSidenavContainer, MatSidenav, MatSidenavContent, MatDrawerMode } from '@angular/material/sidenav';
 import { MatFabButton } from '@angular/material/button';
 import { MatTooltip } from '@angular/material/tooltip';
 import { MatIcon } from '@angular/material/icon';
@@ -20,7 +20,7 @@ import { NavigationButtonComponent } from './navigation-button/navigation-button
 import { NgStyle } from '@angular/common';
 
 @Component({
-    selector: 'logbook',
+    selector: 'app-logbook',
     templateUrl: './logbook.component.html',
     styleUrls: ['./logbook.component.scss'],
     providers: [ChangeStreamService],
@@ -36,7 +36,7 @@ export class LogbookComponent implements OnInit, OnDestroy {
   numTasks = 0;
 
   sidenavOpened = true;
-  sidenavOver = 'push';
+  sidenavOver : MatDrawerMode = 'push';
   expandHeight = '42px';
   collapseHeight = '42px';
   displayMode = 'flat';

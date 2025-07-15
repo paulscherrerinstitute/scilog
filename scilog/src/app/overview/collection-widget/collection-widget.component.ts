@@ -1,4 +1,4 @@
-import { Component, OnInit, EventEmitter, Output, Input, OnDestroy } from '@angular/core';
+import { Component, OnInit, EventEmitter, Output, Input } from '@angular/core';
 import { LogbookItemDataService } from '@shared/remote-data.service';
 import {CollectionConfig} from '@model/config';
 import { MatCard, MatCardHeader, MatCardTitle, MatCardImage, MatCardContent, MatCardActions } from '@angular/material/card';
@@ -11,7 +11,7 @@ import { MatButton } from '@angular/material/button';
     styleUrls: ['./collection-widget.component.css'],
     imports: [MatCard, MatCardHeader, NgIf, MatCardTitle, MatCardImage, MatCardContent, MatCardActions, MatButton]
 })
-export class CollectionWidgetComponent implements OnInit, OnDestroy {
+export class CollectionWidgetComponent implements OnInit {
 
   @Output() collectionSelection = new EventEmitter<CollectionConfig>();
 
@@ -53,8 +53,4 @@ export class CollectionWidgetComponent implements OnInit, OnDestroy {
     this.collectionSelection.emit(this.collection);
     console.log($event);
   }
-
-  ngOnDestroy(): void {
-  }
-
 }

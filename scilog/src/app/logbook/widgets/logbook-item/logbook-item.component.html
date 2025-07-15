@@ -18,8 +18,8 @@
   </mat-form-field> -->
   <div #snippetContainer class="logbook-content">
     <div *uiScroll="let snippet of logbookScrollService.datasource; let i = index">
-      <snippet [snippet]="snippet" [updatedAt]="snippet.updatedAt" [index]=i+1 [config]="config" [indexOrdered]="_indexOrder(i)" (isLoading)="logbookScrollService.setItemStatus(snippet.id, $event)">
-      </snippet>
+      <app-snippet [snippet]="snippet" [updatedAt]="snippet.updatedAt" [index]=i+1 [config]="config" [indexOrdered]="_indexOrder(i)" (isLoading)="logbookScrollService.setItemStatus(snippet.id, $event)">
+      </app-snippet>
     </div>
   </div>
 
@@ -29,10 +29,10 @@
   <button mat-mini-fab class="float" (click)="scrollOnClickTo('start')" [@scrollButton] *ngIf="!isAt('start') && isDescending">
     <mat-icon>keyboard_double_arrow_up</mat-icon>
   </button>
-  <div *ngIf="!mobile && !isReadOnly" [ngClass]="isLightMode == true ? 'editor-container' : 'editor-container-no-border'">
+  <div *ngIf="!mobile && !isReadOnly" [ngClass]="isLightMode ? 'editor-container' : 'editor-container-no-border'">
     <div #editor class="content-editor"
       [ngStyle]="{'padding-left':dashboardView === true ? '0px' : '78px', 'width': dashboardView === true ? '97%' : '92%'}"
-      (resized)="onResized()">
+      (appResized)="onResized()">
       <div class='accessSettings'>
         <span [ngStyle]="{'flex':'1 1 auto'}"></span>
         <span matTooltip="ownerGroup">
@@ -53,7 +53,7 @@
         (ready)="onEditorReady($event)"></ckeditor>
         <div class='tagsContainer'>
           <span class='tagEditor'>
-            <tag-editor [ngStyle]="{'width': '100%'}" #tagEditor [tagIn]="tag" [configIndex]="configIndex"></tag-editor>
+            <app-tag-editor [ngStyle]="{'width': '100%'}" #tagEditor [tagIn]="tag" [configIndex]="configIndex"></app-tag-editor>
           </span>
             <span class="addButton">
               <button mat-mini-fab (click)="addContent()" matTooltip="Send">

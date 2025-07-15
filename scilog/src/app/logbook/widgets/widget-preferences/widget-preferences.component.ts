@@ -28,7 +28,7 @@ import { MatIcon } from '@angular/material/icon';
 import { MatButton } from '@angular/material/button';
 
 @Component({
-    selector: 'widget-preferences',
+    selector: 'app-widget-preferences',
     templateUrl: './widget-preferences.component.html',
     styleUrls: ['./widget-preferences.component.scss'],
     imports: [MatDialogTitle, CdkScrollable, MatDialogContent, FormsModule, ReactiveFormsModule, MatDivider, MatFormField, MatLabel, MatInput, MatSelect, MatOption, NgIf, NgSwitch, NgSwitchCase, MatSlideToggle, MatTooltip, CdkTextareaAutosize, MatAutocompleteTrigger, MatAutocomplete, NgFor, MatChipGrid, MatChipRow, MatIcon, MatChipRemove, MatChipInput, MatDialogActions, MatButton, AsyncPipe]

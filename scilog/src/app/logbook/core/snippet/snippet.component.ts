@@ -25,7 +25,7 @@ import { MatMenuTrigger, MatMenu, MatMenuItem } from '@angular/material/menu';
 
 
 @Component({
-    selector: 'snippet',
+    selector: 'app-snippet',
     templateUrl: './snippet.component.html',
     styleUrls: ['./snippet.component.scss'],
     animations: [
@@ -110,7 +110,7 @@ export class SnippetComponent implements OnInit, AfterContentInit, AfterViewChec
     public dialog: MatDialog,
     private logbookItemDataService: LogbookItemDataService,
     private userPreferences: UserPreferencesService,
-    private isActionAllowed: IsAllowedService) { }
+    protected isActionAllowed: IsAllowedService) { }
 
   ngOnInit(): void {
     if (this.snippet.isMessage) {

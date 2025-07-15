@@ -7,7 +7,7 @@ import { MatTooltip } from '@angular/material/tooltip';
 import { MatIcon } from '@angular/material/icon';
 
 @Component({
-    selector: 'actions-menu',
+    selector: 'app-actions-menu',
     templateUrl: './actions-menu.component.html',
     providers: [IsAllowedService],
     imports: [MatIconButton, MatMenuTrigger, MatTooltip, MatIcon, MatMenu, MatMenuItem]

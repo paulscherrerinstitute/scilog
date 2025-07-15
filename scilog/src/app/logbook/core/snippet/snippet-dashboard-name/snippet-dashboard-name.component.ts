@@ -1,4 +1,4 @@
-import { Component, Inject, OnInit } from '@angular/core';
+import { Component, Inject } from '@angular/core';
 import { MatDialogRef, MAT_DIALOG_DATA, MatDialogTitle, MatDialogContent, MatDialogActions } from '@angular/material/dialog';
 import { Subscription } from 'rxjs';
 import { ChangeStreamNotification } from '../../changestreamnotification.model';
@@ -11,12 +11,12 @@ import { FormsModule } from '@angular/forms';
 import { MatButton } from '@angular/material/button';
 
 @Component({
-    selector: 'snippet-dashboard-name',
+    selector: 'app-snippet-dashboard-name',
     templateUrl: './snippet-dashboard-name.component.html',
     styleUrls: ['./snippet-dashboard-name.component.css'],
     imports: [MatDialogTitle, CdkScrollable, MatDialogContent, MatFormField, MatLabel, MatInput, FormsModule, MatDialogActions, MatButton]
 })
-export class SnippetDashboardNameComponent implements OnInit {
+export class SnippetDashboardNameComponent {
 
   snippet: Basesnippets;
   updateSubscription: Subscription = null; 
@@ -27,10 +27,6 @@ export class SnippetDashboardNameComponent implements OnInit {
     private dataService: LogbookItemDataService) {
       this.snippet = data;
      }
-
-  ngOnInit(): void {
-
-  }
 
   cancelClick(){
     this.dialogRef.close();

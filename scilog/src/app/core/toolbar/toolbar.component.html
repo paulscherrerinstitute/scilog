@@ -12,7 +12,7 @@
     </button>
   </div>
   <div *ngIf='showSearch' class="searchWindow">
-    <search-window #searchWindow [configsArray]='config' [searched]="searched" (close)="closeSearch()" (overviewSearch)="setSearch($event)"></search-window>
+    <app-search-window #searchWindow [configsArray]='config' [searched]="searched" (closed)="closeSearch()" (overviewSearch)="setSearch($event)"></app-search-window>
   </div>
   <div class="flexExpand">
     <button mat-icon-button class='searchButton' (click)="openSearch()" *ngIf="!showMenuIcon">
@@ -42,7 +42,7 @@
       <ng-container *ngFor="let view of views; let i=index;">
         <button mat-menu-item (click)="loadView(i)">
           <mat-icon>visibility</mat-icon>
-          <span [ngStyle]="{'font-weight':view.id == currentView ? 'bold' : 'normal' }">{{ view.name }}</span>
+          <span [ngStyle]="{'font-weight':view.id === currentView ? 'bold' : 'normal' }">{{ view.name }}</span>
         </button>
       </ng-container>
       <button mat-menu-item (click)="openSettings('viewSettings')">

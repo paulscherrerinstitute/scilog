@@ -27,7 +27,7 @@ interface editorDataInput {
 }
 
 @Component({
-    selector: 'add-content',
+    selector: 'app-add-content',
     templateUrl: './add-content.component.html',
     styleUrls: ['./add-content.component.css'],
     imports: [MatDialogTitle, CdkScrollable, MatDialogContent, CKEditorModule, TagEditorComponent, MatTooltip, MatDialogActions, NgIf, MatButton, MatDialogClose]

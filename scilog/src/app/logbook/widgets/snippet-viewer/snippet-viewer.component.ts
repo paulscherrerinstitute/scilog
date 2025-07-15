@@ -11,7 +11,7 @@ import { NgFor } from '@angular/common';
 import { SnippetComponent as SnippetComponent_1 } from '../../core/snippet/snippet.component';
 
 @Component({
-    selector: 'snippet-viewer',
+    selector: 'app-snippet-viewer',
     templateUrl: './snippet-viewer.component.html',
     styleUrls: ['./snippet-viewer.component.css'],
     imports: [NgFor, SnippetComponent_1]
