@@ -1,4 +1,4 @@
-import { ChangeDetectorRef, Component, ElementRef, HostListener, Input, OnInit, QueryList, Renderer2, ViewChild, ViewChildren } from '@angular/core';
+import { ChangeDetectorRef, Component, ElementRef, HostListener, Input, OnInit, QueryList, Renderer2, ViewChild, ViewChildren, AfterViewInit, OnDestroy } from '@angular/core';
 import { ChangeStreamService } from '@shared/change-stream.service';
 import { ChangeStreamNotification } from '@shared/changestreamnotification.model'
 import { HttpClient } from '@angular/common/http';
@@ -97,7 +97,7 @@ import { TagEditorComponent as TagEditorComponent_1 } from '../../core/tag-edito
     ],
     imports: [NgSwitch, ResizedDirective, UiScrollModule, SnippetComponent_1, NgIf, MatMiniFabButton, MatIcon, NgClass, NgStyle, MatTooltip, CKEditorModule, TagEditorComponent_1, MatFabButton]
 })
-export class LogbookItemComponent implements OnInit {
+export class LogbookItemComponent implements OnInit, AfterViewInit, OnDestroy {
 
   @Input()
   config: WidgetItemConfig;

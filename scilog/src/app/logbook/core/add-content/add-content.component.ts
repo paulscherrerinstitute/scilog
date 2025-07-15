@@ -1,4 +1,4 @@
-import { Component, OnInit, Inject, HostListener } from '@angular/core';
+import { Component, OnInit, Inject, HostListener, OnDestroy } from '@angular/core';
 import { MAT_DIALOG_DATA, MatDialogTitle, MatDialogContent, MatDialogActions, MatDialogClose } from '@angular/material/dialog';
 import * as ClassicEditor from '../ckeditor/ckeditor5/build/ckeditor';
 import { ChangeEvent } from '../ckeditor/ckeditor5/build/ckeditor';
@@ -32,7 +32,7 @@ interface editorDataInput {
     styleUrls: ['./add-content.component.css'],
     imports: [MatDialogTitle, CdkScrollable, MatDialogContent, CKEditorModule, TagEditorComponent, MatTooltip, MatDialogActions, NgIf, MatButton, MatDialogClose]
 })
-export class AddContentComponent implements OnInit {
+export class AddContentComponent implements OnInit, OnDestroy {
 
   public Editor = ClassicEditor;
   public editorConfig: any = CKeditorConfig;

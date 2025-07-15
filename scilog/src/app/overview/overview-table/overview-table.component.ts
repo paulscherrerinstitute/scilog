@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, OnInit, Output, ViewChild } from '@angular/core';
+import { Component, EventEmitter, Input, OnInit, Output, ViewChild, AfterViewInit } from '@angular/core';
 import { MatTableDataSource, MatTable, MatColumnDef, MatHeaderCellDef, MatHeaderCell, MatCellDef, MatCell, MatHeaderRowDef, MatHeaderRow, MatRowDef, MatRow } from '@angular/material/table';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatSort, MatSortHeader } from '@angular/material/sort';
@@ -16,7 +16,7 @@ import { DatePipe } from '@angular/common';
     styleUrls: ['./overview-table.component.scss'],
     imports: [MatTable, MatSort, CdkDropList, MatColumnDef, MatHeaderCellDef, MatHeaderCell, CdkDrag, MatSortHeader, MatCellDef, MatCell, ActionsMenuComponent, MatHeaderRowDef, MatHeaderRow, MatRowDef, MatRow, MatPaginator, DatePipe]
 })
-export class OverviewTableComponent implements OnInit {
+export class OverviewTableComponent implements OnInit, AfterViewInit {
 
   @Input() config: WidgetItemConfig;
 

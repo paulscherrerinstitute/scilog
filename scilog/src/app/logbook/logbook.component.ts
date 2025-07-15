@@ -1,4 +1,4 @@
-import { Component, HostListener, OnInit } from '@angular/core';
+import { Component, HostListener, OnInit, OnDestroy } from '@angular/core';
 import { ChangeStreamService } from '@shared/change-stream.service';
 import { ChangeStreamNotification } from '@shared/changestreamnotification.model'
 import { Subscription } from 'rxjs';
@@ -27,7 +27,7 @@ import { NgStyle } from '@angular/common';
     imports: [ToolbarComponent, ResizedDirective, MatSidenavContainer, MatSidenav, MatFabButton, MatTooltip, RouterLink, MatIcon, MatDivider, NavigationButtonComponent, MatSidenavContent, NgStyle, RouterOutlet]
 })
 
-export class LogbookComponent implements OnInit {
+export class LogbookComponent implements OnInit, OnDestroy {
   logbookId: string;
 
   showLoadingCircle = true;

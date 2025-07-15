@@ -1,4 +1,4 @@
-import { Component, OnInit, Inject, ViewChild, NgZone, ElementRef, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, Inject, ViewChild, NgZone, ElementRef, ChangeDetectorRef, AfterViewInit, OnDestroy } from '@angular/core';
 import { UntypedFormArray, UntypedFormBuilder, UntypedFormControl, UntypedFormGroup, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MatChipInputEvent, MatChipGrid, MatChipRow, MatChipRemove, MatChipInput } from '@angular/material/chips';
 import { COMMA, ENTER, SPACE } from '@angular/cdk/keycodes';
@@ -33,7 +33,7 @@ import { MatButton } from '@angular/material/button';
     styleUrls: ['./widget-preferences.component.scss'],
     imports: [MatDialogTitle, CdkScrollable, MatDialogContent, FormsModule, ReactiveFormsModule, MatDivider, MatFormField, MatLabel, MatInput, MatSelect, MatOption, NgIf, NgSwitch, NgSwitchCase, MatSlideToggle, MatTooltip, CdkTextareaAutosize, MatAutocompleteTrigger, MatAutocomplete, NgFor, MatChipGrid, MatChipRow, MatIcon, MatChipRemove, MatChipInput, MatDialogActions, MatButton, AsyncPipe]
 })
-export class WidgetPreferencesComponent implements OnInit {
+export class WidgetPreferencesComponent implements OnInit, AfterViewInit, OnDestroy {
 
 
   data: WidgetItemConfig;

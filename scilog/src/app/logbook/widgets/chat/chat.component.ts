@@ -1,4 +1,4 @@
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, Input, OnInit, OnDestroy } from '@angular/core';
 import { Subscription } from 'rxjs';
 import { NgFor } from '@angular/common';
 import { SnippetComponent } from '../../core/snippet/snippet.component';
@@ -12,7 +12,7 @@ import { MatIcon } from '@angular/material/icon';
     styleUrls: ['./chat.component.css'],
     imports: [NgFor, SnippetComponent, MatInput, MatIconButton, MatIcon]
 })
-export class ChatComponent implements OnInit {
+export class ChatComponent implements OnInit, OnDestroy {
 
   @Input()
   configIndex: number;

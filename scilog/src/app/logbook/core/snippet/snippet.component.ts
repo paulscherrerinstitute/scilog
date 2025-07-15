@@ -1,4 +1,4 @@
-import { Component, OnInit, Input, SecurityContext, ElementRef, ViewChild, Output, EventEmitter, ChangeDetectorRef, SimpleChange, SimpleChanges } from '@angular/core';
+import { Component, OnInit, Input, SecurityContext, ElementRef, ViewChild, Output, EventEmitter, ChangeDetectorRef, SimpleChange, SimpleChanges, AfterContentInit, AfterViewChecked, OnDestroy } from '@angular/core';
 import { ChangeStreamNotification } from '../changestreamnotification.model';
 import { DomSanitizer } from '@angular/platform-browser';
 import { MatDialogConfig, MatDialog, MatDialogRef } from '@angular/material/dialog';
@@ -39,7 +39,7 @@ import { MatMenuTrigger, MatMenu, MatMenuItem } from '@angular/material/menu';
     providers: [IsAllowedService],
     imports: [MatCard, NgClass, NgIf, MatIcon, NgxJdenticonModule, MatTooltip, MatIconButton, MatMenuTrigger, MatMenu, MatMenuItem, MatCardContent, NgFor, SnippetContentComponent, DatePipe]
 })
-export class SnippetComponent implements OnInit {
+export class SnippetComponent implements OnInit, AfterContentInit, AfterViewChecked, OnDestroy {
 
   @Input()
   snippet: ChangeStreamNotification;
@@ -160,7 +160,7 @@ export class SnippetComponent implements OnInit {
     this._subsnippets = new BehaviorSubject(this.snippet.subsnippets);
   }
 
-  @Input('subsnippets') 
+  @Input() 
   set subsnippets(subsnippets: Basesnippets[]) {
       this._subsnippets?.next(subsnippets ?? []);
   }

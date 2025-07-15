@@ -1,4 +1,4 @@
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, Input, OnInit, OnDestroy } from '@angular/core';
 import { Tasks } from '@model/tasks';
 import { TasksService } from '@shared/tasks.service';
 import { LogbookInfoService } from '@shared/logbook-info.service';
@@ -17,7 +17,7 @@ import { TaskComponent } from '../../core/task/task.component';
     styleUrls: ['./todos.component.scss'],
     imports: [NgIf, MatFormField, MatInput, FormsModule, NgFor, TaskComponent]
 })
-export class TodosComponent implements OnInit {
+export class TodosComponent implements OnInit, OnDestroy {
 
   @Input()
   configIndex: number;

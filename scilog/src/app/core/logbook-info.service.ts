@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { Injectable, OnDestroy } from '@angular/core';
 import { BehaviorSubject, Subscription } from 'rxjs';
 import { shareReplay } from 'rxjs/operators';
 import { Logbooks } from '@model/logbooks';
@@ -8,7 +8,7 @@ import { LogbookDataService } from '@shared/remote-data.service';
 @Injectable({
   providedIn: 'root'
 })
-export class LogbookInfoService {
+export class LogbookInfoService implements OnDestroy {
 
   subscriptions: Subscription[] = [];
   private logbook: Logbooks = null;

@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, OnInit, Output, ViewChild, ElementRef, SimpleChange } from '@angular/core';
+import { Component, EventEmitter, Input, OnInit, Output, ViewChild, ElementRef, SimpleChange, OnChanges } from '@angular/core';
 import { MatChipInputEvent, MatChipGrid, MatChipRow, MatChipRemove, MatChipInput } from '@angular/material/chips';
 import { Tags } from '@model/metadata';
 import { COMMA, ENTER, SPACE } from '@angular/cdk/keycodes';
@@ -22,7 +22,7 @@ import { MatOption } from '@angular/material/select';
     styleUrls: ['./tag-editor.component.scss'],
     imports: [MatTooltip, MatIcon, MatFormField, MatChipGrid, NgFor, MatChipRow, NgIf, MatChipRemove, MatInput, FormsModule, MatAutocompleteTrigger, MatChipInput, ReactiveFormsModule, MatAutocomplete, MatOption, AsyncPipe]
 })
-export class TagEditorComponent implements OnInit {
+export class TagEditorComponent implements OnInit, OnChanges {
 
   @Input()
   tagIn: string[] = []

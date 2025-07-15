@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { Injectable, OnDestroy } from '@angular/core';
 import { Observable } from 'rxjs';
 import { ChangeStreamNotification } from './changestreamnotification.model';
 import {ServerSettingsService} from '@shared/config/server-settings.service';
@@ -13,7 +13,7 @@ export interface Message {
 }
 
 @Injectable()
-export class ChangeStreamService {
+export class ChangeStreamService implements OnDestroy {
 
 
   public messages: Subject<Message>;

@@ -1,11 +1,11 @@
-import { Injectable, ElementRef } from '@angular/core';
+import { Injectable, ElementRef, OnDestroy } from '@angular/core';
 import { Subscription, Subject } from 'rxjs';
 import { LogbookItemDataService } from '@shared/remote-data.service';
 import { ScrollBaseService } from './scroll-base.service';
 import _ from 'lodash';
 
 @Injectable()
-export class LogbookScrollService extends ScrollBaseService {
+export class LogbookScrollService extends ScrollBaseService implements OnDestroy {
 
   currentViewSubscription: Subscription = null;
   private itemsStatus = new Map();

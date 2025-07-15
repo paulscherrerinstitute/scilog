@@ -1,4 +1,4 @@
-import { Component, HostListener, OnInit } from '@angular/core';
+import { Component, HostListener, OnInit, OnDestroy } from '@angular/core';
 import { CompactType, DisplayGrid, GridsterConfig, GridsterItemComponent, GridType, GridsterComponent } from 'angular-gridster2';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Subscription } from 'rxjs';
@@ -19,7 +19,7 @@ import { DashboardItemComponent } from './dashboard-item/dashboard-item.componen
     styleUrls: ['./dashboard.component.scss'],
     imports: [ResizedDirective, NgIf, MatIconButton, MatTooltip, MatIcon, MatButton, NgStyle, GridsterComponent, NgClass, NgFor, GridsterItemComponent, DashboardItemComponent, MatMiniFabButton]
 })
-export class DashboardComponent implements OnInit, ComponentCanDeactivate {
+export class DashboardComponent implements OnInit, ComponentCanDeactivate, OnDestroy {
 
 
   urlPath: object;

@@ -1,4 +1,4 @@
-import { Component, OnInit, Output, EventEmitter, Input, ElementRef, ViewChild, afterNextRender } from '@angular/core';
+import { Component, OnInit, Output, EventEmitter, Input, ElementRef, ViewChild, afterNextRender, OnDestroy } from '@angular/core';
 import { WidgetConfig, WidgetItemConfig } from '@model/config';
 import { Subscription } from 'rxjs';
 import { UserPreferencesService } from '@shared/user-preferences.service';
@@ -22,7 +22,7 @@ import { MatDivider } from '@angular/material/divider';
     styleUrls: ['./search-window.component.css'],
     imports: [NgIf, MatFormField, MatInput, FormsModule, MatTooltip, MatIconButton, MatIcon, SearchComponent, MatDivider, NgFor]
 })
-export class SearchWindowComponent implements OnInit {
+export class SearchWindowComponent implements OnInit, OnDestroy {
 
   @Input()
   configsArray: WidgetConfig[];

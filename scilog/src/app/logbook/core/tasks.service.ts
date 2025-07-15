@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { Injectable, OnDestroy } from '@angular/core';
 import { BehaviorSubject, Subscription } from 'rxjs';
 import { shareReplay } from 'rxjs/operators';
 import { Logbooks } from '@model/logbooks';
@@ -10,7 +10,7 @@ import { TaskDataService } from '@shared/remote-data.service';
 @Injectable({
   providedIn: 'root'
 })
-export class TasksService {
+export class TasksService implements OnDestroy {
 
   tasks: Tasks[] = [];
   private tasksSource = new BehaviorSubject(this.tasks);

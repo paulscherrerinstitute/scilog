@@ -1,4 +1,4 @@
-import { Component, OnInit, Input, Output, EventEmitter, ViewChild, HostListener } from '@angular/core';
+import { Component, OnInit, Input, Output, EventEmitter, ViewChild, HostListener, OnDestroy } from '@angular/core';
 import { MatDialogConfig, MatDialog } from '@angular/material/dialog';
 import { WidgetPreferencesComponent } from '../../widgets/widget-preferences/widget-preferences.component';
 import { LogbookItemComponent } from '../../widgets/logbook-item/logbook-item.component';
@@ -24,7 +24,7 @@ import { ScicatViewerComponent } from '../../widgets/scicat-viewer/scicat-viewer
     styleUrls: ['./dashboard-item.component.scss'],
     imports: [NgStyle, NgIf, MatIconButton, MatTooltip, MatIcon, NgSwitch, NgSwitchCase, LogbookItemComponent, ChatComponent, ChartComponent, TodosComponent, SnippetViewerComponent, ScicatViewerComponent, NgSwitchDefault]
 })
-export class DashboardItemComponent implements OnInit, ComponentCanDeactivate {
+export class DashboardItemComponent implements OnInit, ComponentCanDeactivate, OnDestroy {
 
   @Input()
   configIndex: number;
