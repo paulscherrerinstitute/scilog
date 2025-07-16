@@ -7,7 +7,7 @@
     "dev": "ng serve --host 0.0.0.0",
     "build": "ng build",
     "test": "ng test",
-    "test:CI": "ng test --watch=false",
+    "test:CI": "ng lint && ng test --watch=false",
     "lint": "ng lint",
     "lint:fix": "ng lint --fix",
     "e2e": "ng e2e"

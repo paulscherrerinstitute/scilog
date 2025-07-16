@@ -1,4 +1,4 @@
-import { ChangeDetectorRef, Component, ElementRef, HostListener, Input, OnInit, QueryList, Renderer2, ViewChild, ViewChildren } from '@angular/core';
+import { ChangeDetectorRef, Component, ElementRef, HostListener, Input, OnInit, QueryList, Renderer2, ViewChild, ViewChildren, AfterViewInit, OnDestroy } from '@angular/core';
 import { ChangeStreamService } from '@shared/change-stream.service';
 import { ChangeStreamNotification } from '@shared/changestreamnotification.model'
 import { HttpClient } from '@angular/common/http';
@@ -47,7 +47,7 @@ import { TagEditorComponent as TagEditorComponent_1 } from '../../core/tag-edito
 
 
 @Component({
-    selector: 'logbook-item',
+    selector: 'app-logbook-item',
     templateUrl: './logbook-item.component.html',
     styleUrls: ['./logbook-item.component.scss'],
     providers: [ChangeStreamService, LogbookScrollService],
@@ -97,7 +97,7 @@ import { TagEditorComponent as TagEditorComponent_1 } from '../../core/tag-edito
     ],
     imports: [NgSwitch, ResizedDirective, UiScrollModule, SnippetComponent_1, NgIf, MatMiniFabButton, MatIcon, NgClass, NgStyle, MatTooltip, CKEditorModule, TagEditorComponent_1, MatFabButton]
 })
-export class LogbookItemComponent implements OnInit {
+export class LogbookItemComponent implements OnInit, AfterViewInit, OnDestroy {
 
   @Input()
   config: WidgetItemConfig;
@@ -174,7 +174,7 @@ export class LogbookItemComponent implements OnInit {
   constructor(private data: AddContentService,
     private notificationService: ChangeStreamService,
     public dialog: MatDialog,
-    private logbookInfo: LogbookInfoService,
+    public logbookInfo: LogbookInfoService,
     private route: ActivatedRoute,
     private views: ViewsService,
     private renderer: Renderer2,
@@ -840,7 +840,7 @@ export class LogbookItemComponent implements OnInit {
     this.searchStringSubject.next();
   }
 
-  private _indexOrder(i: number) {
+  _indexOrder(i: number) {
     if (this.isDescending) {
       return this.logbookCount - i
     }

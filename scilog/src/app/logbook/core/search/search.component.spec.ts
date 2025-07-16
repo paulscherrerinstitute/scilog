@@ -35,7 +35,7 @@ describe('SearchComponent', () => {
   });
 
   it('should selectedSnippet', () => {
-    const emitSpy = spyOn(component.close, 'emit');
+    const emitSpy = spyOn(component.closed, 'emit');
     component.selectedSnippet('event');
     expect(emitSpy).toHaveBeenCalled();
     expect(component['scrollToElementService'].selectedItem).toEqual({

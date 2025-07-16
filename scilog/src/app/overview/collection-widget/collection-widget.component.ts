@@ -53,8 +53,4 @@ export class CollectionWidgetComponent implements OnInit {
     this.collectionSelection.emit(this.collection);
     console.log($event);
   }
-
-  ngOnDestroy(): void {
-  }
-
 }

@@ -1,4 +1,4 @@
-import { Component, Inject, OnInit } from '@angular/core';
+import { Component, Inject } from '@angular/core';
 import { MatDialogRef, MAT_DIALOG_DATA, MatDialogTitle, MatDialogContent, MatDialogActions } from '@angular/material/dialog';
 import { Basesnippets } from '@model/basesnippets';
 import { CdkScrollable } from '@angular/cdk/scrolling';
@@ -7,12 +7,12 @@ import { MatButton } from '@angular/material/button';
 
 
 @Component({
-    selector: 'snippet-info',
+    selector: 'app-snippet-info',
     templateUrl: './snippet-info.component.html',
     styleUrls: ['./snippet-info.component.css'],
     imports: [MatDialogTitle, CdkScrollable, MatDialogContent, SnippetInfoSectionComponent, MatDialogActions, MatButton]
 })
-export class SnippetInfoComponent implements OnInit {
+export class SnippetInfoComponent {
 
   snippet: Basesnippets;
 
@@ -25,10 +25,6 @@ export class SnippetInfoComponent implements OnInit {
   constructor(@Inject(MAT_DIALOG_DATA) public data: Basesnippets,
   private dialogRef: MatDialogRef<SnippetInfoComponent>) { 
     this.snippet = data;
-  }
-
-  ngOnInit(): void {
-
   }
 
   closeInfo(){

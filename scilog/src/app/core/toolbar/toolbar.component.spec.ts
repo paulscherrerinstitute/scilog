@@ -37,7 +37,7 @@ describe('ToolbarComponent', () => {
     component.showSearch = true;
     fixture.detectChanges();
     fixture.debugElement.query(
-      By.css('search-window')
+      By.css('app-search-window')
     ).triggerEventHandler('overviewSearch', 'searched');
     expect(component.searched).toEqual('searched');
   });

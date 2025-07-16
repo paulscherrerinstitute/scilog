@@ -67,15 +67,16 @@ describe('AddContentComponent', () => {
     ]
   };
 
-  @Component({selector:'tag-editor', template: ''})
-  class TagEditorStub {}
+  @Component({selector:'app-tag-editor', template: ''})
+  class TagEditorStubComponent {}
 
+  // eslint-disable-next-line @angular-eslint/component-selector
   @Component({selector:'ckeditor', template: ''})
-  class CKEditorStub {}
+  class CKEditorStubComponent {}
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      imports: [MatDialogModule, TagEditorStub, AddContentComponent],
+      imports: [MatDialogModule, TagEditorStubComponent, AddContentComponent],
       providers: [
         { provide: MAT_DIALOG_DATA, useValue: {} },
         { provide: MatDialogRef, useValue: {} },
@@ -86,7 +87,7 @@ describe('AddContentComponent', () => {
       ],
     })
       .overrideComponent(AddContentComponent, {
-        add: { imports: [TagEditorStub, CKEditorStub] },
+        add: { imports: [TagEditorStubComponent, CKEditorStubComponent] },
         remove: { imports: [TagEditorComponent, CKEditorModule] },
       })
       .compileComponents();

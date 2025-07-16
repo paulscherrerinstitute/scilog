@@ -1,4 +1,4 @@
-import { Component, OnInit, Output, EventEmitter, Input, ElementRef, ViewChild, afterNextRender } from '@angular/core';
+import { Component, OnInit, Output, EventEmitter, Input, ElementRef, ViewChild, afterNextRender, OnDestroy } from '@angular/core';
 import { WidgetConfig, WidgetItemConfig } from '@model/config';
 import { Subscription } from 'rxjs';
 import { UserPreferencesService } from '@shared/user-preferences.service';
@@ -17,12 +17,12 @@ import { SearchComponent } from '../search/search.component';
 import { MatDivider } from '@angular/material/divider';
 
 @Component({
-    selector: 'search-window',
+    selector: 'app-search-window',
     templateUrl: './search-window.component.html',
     styleUrls: ['./search-window.component.css'],
     imports: [NgIf, MatFormField, MatInput, FormsModule, MatTooltip, MatIconButton, MatIcon, SearchComponent, MatDivider, NgFor]
 })
-export class SearchWindowComponent implements OnInit {
+export class SearchWindowComponent implements OnInit, OnDestroy {
 
   @Input()
   configsArray: WidgetConfig[];
@@ -32,7 +32,7 @@ export class SearchWindowComponent implements OnInit {
 
   config: WidgetItemConfig;
 
-  @Output() close = new EventEmitter<void>();
+  @Output() closed = new EventEmitter<void>();
   @Output() overviewSearch = new EventEmitter<string>();
 
   @ViewChild('searchSnippets') searchSnippets: ElementRef;
@@ -113,7 +113,7 @@ export class SearchWindowComponent implements OnInit {
 
   closeSearch() {
     this.reset();
-    this.close.emit();
+    this.closed.emit();
   }
 
   set searchString(searchString: string) {

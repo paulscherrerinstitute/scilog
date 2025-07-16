@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { Injectable, OnDestroy } from '@angular/core';
 import { BehaviorSubject, Subscription } from 'rxjs';
 import { WidgetConfig, WidgetItemConfig } from '@model/config';
 import { Logbooks } from '@model/logbooks';
@@ -9,7 +9,7 @@ import { ViewDataService } from '@shared/remote-data.service';
 @Injectable({
   providedIn: 'root'
 })
-export class ViewsService {
+export class ViewsService implements OnDestroy {
 
   widgetConfigs: WidgetConfig[] = [];
   private widgetConfigSource = new BehaviorSubject(this.widgetConfigs);

@@ -1,4 +1,4 @@
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, Input, OnDestroy } from '@angular/core';
 import { Subscription } from 'rxjs';
 import { NgFor } from '@angular/common';
 import { SnippetComponent } from '../../core/snippet/snippet.component';
@@ -7,12 +7,12 @@ import { MatIconButton } from '@angular/material/button';
 import { MatIcon } from '@angular/material/icon';
 
 @Component({
-    selector: 'chat',
+    selector: 'app-chat',
     templateUrl: './chat.component.html',
     styleUrls: ['./chat.component.css'],
     imports: [NgFor, SnippetComponent, MatInput, MatIconButton, MatIcon]
 })
-export class ChatComponent implements OnInit {
+export class ChatComponent implements OnDestroy {
 
   @Input()
   configIndex: number;
@@ -23,7 +23,7 @@ export class ChatComponent implements OnInit {
 
   constructor() { }
 
-  ngOnInit(): void {
+  // ngOnInit(): void {
 
     // let params = new HttpParams();
     // params = params.set('filter', JSON.stringify({ "order": ["creationTime ASC"], "where": { "or": [{ "snippetType": "paragraph" }, { "snippetType": "image" }], "parentId": "5f5631c73f870c539a9549ad" }, "include": [{ "relation": "subsnippets" }] }));
@@ -35,7 +35,7 @@ export class ChatComponent implements OnInit {
     //   this.array = JSON.parse(JSON.stringify(data));
 
     // }));
-  }
+  // }
 
   ngOnDestroy(): void {
     this.subscriptions.forEach(

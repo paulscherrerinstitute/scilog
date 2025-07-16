@@ -1,4 +1,4 @@
-import { Component, Input, OnInit, ViewChild } from '@angular/core';
+import { Component, Input, OnInit, ViewChild, OnDestroy } from '@angular/core';
 import { Subscription } from 'rxjs';
 import { LogbookInfoService } from '@shared/logbook-info.service';
 import { ChangeStreamService } from '@shared/change-stream.service';
@@ -9,12 +9,12 @@ import { WidgetConfig, WidgetItemConfig } from '@model/config';
 import { NgChartsModule } from 'ng2-charts';
 
 @Component({
-    selector: 'chart',
+    selector: 'app-chart',
     templateUrl: './chart.component.html',
     styleUrls: ['./chart.component.css'],
     imports: [NgChartsModule]
 })
-export class ChartComponent implements OnInit {
+export class ChartComponent implements OnInit, OnDestroy {
 
   @Input()
   configIndex: number;

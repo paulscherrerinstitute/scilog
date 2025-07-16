@@ -12,20 +12,20 @@ export class ResizedEvent {
   }
 }
 
-@Directive({ selector: '[resized]' })
+@Directive({ selector: '[appResized]' })
 export class ResizedDirective implements OnInit, OnDestroy {
   private observer: ResizeObserver;
   private oldRect?: DOMRectReadOnly;
 
   @Output()
-  public readonly resized: EventEmitter<ResizedEvent>;
+  public readonly appResized: EventEmitter<ResizedEvent>;
 
   public constructor(
     private readonly element: ElementRef,
     private readonly zone: NgZone
   )
   {
-    this.resized = new EventEmitter<ResizedEvent>();
+    this.appResized = new EventEmitter<ResizedEvent>();
     this.observer = new ResizeObserver(entries => this.zone.run(() => this.observe(entries)));
   }
 
@@ -41,7 +41,7 @@ export class ResizedDirective implements OnInit, OnDestroy {
     const domSize = entries[0];
     const resizedEvent = new ResizedEvent(domSize.contentRect, this.oldRect);
     this.oldRect = domSize.contentRect;
-    this.resized.emit(resizedEvent);
+    this.appResized.emit(resizedEvent);
   }
 }
 

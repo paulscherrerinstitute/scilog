@@ -1,15 +1,15 @@
-import { Component, EventEmitter, Input, OnInit, Output, ViewChild, ElementRef } from '@angular/core';
+import { Component, EventEmitter, Input, OnInit, Output, ViewChild, ElementRef, AfterViewInit, AfterViewChecked } from '@angular/core';
 import { ChangeStreamNotification } from '../../changestreamnotification.model';
 import { AppConfigService } from 'src/app/app-config.service';
 import { Filecontainer } from 'src/app/core/model/basesnippets';
 import { PrismService } from '../../prism.service';
 
 @Component({
-    selector: 'snippet-content',
+    selector: 'app-snippet-content',
     templateUrl: './snippet-content.component.html',
     styleUrls: ['./snippet-content.component.css']
 })
-export class SnippetContentComponent implements OnInit {
+export class SnippetContentComponent implements OnInit, AfterViewInit, AfterViewChecked {
 
   @Input()
   snippet: ChangeStreamNotification;

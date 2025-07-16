@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { Component, OnInit, ViewChild, OnDestroy } from '@angular/core';
 import { Logbooks } from '@model/logbooks';
 import { Subscription } from 'rxjs';
 import { UserPreferencesService } from '@shared/user-preferences.service';
@@ -39,7 +39,7 @@ export type MatCardType = 'logbook-module' | 'logbook-headline';
     ],
     imports: [ToolbarComponent, MatButtonToggleGroup, FormsModule, MatButtonToggle, MatIcon, NgIf, MatProgressSpinner, OverviewTableComponent, OverviewScrollComponent]
 })
-export class OverviewComponent implements OnInit {
+export class OverviewComponent implements OnInit, OnDestroy {
 
   config: WidgetItemConfig;
 

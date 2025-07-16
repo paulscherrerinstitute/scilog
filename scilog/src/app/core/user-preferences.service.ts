@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { Injectable, OnDestroy } from '@angular/core';
 import { BehaviorSubject, Subscription } from 'rxjs';
 import { CollectionConfig, UserPreferences } from '@model/config';
 import { UserInfo } from '@model/user-info';
@@ -7,7 +7,7 @@ import { UserPreferencesDataService } from '@shared/remote-data.service';
 @Injectable({
   providedIn: 'root'
 })
-export class UserPreferencesService {
+export class UserPreferencesService implements OnDestroy {
 
 
   collectionConfigs: CollectionConfig[] = [];

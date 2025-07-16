@@ -1,4 +1,4 @@
-import { Component, OnInit, Input, SecurityContext } from '@angular/core';
+import { Component, Input, SecurityContext } from '@angular/core';
 import { ChangeStreamNotification } from '@shared/changestreamnotification.model';
 import { DomSanitizer, SafeResourceUrl, SafeUrl } from '@angular/platform-browser';
 import { MatTable, MatColumnDef, MatHeaderCellDef, MatHeaderCell, MatCellDef, MatCell, MatHeaderRowDef, MatHeaderRow, MatRowDef, MatRow } from '@angular/material/table';
@@ -7,12 +7,12 @@ import { MatMenuTrigger, MatMenu, MatMenuItem } from '@angular/material/menu';
 import { MatIcon } from '@angular/material/icon';
 
 @Component({
-    selector: 'snippet-table',
+    selector: 'app-snippet-table',
     templateUrl: './snippet-table.component.html',
     styleUrls: ['./snippet-table.component.css'],
     imports: [MatTable, MatColumnDef, MatHeaderCellDef, MatHeaderCell, MatCellDef, MatCell, MatButton, MatMenuTrigger, MatIcon, MatMenu, MatMenuItem, MatHeaderRowDef, MatHeaderRow, MatRowDef, MatRow]
 })
-export class SnippetTableComponent implements OnInit {
+export class SnippetTableComponent {
 
 
   @Input()
@@ -24,9 +24,4 @@ export class SnippetTableComponent implements OnInit {
 
 
   constructor(public sanitizer: DomSanitizer) { }
-
-  ngOnInit(): void {
-    
-  }
-
 }

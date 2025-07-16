@@ -14,7 +14,7 @@ import { MatIcon } from '@angular/material/icon';
 import { MatProgressSpinner } from '@angular/material/progress-spinner';
 
 @Component({
-    selector: 'scicat-viewer',
+    selector: 'app-scicat-viewer',
     templateUrl: './scicat-viewer.component.html',
     styleUrls: ['./scicat-viewer.component.css'],
     imports: [NgIf, MatFormField, MatLabel, MatSelect, NgFor, MatOption, MatCard, MatCardHeader, MatCardTitle, MatCardSubtitle, MatCardContent, MatCardActions, MatAnchor, MatIcon, MatProgressSpinner, DatePipe]

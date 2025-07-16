@@ -4,7 +4,7 @@
     </span>
     <span class="flexExpand"></span>
     <span>
-        <button mat-icon-button aria-label="Export" (click)='exportLogbook()' *ngIf="config?.general.type=='logbook'"
+        <button mat-icon-button aria-label="Export" (click)='exportLogbook()' *ngIf="config?.general.type==='logbook'"
             matTooltip="Export logbook">
             <mat-icon>save_alt</mat-icon>
         </button>
@@ -19,12 +19,12 @@
 
 </div>
 <ng-container [ngSwitch]="config?.general.type" class="item-container">
-    <logbook-item *ngSwitchCase="'logbook'" [config]="config" [configIndex]="configIndex"></logbook-item>
-    <chat *ngSwitchCase="'chat'" [configIndex]="configIndex"></chat>
-    <chart *ngSwitchCase="'graph'" [configIndex]="configIndex"></chart>
-    <todos *ngSwitchCase="'tasks'" [configIndex]="configIndex"></todos>
-    <snippet-viewer *ngSwitchCase="'snippetViewer'" [configIndex]="configIndex"></snippet-viewer>
-    <scicat-viewer *ngSwitchCase="'scicatViewer'"></scicat-viewer>
+    <app-logbook-item *ngSwitchCase="'logbook'" [config]="config" [configIndex]="configIndex"></app-logbook-item>
+    <app-chat *ngSwitchCase="'chat'" [configIndex]="configIndex"></app-chat>
+    <app-chart *ngSwitchCase="'graph'" [configIndex]="configIndex"></app-chart>
+    <app-todos *ngSwitchCase="'tasks'" [configIndex]="configIndex"></app-todos>
+    <app-snippet-viewer *ngSwitchCase="'snippetViewer'" [configIndex]="configIndex"></app-snippet-viewer>
+    <app-scicat-viewer *ngSwitchCase="'scicatViewer'"></app-scicat-viewer>
     <div *ngSwitchDefault>
         No content specified.
     </div>

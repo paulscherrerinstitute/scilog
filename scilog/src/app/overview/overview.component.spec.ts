@@ -28,7 +28,7 @@ class UserPreferencesMock {
 @Component({ selector: 'app-toolbar', template: '' })
 class ToolbarStubComponent {}
 
-@Component({ selector: 'overview-scroll', template: '' })
+@Component({ selector: 'app-overview-scroll', template: '' })
 class OverviewScrollStubComponent {
   @Input() config: WidgetItemConfig;
 }

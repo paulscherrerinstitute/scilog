@@ -1,4 +1,4 @@
-import { Component, ElementRef, Inject, OnInit, ViewChild } from '@angular/core';
+import { Component, ElementRef, Inject, OnInit, ViewChild, OnDestroy } from '@angular/core';
 import { AbstractControl, UntypedFormBuilder, UntypedFormControl, UntypedFormGroup, ValidatorFn, Validators, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MatDialogRef, MAT_DIALOG_DATA, MatDialogTitle, MatDialogContent, MatDialogActions } from '@angular/material/dialog';
 import { Observable, Subscription } from 'rxjs';
@@ -44,7 +44,7 @@ function groupCreationValidator(control: AbstractControl): { anyAuthGroup: {valu
     providers: [IsAllowedService],
     imports: [MatDialogTitle, CdkScrollable, MatDialogContent, GridsterComponent, GridsterItemComponent, FormsModule, ReactiveFormsModule, MatFormField, MatLabel, MatInput, MatTooltip, NgIf, MatError, MatSelect, NgFor, MatOption, MatAutocompleteTrigger, MatAutocomplete, MatChipGrid, MatChipRow, MatIcon, MatChipRemove, MatChipInput, MatSlideToggle, MatCardImage, MatDialogActions, MatButton, AsyncPipe]
 })
-export class AddLogbookComponent implements OnInit {
+export class AddLogbookComponent implements OnInit, OnDestroy {
 
 
   logbook: Logbooks;

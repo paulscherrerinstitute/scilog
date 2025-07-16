@@ -15,7 +15,7 @@ type Sizes = {
 }
 
 @Component({
-    selector: 'overview-scroll',
+    selector: 'app-overview-scroll',
     templateUrl: './overview-scroll.component.html',
     styleUrls: ['./overview-scroll.component.css'],
     imports: [CdkVirtualScrollViewport, CdkFixedSizeVirtualScroll, ResizedDirective, CdkVirtualForOf, NgFor, LogbookWidgetComponent]

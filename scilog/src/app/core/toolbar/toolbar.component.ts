@@ -27,7 +27,7 @@ import { NgxJdenticonModule } from 'ngx-jdenticon';
     styleUrls: ['./toolbar.component.scss'],
     imports: [NgIf, MatToolbar, NgClass, MatIconButton, MatIcon, SearchWindowComponent, MatTooltip, MatMenuTrigger, MatMenu, NgFor, MatMenuItem, NgStyle, NgxJdenticonModule]
 })
-export class ToolbarComponent implements OnInit {
+export class ToolbarComponent implements OnInit, OnDestroy {
 
   @Input()
   showMenuIcon: boolean;

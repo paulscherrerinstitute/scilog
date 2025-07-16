@@ -9,7 +9,7 @@ import { UiScrollModule } from 'ngx-ui-scroll';
 import { SnippetComponent } from '../snippet/snippet.component';
 
 @Component({
-    selector: 'search',
+    selector: 'app-search',
     templateUrl: './search.component.html',
     styleUrls: ['./search.component.css'],
     animations: [
@@ -27,7 +27,7 @@ export class SearchComponent implements OnInit {
   @Input()
   config: WidgetItemConfig;
 
-  @Output() close = new EventEmitter<void>();
+  @Output() closed = new EventEmitter<void>();
 
   constructor(
     public searchScrollService: SearchScrollService,
@@ -44,7 +44,7 @@ export class SearchComponent implements OnInit {
       event: $event,
       config: this.config
     };
-    this.close.emit();
+    this.closed.emit();
   }
 
 }

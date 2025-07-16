@@ -10,7 +10,7 @@ import { MatIconButton } from '@angular/material/button';
 import { MatIcon } from '@angular/material/icon';
 
 @Component({
-    selector: 'task',
+    selector: 'app-task',
     templateUrl: './task.component.html',
     styleUrls: ['./task.component.scss'],
     providers: [IsAllowedService],

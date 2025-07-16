@@ -20,7 +20,7 @@
         </span>
 
     </div>
-    <search *ngIf="logbookId && searched" [config]="config" (close)="closeSearch()"></search>
+    <app-search *ngIf="logbookId && searched" [config]="config" (closed)="closeSearch()"></app-search>
     <div class="searchHelp" *ngIf="!logbookId || !searched ">
         <mat-divider></mat-divider>
         <div class="header">

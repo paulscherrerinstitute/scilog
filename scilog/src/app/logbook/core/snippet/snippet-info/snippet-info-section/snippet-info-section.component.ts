@@ -1,5 +1,5 @@
 import { CdkTextareaAutosize } from '@angular/cdk/text-field';
-import { Component, Input, NgZone, OnInit, ViewChild } from '@angular/core';
+import { Component, Input, NgZone, ViewChild } from '@angular/core';
 import { take } from 'rxjs/operators';
 import { Basesnippets } from '@model/basesnippets';
 import { NgFor } from '@angular/common';
@@ -9,12 +9,12 @@ import { FormsModule } from '@angular/forms';
 
 
 @Component({
-    selector: 'snippet-info-section',
+    selector: 'app-snippet-info-section',
     templateUrl: './snippet-info-section.component.html',
     styleUrls: ['./snippet-info-section.component.css'],
     imports: [NgFor, MatFormField, MatLabel, MatInput, CdkTextareaAutosize, FormsModule]
 })
-export class SnippetInfoSectionComponent implements OnInit {
+export class SnippetInfoSectionComponent {
 
   @Input()
   infoSnippets: string[];
@@ -31,9 +31,6 @@ export class SnippetInfoSectionComponent implements OnInit {
   infoFieldsUpdated = ['updatedBy', 'updatedAt'];
 
   constructor(private _ngZone: NgZone) { }
-
-  ngOnInit(): void {
-  }
 
   triggerResize() {
     // Wait for changes to be applied, then trigger textarea resize.

@@ -1,4 +1,4 @@
-import { Component, HostListener, OnInit } from '@angular/core';
+import { Component, HostListener, OnInit, OnDestroy } from '@angular/core';
 import { ChangeStreamService } from '@shared/change-stream.service';
 import { ChangeStreamNotification } from '@shared/changestreamnotification.model'
 import { Subscription } from 'rxjs';
@@ -11,7 +11,7 @@ import { ViewsService } from '@shared/views.service';
 import { TagService } from '@shared/tag.service';
 import { ToolbarComponent } from '../core/toolbar/toolbar.component';
 import { ResizedDirective } from '../core/directives/resized.directive';
-import { MatSidenavContainer, MatSidenav, MatSidenavContent } from '@angular/material/sidenav';
+import { MatSidenavContainer, MatSidenav, MatSidenavContent, MatDrawerMode } from '@angular/material/sidenav';
 import { MatFabButton } from '@angular/material/button';
 import { MatTooltip } from '@angular/material/tooltip';
 import { MatIcon } from '@angular/material/icon';
@@ -20,14 +20,14 @@ import { NavigationButtonComponent } from './navigation-button/navigation-button
 import { NgStyle } from '@angular/common';
 
 @Component({
-    selector: 'logbook',
+    selector: 'app-logbook',
     templateUrl: './logbook.component.html',
     styleUrls: ['./logbook.component.scss'],
     providers: [ChangeStreamService],
     imports: [ToolbarComponent, ResizedDirective, MatSidenavContainer, MatSidenav, MatFabButton, MatTooltip, RouterLink, MatIcon, MatDivider, NavigationButtonComponent, MatSidenavContent, NgStyle, RouterOutlet]
 })
 
-export class LogbookComponent implements OnInit {
+export class LogbookComponent implements OnInit, OnDestroy {
   logbookId: string;
 
   showLoadingCircle = true;
@@ -36,7 +36,7 @@ export class LogbookComponent implements OnInit {
   numTasks = 0;
 
   sidenavOpened = true;
-  sidenavOver = 'push';
+  sidenavOver : MatDrawerMode = 'push';
   expandHeight = '42px';
   collapseHeight = '42px';
   displayMode = 'flat';

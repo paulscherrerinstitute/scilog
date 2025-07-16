@@ -3,19 +3,16 @@ name: Test && Build && Push
 on:
   pull_request:
     branches: [main]
-    paths: 
+    paths:
       - scilog/**
       - .github/workflows/test-build-push.fe.yaml
   push:
     branches: [main]
-    paths: 
+    paths:
       - scilog/**
       - .github/workflows/test-build-push.fe.yaml
   release:
     types: [published]
-    paths: 
-      - scilog/**
-      - .github/workflows/test-build-push.fe.yaml
 
 env:
   CONTAINER_REGISTRY: ghcr.io
@@ -24,14 +21,14 @@ env:
 
 jobs:
   test:
-    name: Test and build image on PR
+    name: Lint, test and build image on PR
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
 
       - name: Test
-        if: github.event_name != 'push' 
+        if: github.event_name != 'push'
         run: |
           cd $CONTEXT
           docker compose -f docker-compose.test.yaml up --build --no-deps --abort-on-container-exit --exit-code-from scilog
@@ -39,7 +36,7 @@ jobs:
 
       - name: Login to GHCR
         uses: docker/login-action@v2
-        if: github.event_name != 'pull_request' 
+        if: github.event_name != 'pull_request'
         with:
           registry: ${{ env.CONTAINER_REGISTRY }}
           username: ${{ github.actor }}

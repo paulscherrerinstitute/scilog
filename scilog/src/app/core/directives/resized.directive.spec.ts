@@ -5,7 +5,7 @@ import { ResizedDirective } from './resized.directive';
 import { By } from '@angular/platform-browser';
 
 @Component({
-    template: `<div style="width: 10px" (resized)="hasBeenResized()"></div>`,
+    template: `<div style="width: 10px" (appResized)="hasBeenResized()"></div>`,
     imports: [ResizedDirective],
 })
 class TestComponent {
@@ -31,7 +31,7 @@ describe('resizedDirective', () => {
 
   it('should respond to resize event', () => {
     expect(component.isResized).toEqual(false);
-    divElement.triggerEventHandler('resized');
+    divElement.triggerEventHandler('appResized');
     expect(component.isResized).toEqual(true);
   });
 });

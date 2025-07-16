@@ -1,4 +1,4 @@
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, Input, OnInit, OnDestroy } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Subscription } from 'rxjs';
 import { WidgetConfig } from '@model/config';
@@ -15,7 +15,7 @@ import { MatBadge } from '@angular/material/badge';
     styleUrls: ['./navigation-button.component.scss'],
     imports: [NgIf, MatFabButton, MatMenuTrigger, MatTooltip, MatIcon, MatBadge, MatMenu, NgFor, MatMenuItem]
 })
-export class NavigationButtonComponent implements OnInit {
+export class NavigationButtonComponent implements OnInit, OnDestroy {
 
   @Input()
   widgetConfigs: WidgetConfig[];

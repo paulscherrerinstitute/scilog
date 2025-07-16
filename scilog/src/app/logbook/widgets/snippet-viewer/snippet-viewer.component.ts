@@ -1,4 +1,4 @@
-import { Component, Input, OnInit, QueryList, ViewChildren } from '@angular/core';
+import { Component, Input, OnInit, QueryList, ViewChildren, OnDestroy } from '@angular/core';
 import { Observable, Subscription } from 'rxjs';
 import { ChangeStreamService } from '@shared/change-stream.service';
 import { LogbookInfoService } from '@shared/logbook-info.service';
@@ -11,12 +11,12 @@ import { NgFor } from '@angular/common';
 import { SnippetComponent as SnippetComponent_1 } from '../../core/snippet/snippet.component';
 
 @Component({
-    selector: 'snippet-viewer',
+    selector: 'app-snippet-viewer',
     templateUrl: './snippet-viewer.component.html',
     styleUrls: ['./snippet-viewer.component.css'],
     imports: [NgFor, SnippetComponent_1]
 })
-export class SnippetViewerComponent implements OnInit {
+export class SnippetViewerComponent implements OnInit, OnDestroy {
 
 
   @Input()

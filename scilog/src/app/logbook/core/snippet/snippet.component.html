@@ -66,8 +66,8 @@
 
   <mat-card-content class="card-content">
     <div *ngFor="let snippet of snippet?.subsnippets; let i = index">
-      <ng-container *ngIf="snippet?.linkType=='quote'">
-        <snippet [snippet]="snippet" [updatedAt]="snippet?.updatedAt" [index]=i [hideMetadata]='hideMetadata'></snippet>
+      <ng-container *ngIf="snippet?.linkType==='quote'">
+        <app-snippet [snippet]="snippet" [updatedAt]="snippet?.updatedAt" [index]=i [hideMetadata]='hideMetadata'></app-snippet>
       </ng-container>
     </div>
     <!-- <div *ngIf="snippet.quote">
@@ -77,9 +77,9 @@
     <span class="snippet-header" *ngIf="config.view.showSnippetHeader">
       {{indexOrdered}} / {{ snippet.createdAt | date:'medium' }} / {{snippet.createdBy}}
     </span>
-    <snippet-content #snippetContent [snippet]='snippet' (htmlContent)="updateHtmlContent($event)"
+    <app-snippet-content #snippetContent [snippet]='snippet' (htmlContent)="updateHtmlContent($event)"
       (isLoading)="setElementLoading($event)">
-    </snippet-content>
+    </app-snippet-content>
     <div class="snippet-tags-container" *ngIf="!_hideMetadata">
       <span class="snippet-tag" *ngFor="let tag of snippet?.tags">
         {{ tag }}
@@ -91,8 +91,8 @@
 </mat-card>
 
 <div *ngFor="let snippet of snippet?.subsnippets; let i = index">
-  <ng-container *ngIf="snippet.linkType!='quote' && snippet.snippetType === 'paragraph'">
-    <snippet [snippet]="snippet" [updatedAt]="snippet.updatedAt" [index]=i [config]="config"
-      [hideMetadata]='hideMetadata' [subsnippets]="snippet.subsnippets"></snippet>
+  <ng-container *ngIf="snippet.linkType!=='quote' && snippet.snippetType === 'paragraph'">
+    <app-snippet [snippet]="snippet" [updatedAt]="snippet.updatedAt" [index]=i [config]="config"
+      [hideMetadata]='hideMetadata' [subsnippets]="snippet.subsnippets"></app-snippet>
   </ng-container>
 </div>
