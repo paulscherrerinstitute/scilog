@@ -1,12 +1,14 @@
 import { Component, OnInit } from '@angular/core';
 import { UserPreferencesService } from '@shared/user-preferences.service';
-import { UntypedFormBuilder, UntypedFormGroup, UntypedFormControl } from '@angular/forms';
+import { UntypedFormBuilder, UntypedFormGroup, UntypedFormControl, FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { MatFormField, MatLabel } from '@angular/material/form-field';
+import { MatInput } from '@angular/material/input';
 
 @Component({
     selector: 'app-profile-settings',
     templateUrl: './profile-settings.component.html',
     styleUrls: ['./profile-settings.component.css'],
-    standalone: false
+    imports: [FormsModule, ReactiveFormsModule, MatFormField, MatLabel, MatInput]
 })
 export class ProfileSettingsComponent implements OnInit {
 

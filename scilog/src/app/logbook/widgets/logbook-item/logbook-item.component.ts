@@ -35,6 +35,15 @@ import { CKeditorConfig } from '@shared/ckeditor/ckeditor-config';
 import { LogbookScrollService } from '@shared/logbook-scroll.service';
 import { ScrollToElementService } from '@shared/scroll-to-element.service';
 import { LinkType } from 'src/app/core/model/paragraphs';
+import { NgSwitch, NgIf, NgClass, NgStyle } from '@angular/common';
+import { ResizedDirective } from '../../../core/directives/resized.directive';
+import { UiScrollModule } from 'ngx-ui-scroll';
+import { SnippetComponent as SnippetComponent_1 } from '../../core/snippet/snippet.component';
+import { MatMiniFabButton, MatFabButton } from '@angular/material/button';
+import { MatIcon } from '@angular/material/icon';
+import { MatTooltip } from '@angular/material/tooltip';
+import { CKEditorModule } from '@ckeditor/ckeditor5-angular';
+import { TagEditorComponent as TagEditorComponent_1 } from '../../core/tag-editor/tag-editor.component';
 
 
 @Component({
@@ -86,7 +95,7 @@ import { LinkType } from 'src/app/core/model/paragraphs';
             ])
         ]),
     ],
-    standalone: false
+    imports: [NgSwitch, ResizedDirective, UiScrollModule, SnippetComponent_1, NgIf, MatMiniFabButton, MatIcon, NgClass, NgStyle, MatTooltip, CKEditorModule, TagEditorComponent_1, MatFabButton]
 })
 export class LogbookItemComponent implements OnInit {
 

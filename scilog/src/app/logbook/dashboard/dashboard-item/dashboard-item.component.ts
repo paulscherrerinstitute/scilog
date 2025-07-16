@@ -8,12 +8,21 @@ import { Subscription } from 'rxjs';
 import { ExportDialogComponent } from './export-dialog/export-dialog.component';
 import { WidgetItemConfig } from '@model/config';
 import { ComponentCanDeactivate } from '../../core/navigation-guard-service';
+import { NgStyle, NgIf, NgSwitch, NgSwitchCase, NgSwitchDefault } from '@angular/common';
+import { MatIconButton } from '@angular/material/button';
+import { MatTooltip } from '@angular/material/tooltip';
+import { MatIcon } from '@angular/material/icon';
+import { ChatComponent } from '../../widgets/chat/chat.component';
+import { ChartComponent } from '../../widgets/chart/chart.component';
+import { TodosComponent } from '../../widgets/todos/todos.component';
+import { SnippetViewerComponent } from '../../widgets/snippet-viewer/snippet-viewer.component';
+import { ScicatViewerComponent } from '../../widgets/scicat-viewer/scicat-viewer.component';
 
 @Component({
     selector: 'dashboard-item',
     templateUrl: './dashboard-item.component.html',
     styleUrls: ['./dashboard-item.component.scss'],
-    standalone: false
+    imports: [NgStyle, NgIf, MatIconButton, MatTooltip, MatIcon, NgSwitch, NgSwitchCase, LogbookItemComponent, ChatComponent, ChartComponent, TodosComponent, SnippetViewerComponent, ScicatViewerComponent, NgSwitchDefault]
 })
 export class DashboardItemComponent implements OnInit, ComponentCanDeactivate {
 

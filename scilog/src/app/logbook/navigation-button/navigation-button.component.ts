@@ -2,12 +2,18 @@ import { Component, Input, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Subscription } from 'rxjs';
 import { WidgetConfig } from '@model/config';
+import { NgIf, NgFor } from '@angular/common';
+import { MatFabButton } from '@angular/material/button';
+import { MatMenuTrigger, MatMenu, MatMenuItem } from '@angular/material/menu';
+import { MatTooltip } from '@angular/material/tooltip';
+import { MatIcon } from '@angular/material/icon';
+import { MatBadge } from '@angular/material/badge';
 
 @Component({
     selector: 'app-navigation-button',
     templateUrl: './navigation-button.component.html',
     styleUrls: ['./navigation-button.component.scss'],
-    standalone: false
+    imports: [NgIf, MatFabButton, MatMenuTrigger, MatTooltip, MatIcon, MatBadge, MatMenu, NgFor, MatMenuItem]
 })
 export class NavigationButtonComponent implements OnInit {
 

@@ -8,6 +8,9 @@ import { ChangeStreamNotification } from '@shared/changestreamnotification.model
 import { LinkType, Paragraphs } from '@model/paragraphs';
 import { AppConfigService } from 'src/app/app-config.service';
 import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http';
+import { Component } from '@angular/core';
+import { TagEditorComponent } from '@shared/tag-editor/tag-editor.component';
+import { CKEditorModule } from '@ckeditor/ckeditor5-angular';
 
 class AddContentServiceMock {
   currentMessage = of({});
@@ -64,19 +67,28 @@ describe('AddContentComponent', () => {
     ]
   };
 
+  @Component({selector:'tag-editor', template: ''})
+  class TagEditorStub {}
+
+  @Component({selector:'ckeditor', template: ''})
+  class CKEditorStub {}
+
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-    declarations: [AddContentComponent],
-    imports: [MatDialogModule],
-    providers: [
+      imports: [MatDialogModule, TagEditorStub, AddContentComponent],
+      providers: [
         { provide: MAT_DIALOG_DATA, useValue: {} },
         { provide: MatDialogRef, useValue: {} },
         { provide: AddContentService, useClass: AddContentServiceMock },
         { provide: AppConfigService, useValue: { getConfig } },
         provideHttpClient(withInterceptorsFromDi()),
         provideHttpClientTesting(),
-    ]
-})
+      ],
+    })
+      .overrideComponent(AddContentComponent, {
+        add: { imports: [TagEditorStub, CKEditorStub] },
+        remove: { imports: [TagEditorComponent, CKEditorModule] },
+      })
       .compileComponents();
   }));
 

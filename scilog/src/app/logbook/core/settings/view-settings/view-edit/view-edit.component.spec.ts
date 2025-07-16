@@ -22,14 +22,13 @@ describe('ViewEditComponent', () => {
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      providers: [
+    providers: [
         UntypedFormBuilder,
-        {provide: UserPreferencesService, useClass: UserPreferencesMock},
-        {provide: ViewDataService, useValue: viewDataServiceSpy}
-      ],
-      imports: [ MatAutocomplete ],
-      declarations: [ ViewEditComponent ]
-    })
+        { provide: UserPreferencesService, useClass: UserPreferencesMock },
+        { provide: ViewDataService, useValue: viewDataServiceSpy }
+    ],
+    imports: [MatAutocomplete, ViewEditComponent]
+})
     .compileComponents();
   }));
 

@@ -37,15 +37,14 @@ describe('ChartComponent', () => {
     changestreamSpy.getNotification.and.returnValue(of({}));
     
     TestBed.configureTestingModule({
-      providers: [
+    imports: [ChartComponent],
+    providers: [
         { provide: ViewsService, useClass: ViewsServiceMock },
         { provide: PlotDataService, useValue: plotSpy },
         { provide: LogbookInfoService, useClass: LogbookInfoMock },
         { provide: ChangeStreamService, useValue: changestreamSpy },
-
-      ],
-      declarations: [ ChartComponent ]
-    })
+    ]
+})
     .compileComponents();
   }));
 

@@ -27,13 +27,12 @@ describe('OverviewTableComponent', () => {
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      declarations: [OverviewTableComponent],
-      imports: [MatPaginatorModule, NoopAnimationsModule],
-      providers: [
+    imports: [MatPaginatorModule, NoopAnimationsModule, OverviewTableComponent],
+    providers: [
         { provide: LogbookDataService, useValue: logbookDataSpy },
         { provide: UserPreferencesService, useClass: UserPreferencesMock },
-      ]
-    })
+    ]
+})
       .compileComponents();
   }));
 

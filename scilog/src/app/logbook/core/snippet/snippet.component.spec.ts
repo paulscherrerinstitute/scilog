@@ -8,6 +8,7 @@ import { of } from 'rxjs';
 import { UserPreferencesService } from '@shared/user-preferences.service';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { WidgetItemConfig } from '@model/config';
+import { AppConfigService } from 'src/app/app-config.service';
 
 describe('SnippetComponent', () => {
   let component: SnippetComponent;
@@ -45,21 +46,23 @@ describe('SnippetComponent', () => {
     "textcontent": "<p>test</p>"
 
   }
+  const returnEmpty = () => ({});
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      imports: [
+    imports: [
         MatDialogModule,
         MatMenuModule,
-        BrowserAnimationsModule
-      ],
-      providers: [
+        BrowserAnimationsModule,
+        SnippetComponent
+    ],
+    providers: [
         { provide: MAT_DIALOG_DATA, useValue: {} },
         { provide: MatDialogRef, useValue: {} },
         { provide: LogbookItemDataService, useValue: logbookItemDataServiceSpy },
         { provide: UserPreferencesService, useValue: userPreferencesServiceSpy },
-      ],
-      declarations: [SnippetComponent]
-    })
+        { provide: AppConfigService, useValue: { getConfig: returnEmpty, getScicatSettings: returnEmpty } },
+    ]
+})
       .compileComponents();
   }));
 

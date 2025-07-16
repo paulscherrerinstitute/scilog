@@ -11,11 +11,11 @@ describe('SnippetContentComponent', () => {
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      providers: [
+    imports: [SnippetContentComponent],
+    providers: [
         { provide: AppConfigService, useValue: { getConfig } }
-      ],
-      declarations: [SnippetContentComponent]
-    })
+    ]
+})
       .compileComponents();
   }));
 

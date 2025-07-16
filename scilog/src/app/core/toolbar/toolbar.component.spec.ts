@@ -17,8 +17,7 @@ describe('ToolbarComponent', () => {
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-    declarations: [ToolbarComponent],
-    imports: [RouterTestingModule, MatDialogModule, MatMenuModule],
+    imports: [RouterTestingModule, MatDialogModule, MatMenuModule, ToolbarComponent],
     providers: [{ provide: AppConfigService, useValue: { getConfig } }, provideHttpClient(withInterceptorsFromDi()), provideHttpClientTesting(),]
 })
     .compileComponents();

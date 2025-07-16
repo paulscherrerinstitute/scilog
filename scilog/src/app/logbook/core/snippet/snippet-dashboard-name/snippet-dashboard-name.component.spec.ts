@@ -47,13 +47,13 @@ describe('SnippetDashboardNameComponent', () => {
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      providers: [
+    imports: [SnippetDashboardNameComponent],
+    providers: [
         { provide: MAT_DIALOG_DATA, useValue: snippetMock },
         { provide: MatDialogRef, useClass: DialogRefMock },
         { provide: LogbookItemDataService, useValue: logbookItemDataSpy }
-      ],
-      declarations: [SnippetDashboardNameComponent]
-    })
+    ]
+})
       .compileComponents();
   }));
 

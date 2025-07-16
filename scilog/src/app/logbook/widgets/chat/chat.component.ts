@@ -1,11 +1,16 @@
 import { Component, Input, OnInit } from '@angular/core';
 import { Subscription } from 'rxjs';
+import { NgFor } from '@angular/common';
+import { SnippetComponent } from '../../core/snippet/snippet.component';
+import { MatInput } from '@angular/material/input';
+import { MatIconButton } from '@angular/material/button';
+import { MatIcon } from '@angular/material/icon';
 
 @Component({
     selector: 'chat',
     templateUrl: './chat.component.html',
     styleUrls: ['./chat.component.css'],
-    standalone: false
+    imports: [NgFor, SnippetComponent, MatInput, MatIconButton, MatIcon]
 })
 export class ChatComponent implements OnInit {
 

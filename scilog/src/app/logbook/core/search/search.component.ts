@@ -3,6 +3,10 @@ import { SearchScrollService } from 'src/app/core/search-scroll.service';
 import { ScrollToElementService } from '../scroll-to-element.service';
 import { WidgetItemConfig } from 'src/app/core/model/config';
 import { animate, style, transition, trigger } from '@angular/animations';
+import { NgIf } from '@angular/common';
+import { MatProgressSpinner } from '@angular/material/progress-spinner';
+import { UiScrollModule } from 'ngx-ui-scroll';
+import { SnippetComponent } from '../snippet/snippet.component';
 
 @Component({
     selector: 'search',
@@ -16,7 +20,7 @@ import { animate, style, transition, trigger } from '@angular/animations';
             ])
         ]),
     ],
-    standalone: false
+    imports: [NgIf, MatProgressSpinner, UiScrollModule, SnippetComponent]
 })
 export class SearchComponent implements OnInit {
 

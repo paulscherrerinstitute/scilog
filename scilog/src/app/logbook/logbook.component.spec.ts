@@ -14,8 +14,7 @@ describe('LogbookComponent', () => {
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-    declarations: [LogbookComponent],
-    imports: [RouterTestingModule],
+    imports: [RouterTestingModule, LogbookComponent],
     providers: [{ provide: AppConfigService, useValue: { getConfig } }, provideHttpClient(withInterceptorsFromDi()), provideHttpClientTesting()]
 })
     .compileComponents();

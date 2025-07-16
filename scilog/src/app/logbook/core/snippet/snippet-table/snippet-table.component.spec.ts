@@ -11,9 +11,9 @@ describe('SnippetTableComponent', () => {
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      declarations: [ SnippetTableComponent ],
-      providers: [{ provide: AppConfigService, useValue: { getConfig } }],
-    })
+    imports: [SnippetTableComponent],
+    providers: [{ provide: AppConfigService, useValue: { getConfig } }],
+})
     .compileComponents();
   }));
 

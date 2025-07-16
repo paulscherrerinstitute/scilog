@@ -1,17 +1,27 @@
 import { Component, ElementRef, Inject, OnInit, ViewChild } from '@angular/core';
-import { AbstractControl, UntypedFormBuilder, UntypedFormControl, UntypedFormGroup, ValidatorFn, Validators } from '@angular/forms';
-import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
+import { AbstractControl, UntypedFormBuilder, UntypedFormControl, UntypedFormGroup, ValidatorFn, Validators, FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { MatDialogRef, MAT_DIALOG_DATA, MatDialogTitle, MatDialogContent, MatDialogActions } from '@angular/material/dialog';
 import { Observable, Subscription } from 'rxjs';
-import { CompactType, DisplayGrid, GridsterConfig, GridsterItem,GridType } from 'angular-gridster2';
+import { CompactType, DisplayGrid, GridsterConfig, GridsterItem, GridType, GridsterComponent, GridsterItemComponent } from 'angular-gridster2';
 import { COMMA, ENTER, SPACE } from '@angular/cdk/keycodes';
-import { MatAutocompleteSelectedEvent, MatAutocomplete } from '@angular/material/autocomplete';
-import { MatChipInputEvent } from '@angular/material/chips';
+import { MatAutocompleteSelectedEvent, MatAutocomplete, MatAutocompleteTrigger } from '@angular/material/autocomplete';
+import { MatChipInputEvent, MatChipGrid, MatChipRow, MatChipRemove, MatChipInput } from '@angular/material/chips';
 import { map, startWith } from 'rxjs/operators';
 import { UserPreferencesService } from '@shared/user-preferences.service';
 import { Logbooks } from '@model/logbooks';
 import { LogbookDataService, LogbookItemDataService } from '@shared/remote-data.service';
 import { SnackbarService } from 'src/app/core/snackbar.service';
 import { IsAllowedService } from '../is-allowed.service';
+import { CdkScrollable } from '@angular/cdk/scrolling';
+import { MatFormField, MatLabel, MatError } from '@angular/material/form-field';
+import { MatInput } from '@angular/material/input';
+import { MatTooltip } from '@angular/material/tooltip';
+import { NgIf, NgFor, AsyncPipe } from '@angular/common';
+import { MatSelect, MatOption } from '@angular/material/select';
+import { MatIcon } from '@angular/material/icon';
+import { MatSlideToggle } from '@angular/material/slide-toggle';
+import { MatCardImage } from '@angular/material/card';
+import { MatButton } from '@angular/material/button';
 
 function ownerGroupMemberValidator(groups: string[]): ValidatorFn {
   return (control: AbstractControl): { forbiddenGroup: {value: string} } | null => {
@@ -32,7 +42,7 @@ function groupCreationValidator(control: AbstractControl): { anyAuthGroup: {valu
     templateUrl: './add-logbook.component.html',
     styleUrls: ['./add-logbook.component.css'],
     providers: [IsAllowedService],
-    standalone: false
+    imports: [MatDialogTitle, CdkScrollable, MatDialogContent, GridsterComponent, GridsterItemComponent, FormsModule, ReactiveFormsModule, MatFormField, MatLabel, MatInput, MatTooltip, NgIf, MatError, MatSelect, NgFor, MatOption, MatAutocompleteTrigger, MatAutocomplete, MatChipGrid, MatChipRow, MatIcon, MatChipRemove, MatChipInput, MatSlideToggle, MatCardImage, MatDialogActions, MatButton, AsyncPipe]
 })
 export class AddLogbookComponent implements OnInit {
 

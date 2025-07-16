@@ -1,8 +1,8 @@
 import { COMMA, ENTER, SPACE } from '@angular/cdk/keycodes';
 import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
-import { AbstractControl, AsyncValidator, UntypedFormBuilder, UntypedFormControl, UntypedFormGroup, ValidatorFn, Validators } from '@angular/forms';
-import { MatAutocomplete, MatAutocompleteSelectedEvent } from '@angular/material/autocomplete';
-import { MatChipInputEvent } from '@angular/material/chips';
+import { AbstractControl, AsyncValidator, UntypedFormBuilder, UntypedFormControl, UntypedFormGroup, ValidatorFn, Validators, FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { MatAutocomplete, MatAutocompleteSelectedEvent, MatAutocompleteTrigger } from '@angular/material/autocomplete';
+import { MatChipInputEvent, MatChipGrid, MatChipRow, MatChipRemove, MatChipInput } from '@angular/material/chips';
 import { Observable, Subscription } from 'rxjs';
 import { LogbookInfoService } from '@shared/logbook-info.service';
 import { UserPreferencesService } from '@shared/user-preferences.service';
@@ -12,6 +12,18 @@ import { Logbooks } from '@model/logbooks';
 import { Views } from '@model/views';
 import { map, startWith } from 'rxjs/operators';
 import { LogbookDataService, ViewDataService } from '@shared/remote-data.service';
+import { MatSidenavContainer } from '@angular/material/sidenav';
+import { MatTabGroup, MatTab } from '@angular/material/tabs';
+import { MatFormField, MatLabel, MatError } from '@angular/material/form-field';
+import { MatInput } from '@angular/material/input';
+import { NgIf, NgFor, AsyncPipe } from '@angular/common';
+import { MatSlideToggle } from '@angular/material/slide-toggle';
+import { MatDivider } from '@angular/material/divider';
+import { MatSelect, MatOption } from '@angular/material/select';
+import { MatIcon } from '@angular/material/icon';
+import { MatTooltip } from '@angular/material/tooltip';
+import { MatButton } from '@angular/material/button';
+import { ViewEditComponent } from './view-edit/view-edit.component';
 
 
 
@@ -56,7 +68,7 @@ export function accessGroupsMemberValidator(groups: string[], chips: string[]): 
     selector: 'app-view-settings',
     templateUrl: './view-settings.component.html',
     styleUrls: ['./view-settings.component.css'],
-    standalone: false
+    imports: [MatSidenavContainer, MatTabGroup, MatTab, FormsModule, ReactiveFormsModule, MatFormField, MatLabel, MatInput, NgIf, MatError, MatSlideToggle, MatDivider, MatSelect, NgFor, MatOption, MatAutocompleteTrigger, MatAutocomplete, MatChipGrid, MatChipRow, MatIcon, MatChipRemove, MatChipInput, MatTooltip, MatButton, ViewEditComponent, AsyncPipe]
 })
 export class ViewSettingsComponent implements OnInit {
 

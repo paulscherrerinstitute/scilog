@@ -6,7 +6,6 @@ import { AppConfigService } from 'src/app/app-config.service';
 
 import { SearchWindowComponent } from './search-window.component';
 import { WidgetItemConfig } from 'src/app/core/model/config';
-import { TagService } from '../tag.service';
 import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http';
 
 const getConfig = () => ({});

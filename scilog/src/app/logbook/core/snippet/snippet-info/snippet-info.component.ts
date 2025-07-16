@@ -1,13 +1,16 @@
 import { Component, Inject, OnInit } from '@angular/core';
-import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
+import { MatDialogRef, MAT_DIALOG_DATA, MatDialogTitle, MatDialogContent, MatDialogActions } from '@angular/material/dialog';
 import { Basesnippets } from '@model/basesnippets';
+import { CdkScrollable } from '@angular/cdk/scrolling';
+import { SnippetInfoSectionComponent } from './snippet-info-section/snippet-info-section.component';
+import { MatButton } from '@angular/material/button';
 
 
 @Component({
     selector: 'snippet-info',
     templateUrl: './snippet-info.component.html',
     styleUrls: ['./snippet-info.component.css'],
-    standalone: false
+    imports: [MatDialogTitle, CdkScrollable, MatDialogContent, SnippetInfoSectionComponent, MatDialogActions, MatButton]
 })
 export class SnippetInfoComponent implements OnInit {
 

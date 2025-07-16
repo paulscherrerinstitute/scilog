@@ -16,12 +16,11 @@ describe('ActionsMenuComponent', () => {
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      declarations: [ActionsMenuComponent],
-      imports: [MatMenuModule],
-      providers: [
+    imports: [MatMenuModule, ActionsMenuComponent],
+    providers: [
         { provide: UserPreferencesService, useClass: UserPreferencesMock },
-      ]
-    })
+    ]
+})
       .compileComponents();
   }));
 

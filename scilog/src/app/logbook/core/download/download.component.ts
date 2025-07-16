@@ -5,8 +5,7 @@ import { LogbookItemDataService } from '@shared/remote-data.service';
 @Component({
     selector: 'app-download',
     templateUrl: './download.component.html',
-    styleUrls: ['./download.component.css'],
-    standalone: false
+    styleUrls: ['./download.component.css']
 })
 export class DownloadComponent implements OnInit {
 

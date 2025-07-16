@@ -5,6 +5,8 @@ import { UserPreferencesService } from '@shared/user-preferences.service';
 import { LogbookInfoService } from '@shared/logbook-info.service';
 import { of } from 'rxjs';
 import { Logbooks } from '@model/logbooks';
+import { provideRouter } from '@angular/router';
+import { Component } from '@angular/core';
 
 class UserPreferencesMock {
   userInfo = {
@@ -12,6 +14,9 @@ class UserPreferencesMock {
 
   }
 }
+
+@Component({})
+class DummyComponent {}
 
 describe('LogbookWidgetComponent', () => {
   let component: LogbookWidgetComponent;
@@ -48,13 +53,14 @@ describe('LogbookWidgetComponent', () => {
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      providers: [
-        {provide: LogbookInfoService, useValue: logbookSpy},
-        {provide: UserPreferencesService, useClass: UserPreferencesMock},
-        {provide: LogbookItemDataService, useValue: logbookItemDataSpy},
-      ],
-      declarations: [ LogbookWidgetComponent ]
-    })
+    imports: [LogbookWidgetComponent],
+    providers: [
+        { provide: LogbookInfoService, useValue: logbookSpy },
+        { provide: UserPreferencesService, useClass: UserPreferencesMock },
+        { provide: LogbookItemDataService, useValue: logbookItemDataSpy },
+        provideRouter([{path: '', component: DummyComponent}])
+    ]
+})
     .compileComponents();
   }));
 

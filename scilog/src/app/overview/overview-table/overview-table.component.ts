@@ -1,18 +1,20 @@
 import { Component, EventEmitter, Input, OnInit, Output, ViewChild } from '@angular/core';
-import { MatTableDataSource } from '@angular/material/table';
+import { MatTableDataSource, MatTable, MatColumnDef, MatHeaderCellDef, MatHeaderCell, MatCellDef, MatCell, MatHeaderRowDef, MatHeaderRow, MatRowDef, MatRow } from '@angular/material/table';
 import { MatPaginator } from '@angular/material/paginator';
-import { MatSort } from '@angular/material/sort';
-import { CdkDragDrop, moveItemInArray } from '@angular/cdk/drag-drop';
+import { MatSort, MatSortHeader } from '@angular/material/sort';
+import { CdkDragDrop, moveItemInArray, CdkDropList, CdkDrag } from '@angular/cdk/drag-drop';
 import { Logbooks } from '../../core/model/logbooks';
 import { WidgetItemConfig } from '../../core/model/config';
 import { LogbookDataService } from '../../core/remote-data.service';
 import { Router } from '@angular/router';
+import { ActionsMenuComponent } from '../actions-menu/actions-menu.component';
+import { DatePipe } from '@angular/common';
 
 @Component({
     selector: 'overview-table',
     templateUrl: './overview-table.component.html',
     styleUrls: ['./overview-table.component.scss'],
-    standalone: false
+    imports: [MatTable, MatSort, CdkDropList, MatColumnDef, MatHeaderCellDef, MatHeaderCell, CdkDrag, MatSortHeader, MatCellDef, MatCell, ActionsMenuComponent, MatHeaderRowDef, MatHeaderRow, MatRowDef, MatRow, MatPaginator, DatePipe]
 })
 export class OverviewTableComponent implements OnInit {
 

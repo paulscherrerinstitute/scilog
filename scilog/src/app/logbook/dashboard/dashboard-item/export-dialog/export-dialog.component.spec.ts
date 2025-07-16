@@ -28,14 +28,14 @@ describe('ExportDialogComponent', () => {
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      providers: [
+    imports: [ExportDialogComponent],
+    providers: [
         { provide: MatDialogRef, useValue: mockDialogRef },
         { provide: MAT_DIALOG_DATA, useValue: {} },
-        { provide: LogbookItemDataService, useValue: logbookItemDataSpy},
+        { provide: LogbookItemDataService, useValue: logbookItemDataSpy },
         { provide: AppConfigService, useValue: { getConfig } },
-      ],
-      declarations: [ ExportDialogComponent ]
-    })
+    ]
+})
     .compileComponents();
   }));
 

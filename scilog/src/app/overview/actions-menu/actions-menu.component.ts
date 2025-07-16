@@ -1,12 +1,16 @@
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { IsAllowedService } from '../is-allowed.service';
 import { Logbooks } from 'src/app/core/model/logbooks';
+import { MatIconButton } from '@angular/material/button';
+import { MatMenuTrigger, MatMenu, MatMenuItem } from '@angular/material/menu';
+import { MatTooltip } from '@angular/material/tooltip';
+import { MatIcon } from '@angular/material/icon';
 
 @Component({
     selector: 'actions-menu',
     templateUrl: './actions-menu.component.html',
     providers: [IsAllowedService],
-    standalone: false
+    imports: [MatIconButton, MatMenuTrigger, MatTooltip, MatIcon, MatMenu, MatMenuItem]
 })
 export class ActionsMenuComponent implements OnInit {
 

@@ -11,6 +11,12 @@ import { CookiesService } from '@shared/cookies.service';
 import { animate, style, transition, trigger } from '@angular/animations';
 import { OverviewTableComponent } from './overview-table/overview-table.component';
 import { OverviewScrollComponent } from './overview-scroll/overview-scroll.component';
+import { ToolbarComponent } from '../core/toolbar/toolbar.component';
+import { MatButtonToggleGroup, MatButtonToggle } from '@angular/material/button-toggle';
+import { FormsModule } from '@angular/forms';
+import { MatIcon } from '@angular/material/icon';
+import { NgIf } from '@angular/common';
+import { MatProgressSpinner } from '@angular/material/progress-spinner';
 
 enum ContentType {
   COLLECTION = 'collection',
@@ -31,7 +37,7 @@ export type MatCardType = 'logbook-module' | 'logbook-headline';
             ])
         ]),
     ],
-    standalone: false
+    imports: [ToolbarComponent, MatButtonToggleGroup, FormsModule, MatButtonToggle, MatIcon, NgIf, MatProgressSpinner, OverviewTableComponent, OverviewScrollComponent]
 })
 export class OverviewComponent implements OnInit {
 

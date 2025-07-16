@@ -9,15 +9,15 @@ describe('SnippetInfoComponent', () => {
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      providers:[
+    providers: [
         { provide: MAT_DIALOG_DATA, useValue: {} },
         { provide: MatDialogRef, useValue: {} }
-      ],
-      imports: [
-        MatDialogModule,         
-      ],
-      declarations: [ SnippetInfoComponent ]
-    })
+    ],
+    imports: [
+        MatDialogModule,
+        SnippetInfoComponent,
+    ]
+})
     .compileComponents();
   }));
 

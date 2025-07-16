@@ -1,12 +1,15 @@
 import { Component, OnInit, EventEmitter, Output, Input } from '@angular/core';
 import { LogbookItemDataService } from '@shared/remote-data.service';
 import {CollectionConfig} from '@model/config';
+import { MatCard, MatCardHeader, MatCardTitle, MatCardImage, MatCardContent, MatCardActions } from '@angular/material/card';
+import { NgIf } from '@angular/common';
+import { MatButton } from '@angular/material/button';
 
 @Component({
     selector: 'app-collection-widget',
     templateUrl: './collection-widget.component.html',
     styleUrls: ['./collection-widget.component.css'],
-    standalone: false
+    imports: [MatCard, MatCardHeader, NgIf, MatCardTitle, MatCardImage, MatCardContent, MatCardActions, MatButton]
 })
 export class CollectionWidgetComponent implements OnInit {
 

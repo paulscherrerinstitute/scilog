@@ -5,12 +5,17 @@ import { LogbookInfoService } from '@shared/logbook-info.service';
 import { ChangeStreamService } from '@shared/change-stream.service';
 import { Subscription } from 'rxjs';
 import { ViewsService } from '@shared/views.service';
+import { NgIf, NgFor } from '@angular/common';
+import { MatFormField } from '@angular/material/form-field';
+import { MatInput } from '@angular/material/input';
+import { FormsModule } from '@angular/forms';
+import { TaskComponent } from '../../core/task/task.component';
 
 @Component({
     selector: 'todos',
     templateUrl: './todos.component.html',
     styleUrls: ['./todos.component.scss'],
-    standalone: false
+    imports: [NgIf, MatFormField, MatInput, FormsModule, NgFor, TaskComponent]
 })
 export class TodosComponent implements OnInit {
 

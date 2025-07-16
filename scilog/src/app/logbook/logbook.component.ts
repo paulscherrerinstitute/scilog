@@ -2,20 +2,29 @@ import { Component, HostListener, OnInit } from '@angular/core';
 import { ChangeStreamService } from '@shared/change-stream.service';
 import { ChangeStreamNotification } from '@shared/changestreamnotification.model'
 import { Subscription } from 'rxjs';
-import { ActivatedRoute, Router } from '@angular/router';
+import { ActivatedRoute, Router, RouterLink, RouterOutlet } from '@angular/router';
 import { LogbookInfoService } from '@shared/logbook-info.service';
 import { Logbooks } from '@model/logbooks';
 import { WidgetConfig } from '@model/config';
 import { TasksService } from '@shared/tasks.service'
 import { ViewsService } from '@shared/views.service';
 import { TagService } from '@shared/tag.service';
+import { ToolbarComponent } from '../core/toolbar/toolbar.component';
+import { ResizedDirective } from '../core/directives/resized.directive';
+import { MatSidenavContainer, MatSidenav, MatSidenavContent } from '@angular/material/sidenav';
+import { MatFabButton } from '@angular/material/button';
+import { MatTooltip } from '@angular/material/tooltip';
+import { MatIcon } from '@angular/material/icon';
+import { MatDivider } from '@angular/material/divider';
+import { NavigationButtonComponent } from './navigation-button/navigation-button.component';
+import { NgStyle } from '@angular/common';
 
 @Component({
     selector: 'logbook',
     templateUrl: './logbook.component.html',
     styleUrls: ['./logbook.component.scss'],
     providers: [ChangeStreamService],
-    standalone: false
+    imports: [ToolbarComponent, ResizedDirective, MatSidenavContainer, MatSidenav, MatFabButton, MatTooltip, RouterLink, MatIcon, MatDivider, NavigationButtonComponent, MatSidenavContent, NgStyle, RouterOutlet]
 })
 
 export class LogbookComponent implements OnInit {

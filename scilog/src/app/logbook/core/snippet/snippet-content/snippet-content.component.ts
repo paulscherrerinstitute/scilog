@@ -7,8 +7,7 @@ import { PrismService } from '../../prism.service';
 @Component({
     selector: 'snippet-content',
     templateUrl: './snippet-content.component.html',
-    styleUrls: ['./snippet-content.component.css'],
-    standalone: false
+    styleUrls: ['./snippet-content.component.css']
 })
 export class SnippetContentComponent implements OnInit {
 

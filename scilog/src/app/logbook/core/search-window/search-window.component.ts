@@ -1,4 +1,4 @@
-import { Component, OnInit, Output, EventEmitter, Input, ElementRef, ViewChild } from '@angular/core';
+import { Component, OnInit, Output, EventEmitter, Input, ElementRef, ViewChild, afterNextRender } from '@angular/core';
 import { WidgetConfig, WidgetItemConfig } from '@model/config';
 import { Subscription } from 'rxjs';
 import { UserPreferencesService } from '@shared/user-preferences.service';
@@ -6,12 +6,21 @@ import { LogbookInfoService } from '@shared/logbook-info.service';
 import { TagService } from '@shared/tag.service';
 import { Hotkeys } from '@shared/hotkeys.service';
 import { SearchScrollService } from 'src/app/core/search-scroll.service';
+import { NgIf, NgFor } from '@angular/common';
+import { MatFormField } from '@angular/material/form-field';
+import { MatInput } from '@angular/material/input';
+import { FormsModule } from '@angular/forms';
+import { MatTooltip } from '@angular/material/tooltip';
+import { MatIconButton } from '@angular/material/button';
+import { MatIcon } from '@angular/material/icon';
+import { SearchComponent } from '../search/search.component';
+import { MatDivider } from '@angular/material/divider';
 
 @Component({
     selector: 'search-window',
     templateUrl: './search-window.component.html',
     styleUrls: ['./search-window.component.css'],
-    standalone: false
+    imports: [NgIf, MatFormField, MatInput, FormsModule, MatTooltip, MatIconButton, MatIcon, SearchComponent, MatDivider, NgFor]
 })
 export class SearchWindowComponent implements OnInit {
 
@@ -42,7 +51,9 @@ export class SearchWindowComponent implements OnInit {
     private tagService: TagService,
     private hotkeys: Hotkeys,
     private searchScrollService: SearchScrollService,
-  ) { }
+  ) { 
+    afterNextRender({ read: () => this.searchSnippets.nativeElement.focus() });
+  }
 
   async ngOnInit(): Promise<void> {
     this.searchString = this.searched;
@@ -57,12 +68,6 @@ export class SearchWindowComponent implements OnInit {
       this.submitSearch();
     }));
 
-  }
-  ngAfterViewInit(): void {
-    //Called after ngAfterContentInit when the component's view has been initialized. Applies to components only.
-    //Add 'implements AfterViewInit' to the class.
-
-    this.searchSnippets.nativeElement.focus();
   }
 
   submitSearch() {

@@ -211,9 +211,8 @@ describe('LogbookItemComponent', () => {
 
 
     TestBed.configureTestingModule({
-    declarations: [LogbookItemComponent],
     imports: [MatDialogModule,
-        BrowserAnimationsModule],
+        BrowserAnimationsModule, LogbookItemComponent],
     providers: [MatSnackBarModule,
         { provide: MAT_DIALOG_DATA, useValue: {} },
         { provide: MatDialogRef, useValue: {} },

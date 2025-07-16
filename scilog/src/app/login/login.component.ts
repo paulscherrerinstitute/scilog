@@ -1,15 +1,22 @@
 import { Component, Inject, OnInit } from '@angular/core';
-import { UntypedFormBuilder, UntypedFormGroup, Validators } from '@angular/forms';
+import { UntypedFormBuilder, UntypedFormGroup, Validators, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { AuthService } from '@shared/auth-services/auth.service';
 import { AppConfig, AppConfigService, Oauth2Endpoint } from '../app-config.service';
-import { DOCUMENT } from '@angular/common';
+import { DOCUMENT, NgIf } from '@angular/common';
+import { MatCard, MatCardTitle, MatCardImage, MatCardContent } from '@angular/material/card';
+import { MatTabGroup, MatTab, MatTabLabel } from '@angular/material/tabs';
+import { MatTooltip } from '@angular/material/tooltip';
+import { MatButton, MatIconButton } from '@angular/material/button';
+import { MatFormField, MatLabel, MatSuffix } from '@angular/material/form-field';
+import { MatInput } from '@angular/material/input';
+import { MatIcon } from '@angular/material/icon';
 
 @Component({
     selector: 'app-login',
     templateUrl: './login.component.html',
     styleUrls: ['./login.component.css'],
-    standalone: false
+    imports: [MatCard, MatCardTitle, MatCardImage, MatCardContent, MatTabGroup, NgIf, MatTab, MatTabLabel, MatTooltip, MatButton, FormsModule, ReactiveFormsModule, MatFormField, MatLabel, MatInput, MatIconButton, MatSuffix, MatIcon]
 })
 export class LoginComponent implements OnInit {
 

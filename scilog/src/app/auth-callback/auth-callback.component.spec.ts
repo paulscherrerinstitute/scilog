@@ -3,9 +3,7 @@ import { AuthCallbackComponent } from './auth-callback.component';
 import { provideRouter, Router } from '@angular/router';
 import { Component } from '@angular/core';
 
-@Component({
-    standalone: false
-})
+@Component({})
 class DummyComponent {}
 
 describe('AuthCallbackComponent', () => {
@@ -15,15 +13,15 @@ describe('AuthCallbackComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [AuthCallbackComponent],
-      providers: [
+    imports: [AuthCallbackComponent],
+    providers: [
         provideRouter([
-          { path: 'overview', component: DummyComponent },
-          { path: 'auth-callback', component: AuthCallbackComponent },
-          { path: 'dashboard', component: DummyComponent },
+            { path: 'overview', component: DummyComponent },
+            { path: 'auth-callback', component: AuthCallbackComponent },
+            { path: 'dashboard', component: DummyComponent },
         ]),
-      ],
-    }).compileComponents();
+    ],
+}).compileComponents();
 
     fixture = TestBed.createComponent(AuthCallbackComponent);
     component = fixture.componentInstance;

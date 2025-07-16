@@ -14,8 +14,7 @@ describe('SearchComponent', () => {
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-    declarations: [SearchComponent],
-    imports: [BrowserAnimationsModule],
+    imports: [BrowserAnimationsModule, SearchComponent],
     providers: [
         { provide: AppConfigService, useValue: { getConfig } },
         provideHttpClient(withInterceptorsFromDi()),
