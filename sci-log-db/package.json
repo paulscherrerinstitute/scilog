@@ -50,16 +50,16 @@
     "!*/__tests__"
   ],
   "dependencies": {
-    "@loopback/authentication": "^9.0.5",
-    "@loopback/authentication-jwt": "^0.12.5",
-    "@loopback/authentication-passport": "^5.0.5",
-    "@loopback/authorization": "^0.12.5",
-    "@loopback/boot": "^5.0.5",
-    "@loopback/core": "^4.0.5",
-    "@loopback/repository": "^5.1.0",
-    "@loopback/rest": "^12.0.5",
-    "@loopback/rest-explorer": "^5.0.5",
-    "@loopback/service-proxy": "^5.0.5",
+    "@loopback/authentication": "^12.0.4",
+    "@loopback/authentication-jwt": "^0.16.4",
+    "@loopback/authentication-passport": "^8.0.4",
+    "@loopback/authorization": "^0.16.3",
+    "@loopback/boot": "^8.0.3",
+    "@loopback/core": "^7.0.2",
+    "@loopback/repository": "^8.0.2",
+    "@loopback/rest": "^15.0.3",
+    "@loopback/rest-explorer": "^8.0.3",
+    "@loopback/service-proxy": "^8.0.2",
     "@types/multer": "^1.4.4",
     "ajv": "^7.2.4",
     "connect-mongo": "^4.6.0",
@@ -81,20 +81,20 @@
     "tslib": "^2.0.0"
   },
   "devDependencies": {
-    "@loopback/build": "^9.0.5",
-    "@loopback/eslint-config": "^13.0.5",
-    "@loopback/testlab": "^5.0.5",
+    "@loopback/build": "^12.0.2",
+    "@loopback/eslint-config": "^16.0.0",
+    "@loopback/testlab": "^8.0.2",
     "@types/express-session": "^1.17.4",
     "@types/formidable": "^2.0.5",
     "@types/jsdom": "^21.1.0",
     "@types/ldapjs": "^1.0.9",
-    "@types/node": "^14.18.33",
+    "@types/node": "^16.18.126",
     "@types/passport": "^1.0.7",
     "@types/prismjs": "^1.26.0",
     "@types/tar": "^6.1.11",
-    "eslint": "^8.28.0",
+    "eslint": "^8.57.1",
     "source-map-support": "^0.5.21",
     "tsc-watch": "^5.0.3",
-    "typescript": "~4.8.4"
+    "typescript": "~5.2.2"
   }
 }
