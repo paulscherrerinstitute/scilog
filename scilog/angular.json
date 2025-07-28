@@ -11,12 +11,8 @@
       "prefix": "app",
       "architect": {
         "build": {
-          "builder": "@angular-builders/custom-webpack:browser",
+          "builder": "@angular-devkit/build-angular:browser",
           "options": {
-            "customWebpackConfig": {
-              "path": "./custom-webpack.config.js",
-              "replaceDuplicatePlugins": true
-            },
             "allowedCommonJsDependencies": [
               "lodash",
               "css-element-queries",
@@ -47,7 +43,11 @@
             "namedChunks": true
           },
           "configurations": {
+            "development": {
+              "tsConfig": "tsconfig.app.dev.json"
+            },
             "production": {
+              "tsConfig": "tsconfig.app.dev.json",
               "fileReplacements": [
                 {
                   "replace": "src/environments/environment.ts",
@@ -78,11 +78,14 @@
           "defaultConfiguration": ""
         },
         "serve": {
-          "builder": "@angular-builders/custom-webpack:dev-server",
+          "builder": "@angular-devkit/build-angular:dev-server",
           "options": {
             "buildTarget": "scilog:build"
           },
           "configurations": {
+            "development": {
+              "buildTarget": "scilog:build:development"
+            },
             "production": {
               "buildTarget": "scilog:build:production"
             }
