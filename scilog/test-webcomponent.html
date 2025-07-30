@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8" />
+  <title>Getting started with CSS</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+
+<body>
+  <h1>I am a level one heading</h1>
+
+  <p>
+    This is a paragraph of text. In the text is a
+    <span class="special">span element</span> and also a
+    <a href="https://example.com">link</a>.
+  </p>
+
+  <p>
+    This is the second paragraph. It contains an <em>emphasized</em> element.
+  </p>
+
+  <ul>
+    <li>Item <span>one</span></li>
+    <li class="special">Item two</li>
+    <li>Item <em>three</em></li>
+  </ul>
+
+  <div class="outer">
+    <div class="box">The inner box is 90% - 30px.</div>
+  </div>
+
+
+  <script src="scicat-viewer-element.js" type="module"></script>
+  <scicat-viewer-element></scicat-viewer-element>
+
+  <script>
+    function stylizeElement() {
+      const host = document.querySelector("scicat-viewer-element");
+      console.log("host", host, "shadowRoot", host.shadowRoot);
+      const styleSheet = new CSSStyleSheet();
+      fetch("styles-J25LWAFB.css")
+        .then(response => response.text())
+        .then(text => {
+          styleSheet.replaceSync(text);
+          console.log("text", text);
+          host.shadowRoot.adoptedStyleSheets = [styleSheet];
+          document.body.removeChild(host);
+          document.body.appendChild(host);
+          console.log("host", host, "shadowRoot", host.shadowRoot);
+        })
+        .catch(error => console.error("Error loading stylesheet:", error));
+    }
+    //setTimeout(stylizeElement, 1000);
+  </script>
+</body>
+
+</html>
