@@ -47,6 +47,12 @@ export class Logbook extends Basesnippet {
   })
   location: string;
 
+  @property({
+    type: 'date',
+    index: true,
+  })
+  touchedAt: Date;
+
   constructor(data?: Partial<Logbook>) {
     super(data);
   }
