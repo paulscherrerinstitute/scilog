@@ -71,9 +71,9 @@ describe('OverviewTableComponent', () => {
   });
 
   it('should test drop', () => {
-    expect(component.displayedColumns).toEqual(['name', 'description', 'ownerGroup', 'createdAt', 'thumbnail', 'actions']);
+    expect(component.displayedColumns).toEqual(['name', 'description', 'ownerGroup', 'touchedAt', 'createdAt', 'thumbnail', 'actions']);
     component.drop({ previousIndex: 1, currentIndex: 2 } as CdkDragDrop<string[]>);
-    expect(component.displayedColumns).toEqual(['name', 'ownerGroup', 'description', 'createdAt', 'thumbnail', 'actions']);
+    expect(component.displayedColumns).toEqual(['name', 'ownerGroup', 'description', 'touchedAt', 'createdAt', 'thumbnail', 'actions']);
   });
 
   [undefined, '123'].forEach(t => {

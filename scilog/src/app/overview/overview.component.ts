@@ -153,7 +153,7 @@ export class OverviewComponent implements OnInit, OnDestroy {
         readonly: true
       },
       view: {
-        order: ["defaultOrder DESC"],
+        order: ["touchedAt DESC"],
         hideMetadata: false,
         showSnippetHeader: false
       }
