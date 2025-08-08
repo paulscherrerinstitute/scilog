@@ -105,11 +105,11 @@ export class LogbookComponent implements OnInit, OnDestroy {
     this.subscriptions.push(this.route.paramMap.subscribe(params => {
       this.logbookId = params.get('logbookId');
       console.log('logbook: ', this.logbookId);
+      this.updateLogbookInfo();
+      this.logbookDataService.touchLogbook(this.logbookId).catch(() => {
+        console.error('Error touching logbook');
+      });
     }));
-    this.updateLogbookInfo();
-    this.logbookDataService.touchLogbook(this.logbookId).catch(() => {
-      console.error('Error touching logbook');
-    });
   }
 
   async updateLogbookInfo(){

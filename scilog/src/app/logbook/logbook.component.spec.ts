@@ -46,4 +46,9 @@ describe('LogbookComponent', () => {
     expect(component.sidenavOver).toEqual('side');
   });
 
+  it('should call touchLogbook on init', () => {
+    const logbookDataServiceSpy = spyOn(component['logbookDataService'], 'touchLogbook').and.callThrough();
+    component.ngOnInit();
+    expect(logbookDataServiceSpy).toHaveBeenCalledWith(component.logbookId);
+  });
 });
