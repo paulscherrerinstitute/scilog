@@ -306,8 +306,8 @@ export class AutoAddRepository<
         // console.log("PATCH case")
         if (!ctx.options.touched) {
           ctx.data.updatedAt = new Date();
+          ctx.data.updatedBy = currentUser?.email ?? 'unknown@domain.org';
         }
-        ctx.data.updatedBy = currentUser?.email ?? 'unknown@domain.org';
         // remove all auto generated fields
         delete ctx.data.createdAt;
         delete ctx.data.createdBy;
