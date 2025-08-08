@@ -18,6 +18,7 @@ import { MatIcon } from '@angular/material/icon';
 import { MatDivider } from '@angular/material/divider';
 import { NavigationButtonComponent } from './navigation-button/navigation-button.component';
 import { NgStyle } from '@angular/common';
+import { LogbookDataService } from '@shared/remote-data.service';
 
 @Component({
     selector: 'app-logbook',
@@ -57,6 +58,7 @@ export class LogbookComponent implements OnInit, OnDestroy {
   constructor(
     private route: ActivatedRoute,
     private logbookInfo: LogbookInfoService,
+    private logbookDataService: LogbookDataService,
     private tasks: TasksService,
     private views: ViewsService,
     private router: Router,
@@ -103,8 +105,11 @@ export class LogbookComponent implements OnInit, OnDestroy {
     this.subscriptions.push(this.route.paramMap.subscribe(params => {
       this.logbookId = params.get('logbookId');
       console.log('logbook: ', this.logbookId);
+      this.updateLogbookInfo();
+      this.logbookDataService.touchLogbook(this.logbookId).catch(() => {
+        console.error('Error touching logbook');
+      });
     }));
-    this.updateLogbookInfo();
   }
 
   async updateLogbookInfo(){

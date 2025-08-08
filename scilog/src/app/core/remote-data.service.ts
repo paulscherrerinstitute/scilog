@@ -29,8 +29,8 @@ export class RemoteDataService {
     return `${this.serverSettings.getServerAddress()}/images`
   }
 
-  constructor(private httpClient: HttpClient,
-    private serverSettings: ServerSettingsService) { }
+  constructor(protected httpClient: HttpClient,
+    protected serverSettings: ServerSettingsService) { }
 
   protected deleteSnippet(snippetPath: string, snippetId: string) {
     return this.httpClient.delete(this.serverSettings.getServerAddress() + snippetPath + "/" + snippetId);
@@ -313,6 +313,11 @@ export class LogbookDataService extends RemoteDataService {
   patchLogbook(logbookId: string, payload: any): Promise<Logbooks> {
     const headers = new HttpHeaders().set('Content-Type', 'application/json');
     return this.patchSnippet<Logbooks>('logbooks', logbookId, JSON.stringify(payload), headers).toPromise();
+  }
+
+  touchLogbook(logbookId: string): Promise<void> {
+    const headers = new HttpHeaders().set('Content-Type', 'application/json');
+    return this.httpClient.patch<void>(this.serverSettings.getServerAddress() + 'logbooks/' + logbookId + '/touch', {}, { headers }).toPromise();
   }
 
   postLogbook(payload: any): Promise<Logbooks> {

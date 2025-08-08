@@ -28,7 +28,7 @@ export class OverviewTableComponent implements OnInit, AfterViewInit {
 
   dataSource: MatTableDataSource<Logbooks>;
   totalItems: number;
-  displayedColumns = ['name', 'description', 'ownerGroup', 'createdAt', 'thumbnail', 'actions'];
+  displayedColumns = ['name', 'description', 'ownerGroup', 'touchedAt', 'createdAt', 'thumbnail', 'actions'];
   private _config: WidgetItemConfig;
   isLoaded: boolean;
 

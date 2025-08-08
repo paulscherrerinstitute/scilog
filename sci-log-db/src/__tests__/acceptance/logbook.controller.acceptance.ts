@@ -229,6 +229,29 @@ describe('Logbook', function (this: Suite) {
       .expect(204);
   });
 
+  it('should touch snippet by id with token and update touchedAt', async () => {
+    const timeBefore = new Date();
+    await client
+      .patch(`/logbooks/${logbookSnippetId}/touch`)
+      .set('Authorization', 'Bearer ' + token)
+      .set('Content-Type', 'application/json')
+      .expect(204);
+    await client
+      .get(`/logbooks/${logbookSnippetId}`)
+      .set('Authorization', 'Bearer ' + token)
+      .set('Content-Type', 'application/json')
+      .expect(200)
+      .then(result => {
+        expect(result.body.id).to.eql(logbookSnippetId);
+        const touchedAt = new Date(result.body.touchedAt);
+        expect(touchedAt).to.be.a.Date();
+        expect(touchedAt.getTime()).to.be.greaterThan(timeBefore.getTime());
+      })
+      .catch(err => {
+        throw err;
+      });
+  });
+
   it('Search index with token should return 200 and zero matches', async () => {
     const includeTags = {fields: {tags: true}};
     await client

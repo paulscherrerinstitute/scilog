@@ -209,6 +209,22 @@ export class LogbookController {
     });
   }
 
+  @patch('/logbooks/{id}/touch', {
+    security: OPERATION_SECURITY_SPEC,
+    responses: {
+      '204': {
+        description: 'Logbook TOUCH success',
+      },
+    },
+  })
+  async touchLogbook(@param.path.string('id') id: string): Promise<void> {
+    await this.logbookRepository.updateById(
+      id,
+      {touchedAt: new Date()},
+      {currentUser: this.user, touched: true},
+    );
+  }
+
   @del('/logbooks/{id}', {
     security: OPERATION_SECURITY_SPEC,
     responses: {
