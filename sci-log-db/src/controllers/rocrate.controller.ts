@@ -1,17 +1,22 @@
 // Uncomment these imports to begin using these cool features!
 
 import { Filter, repository } from '@loopback/repository';
-import { get, param } from '@loopback/rest';
+import { get, param, RestBindings, Response } from '@loopback/rest';
 
-import { inject } from '@loopback/core';
+import { generateUniqueId, inject } from '@loopback/core';
 import { ROCrate } from '../../rocrate-js/dist/lib/rocrate';
 import { BasesnippetRepository, LogbookRepository } from '../repositories';
-import { Basesnippet, Logbook, Paragraph, Task } from '../models';
+import { Basesnippet, Logbook, Paragraph } from '../models';
 import { SecurityBindings, UserProfile } from '@loopback/security';
 import { OPERATION_SECURITY_SPEC } from '../utils/security-spec';
 import { authenticate } from '@loopback/authentication';
 import { authorize } from '@loopback/authorization';
 import { basicAuthorization } from '../services/basic.authorizor';
+import fs from 'fs';
+import archiver from 'archiver';
+import path from 'path';
+import os from 'os';
+
 
 @authenticate('jwt')
 @authorize({
@@ -56,7 +61,7 @@ export class RocrateController {
   async findById(@param.path.string('id') id: string): Promise<object> {
     const logbook: Logbook = await this.logbookRepository.findById(id, {}, { currentUser: this.user });
     const baseSnippets = await this.baseSnippetRepository.find(this.getFilter(id), { currentUser: this.user });
-    const crate = new ROCrate({}, { link: false });
+    const crate = new ROCrate({});
     const rootDataset = crate.root;
     rootDataset.name = logbook.name;
     rootDataset.description = logbook.description ?? '';
@@ -111,25 +116,25 @@ export class RocrateController {
         paragraphEntity.comment.push({ '@id': `comment://${snippet.id}` });
       }
 
-      if (snippet.snippetType === 'task') {
-        crate.addEntity({
-          '@id': `howtodirection://${snippet.id}`,
-          '@type': 'HowToDirection',
-          'text': (snippet as Task).content,
-        });
-        crate.addEntity({
-          '@id': `howtostep://${snippet.id}`,
-          '@type': 'HowToStep',
-          'position': ++this.counter,
-          'creativeWorkStatus': (snippet as Task).isDone ? 'finished' : 'unfinished',
-          'temporal': (snippet as Task).createdAt.toISOString(),
-          'itemListElement': {
-            '@id': `howtodirection://${snippet.id}`
-          }
-        });
-        if (!logbookEntry.step) logbookEntry.step = [];
-        logbookEntry.step.push({ '@id': `howtostep://${snippet.id}` });
-      }
+      // if (snippet.snippetType === 'task') {
+      //   crate.addEntity({
+      //     '@id': `howtodirection://${snippet.id}`,
+      //     '@type': 'HowToDirection',
+      //     'text': (snippet as Task).content,
+      //   });
+      //   crate.addEntity({
+      //     '@id': `howtostep://${snippet.id}`,
+      //     '@type': 'HowToStep',
+      //     'position': ++this.counter,
+      //     'creativeWorkStatus': (snippet as Task).isDone ? 'finished' : 'unfinished',
+      //     'temporal': (snippet as Task).createdAt.toISOString(),
+      //     'itemListElement': {
+      //       '@id': `howtodirection://${snippet.id}`
+      //     }
+      //   });
+      //   if (!logbookEntry.step) logbookEntry.step = [];
+      //   logbookEntry.step.push({ '@id': `howtostep://${snippet.id}` });
+      // }
       if (snippet.subsnippets && snippet.subsnippets.length > 0) {
         snippet.subsnippets.forEach(addRecursive);
       }
@@ -137,5 +142,57 @@ export class RocrateController {
     baseSnippets.forEach(addRecursive);
 
     return crate;
+  }
+
+  // GET /rocrates/{id}/download
+  @get('/rocrates/{id}/download', {
+    security: OPERATION_SECURITY_SPEC,
+    responses: {
+      '200': {
+        description: 'Rocrate model instance',
+        content: { 'application/zip': { schema: { type: 'object' } } },
+      },
+    }
+  })
+  async downloadById(@param.path.string('id') id: string, @inject(RestBindings.Http.RESPONSE) response: Response) {
+    const crate = await this.findById(id);
+    // create a temporary working directory
+    const tempDir = path.join(os.tmpdir(), `rocrate-${generateUniqueId()}`);
+    fs.mkdirSync(tempDir, { recursive: true });
+    await this.createZip(crate, tempDir);
+    response.download(path.join(tempDir, 'testeln.eln'), (err) => {
+      if (err) {
+        console.error('Error sending file:', err);
+        response.status(500).send('Error sending file');
+      } else {
+        // Clean up the temporary directory after sending the file
+        fs.rmSync(tempDir, { recursive: true, force: true });
+      }
+    });
+    return response;
+  }
+
+  private async createZip(crate: object, tmpPath: string): Promise<void> {
+    // write metadata file
+    fs.writeFileSync(`${tmpPath}/ro-crate-metadata.json`, JSON.stringify(crate, null, 2));
+
+    const output = fs.createWriteStream(`${tmpPath}/testeln.eln`);
+    const archive = archiver('zip');
+
+    archive.pipe(output);
+
+    const archiveName = 'testeln';
+    archive.file(`${tmpPath}/ro-crate-metadata.json`, { name: `${archiveName}/ro-crate-metadata.json` });
+
+    await new Promise<void>((resolve, reject) => {
+      output.on('close', () => {
+        console.log(`${archive.pointer()} total bytes`);
+        console.log('Archive finalized and file written.');
+        resolve();
+      });
+      archive.on('error', err => reject(err));
+      archive.finalize().catch(err => reject(err));
+    });
+    console.log('Wrote testeln.eln');
   }
 }

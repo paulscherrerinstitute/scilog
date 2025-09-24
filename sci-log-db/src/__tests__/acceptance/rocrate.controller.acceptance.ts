@@ -29,40 +29,37 @@ describe('RocrateController', function (this: Suite) {
       .set('Authorization', 'Bearer ' + token)
       .set('Content-Type', 'application/json')
       .expect(200)
-      .then(
-        async result => {
-          console.log(JSON.stringify(result.body, null, 2));
-          fs.writeFileSync('ro-crate-metadata.json', JSON.stringify(result.body, null, 2));
-          // zip up the ro-crate.
-          // the zip archive is called testeln.eln (not .zip)
-          // and contains the ro-crate-metadata.json inside it
-          const output = fs.createWriteStream('testeln.eln');
-          const archive = archiver('zip', { zlib: { level: 9 } });
-          output.on('close', function () {
-            console.log(archive.pointer() + ' total bytes');
-            console.log('archiver has been finalized and the output file descriptor has closed.');
+      .then(async result => {
+        console.log(JSON.stringify(result.body, null, 2));
+
+        // write metadata file
+        fs.writeFileSync(
+          'ro-crate-metadata.json',
+          JSON.stringify(result.body, null, 2)
+        );
+
+        // set up output stream and archive
+        const output = fs.createWriteStream('testeln.eln');
+        const archive = archiver('zip');
+
+        archive.pipe(output);
+
+        const archiveName = 'testeln';
+        archive.file('ro-crate-metadata.json', { name: `${archiveName}/ro-crate-metadata.json` });
+
+        // wait for close event so we know the file is fully flushed
+        await new Promise<void>((resolve, reject) => {
+          output.on('close', () => {
+            console.log(`${archive.pointer()} total bytes`);
+            console.log('Archive finalized and file written.');
+            resolve();
           });
-          archive.on('warning', function (err) {
-            if (err.code === 'ENOENT') {
-              console.warn(err);
-            } else {
-              throw err;
-            }
-          });
-          archive.on('error', function (err) {
-            throw err;
-          });
-          archive.pipe(output);
-          archive.file('ro-crate-metadata.json', { name: 'ro-crate-metadata.json' });
-          // sleep for 1 second to ensure the file is written
-          function sleep(ms: number) {
-            return new Promise(resolve => setTimeout(resolve, ms));
-          }
-          await archive.finalize();
-          await sleep(1000);
-          console.log('Wrote testeln.eln');
-        }
-      );
+          archive.on('error', err => reject(err));
+          archive.finalize().catch(err => reject(err));
+        });
+
+        console.log('Wrote testeln.eln');
+      });
   });
 
 
