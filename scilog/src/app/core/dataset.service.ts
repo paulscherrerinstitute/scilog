@@ -1,11 +1,12 @@
-import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { ServerSettingsService } from './config/server-settings.service';
-import type {
+import {
+  DatasetsService,
   OutputDatasetObsoleteDto,
   ReturnedUserDto,
-} from '@scicatproject/scicat-sdk-ts-fetch';
+  UsersService,
+} from '@scicatproject/scicat-sdk-ts-angular';
 
 export type Dataset = OutputDatasetObsoleteDto;
 export type DatasetSummary = Pick<
@@ -19,36 +20,25 @@ export type ScicatUser = ReturnedUserDto;
 })
 export class DatasetService {
   constructor(
-    private httpClient: HttpClient,
-    private serverSettingsService: ServerSettingsService
+    private serverSettingsService: ServerSettingsService,
+    private datasetsService: DatasetsService,
+    private usersService: UsersService
   ) {}
 
   getDatasets(): Observable<DatasetSummary[]> {
-    return this.httpClient.get<DatasetSummary[]>(
-      `${this.serverSettingsService.getSciCatServerAddress()}/api/v3/datasets`,
-      {
-        params: {
-          filter: JSON.stringify({
-            fields: ['pid', 'datasetName', 'creationTime'],
-            limits: { limit: 100, order: 'creationTime:desc' },
-          }),
-        },
-      }
-    );
+    const filter = JSON.stringify({
+      fields: ['pid', 'datasetName', 'creationTime'],
+      limits: { limit: 100, order: 'creationTime:desc' },
+    });
+    return this.datasetsService.datasetsControllerFindAllV3(filter);
   }
 
   getDataset(pid: string): Observable<Dataset> {
-    return this.httpClient.get<Dataset>(
-      `${this.serverSettingsService.getSciCatServerAddress()}/api/v3/datasets/${encodeURIComponent(
-        pid
-      )}`
-    );
+    return this.datasetsService.datasetsControllerFindByIdV3(pid);
   }
 
   getMyself(): Observable<ScicatUser> {
-    return this.httpClient.get<ScicatUser>(
-      `${this.serverSettingsService.getSciCatServerAddress()}/api/v3/users/my/self`
-    );
+    return this.usersService.usersControllerGetMyUserV3() as Observable<ScicatUser>;
   }
 
   getDatasetDetailPageUrl(pid: string): string {
