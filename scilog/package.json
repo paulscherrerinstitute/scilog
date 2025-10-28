@@ -58,7 +58,7 @@
     "@angular-eslint/template-parser": "19.7.0",
     "@angular/cli": "^19.2.14",
     "@angular/compiler-cli": "^19.2.14",
-    "@scicatproject/scicat-sdk-ts-fetch": "^4.13.0",
+    "@scicatproject/scicat-sdk-ts-angular": "^4.25.1",
     "@types/jasmine": "~3.6.0",
     "@types/jasminewd2": "~2.0.3",
     "@types/node": "^22.15.29",
