@@ -3,10 +3,11 @@
     <mat-progress-bar mode="query" [color]="'accent'"></mat-progress-bar>
   </div>
   <div class="exportDialog-container">
-    <h2>Export to PDF</h2>
+    <h2>Export logbook</h2>
     <div>
       <button mat-button (click)="close()">Cancel</button>
-      <button mat-button (click)="exportData()">Export data</button>
+      <button mat-button (click)="exportData('pdf')">Export to PDF</button>
+      <button mat-button (click)="exportData('eln')">Export to ELN</button>
     </div>
   </div>
   <a class="download-link" #downloadLink></a>

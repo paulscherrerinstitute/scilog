@@ -290,6 +290,10 @@ export class LogbookItemDataService extends RemoteDataService {
     headers = headers.set('Content-Type', 'application/json');
     return this.getSnippets<Blob>("basesnippets/export=" + exportType + "", { headers: headers, responseType: 'blob', params: this._prepareParams(config, skip, limit) }).toPromise();
   }
+
+  exportELN(logbookId: string): Promise<Blob> {
+    return this.httpClient.get(`${this.serverSettings.getServerAddress()}rocrates/${logbookId}/download`, { responseType: 'blob' }).toPromise();
+  }
 }
 
 @Injectable({
