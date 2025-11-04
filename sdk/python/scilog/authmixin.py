@@ -22,6 +22,7 @@ class AuthMixin(ABC):
         self._username = options.get("username")
         self._password = options.get("password")
         self._login_path = options.get("login_path")
+        self.options = options
 
     def __repr__(self):
         tn = typename(self)

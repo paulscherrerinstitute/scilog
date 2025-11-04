@@ -1,4 +1,4 @@
-from .authmixin import HEADER_JSON, AuthError, AuthMixin
+from .authmixin import HEADER_JSON, AuthError
 from .httpclient import HttpClient
 
 
@@ -6,12 +6,13 @@ class SciCatRestAPI(HttpClient):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.login_path = self._login_path or "https://dacat.psi.ch/auth/msad"
+        self.token_prefix = self.options.get("token_prefix", "")
 
     def authenticate(self, username, password):
         auth_payload = {"username": username, "password": password}
         res = self._login(auth_payload, HEADER_JSON)
         try:
-            token = res["id"]
+            token = f"{self.token_prefix}{res['id']}"
         except KeyError as e:
             raise SciCatAuthError(res) from e
         else:
