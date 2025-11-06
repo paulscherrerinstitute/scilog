@@ -151,6 +151,7 @@ class ClientSettingsFromEnv:
             "login_path": "/".join(
                 [self.address.strip("/"), os.environ[f"{name}_LOGIN"].strip("/")]
             ),
+            "token_prefix": os.environ.get(f"{name}_TOKEN_PREFIX"),
         }
 
 
