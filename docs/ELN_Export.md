@@ -28,7 +28,6 @@ We note that all the above types inherit from CreativeWork.
 
 Visually:
 
-
 ```mermaid
 ---
 title: Logbook entity-relations
@@ -48,29 +47,29 @@ erDiagram
 The Logbook is our container type. It has a title, author / creator, description, and create/update timestamps.
 We map these to following schema.org properties:
 
-| Logbook property | schema.org property |
-| ---------------- | ------------------- |
-| created at       | dateCreated         |
-| updated at       | dateModified        |
-| title            | name                |
-| description      | description         |
-| creator/author   | author              |
+| Logbook property | schema.org property                             |
+| ---------------- | ----------------------------------------------- |
+| created at       | [dateCreated](https://schema.org/dateCreated)   |
+| updated at       | [dateModified](https://schema.org/dateModified) |
+| title            | [name](https://schema.org/name)                 |
+| description      | [description](https://schema.org/description)   |
+| creator/author   | [author](https://schema.org/author)             |
 
 A message and comment have the same properties, except for how they reference Files (messageAttachment vs sharedContent).
 
-| Message / Comment property | schema.org property           |
-| -------------------------- | ----------------------------- |
-| created at                 | dateCreated                   |
-| updated at                 | dateModified                  |
-| HTML text content          | text                          |
-|                            | `encodingFormat: "text/html"` |
-| tags                       | keyword                       |
-| author                     | author                        |
+| Message / Comment property | schema.org property                                                |
+| -------------------------- | ------------------------------------------------------------------ |
+| created at                 | [dateCreated](https://schema.org/dateCreated)                      |
+| updated at                 | [dateModified](https://schema.org/dateModified)                    |
+| HTML text content          | [text](https://schema.org/text)                                    |
+|                            | [`encodingFormat`](https://schema.org/encodingFormat): `text/html` |
+| tags                       | [keyword](https://schema.org/keyword)                              |
+| author                     | [author](https://schema.org/author)                                |
 
-An `author` is a schema.org Person.
+An `author` is a schema.org `Person`.
 
 Finally, a File may have the usual [metadata properties](https://github.com/TheELNConsortium/TheELNFileFormat/blob/master/SPECIFICATION.md#example-file) as described in the ELN file format.
 
 ### How are attached files included?
 
-Again, we follow the ELN file format - A `Message` or a `Comment` will have an `@id` of a local directory name. All the files attached to the message/comment will be placed in the directory, and have local identifiers as well.
+Again, we follow the ELN file format - A `Message` or a `Comment` will have an `@id` of a local directory name. As directory nodes in RO-Crate are [required](https://www.researchobject.org/ro-crate/specification/1.2/data-entities.html#directory-data-entity) to be Dataset, we will also have `Dataset` as an additional type in the `@type` array. All the files attached to the message/comment will be placed in the directory, and have local identifiers as well.
