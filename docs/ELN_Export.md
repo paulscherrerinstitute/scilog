@@ -1,19 +1,75 @@
-Below we give a mapping from SciLog concepts to ELN terms.
+# API-01 ELN conventions
 
-| SciLog Concept | ELN term /schema.org property |
-|----------------|----------|
-| Logbook        | @type=Dataset, genre=experiment |
-| Paragraph      | @type=Dataset, genre=experiment     |
-| Logbook -->is_parent_of--> Paragraph | mentions |
-| comments       | comment |
-| Paragraph.textContent | text |
-| tags           | keywords |
-| Snippet.createdAt | dateCreated |
-| Snippet.updatedAt | dateModified |
-| Logbook.title | name |
-| Logbook.description | description |
+- Roughly the [ELN File format](https://github.com/TheELNConsortium/TheELNFileFormat/blob/master/SPECIFICATION.md) (in terms of structure of the archive i.e. a zipped RO-Crate with .eln extension)
+- Except, more informative types than `Dataset` (e.g. Book, Message, etc), instead of using the `genre` property to distinguish between ELN concepts.
+- Possibility to have multiple `@type`s e.g. `[Book, Dataset]`, for best-effort compatibility with the ELN file format
 
-The `Dataset`s are further classified by the `genre` property as per the ELN spec ([issue](https://github.com/TheELNConsortium/TheELNFileFormat/pull/103)). The value of `experiment` is used for both Logbooks and Paragraphs. This is to done to be compatible with elabFTW. Other possible values in elabFTW are `resource`.
-(From here: https://github.com/TheELNConsortium/TheELNFileFormat/discussions/55:
-How to discriminate experiments, samples, equipements
-Use genre: https://schema.org/genre)
+## Structure of a logbook
+
+A logbook is a collection of messages. A message may have several comments. Both messages and comments may have attached files.
+We found the following schema.org types appropriate for these entities:
+
+| ELN Concept | schema.org class                              |
+| ----------- | --------------------------------------------- |
+| Logbook     | [Book](https://schema.org/Book)               |
+| Message     | [Message](https://schema.org/Message)         |
+| Comment     | [Comment](https://schema.org/Comment)         |
+| File        | [MediaObject](https://schema.org/MediaObject) |
+
+We note that all the above types inherit from CreativeWork.
+
+### How are the entities related?
+
+- A Logbook (`Book`) [`hasPart`](https://schema.org/hasPart) `Message`s.
+- A `Message` has `Comments` through the [`comment`](https://schema.org/comment) property.
+- Files:
+  - Messages have attachments (i.e. `MediaObject`s) through the [`messageAttachment`](https://schema.org/messageAttachment) property.
+  - Comments have attachments through the [`sharedContent`](https://schema.org/sharedContent) property.
+
+### Properties of the entities
+
+The Logbook is our container type. It has a title, author / creator, description, and create/update timestamps.
+We map these to following schema.org properties:
+
+| Logbook property | schema.org property |
+| ---------------- | ------------------- |
+| created at       | dateCreated         |
+| updated at       | dateModified        |
+| title            | name                |
+| description      | description         |
+| creator/author   | author              |
+
+A message and comment have the same properties, except for how they reference Files (messageAttachment vs sharedContent).
+
+| Message / Comment property | schema.org property           |
+| -------------------------- | ----------------------------- |
+| created at                 | dateCreated                   |
+| updated at                 | dateModified                  |
+| HTML text content          | text                          |
+|                            | `encodingFormat: "text/html"` |
+| tags                       | keyword                       |
+| author                     | author                        |
+
+An `author` is a schema.org Person.
+
+Finally, a File may have the usual [metadata properties](https://github.com/TheELNConsortium/TheELNFileFormat/blob/master/SPECIFICATION.md#example-file) as described in the ELN file format.
+
+### How are attached files included?
+
+Again, we follow the ELN file format - A `Message` or a `Comment` will have an `@id` of a local directory name. All the files attached to the message/comment will be placed in the directory, and have local identifiers as well.
+
+### Visual
+
+```mermaid
+---
+title: Logbook entities
+---
+erDiagram
+    Book ||--o{ Message : hasPart
+    Message ||--o{ Comment : comment
+    Message ||--o{ MediaObject : messageAttachment
+    Comment ||--o{ MediaObject : sharedContent
+    Message ||--o| Person : author
+    Comment ||--o| Person : author
+    Book ||--o| Person : author
+```
