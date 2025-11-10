@@ -26,6 +26,23 @@ We note that all the above types inherit from CreativeWork.
   - Messages have attachments (i.e. `MediaObject`s) through the [`messageAttachment`](https://schema.org/messageAttachment) property.
   - Comments have attachments through the [`sharedContent`](https://schema.org/sharedContent) property.
 
+Visually:
+
+
+```mermaid
+---
+title: Logbook entity-relations
+---
+erDiagram
+    Book ||--o{ Message : hasPart
+    Message ||--o{ Comment : comment
+    Message ||--o{ MediaObject : messageAttachment
+    Comment ||--o{ MediaObject : sharedContent
+    Message ||--o| Person : author
+    Comment ||--o| Person : author
+    Book ||--o| Person : author
+```
+
 ### Properties of the entities
 
 The Logbook is our container type. It has a title, author / creator, description, and create/update timestamps.
@@ -57,19 +74,3 @@ Finally, a File may have the usual [metadata properties](https://github.com/TheE
 ### How are attached files included?
 
 Again, we follow the ELN file format - A `Message` or a `Comment` will have an `@id` of a local directory name. All the files attached to the message/comment will be placed in the directory, and have local identifiers as well.
-
-### Visual
-
-```mermaid
----
-title: Logbook entities
----
-erDiagram
-    Book ||--o{ Message : hasPart
-    Message ||--o{ Comment : comment
-    Message ||--o{ MediaObject : messageAttachment
-    Comment ||--o{ MediaObject : sharedContent
-    Message ||--o| Person : author
-    Comment ||--o| Person : author
-    Book ||--o| Person : author
-```
