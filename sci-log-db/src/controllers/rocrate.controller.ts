@@ -34,7 +34,7 @@ export class RocrateController {
     @repository(BasesnippetRepository)
     private baseSnippetRepository: BasesnippetRepository,
     @repository(LogbookRepository) private logbookRepository: LogbookRepository,
-    @repository(FileRepository) private fileRepository: LogbookRepository,
+    @repository(FileRepository) private fileRepository: FileRepository,
   ) {}
   counter = 0;
   getFilter(id: string): Filter<Basesnippet> {
@@ -84,26 +84,17 @@ export class RocrateController {
       {currentUser: this.user},
     );
     const crate = new ROCrate({});
-    const rootDataset = crate.root;
-    rootDataset.name = logbook.name;
-    rootDataset.description = logbook.description ?? '';
+    crate.root.name = logbook.name;
+    crate.root.description = logbook.description ?? '';
     crate.root.hasPart = [];
+    crate.root["@type"] = ['Book', 'Dataset'];
+    crate.root.dateCreated = logbook.createdAt.toISOString()
     let person = {
       '@id': `person://${logbook.createdBy}`,
       '@type': 'Person',
     };
     crate.addEntity(person);
-    crate.root.hasPart.push({
-      '@id': `logbook://${logbook.id}`,
-      '@type': ['Book', 'Dataset'],
-      genre: 'experiment',
-      name: `test scilog export: ${logbook.name}`,
-      description: logbook.description ?? '',
-      dateCreated: logbook.createdAt.toISOString(),
-      author: person,
-      hasPart: [],
-    });
-    const logbookEntry = crate.getEntity(`logbook://${logbook.id}`);
+    crate.root.author = person;
     const addRecursive = async (snippet: Basesnippet) => {
       person = {
         '@id': `person://${snippet.createdBy}`,
@@ -125,11 +116,12 @@ export class RocrateController {
           const bucket = new mongodb.GridFSBucket(
             this.fileRepository.dataSource.connector?.db,
           );
+          if (!fs.existsSync(`${tmpDir}/${snippet.id}`)) fs.mkdirSync(`${tmpDir}/${snippet.id}`);
           const pipedStream = bucket
             .openDownloadStream(fileObj._fileId as unknown as ObjectId)
             .pipe(
               fs.createWriteStream(
-                `${tmpDir}/${fileObj._fileId}.${fileObj.fileExtension}`,
+                `${tmpDir}/${snippet.id}/${fileObj._fileId}.${fileObj.fileExtension}`,
               ),
             );
           await new Promise<void>((resolve, reject) => {
@@ -137,7 +129,7 @@ export class RocrateController {
               this.addToZip(
                 archive,
                 tmpDir,
-                `${fileObj._fileId}.${fileObj.fileExtension}`,
+                `${snippet.id}/${fileObj._fileId}.${fileObj.fileExtension}`,
               );
               console.log(`${archive.pointer()} total bytes written`);
               resolve();
@@ -145,7 +137,7 @@ export class RocrateController {
           });
         }
         return {
-          '@id': `./${fileObj._fileId}.${fileObj.fileExtension}`,
+          '@id': `./${snippet.id}/${fileObj._fileId}.${fileObj.fileExtension}`,
           '@type': 'File',
           name: fileObj.name,
           encodingFormat: fileObj.contentType,
@@ -172,19 +164,19 @@ export class RocrateController {
         }
         if ((snippet as Paragraph).linkType === 'paragraph') {
           paragraph = {
-            '@id': `paragraph://${snippet.id}`,
+            '@id': `./${snippet.id}`,
             '@type': ['Message', 'Dataset'],
             name: `Paragraph ${snippet.id}`,
             ...paragraph,
           };
-          logbookEntry.hasPart.push(paragraph);
+          crate.root.hasPart.push(paragraph);
         }
         if ((snippet as Paragraph).linkType === 'comment') {
           const parentParagraph = crate.getEntity(
-            `paragraph://${snippet.parentId}`,
+            `./${snippet.parentId}`,
           );
           paragraph = {
-            '@id': `comment://${snippet.id}`,
+            '@id': `./${snippet.id}`,
             '@type': ['Comment', 'Dataset'],
             name: `Comment ${snippet.id}`,
             parentItem: parentParagraph,
