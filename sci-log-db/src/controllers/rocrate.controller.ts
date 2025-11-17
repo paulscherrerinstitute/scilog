@@ -164,7 +164,7 @@ export class RocrateController {
         }
         if ((snippet as Paragraph).linkType === 'paragraph') {
           paragraph = {
-            '@id': `./${snippet.id}`,
+            '@id': `./${snippet.id}/`,
             '@type': ['Message', 'Dataset'],
             name: `Paragraph ${snippet.id}`,
             ...paragraph,
@@ -173,10 +173,10 @@ export class RocrateController {
         }
         if ((snippet as Paragraph).linkType === 'comment') {
           const parentParagraph = crate.getEntity(
-            `./${snippet.parentId}`,
+            `./${snippet.parentId}/`,
           );
           paragraph = {
-            '@id': `./${snippet.id}`,
+            '@id': `./${snippet.id}/`,
             '@type': ['Comment', 'Dataset'],
             name: `Comment ${snippet.id}`,
             parentItem: parentParagraph,
