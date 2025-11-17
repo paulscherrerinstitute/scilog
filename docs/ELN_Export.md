@@ -20,11 +20,10 @@ We note that all the above types inherit from CreativeWork.
 
 ### How are the entities related?
 
-- A Logbook (`Book`) [`hasPart`](https://schema.org/hasPart) `Message`s.
-- A `Message` has `Comments` through the [`comment`](https://schema.org/comment) property.
-- Files:
-  - Messages have attachments (i.e. `MediaObject`s) through the [`messageAttachment`](https://schema.org/messageAttachment) property.
-  - Comments have attachments through the [`sharedContent`](https://schema.org/sharedContent) property.
+- A Logbook (`Book`) has  `Message`s through the [`hasPart`](https://schema.org/hasPart) property.
+- A `Message` has `Comment`s through the [`comment`](https://schema.org/comment) property.
+- Messages and Comments have files (i.e. `MediaObject`s) through the [`hasPart`](https://schema.org/messageAttachment) property. 
+(`MediaObject` is aliased to `File` in the [ro-crate context](https://w3id.org/ro/crate/1.2/context))
 
 Visually:
 
@@ -35,8 +34,8 @@ title: Logbook entity-relations
 erDiagram
     Book ||--o{ Message : hasPart
     Message ||--o{ Comment : comment
-    Message ||--o{ MediaObject : messageAttachment
-    Comment ||--o{ MediaObject : sharedContent
+    Message ||--o{ MediaObject : hasPart
+    Comment ||--o{ MediaObject : hasPart
     Message ||--o| Person : author
     Comment ||--o| Person : author
     Book ||--o| Person : author
@@ -55,7 +54,7 @@ We map these to following schema.org properties:
 | description      | [description](https://schema.org/description)   |
 | creator/author   | [author](https://schema.org/author)             |
 
-A message and comment have the same properties, except for how they reference Files (messageAttachment vs sharedContent).
+A message and comment have the same properties:
 
 | Message / Comment property | schema.org property                                                |
 | -------------------------- | ------------------------------------------------------------------ |
@@ -63,7 +62,7 @@ A message and comment have the same properties, except for how they reference Fi
 | updated at                 | [dateModified](https://schema.org/dateModified)                    |
 | HTML text content          | [text](https://schema.org/text)                                    |
 |                            | [`encodingFormat`](https://schema.org/encodingFormat): `text/html` |
-| tags                       | [keyword](https://schema.org/keyword)                              |
+| tags                       | [keywords](https://schema.org/keywords)                              |
 | author                     | [author](https://schema.org/author)                                |
 
 An `author` is a schema.org `Person`.

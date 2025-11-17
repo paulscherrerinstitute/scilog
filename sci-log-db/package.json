@@ -79,6 +79,7 @@
     "prismjs": "^1.29.0",
     "puppeteer": "^19.7.5",
     "ro-crate": "^3.6.1",
+    "ro-crate-html": "^0.1.6",
     "socket.io": "^2.3.0",
     "tar": "^6.2.0",
     "tslib": "^2.0.0"

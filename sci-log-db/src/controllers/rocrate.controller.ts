@@ -1,22 +1,27 @@
-// Uncomment these imports to begin using these cool features!
+import {Filter, repository} from '@loopback/repository';
+import {get, param, RestBindings, Response} from '@loopback/rest';
 
-import { Filter, repository } from '@loopback/repository';
-import { get, param, RestBindings, Response } from '@loopback/rest';
-
-import { generateUniqueId, inject } from '@loopback/core';
-import { ROCrate } from '../../rocrate-js/dist/lib/rocrate';
-import { BasesnippetRepository, LogbookRepository } from '../repositories';
-import { Basesnippet, Logbook, Paragraph } from '../models';
-import { SecurityBindings, UserProfile } from '@loopback/security';
-import { OPERATION_SECURITY_SPEC } from '../utils/security-spec';
-import { authenticate } from '@loopback/authentication';
-import { authorize } from '@loopback/authorization';
-import { basicAuthorization } from '../services/basic.authorizor';
+import {generateUniqueId, inject} from '@loopback/core';
+import {ROCrate} from '../../rocrate-js/dist/lib/rocrate';
+import {BasesnippetRepository, LogbookRepository} from '../repositories';
+import {Basesnippet, Filecontainer, Logbook, Paragraph} from '../models';
+import {SecurityBindings, UserProfile} from '@loopback/security';
+import {OPERATION_SECURITY_SPEC} from '../utils/security-spec';
+import {authenticate} from '@loopback/authentication';
+import {authorize} from '@loopback/authorization';
+import {basicAuthorization} from '../services/basic.authorizor';
 import fs from 'fs';
 import archiver from 'archiver';
 import path from 'path';
 import os from 'os';
+import {FileRepository} from '../repositories/file.repository';
+import {Filesnippet} from '../models/file.model';
 
+import {ObjectId} from 'mongodb';
+import * as mongodb from 'mongodb';
+// @ts-ignore
+import {Preview, Defaults} from 'ro-crate-html';
+const HtmlFile = require('ro-crate-html/lib/ro-crate-preview-file.js');
 
 @authenticate('jwt')
 @authorize({
@@ -26,17 +31,19 @@ import os from 'os';
 export class RocrateController {
   constructor(
     @inject(SecurityBindings.USER) private user: UserProfile,
-    @repository(BasesnippetRepository) private baseSnippetRepository: BasesnippetRepository,
+    @repository(BasesnippetRepository)
+    private baseSnippetRepository: BasesnippetRepository,
     @repository(LogbookRepository) private logbookRepository: LogbookRepository,
-  ) { }
+    @repository(FileRepository) private fileRepository: LogbookRepository,
+  ) {}
   counter = 0;
   getFilter(id: string): Filter<Basesnippet> {
     return {
       where: {
         and: [
-          { snippetType: { inq: ['paragraph', 'image', 'task'] } },
-          { deleted: false },
-          { parentId: { inq: [id] } },
+          {snippetType: {inq: ['paragraph']}},
+          {deleted: false},
+          {parentId: id},
         ],
       },
       include: [
@@ -54,13 +61,28 @@ export class RocrateController {
     responses: {
       '200': {
         description: 'Rocrate model instance',
-        content: { 'application/json': { schema: { type: 'object' } } },
+        content: {'application/json': {schema: {type: 'object'}}},
       },
     },
   })
   async findById(@param.path.string('id') id: string): Promise<object> {
-    const logbook: Logbook = await this.logbookRepository.findById(id, {}, { currentUser: this.user });
-    const baseSnippets = await this.baseSnippetRepository.find(this.getFilter(id), { currentUser: this.user });
+    return this.prepareRoCrate(id);
+  }
+
+  async prepareRoCrate(
+    id: string,
+    tmpDir: string | undefined = undefined,
+    archive: archiver.Archiver | undefined = undefined,
+  ): Promise<object> {
+    const logbook: Logbook = await this.logbookRepository.findById(
+      id,
+      {},
+      {currentUser: this.user},
+    );
+    const baseSnippets: Basesnippet[] = await this.baseSnippetRepository.find(
+      this.getFilter(id),
+      {currentUser: this.user},
+    );
     const crate = new ROCrate({});
     const rootDataset = crate.root;
     rootDataset.name = logbook.name;
@@ -73,47 +95,104 @@ export class RocrateController {
     crate.addEntity(person);
     crate.root.hasPart.push({
       '@id': `logbook://${logbook.id}`,
-      '@type': 'Dataset',
-      'genre': 'experiment',
-      'name': `test scilog export: ${logbook.name}`,
-      'description': logbook.description ?? '',
-      'dateCreated': logbook.createdAt.toISOString(),
-      'author': person,
-      'mentions': [],
+      '@type': ['Book', 'Dataset'],
+      genre: 'experiment',
+      name: `test scilog export: ${logbook.name}`,
+      description: logbook.description ?? '',
+      dateCreated: logbook.createdAt.toISOString(),
+      author: person,
+      hasPart: [],
     });
     const logbookEntry = crate.getEntity(`logbook://${logbook.id}`);
-    const addRecursive = (snippet: Basesnippet) => {
+    const addRecursive = async (snippet: Basesnippet) => {
       person = {
         '@id': `person://${snippet.createdBy}`,
         '@type': 'Person',
       };
       crate.addEntity(person);
-      if (snippet.snippetType === 'paragraph' && (snippet as Paragraph).linkType === 'paragraph') {
-        crate.root.hasPart.push({
-          '@id': `paragraph://${snippet.id}`,
-          '@type': 'Dataset',
-          'name': `Paragraph ${snippet.id}`,
+      const processAndGetFileEntity = async (
+        file: Filecontainer,
+        archive?: archiver.Archiver,
+        tmpDir?: string,
+      ): Promise<Record<string, unknown>> => {
+        const fileObj: Filesnippet = await this.fileRepository.findById(
+          file.fileId,
+          {},
+          {currentUser: this.user},
+        );
+        console.log('found fileObj for file', fileObj, file);
+        if (archive && tmpDir) {
+          const bucket = new mongodb.GridFSBucket(
+            this.fileRepository.dataSource.connector?.db,
+          );
+          const pipedStream = bucket
+            .openDownloadStream(fileObj._fileId as unknown as ObjectId)
+            .pipe(
+              fs.createWriteStream(
+                `${tmpDir}/${fileObj._fileId}.${fileObj.fileExtension}`,
+              ),
+            );
+          await new Promise<void>((resolve, reject) => {
+            pipedStream.on('close', () => {
+              this.addToZip(
+                archive,
+                tmpDir,
+                `${fileObj._fileId}.${fileObj.fileExtension}`,
+              );
+              console.log(`${archive.pointer()} total bytes written`);
+              resolve();
+            });
+          });
+        }
+        return {
+          '@id': `./${fileObj._fileId}.${fileObj.fileExtension}`,
+          '@type': 'File',
+          name: fileObj.name,
+          encodingFormat: fileObj.contentType,
+        };
+      };
+      if (snippet.snippetType === 'paragraph') {
+        let paragraph: Record<string, unknown> = {
           text: (snippet as Paragraph).textcontent ?? '',
-          genre: 'experiment',
           dateCreated: snippet.createdAt.toISOString(),
           keywords: snippet.tags ? snippet.tags.join(',') : '',
           encodingFormat: 'text/html',
           author: person,
-        });
-        logbookEntry.mentions.push({ '@id': `paragraph://${snippet.id}` });
-      }
-      if (snippet.snippetType === 'paragraph' && (snippet as Paragraph).linkType === 'comment') {
-        crate.addEntity({
-          '@id': `comment://${snippet.id}`,
-          '@type': 'Comment',
-          'text': (snippet as Paragraph).htmlTextcontent ?? '',
-          'dateCreated': snippet.createdAt.toISOString(),
-          'author': person,
-          // 'about': { '@id': `paragraph://${snippet.parentId}` },
-        });
-        const paragraphEntity = crate.getEntity(`paragraph://${snippet.parentId}`);
-        if (!paragraphEntity.comment) paragraphEntity.comment = [];
-        paragraphEntity.comment.push({ '@id': `comment://${snippet.id}` });
+        };
+        if (
+          (snippet as Paragraph).files &&
+          (snippet as Paragraph).files!.length > 0
+        ) {
+          // wait for all file processing (downloads + adding to archive) to finish
+          paragraph.hasPart = await Promise.all(
+            (snippet as Paragraph).files!.map(x =>
+              processAndGetFileEntity(x, archive, tmpDir),
+            ),
+          );
+        }
+        if ((snippet as Paragraph).linkType === 'paragraph') {
+          paragraph = {
+            '@id': `paragraph://${snippet.id}`,
+            '@type': ['Message', 'Dataset'],
+            name: `Paragraph ${snippet.id}`,
+            ...paragraph,
+          };
+          logbookEntry.hasPart.push(paragraph);
+        }
+        if ((snippet as Paragraph).linkType === 'comment') {
+          const parentParagraph = crate.getEntity(
+            `paragraph://${snippet.parentId}`,
+          );
+          paragraph = {
+            '@id': `comment://${snippet.id}`,
+            '@type': ['Comment', 'Dataset'],
+            name: `Comment ${snippet.id}`,
+            parentItem: parentParagraph,
+            ...paragraph,
+          };
+          if (!parentParagraph.comment) parentParagraph.comment = [];
+          parentParagraph.comment.push(paragraph);
+        }
       }
 
       // if (snippet.snippetType === 'task') {
@@ -136,10 +215,14 @@ export class RocrateController {
       //   logbookEntry.step.push({ '@id': `howtostep://${snippet.id}` });
       // }
       if (snippet.subsnippets && snippet.subsnippets.length > 0) {
-        snippet.subsnippets.forEach(addRecursive);
+        for (const ss of snippet.subsnippets) {
+          await addRecursive(ss);
+        }
       }
+    };
+    for (const bs of baseSnippets) {
+      await addRecursive(bs);
     }
-    baseSnippets.forEach(addRecursive);
 
     return crate;
   }
@@ -150,44 +233,68 @@ export class RocrateController {
     responses: {
       '200': {
         description: 'Rocrate model instance',
-        content: { 'application/zip': { schema: { type: 'object' } } },
+        content: {'application/zip': {schema: {type: 'object'}}},
       },
-    }
+    },
   })
-  async downloadById(@param.path.string('id') id: string, @inject(RestBindings.Http.RESPONSE) response: Response) {
-    const crate = await this.findById(id);
+  async downloadById(
+    @param.path.string('id') id: string,
+    @inject(RestBindings.Http.RESPONSE) response: Response,
+  ) {
     // create a temporary working directory
-    const tempDir = path.join(os.tmpdir(), `rocrate-${generateUniqueId()}`);
-    fs.mkdirSync(tempDir, { recursive: true });
-    await this.createZip(crate, tempDir);
-    response.download(path.join(tempDir, 'testeln.eln'), (err) => {
+    const tmpDir = path.join(os.tmpdir(), `rocrate-${generateUniqueId()}`);
+    fs.mkdirSync(tmpDir, {recursive: true});
+    const [output, archive] = this.initArchive(tmpDir);
+    const crate = await this.prepareRoCrate(id, tmpDir, archive);
+    fs.writeFileSync(
+      `${tmpDir}/ro-crate-metadata.json`,
+      JSON.stringify(crate, null, 2),
+    );
+    this.addToZip(archive, tmpDir, 'ro-crate-metadata.json');
+    const x = await new HtmlFile(new Preview(crate)).render(
+      Defaults.render_script,
+    );
+    fs.writeFileSync(`${tmpDir}/ro-crate-preview.html`, x);
+    this.addToZip(archive, tmpDir, 'ro-crate-preview.html');
+    await this.closeArchive(output, archive);
+    response.download(path.join(tmpDir, 'testeln.eln'), err => {
       if (err) {
         console.error('Error sending file:', err);
         response.status(500).send('Error sending file');
       } else {
         // Clean up the temporary directory after sending the file
-        fs.rmSync(tempDir, { recursive: true, force: true });
+        fs.rmSync(tmpDir, {recursive: true, force: true});
       }
     });
     return response;
   }
 
-  private async createZip(crate: object, tmpPath: string): Promise<void> {
-    // write metadata file
-    fs.writeFileSync(`${tmpPath}/ro-crate-metadata.json`, JSON.stringify(crate, null, 2));
+  private addToZip(
+    archive: archiver.Archiver,
+    tmpDir: string,
+    filePath: string,
+  ) {
+    const archiveName = 'testeln';
+    archive.file(`${tmpDir}/${filePath}`, {
+      name: `${archiveName}/${filePath}`,
+    });
+  }
 
-    const output = fs.createWriteStream(`${tmpPath}/testeln.eln`);
+  private initArchive(tmpDir: string): [fs.WriteStream, archiver.Archiver] {
+    const output = fs.createWriteStream(`${tmpDir}/testeln.eln`);
     const archive = archiver('zip');
 
     archive.pipe(output);
+    return [output, archive];
+  }
 
-    const archiveName = 'testeln';
-    archive.file(`${tmpPath}/ro-crate-metadata.json`, { name: `${archiveName}/ro-crate-metadata.json` });
-
+  private async closeArchive(
+    output: fs.WriteStream,
+    archive: archiver.Archiver,
+  ) {
     await new Promise<void>((resolve, reject) => {
       output.on('close', () => {
-        console.log(`${archive.pointer()} total bytes`);
-        console.log('Archive finalized and file written.');
+        console.log(`${archive.pointer()} total bytes written`);
         resolve();
       });
       archive.on('error', err => reject(err));

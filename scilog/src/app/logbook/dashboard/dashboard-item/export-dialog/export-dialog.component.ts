@@ -42,7 +42,10 @@ export class ExportDialogComponent {
       const url = window.URL.createObjectURL(blob);
       const link = this.downloadLink.nativeElement;
       link.href = url;
-      link.download = `export - ${this.datePipe.transform(Date.now(), 'yyyy-MM-dd hh:mm:ss z')}.${option}`;
+      link.download = `export - ${this.datePipe.transform(
+        Date.now(),
+        'yyyy-MM-dd hh:mm:ss z'
+      )}${option === 'eln' ? '.eln' : ''}`;
       link.click();
       window.URL.revokeObjectURL(url);
     }
