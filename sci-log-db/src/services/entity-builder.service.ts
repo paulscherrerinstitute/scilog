@@ -12,6 +12,7 @@ export class EntityBuilderService {
     return {
       '@id': `person://${createdBy}`,
       '@type': 'Person',
+      email: createdBy,
     };
   }
 
@@ -53,7 +54,7 @@ export class EntityBuilderService {
       genre: 'experiment',
       name: `SciLog ELN export: ${logbook.name}`,
       description: logbook.description ?? '',
-      dateCreated: logbook.createdAt.toISOString(),
+      dateCreated: logbook.createdAt?.toISOString(),
       author,
     };
   }
@@ -76,11 +77,14 @@ export class EntityBuilderService {
     const document = dom.window.document;
 
     const paraFile = paragraph.files?.find(f => f.fileId === fileObj.id);
-    const newHref = this.getFilePath(paragraph.id, fileObj._fileId, fileObj.fileExtension);
+    const newHref = this.getFilePath(
+      paragraph.id,
+      fileObj._fileId,
+      fileObj.fileExtension,
+    );
 
     const linkSelector = `a[href="file:${paraFile?.fileHash}"]`;
     const links = document.querySelectorAll(linkSelector);
-
     links.forEach(link => {
       link.setAttribute('href', newHref);
     });

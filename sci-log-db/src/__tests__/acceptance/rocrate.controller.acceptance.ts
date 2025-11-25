@@ -1,66 +1,72 @@
-import { Client } from '@loopback/testlab';
-import { Suite } from 'mocha';
-import { SciLogDbApplication } from '../..';
-import { createUserToken, setupApplication } from './test-helper';
-import fs from 'fs';
-import archiver from 'archiver';
+import {Client, expect} from '@loopback/testlab';
+import {Suite} from 'mocha';
+import {SciLogDbApplication} from '../..';
+import {clearDatabase, createUserToken, setupApplication} from './test-helper';
+import {DatabaseHelper} from '../database.helpers';
+// @ts-ignore
+import {ROCrate} from 'ro-crate';
 
 describe('RocrateController', function (this: Suite) {
   this.timeout(5000);
   let app: SciLogDbApplication;
   let client: Client;
   let token: string;
+  let databaseHelper: DatabaseHelper;
+
+  const LOGBOOK_OWNER_GROUP = 'roCrateAcceptance';
+
+  const user = {
+    email: 'test@loopback.io',
+    firstName: 'Example',
+    lastName: 'User',
+    roles: [LOGBOOK_OWNER_GROUP, 'any-authenticated-user'],
+  };
 
   before('setupApplication', async () => {
-    ({ app, client } = await setupApplication({ dirtyDb: true }));
-    // await clearDatabase(app);
-    token = await createUserToken(app, client, ['oidc-user@facility.com']);
+    ({app, client} = await setupApplication());
+    await clearDatabase(app);
+    databaseHelper = new DatabaseHelper(app);
+    token = await createUserToken(app, client, undefined, user);
   });
 
   after(async () => {
-    //await clearDatabase(app);
+    await clearDatabase(app);
     if (app != null) await app.stop();
   });
 
-  it('dummy test for rocrate endpoint for development', async () => {
-    console.log('Using token: ' + token);
+  const logbookSnippet = {
+    ownerGroup: LOGBOOK_OWNER_GROUP,
+    isPrivate: true,
+    tags: ['tag1'],
+    description: 'test description',
+    name: 'aSearchableName',
+    location: 'aLocation',
+  };
+
+  it('gets rocrate metadata for existing logbook', async () => {
+    const logbook = await databaseHelper.givenLogbook(logbookSnippet, {
+      currentUser: user,
+    });
     await client
-      .get('/rocrates/68b7047b45f9f4795ee4ea60')
+      .get(`/rocrates/${logbook.id}`)
       .set('Authorization', 'Bearer ' + token)
       .set('Content-Type', 'application/json')
       .expect(200)
-      .then(async result => {
-        console.log(JSON.stringify(result.body, null, 2));
+      .then(result => {
+        // sanity checks that it's a valid ro-crate
+        const crate = new ROCrate(result.body);
+        expect(crate.rootDataset.name).to.equal(logbookSnippet.name);
+        const logbookEntity = crate.getEntity(`./${logbook.id}/`);
+        expect(crate.hasType(logbookEntity, 'Book')).to.be.true();
+        expect(logbookEntity.description).to.equal(logbookSnippet.description);
 
-        // write metadata file
-        fs.writeFileSync(
-          'ro-crate-metadata.json',
-          JSON.stringify(result.body, null, 2)
-        );
-
-        // set up output stream and archive
-        const output = fs.createWriteStream('testeln.eln');
-        const archive = archiver('zip');
-
-        archive.pipe(output);
-
-        const archiveName = 'testeln';
-        archive.file('ro-crate-metadata.json', { name: `${archiveName}/ro-crate-metadata.json` });
-
-        // wait for close event so we know the file is fully flushed
-        await new Promise<void>((resolve, reject) => {
-          output.on('close', () => {
-            console.log(`${archive.pointer()} total bytes`);
-            console.log('Archive finalized and file written.');
-            resolve();
-          });
-          archive.on('error', err => reject(err));
-          archive.finalize().catch(err => reject(err));
-        });
-
-        console.log('Wrote testeln.eln');
+        // check author is linked
+        const authorEntity = crate.getEntity(logbookEntity.author['@id']);
+        expect(crate.hasType(authorEntity, 'Person')).to.be.true();
+        expect(authorEntity.email).to.equal(user.email);
+      })
+      .catch(error => {
+        throw error;
       });
   });
-
-
 });
