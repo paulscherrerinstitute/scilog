@@ -66,7 +66,7 @@ describe('ExportDialogComponent', () => {
     spyOn(component['downloadLink'].nativeElement, 'click')
     const datePrefix = '2023-02-1';
     spyOn(Date, 'now').and.returnValue(Date.parse(`${datePrefix}5`));
-    await component.exportData();
+    await component.exportData("pdf");
     expect(mockDialogRef.close).toHaveBeenCalledTimes(1);
     expect(component['downloadLink'].nativeElement.click).toHaveBeenCalledTimes(1);
     expect(component['downloadLink'].nativeElement.download.slice(0, 18)).toEqual(`export - ${datePrefix}`);
