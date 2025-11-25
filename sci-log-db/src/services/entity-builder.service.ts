@@ -1,6 +1,8 @@
 import {injectable, BindingScope} from '@loopback/core';
 import {Logbook, Paragraph} from '../models';
 import {Filesnippet} from '../models/file.model';
+import {JSDOM} from 'jsdom';
+import path from 'path';
 
 @injectable({scope: BindingScope.TRANSIENT})
 export class EntityBuilderService {
@@ -49,24 +51,54 @@ export class EntityBuilderService {
       '@id': this.getEntityId(logbook.id),
       '@type': ['Book', 'Dataset'],
       genre: 'experiment',
-      name: `test scilog export: ${logbook.name}`,
+      name: `SciLog ELN export: ${logbook.name}`,
       description: logbook.description ?? '',
       dateCreated: logbook.createdAt.toISOString(),
-      hasPart: [] as Array<ReturnType<typeof this.buildParagraphEntity>>,
       author,
     };
   }
 
   buildFileEntity(snippetId: string, fileObj: Filesnippet) {
     return {
-      '@id': `./${snippetId}/${fileObj._fileId}.${fileObj.fileExtension}`,
+      '@id': this.getFilePath(
+        snippetId,
+        fileObj._fileId,
+        fileObj.fileExtension,
+      ),
       '@type': 'File',
       name: fileObj.name,
       encodingFormat: fileObj.contentType,
     };
   }
 
+  replaceFileReferences(paragraph: Paragraph, fileObj: Filesnippet): string {
+    const dom = new JSDOM(paragraph.textcontent ?? '');
+    const document = dom.window.document;
+
+    const paraFile = paragraph.files?.find(f => f.fileId === fileObj.id);
+    const newHref = this.getFilePath(paragraph.id, fileObj._fileId, fileObj.fileExtension);
+
+    const linkSelector = `a[href="file:${paraFile?.fileHash}"]`;
+    const links = document.querySelectorAll(linkSelector);
+
+    links.forEach(link => {
+      link.setAttribute('href', newHref);
+    });
+
+    const imgTitleSelector = `img[title="${paraFile?.fileHash}"]`;
+    const images = document.querySelectorAll(imgTitleSelector);
+    images.forEach(img => {
+      img.setAttribute('src', newHref);
+    });
+
+    return document.body.innerHTML;
+  }
+
   getEntityId(snippetId: string) {
     return `./${snippetId}/`;
+  }
+
+  getFilePath(snippetId: string, fileId: string, ext: string) {
+    return `./${path.join(snippetId, `${fileId}.${ext}`)}`;
   }
 }

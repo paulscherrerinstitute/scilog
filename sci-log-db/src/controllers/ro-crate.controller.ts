@@ -2,7 +2,6 @@ import {repository} from '@loopback/repository';
 import {get, param, RestBindings, Response} from '@loopback/rest';
 
 import {inject, service} from '@loopback/core';
-import {SecurityBindings, UserProfile} from '@loopback/security';
 import {OPERATION_SECURITY_SPEC} from '../utils/security-spec';
 import {authenticate} from '@loopback/authentication';
 import {authorize} from '@loopback/authorization';
@@ -19,15 +18,16 @@ import * as mongodb from 'mongodb';
 import {Preview, Defaults} from 'ro-crate-html';
 // @ts-ignore
 import HtmlFile from 'ro-crate-html/lib/ro-crate-preview-file.js';
+import path from 'path';
 
 @authenticate('jwt')
 @authorize({
   allowedRoles: ['any-authenticated-user'],
   voters: [basicAuthorization],
 })
-export class RocrateController {
+export class RoCrateController {
+  static readonly ARCHIVE_ROOT = 'scilog-eln-export';
   constructor(
-    @inject(SecurityBindings.USER) private user: UserProfile,
     @repository(FileRepository) private fileRepository: FileRepository,
     @service(RoCrateService) private rocrateService: RoCrateService,
     @service(ArchiveService) private archiveService: ArchiveService,
@@ -74,7 +74,10 @@ export class RocrateController {
       ({snippetId, fileId, fileExt}) => {
         return {
           stream: bucket.openDownloadStream(fileId as unknown as ObjectId),
-          archivePath: `testeln/${snippetId}/${fileId}.${fileExt}`,
+          archivePath: path.join(
+            RoCrateController.ARCHIVE_ROOT,
+            this.entityBuilder.getFilePath(snippetId, fileId, fileExt),
+          ),
         };
       },
     );
@@ -83,16 +86,22 @@ export class RocrateController {
     const metadataJson = JSON.stringify(rocrate, null, 2);
     assets.push({
       stream: Readable.from([metadataJson]),
-      archivePath: 'testeln/ro-crate-metadata.json',
+      archivePath: path.join(
+        RoCrateController.ARCHIVE_ROOT,
+        'ro-crate-metadata.json',
+      ),
     });
 
     // generate preview html and add as stream asset
-    const previewHtml = await new HtmlFile(new Preview(rocrate)).render(
+    const previewHtml: string = await new HtmlFile(new Preview(rocrate)).render(
       Defaults.render_script,
     );
     assets.push({
       stream: Readable.from([previewHtml]),
-      archivePath: 'testeln/ro-crate-preview.html',
+      archivePath: path.join(
+        RoCrateController.ARCHIVE_ROOT,
+        'ro-crate-preview.html',
+      ),
     });
 
     await this.archiveService.streamZipToResponse(assets, response);

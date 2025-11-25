@@ -6,4 +6,4 @@ export * from './logbook.controller';
 export * from './user.controller';
 export * from './user-preference.controller';
 export * from './oidc.controller';
-export * from './rocrate.controller';
+export * from './ro-crate.controller';
