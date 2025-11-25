@@ -8,7 +8,7 @@ import yauzl from 'yauzl';
 // @ts-ignore
 import {ROCrate} from 'ro-crate';
 import {pipeline, Readable} from 'stream';
-import { RoCrateController } from '../../controllers';
+import {RoCrateController} from '../../controllers';
 
 describe('RocrateController', function (this: Suite) {
   this.timeout(5000);
@@ -101,13 +101,33 @@ describe('RocrateController', function (this: Suite) {
       })
       .then(async () => {
         const files = await listZipEntries(ZIP_FILE_PATH);
-        expect(files).to.containEql(`${RoCrateController.ARCHIVE_ROOT}/ro-crate-metadata.json`);
-        expect(files).to.containEql(`${RoCrateController.ARCHIVE_ROOT}/ro-crate-preview.html`);
+        expect(files).to.containEql(
+          `${RoCrateController.ARCHIVE_ROOT}/ro-crate-metadata.json`,
+        );
+        expect(files).to.containEql(
+          `${RoCrateController.ARCHIVE_ROOT}/ro-crate-preview.html`,
+        );
         fs.unlinkSync(ZIP_FILE_PATH);
       })
       .catch(error => {
         throw error;
       });
+  });
+
+  it('throws 404 for non-existing logbook', async () => {
+    await client
+      .get('/rocrates/nosuchlogbook')
+      .set('Authorization', 'Bearer ' + token)
+      .set('Content-Type', 'application/json')
+      .expect(404);
+  });
+
+  it('throws 404 for non-existing logbook (download)', async () => {
+    await client
+      .get('/rocrates/nosuchlogbook/download')
+      .set('Authorization', 'Bearer ' + token)
+      .set('Content-Type', 'application/json')
+      .expect(404);
   });
 });
 

@@ -23,7 +23,6 @@
     "eslint:fix": "npm run eslint -- --fix",
     "pretest": "npm run clean && npm run build",
     "test": "lb-mocha --allow-console-logs --exit \"dist/__tests__\"",
-    "test:selected": "npm run build && lb-mocha --allow-console-logs --exit",
     "posttest": "npm run lint",
     "test:dev": "lb-mocha --allow-console-logs dist/__tests__/**/*.js && npm run posttest",
     "docker:build": "docker build -t sci-log-db .",
