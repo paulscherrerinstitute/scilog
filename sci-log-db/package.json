@@ -82,7 +82,8 @@
     "ro-crate-html": "^0.1.6",
     "socket.io": "^2.3.0",
     "tar": "^6.2.0",
-    "tslib": "^2.0.0"
+    "tslib": "^2.0.0",
+    "yauzl": "^3.2.0"
   },
   "devDependencies": {
     "@loopback/build": "^9.0.5",
