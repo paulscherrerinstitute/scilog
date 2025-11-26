@@ -1,4 +1,4 @@
-import {DefaultCrudRepository, Options} from '@loopback/repository';
+import {Options} from '@loopback/repository';
 import {Logbook} from '../models';
 import {LogbookRepository} from '../repositories';
 import {SciLogDbApplication} from '../application';

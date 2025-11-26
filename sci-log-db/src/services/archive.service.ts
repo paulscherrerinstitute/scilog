@@ -31,7 +31,8 @@ export class ArchiveService {
           resolve();
         }
       });
-      archive.finalize();
+      // eslint-disable-next-line no-void
+      void archive.finalize();
     });
   }
 }

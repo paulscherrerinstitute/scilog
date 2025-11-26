@@ -8,6 +8,7 @@ import {Filesnippet} from '../models/file.model';
 import {SecurityBindings, UserProfile} from '@loopback/security';
 
 import {RawEntity} from 'ro-crate/lib/types';
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore
 import {ROCrate} from 'ro-crate';
 

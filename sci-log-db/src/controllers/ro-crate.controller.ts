@@ -14,8 +14,10 @@ import {Readable} from 'stream';
 
 import {ObjectId} from 'mongodb';
 import * as mongodb from 'mongodb';
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore
 import {Preview, Defaults} from 'ro-crate-html';
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore
 import HtmlFile from 'ro-crate-html/lib/ro-crate-preview-file.js';
 import path from 'path';

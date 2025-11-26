@@ -5,6 +5,7 @@ import {clearDatabase, createUserToken, setupApplication} from './test-helper';
 import {DatabaseHelper} from '../database.helpers';
 import fs from 'fs';
 import yauzl from 'yauzl';
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore
 import {ROCrate} from 'ro-crate';
 import {pipeline, Readable} from 'stream';
