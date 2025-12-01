@@ -40,7 +40,18 @@ describe('ROCrateService (unit)', () => {
         id: 'snippet-1',
         textcontent: 'Paragraph 1',
       }),
-      givenParagraph({id: 'snippet-2', textcontent: 'Paragraph 2'}),
+      givenParagraph({
+        id: 'snippet-2',
+        textcontent: 'Paragraph 2',
+        subsnippets: [
+          givenParagraph({
+            id: 'snippet-3',
+            textcontent: 'Comment on paragraph 1',
+            parentId: 'snippet-2',
+            linkType: LinkType.COMMENT,
+          }),
+        ],
+      }),
     ]);
 
     const roCrateService = new RoCrateService(
@@ -54,7 +65,35 @@ describe('ROCrateService (unit)', () => {
     const {rocrate} = await roCrateService.getRoCrateMetadata('logbook-id');
 
     console.log(JSON.stringify(rocrate, null, 2));
-    expect(rocrate).to.be.an.Object();
+    // assert the structure of the ro-crate: root data entity has a logbook,
+    // with hasPart two snippets, and a comment on second paragraph
+    expect(rocrate.root.hasPart).to.be.Array();
+    expect(rocrate.root.hasPart).to.have.length(1);
+    expect(rocrate.root.hasPart).to.containEql({
+      '@id': entityBuilder.getEntityId('logbook-1'),
+    });
+    const logbookEntity = rocrate.getEntity(
+      entityBuilder.getEntityId('logbook-1'),
+    );
+    // expect logbook name/description to match
+    expect(logbookEntity.name).to.equal('SciLog ELN export: Test Logbook');
+    expect(logbookEntity.description).to.equal('A logbook for testing');
+    // expect hasPart to contain two snippets
+    expect(logbookEntity.hasPart).to.be.Array();
+    expect(logbookEntity.hasPart).to.have.length(2);
+    expect(logbookEntity.hasPart).to.containEql({
+      '@id': entityBuilder.getEntityId('snippet-1'),
+    });
+    expect(logbookEntity.hasPart).to.containEql({
+      '@id': entityBuilder.getEntityId('snippet-2'),
+    });
+    // expect second snippet to have comment as comment
+    const snippet2Entity = rocrate.getEntity(
+      entityBuilder.getEntityId('snippet-2'),
+    );
+    expect(snippet2Entity.comment).to.containEql({
+      '@id': entityBuilder.getEntityId('snippet-3'),
+    });
   });
 
   it('gets ro-crate and file metadata for a logbook with files', async () => {
