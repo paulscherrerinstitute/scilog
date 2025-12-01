@@ -2,8 +2,11 @@ import {injectable, BindingScope, service, inject} from '@loopback/core';
 import {Basesnippet, Paragraph, Logbook, LinkType} from '../models';
 import {EntityBuilderService} from './entity-builder.service';
 import {Filter, repository} from '@loopback/repository';
-import {BasesnippetRepository, LogbookRepository} from '../repositories';
-import {FileRepository} from '../repositories/file.repository';
+import {
+  BasesnippetRepository,
+  FileRepository,
+  LogbookRepository,
+} from '../repositories';
 import {Filesnippet} from '../models/file.model';
 import {SecurityBindings, UserProfile} from '@loopback/security';
 
@@ -105,21 +108,23 @@ export class RoCrateService {
   }
 
   private async handleFiles(paragraph: Paragraph) {
+    const paragraphEntity = this.crate.getEntity(
+      this.entityBuilder.getEntityId(paragraph.id),
+    );
+    paragraphEntity.hasPart ||= [];
     for (const file of paragraph.files ?? []) {
       const fileObj: Filesnippet = await this.fileRepository.findById(
         file.fileId,
         {},
         {currentUser: this.user},
       );
-      const paragraphEntity = this.crate.getEntity(
-        this.entityBuilder.getEntityId(paragraph.id),
-      );
-      paragraphEntity.hasPart ||= [];
       paragraphEntity.hasPart.push(
         this.entityBuilder.buildFileEntity(paragraph.id, fileObj),
       );
-      paragraphEntity.text = paragraph.textcontent =
-        this.entityBuilder.replaceFileReferences(paragraph, fileObj);
+      paragraph.textcontent = this.entityBuilder.replaceFileReferences(
+        paragraph,
+        fileObj,
+      );
 
       this.fileMetadata.push({
         snippetId: paragraph.id,
@@ -127,6 +132,7 @@ export class RoCrateService {
         fileExt: fileObj.fileExtension,
       });
     }
+    paragraphEntity.text = paragraph.textcontent;
   }
 
   private getFilter(id: string): Filter<Basesnippet> {

@@ -6,7 +6,10 @@ import {SciLogDbApplication} from '../application';
 export class DatabaseHelper {
   constructor(private app: SciLogDbApplication) {}
 
-  async givenLogbook(data: Partial<Logbook>, options?: Options) {
+  async givenLogbook(
+    data: Partial<Logbook>,
+    options?: Options,
+  ): Promise<Logbook> {
     const logbookRepository = await this.app.getRepository(LogbookRepository);
     return logbookRepository.create(data, options);
   }
