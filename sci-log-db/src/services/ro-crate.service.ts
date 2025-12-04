@@ -89,6 +89,7 @@ export class RoCrateService {
     const author = this.entityBuilder.buildPerson(paragraph.createdBy);
     this.crate.addEntity(author);
 
+    if (paragraph.linkType === LinkType.QUOTE) return;
     if (paragraph.linkType === LinkType.PARAGRAPH) {
       this.logbookEntity.hasPart ||= [];
       this.logbookEntity.hasPart.push(
