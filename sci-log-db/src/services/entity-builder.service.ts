@@ -4,7 +4,7 @@ import {Filesnippet} from '../models/file.model';
 import {JSDOM} from 'jsdom';
 import path from 'path';
 
-@injectable({scope: BindingScope.TRANSIENT})
+@injectable({scope: BindingScope.SINGLETON})
 export class EntityBuilderService {
   constructor() {}
 
@@ -83,19 +83,33 @@ export class EntityBuilderService {
       fileObj.fileExtension,
     );
 
-    const linkSelector = `a[href="file:${paraFile?.fileHash}"]`;
-    const links = document.querySelectorAll(linkSelector);
-    links.forEach(link => {
-      link.setAttribute('href', newHref);
-    });
+    this.updateElementsInDocument(
+      document,
+      `a[href="file:${paraFile?.fileHash}"]`,
+      'href',
+      newHref,
+    );
 
-    const imgTitleSelector = `img[title="${paraFile?.fileHash}"]`;
-    const images = document.querySelectorAll(imgTitleSelector);
-    images.forEach(img => {
-      img.setAttribute('src', newHref);
-    });
+    this.updateElementsInDocument(
+      document,
+      `img[title="${paraFile?.fileHash}"]`,
+      'src',
+      newHref,
+    );
 
     return document.body.innerHTML;
+  }
+
+  private updateElementsInDocument(
+    document: Document,
+    selector: string,
+    attribute: string,
+    value: string,
+  ): void {
+    const elements = document.querySelectorAll(selector);
+    elements.forEach(el => {
+      el.setAttribute(attribute, value);
+    });
   }
 
   getEntityId(snippetId: string) {
