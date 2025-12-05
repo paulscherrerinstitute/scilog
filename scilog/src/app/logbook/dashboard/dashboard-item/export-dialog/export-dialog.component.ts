@@ -33,15 +33,19 @@ export class ExportDialogComponent {
     this.dialogRef.close();
   }
 
-  async exportData(){
+  async exportData(option: 'pdf' | 'eln') {
     console.log(this.config)
     this.inProgress = true;
-    const blob = await this.logbookItemDataService.exportLogbook('pdf', this.config, 0, Infinity);
+    const blob = option === 'pdf' ? await this.logbookItemDataService.exportLogbook(option, this.config, 0, Infinity)
+      : await this.logbookItemDataService.exportELN(this.config.filter.targetId);
     if (typeof blob != "undefined"){
       const url = window.URL.createObjectURL(blob);
       const link = this.downloadLink.nativeElement;
       link.href = url;
-      link.download = `export - ${this.datePipe.transform(Date.now(), 'yyyy-MM-dd hh:mm:ss z')}`;
+      link.download = `export - ${this.datePipe.transform(
+        Date.now(),
+        'yyyy-MM-dd hh:mm:ss z'
+      )}${option === 'eln' ? '.eln' : ''}`;
       link.click();
       window.URL.revokeObjectURL(url);
     }

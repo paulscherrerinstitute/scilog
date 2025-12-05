@@ -4,3 +4,6 @@
 // License text available at https://opensource.org/licenses/MIT
 
 export * from './file-upload.service';
+export * from './ro-crate.service';
+export * from './entity-builder.service';
+export * from './archive.service';

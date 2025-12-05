@@ -23,5 +23,6 @@
     * [Contributing](Development/Contributing.md)
     * [Adding Documentation](Development/Documentation.md)
     * [GitHub Flow](Development/GitHubFlow.md)
+* [ELN Export](ELN_Export.md)
 * [Example of API Documentation](https://scilog.psi.ch/api/v1/explorer)
 
