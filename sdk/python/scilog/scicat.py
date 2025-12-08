@@ -1,3 +1,6 @@
+from json import dumps
+from urllib.parse import quote
+
 from .authmixin import HEADER_JSON, AuthError
 from .httpclient import HttpClient
 
@@ -20,13 +23,33 @@ class SciCatRestAPI(HttpClient):
 
 
 class SciCat:
+    max_iterations = 1000
+
     def __init__(self, *args, **kwargs):
         self.http_client = SciCatRestAPI(*args, **kwargs)
 
+    def _proposals_batch(self):
+        url = self.http_client.address + "/proposals"
+        limit = 500
+        filter = {"limits": {"skip": 0, "limit": limit}}
+        iteration = 0
+        while True:
+            iteration += 1
+            if iteration > self.max_iterations:
+                raise RuntimeError("Exceeded maximum iterations in proposals_batch")
+            proposals = self.http_client.get_request(
+                f"{url}?filter={quote(dumps(filter))}", headers=HEADER_JSON
+            )
+            if not proposals or len(proposals) == 0:
+                break
+            yield proposals
+            filter["limits"]["skip"] += limit
+
     @property
     def proposals(self):
-        url = self.http_client.address + "/proposals"
-        return self.http_client.get_request(url, headers=HEADER_JSON)
+        for proposals_batch in self._proposals_batch():
+            for proposal in proposals_batch:
+                yield proposal
 
 
 class SciCatAuthError(AuthError):
