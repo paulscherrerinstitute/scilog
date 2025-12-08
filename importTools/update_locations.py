@@ -161,7 +161,7 @@ if __name__ == "__main__":
 
     scilog = ClientSettingsFromEnv("SCILOG")
 
-    cat = SciCat(**scicat.__dict__)
+    cat = SciCat(**scicat.__dict__, return_options={"lazy": True})
     props = cat.proposals
 
     log = SciLog(**scilog.__dict__)

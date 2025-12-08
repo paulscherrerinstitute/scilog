@@ -25,7 +25,8 @@ class SciCatRestAPI(HttpClient):
 class SciCat:
     max_iterations = 1000
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args, return_options=None, **kwargs):
+        self.return_options = return_options or {}
         self.http_client = SciCatRestAPI(*args, **kwargs)
 
     def _proposals_batch(self):
@@ -47,9 +48,9 @@ class SciCat:
 
     @property
     def proposals(self):
-        for proposals_batch in self._proposals_batch():
-            for proposal in proposals_batch:
-                yield proposal
+        lazy = self.return_options.get("lazy", False)
+        generator = (proposal for batch in self._proposals_batch() for proposal in batch)
+        return generator if lazy else list(generator)
 
 
 class SciCatAuthError(AuthError):

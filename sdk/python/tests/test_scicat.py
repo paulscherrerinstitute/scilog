@@ -9,13 +9,6 @@ from scilog import SciCat
 ADDRESS = "http://scicat"
 
 
-@pytest.fixture()
-def scicat():
-    scicat_client = SciCat(ADDRESS)
-    scicat_client.http_client.config = {}
-    return scicat_client
-
-
 @patch("requests.post")
 @patch("requests.get")
 @pytest.mark.parametrize(
@@ -37,11 +30,11 @@ def test_get_proposals(mock_get, mock_post, token_prefix):
     token = "token123"
 
     scicat = SciCat(ADDRESS, options=options)
+    scicat.http_client.config = {}
     mock_response = Mock()
     mock_response.json.return_value = {"id": token}
     mock_post.return_value = mock_response
-    scicat.http_client.config = {}
-    scicat.proposals
+    list(scicat.proposals)
     mock_post.assert_called_with(
         options["login_path"],
         json={"username": options["username"], "password": options["password"]},
@@ -60,7 +53,9 @@ def test_get_proposals(mock_get, mock_post, token_prefix):
 
 
 @patch("scilog.scicat.SciCatRestAPI.get_request")
-def test__proposals_batch(mock_get, scicat):
+def test__proposals_batch(mock_get):
+    scicat = SciCat(ADDRESS)
+    scicat.http_client.config = {}
 
     mock_get.side_effect = [[1, 2], [3, 4], []]
     filters = [{"limits": {"skip": 0, "limit": 500}}, {"limits": {"skip": 500, "limit": 500}}]
@@ -77,8 +72,19 @@ def test__proposals_batch(mock_get, scicat):
 
 
 @patch("scilog.scicat.SciCatRestAPI.get_request")
-def test_proposals(mock_get, scicat):
+@pytest.mark.parametrize(
+    "lazy",
+    [
+        True,
+        False,
+    ],
+)
+def test_proposals(mock_get, lazy):
+    scicat = SciCat(ADDRESS, return_options={"lazy": lazy})
+    scicat.http_client.config = {}
     mock_get.side_effect = [[1, 2], [3, 4], []]
     proposals = [1, 2, 3, 4]
-    for i, p in enumerate(scicat.proposals):
+    scicat_proposals = scicat.proposals
+    for i, p in enumerate(scicat_proposals):
         assert p == proposals[i]
+    assert len(list(scicat_proposals)) == (0 if lazy else len(proposals))
