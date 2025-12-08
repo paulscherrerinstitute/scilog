@@ -73,18 +73,20 @@ def test__proposals_batch(mock_get):
 
 @patch("scilog.scicat.SciCatRestAPI.get_request")
 @pytest.mark.parametrize(
-    "lazy",
+    "return_options",
     [
-        True,
-        False,
+        None,
+        {"lazy": True},
+        {"lazy": False},
     ],
 )
-def test_proposals(mock_get, lazy):
-    scicat = SciCat(ADDRESS, return_options={"lazy": lazy})
+def test_proposals(mock_get, return_options):
+    scicat = SciCat(ADDRESS, return_options=return_options)
     scicat.http_client.config = {}
     mock_get.side_effect = [[1, 2], [3, 4], []]
     proposals = [1, 2, 3, 4]
     scicat_proposals = scicat.proposals
     for i, p in enumerate(scicat_proposals):
         assert p == proposals[i]
+    lazy = return_options.get("lazy", False) if return_options else False
     assert len(list(scicat_proposals)) == (0 if lazy else len(proposals))
