@@ -15,7 +15,7 @@ from scilog import SciCat
         "Bearer ",
     ],
 )
-def test_get_proposals(mock_post, mock_get, token_prefix):
+def test_get_proposals(mock_get, mock_post, token_prefix):
     address = "http://scicat"
     options = {
         "username": f"username{token_prefix}",
@@ -29,17 +29,17 @@ def test_get_proposals(mock_post, mock_get, token_prefix):
     scicat = SciCat(address, options=options)
     mock_response = Mock()
     mock_response.json.return_value = {"id": token}
-    mock_get.return_value = mock_response
+    mock_post.return_value = mock_response
     scicat.http_client.config = {}
     scicat.proposals
-    mock_get.assert_called_with(
+    mock_post.assert_called_with(
         options["login_path"],
         json={"username": options["username"], "password": options["password"]},
         headers=headers,
         timeout=ANY,
         verify=True,
     )
-    mock_post.assert_called_with(
+    mock_get.assert_called_with(
         f"{address}/proposals",
         params=None,
         headers={**headers, "Authorization": f"{token_prefix or ''}{token}"},
