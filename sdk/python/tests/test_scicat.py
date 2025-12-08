@@ -11,6 +11,7 @@ from scilog import SciCat
     "token_prefix",
     [
         "",
+        None,
         "Bearer ",
     ],
 )
@@ -41,7 +42,7 @@ def test_get_proposals(mock_post, mock_get, token_prefix):
     mock_post.assert_called_with(
         f"{address}/proposals",
         params=None,
-        headers={**headers, "Authorization": f"{token_prefix}{token}"},
+        headers={**headers, "Authorization": f"{token_prefix or ''}{token}"},
         timeout=ANY,
         verify=True,
     )

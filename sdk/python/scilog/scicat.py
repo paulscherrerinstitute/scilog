@@ -6,7 +6,7 @@ class SciCatRestAPI(HttpClient):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.login_path = self._login_path or "https://dacat.psi.ch/auth/msad"
-        self.token_prefix = self.options.get("token_prefix", "")
+        self.token_prefix = self.options.get("token_prefix", "") or ""
 
     def authenticate(self, username, password):
         auth_payload = {"username": username, "password": password}
