@@ -1,10 +1,14 @@
 .profile {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    flex-direction: column;
-  }
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+}
 
-  input:disabled {
-	color: rgba(0, 0, 0, 1);
+input:disabled {
+  color: rgba(0, 0, 0, 1);
+}
+
+button[matSuffix] {
+  color: gray;
 }

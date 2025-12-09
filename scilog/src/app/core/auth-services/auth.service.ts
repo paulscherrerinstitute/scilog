@@ -40,4 +40,7 @@ export class AuthService {
     return Math.floor((Math.random() * 1000) + 1).toString();
   }
 
+  getScilogToken(): string | null {
+    return localStorage.getItem('id_token');
+  }
 }
