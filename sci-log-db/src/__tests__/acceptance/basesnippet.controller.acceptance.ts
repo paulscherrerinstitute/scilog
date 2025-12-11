@@ -463,17 +463,28 @@ describe('Basesnippet', function (this: Suite) {
       .then(
         result => (
           expect(result.body).to.containEql(
-            _.omit(baseSnippet, ['ownerGroup', 'updateACL']),
+            _.omit(baseSnippet, [
+              'ownerGroup',
+              'updateACL',
+              'readACL',
+              'shareACL',
+            ]),
           ),
           expect(result.body.snippetType).to.be.eql('base'),
-          expect(result.body.readACL).to.be.eql(['basesnippetAcceptance']),
+          expect(result.body.readACL).to.be.eql([
+            'basesnippetAcceptance',
+            'test@loopback.io',
+          ]),
           expect(result.body.createACL).to.be.eql(['basesnippetAcceptance']),
           expect(result.body.updateACL).to.be.eql([
             'basesnippetAcceptance',
             'test@loopback.io',
           ]),
           expect(result.body.deleteACL).to.be.eql(['basesnippetAcceptance']),
-          expect(result.body.shareACL).to.be.eql(['basesnippetAcceptance']),
+          expect(result.body.shareACL).to.be.eql([
+            'basesnippetAcceptance',
+            'test@loopback.io',
+          ]),
           expect(result.body.adminACL).to.be.eql(['admin'])
         ),
       )
@@ -710,11 +721,19 @@ describe('Basesnippet', function (this: Suite) {
         ownerGroup: 'basesnippetAcceptance',
         accessGroups: ['someNew'],
       },
-      expected: 204,
+      expected: {
+        code: 204,
+        accessGroups: ['basesnippetAcceptance', 'someNew', 'test@loopback.io'],
+        readACL: ['basesnippetAcceptance', 'someNew', 'test@loopback.io'],
+      },
     },
     {
       input: {readACL: ['basesnippetAcceptance', 'someNew']},
-      expected: 204,
+      expected: {
+        code: 204,
+        accessGroups: ['basesnippetAcceptance', 'someNew'],
+        readACL: ['basesnippetAcceptance', 'someNew'],
+      },
     },
     {
       input: {
@@ -722,11 +741,17 @@ describe('Basesnippet', function (this: Suite) {
         accessGroups: ['someAccessGroups'],
         ownerGroup: 'someOwnerGroup',
       },
-      expected: 204,
+      expected: {
+        code: 204,
+        accessGroups: ['basesnippetAcceptance', 'someNew'],
+        readACL: ['basesnippetAcceptance', 'someNew'],
+      },
     },
     {
       input: {name: 'aName'},
-      expected: 403,
+      expected: {
+        code: 403,
+      },
     },
   ].forEach((t, i) => {
     it(`patch accessGroups of snippet by id with token ${i}`, async () => {
@@ -745,9 +770,9 @@ describe('Basesnippet', function (this: Suite) {
         .set('Authorization', 'Bearer ' + token)
         .set('Content-Type', 'application/json')
         .send(t.input)
-        .expect(t.expected);
+        .expect(t.expected.code);
 
-      if (t.expected === 204)
+      if (t.expected.code === 204)
         await client
           .get(`/basesnippets/${snippet.body.id}`)
           .set('Authorization', 'Bearer ' + token)
@@ -756,14 +781,10 @@ describe('Basesnippet', function (this: Suite) {
           .then(
             result => (
               expect(result.body.ownerGroup).to.be.eql('basesnippetAcceptance'),
-              expect(result.body.accessGroups).to.be.eql([
-                'basesnippetAcceptance',
-                'someNew',
-              ]),
-              expect(result.body.readACL).to.be.eql([
-                'basesnippetAcceptance',
-                'someNew',
-              ])
+              expect(result.body.accessGroups).to.be.eql(
+                t.expected.accessGroups,
+              ),
+              expect(result.body.readACL).to.be.eql(t.expected.readACL)
             ),
           )
           .catch(err => {
