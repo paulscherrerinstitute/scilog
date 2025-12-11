@@ -395,11 +395,30 @@ describe('File controller services', function (this: Suite) {
       .attach('file', __filename)
       .expect(200)
       .then(result => {
-        expect(result.body.accessGroups).to.be.eql(['anAccessGroup']);
-        expect(result.body.readACL).to.be.eql(['anAccessGroup']);
+        expect(result.body.accessGroups).to.be.eql([
+          'anAccessGroup',
+          'test@loopback.io',
+        ]);
+        expect(result.body.readACL).to.be.eql([
+          'anAccessGroup',
+          'test@loopback.io',
+        ]);
       })
       .catch(err => {
         throw err;
+      });
+  });
+
+  it('tries to post a file without accessGroups should add createdBy to readACL and accessGroups', async () => {
+    await client
+      .post('/filesnippet/files')
+      .set('Authorization', 'Bearer ' + token)
+      .type('form')
+      .attach('file', __filename)
+      .expect(200)
+      .then(result => {
+        expect(result.body.accessGroups).to.be.eql(['test@loopback.io']);
+        expect(result.body.readACL).to.be.eql(['test@loopback.io']);
       });
   });
 });
