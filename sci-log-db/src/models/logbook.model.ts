@@ -50,6 +50,7 @@ export class Logbook extends Basesnippet {
   @property({
     type: 'date',
     index: true,
+    defaultFn: 'now',
   })
   touchedAt: Date;
 
