@@ -342,9 +342,6 @@ export class AutoAddRepository<
             ctx.instance.updatedBy ??
             currentUser?.email ??
             'unknown@domain.org';
-          if (ctx.instance.snippetType === 'logbook') {
-            ctx.instance.touchedAt = new Date();
-          }
           await this.aclDefaultOnCreation(ctx.instance);
           if (
             !currentUser.roles.some(
