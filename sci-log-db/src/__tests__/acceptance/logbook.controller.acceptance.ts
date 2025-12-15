@@ -274,7 +274,7 @@ describe('Logbook', function (this: Suite) {
       },
       output: [
         ['logbookAcceptance', 'toPropagate'],
-        ['logbookAcceptance', 'toPropagate'],
+        ['logbookAcceptance', 'toPropagate', 'test@loopback.io'],
       ],
     },
     {
@@ -284,7 +284,12 @@ describe('Logbook', function (this: Suite) {
       },
       output: [
         ['logbookAcceptance', 'accessGroupPropagated'],
-        ['logbookAcceptance', 'accessGroupPropagated', 'toPropagate'],
+        [
+          'logbookAcceptance',
+          'accessGroupPropagated',
+          'toPropagate',
+          'test@loopback.io',
+        ],
       ],
     },
   ].forEach(t =>

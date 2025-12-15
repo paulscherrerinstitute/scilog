@@ -519,6 +519,8 @@ export class LogbookItemComponent implements OnInit, AfterViewInit, OnDestroy {
     // I guess it should only take these variables if they are not defined in the msg...
     console.log("referenceEntry: ", referenceEntry)
     let payload: ChangeStreamNotification = {
+      ownerGroup: referenceEntry.ownerGroup,
+      accessGroups: referenceEntry.accessGroups,
       isPrivate: referenceEntry.isPrivate,
       tags: msg.tags,
       snippetType: "paragraph",

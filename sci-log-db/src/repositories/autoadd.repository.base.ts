@@ -188,8 +188,13 @@ export class AutoAddRepository<
   ) {
     if (aclType === 'shareACL')
       return arrayOfUniqueFrom(parent.shareACL, parent.readACL);
-    if (aclType === 'readACL')
-      return arrayOfUniqueFrom(parent.readACL, data.accessGroups);
+    if (aclType === 'readACL') {
+      return arrayOfUniqueFrom(
+        parent.readACL,
+        data.accessGroups,
+        data.createdBy,
+      );
+    }
     if (aclType === 'updateACL' && isNewInstance)
       return arrayOfUniqueFrom(parent.updateACL, data.createdBy);
     return parent[aclType as keyof Basesnippet];
