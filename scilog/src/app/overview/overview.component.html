@@ -4,13 +4,23 @@
     <h1>Logbooks</h1>
     <mat-button-toggle-group [(ngModel)]="matCardType">
       <mat-button-toggle value="logbook-module"><mat-icon>view_module</mat-icon></mat-button-toggle>
-      <mat-button-toggle value="logbook-headline"><mat-icon>view_headline</mat-icon></mat-button-toggle>
+      <mat-button-toggle value="logbook-headline"
+        ><mat-icon>view_headline</mat-icon></mat-button-toggle
+      >
     </mat-button-toggle-group>
-    <button (click)='addCollectionLogbook("logbook")'>Add logbook</button><br>
+    <button (click)="addCollectionLogbook('logbook')">Add logbook</button><br />
     <mat-spinner *ngIf="!overviewComponent?.isLoaded" [@spinner] class="spinner"></mat-spinner>
-    <app-overview-table *ngIf="matCardType === 'logbook-headline'" [config]="config" (logbookEdit)="editLogbook($event)"
-      (logbookSelection)="logbookSelected($event)"></app-overview-table>
-    <app-overview-scroll *ngIf="matCardType === 'logbook-module'" [config]="config" (logbookEdit)="editLogbook($event)"
-      (logbookSelection)="logbookSelected($event)"></app-overview-scroll>
+    <app-overview-table
+      *ngIf="matCardType === 'logbook-headline'"
+      [config]="config"
+      (logbookEdit)="editLogbook($event)"
+      (logbookSelection)="logbookSelected($event)"
+    ></app-overview-table>
+    <app-overview-scroll
+      *ngIf="matCardType === 'logbook-module'"
+      [config]="config"
+      (logbookEdit)="editLogbook($event)"
+      (logbookSelection)="logbookSelected($event)"
+    ></app-overview-scroll>
   </div>
 </div>

@@ -1,43 +1,42 @@
-::ng-deep  .gridster{
-    background-color:#f0f0f0;
-  }
-::ng-deep .mat-mdc-form-field{
-    width: 90%;
+::ng-deep .gridster {
+  background-color: #f0f0f0;
+}
+::ng-deep .mat-mdc-form-field {
+  width: 90%;
 }
 
 .header {
-    display: flex;
+  display: flex;
 }
 
 .flexExpand {
-    flex: 1 1 auto;
-    /* padding:50px; */
+  flex: 1 1 auto;
+  /* padding:50px; */
 }
 
 .headerTitle {
-    color: #004c63;
-    /* padding: 5px; */
-    opacity: 0.9;
-    font-weight: bold;
+  color: #004c63;
+  /* padding: 5px; */
+  opacity: 0.9;
+  font-weight: bold;
 }
 
 .logbook-container {
-    /* overflow-y: scroll; */
-    /* overflow-x: hdden; */
-    height: 60vh;
-    width: 50vw;
+  /* overflow-y: scroll; */
+  /* overflow-x: hdden; */
+  height: 60vh;
+  width: 50vw;
 }
 
 .gridster-container {
-    /* overflow-y: scroll; */
-    height: 60vh;
-    background-color:#ffffff;
-    padding: 5px;
+  /* overflow-y: scroll; */
+  height: 60vh;
+  background-color: #ffffff;
+  padding: 5px;
 }
 
 .gridster-item {
-    overflow-y: scroll;
-    height: fit-content;
-    background-color:#ffffff;
+  overflow-y: scroll;
+  height: fit-content;
+  background-color: #ffffff;
 }
-

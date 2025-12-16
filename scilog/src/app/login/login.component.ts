@@ -1,5 +1,11 @@
 import { Component, Inject, OnInit } from '@angular/core';
-import { UntypedFormBuilder, UntypedFormGroup, Validators, FormsModule, ReactiveFormsModule } from '@angular/forms';
+import {
+  UntypedFormBuilder,
+  UntypedFormGroup,
+  Validators,
+  FormsModule,
+  ReactiveFormsModule,
+} from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { AuthService } from '@shared/auth-services/auth.service';
 import { AppConfig, AppConfigService, Oauth2Endpoint } from '../app-config.service';
@@ -13,20 +19,37 @@ import { MatInput } from '@angular/material/input';
 import { MatIcon } from '@angular/material/icon';
 
 @Component({
-    selector: 'app-login',
-    templateUrl: './login.component.html',
-    styleUrls: ['./login.component.css'],
-    imports: [MatCard, MatCardTitle, MatCardImage, MatCardContent, MatTabGroup, NgIf, MatTab, MatTabLabel, MatTooltip, MatButton, FormsModule, ReactiveFormsModule, MatFormField, MatLabel, MatInput, MatIconButton, MatSuffix, MatIcon]
+  selector: 'app-login',
+  templateUrl: './login.component.html',
+  styleUrls: ['./login.component.css'],
+  imports: [
+    MatCard,
+    MatCardTitle,
+    MatCardImage,
+    MatCardContent,
+    MatTabGroup,
+    NgIf,
+    MatTab,
+    MatTabLabel,
+    MatTooltip,
+    MatButton,
+    FormsModule,
+    ReactiveFormsModule,
+    MatFormField,
+    MatLabel,
+    MatInput,
+    MatIconButton,
+    MatSuffix,
+    MatIcon,
+  ],
 })
 export class LoginComponent implements OnInit {
-
   hide = true;
   form: UntypedFormGroup;
   loginMessage = ' ';
   appConfig: AppConfig = this.appConfigService.getConfig();
   oAuth2Endpoint: Oauth2Endpoint;
 
-  
   constructor(
     private appConfigService: AppConfigService,
     private fb: UntypedFormBuilder,
@@ -34,7 +57,7 @@ export class LoginComponent implements OnInit {
     private router: Router,
     private route: ActivatedRoute,
     @Inject(DOCUMENT) public document: Document,
-    ) {
+  ) {
     this.form = this.fb.group({
       email: ['', Validators.required],
       password: ['', Validators.required],
@@ -43,15 +66,15 @@ export class LoginComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    if (this.authService.forceReload){
+    if (this.authService.forceReload) {
       window.location.reload();
     }
     this.route.queryParams.subscribe((params) => {
       if (!!params.token) {
-        this.authService.setSession({token: params.token});
+        this.authService.setSession({ token: params.token });
         this.router.navigateByUrl('/overview');
       }
-    })
+    });
   }
 
   async login() {
@@ -60,14 +83,14 @@ export class LoginComponent implements OnInit {
       try {
         let data = await this.authService.login(val.email, val.password).toPromise();
         console.log(data);
-        console.log("User is logged in");
+        console.log('User is logged in');
         this.router.navigateByUrl('/overview');
       } catch (error) {
         switch (error.statusText) {
-          case "Unknown Error":
+          case 'Unknown Error':
             this.loginMessage = 'Authentication failed.';
             return;
-          case "Unauthorized":
+          case 'Unauthorized':
             this.loginMessage = 'User name / email or password are not correct.';
             return;
           default:
@@ -80,6 +103,5 @@ export class LoginComponent implements OnInit {
 
   redirectOIDC(authURL: string) {
     this.document.location.href = `${this.appConfig.lbBaseURL}/${authURL}/login`;
-  };
-
-};
+  }
+}

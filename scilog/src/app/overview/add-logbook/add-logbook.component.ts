@@ -1,11 +1,44 @@
 import { Component, ElementRef, Inject, OnInit, ViewChild, OnDestroy } from '@angular/core';
-import { AbstractControl, UntypedFormBuilder, UntypedFormControl, UntypedFormGroup, ValidatorFn, Validators, FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { MatDialogRef, MAT_DIALOG_DATA, MatDialogTitle, MatDialogContent, MatDialogActions } from '@angular/material/dialog';
+import {
+  AbstractControl,
+  UntypedFormBuilder,
+  UntypedFormControl,
+  UntypedFormGroup,
+  ValidatorFn,
+  Validators,
+  FormsModule,
+  ReactiveFormsModule,
+} from '@angular/forms';
+import {
+  MatDialogRef,
+  MAT_DIALOG_DATA,
+  MatDialogTitle,
+  MatDialogContent,
+  MatDialogActions,
+} from '@angular/material/dialog';
 import { Observable, Subscription } from 'rxjs';
-import { CompactType, DisplayGrid, GridsterConfig, GridsterItem, GridType, GridsterComponent, GridsterItemComponent } from 'angular-gridster2';
+import {
+  CompactType,
+  DisplayGrid,
+  GridsterConfig,
+  GridsterItem,
+  GridType,
+  GridsterComponent,
+  GridsterItemComponent,
+} from 'angular-gridster2';
 import { COMMA, ENTER, SPACE } from '@angular/cdk/keycodes';
-import { MatAutocompleteSelectedEvent, MatAutocomplete, MatAutocompleteTrigger } from '@angular/material/autocomplete';
-import { MatChipInputEvent, MatChipGrid, MatChipRow, MatChipRemove, MatChipInput } from '@angular/material/chips';
+import {
+  MatAutocompleteSelectedEvent,
+  MatAutocomplete,
+  MatAutocompleteTrigger,
+} from '@angular/material/autocomplete';
+import {
+  MatChipInputEvent,
+  MatChipGrid,
+  MatChipRow,
+  MatChipRemove,
+  MatChipInput,
+} from '@angular/material/chips';
 import { map, startWith } from 'rxjs/operators';
 import { UserPreferencesService } from '@shared/user-preferences.service';
 import { Logbooks } from '@model/logbooks';
@@ -24,36 +57,64 @@ import { MatCardImage } from '@angular/material/card';
 import { MatButton } from '@angular/material/button';
 
 function ownerGroupMemberValidator(groups: string[]): ValidatorFn {
-  return (control: AbstractControl): { forbiddenGroup: {value: string} } | null => {
-    const forbidden = control.value && 
+  return (control: AbstractControl): { forbiddenGroup: { value: string } } | null => {
+    const forbidden =
+      control.value &&
       control.value !== 'any-authenticated-user' &&
       !groups.includes(control.value);
     return forbidden ? { forbiddenGroup: { value: control.value } } : null;
   };
 }
 
-function groupCreationValidator(control: AbstractControl): { anyAuthGroup: {value: string | string[]} } | null {
-    const forbidden = control.value?.includes('any-authenticated-user');
-    return forbidden ? { anyAuthGroup: { value: control.value } } : null;
+function groupCreationValidator(
+  control: AbstractControl,
+): { anyAuthGroup: { value: string | string[] } } | null {
+  const forbidden = control.value?.includes('any-authenticated-user');
+  return forbidden ? { anyAuthGroup: { value: control.value } } : null;
 }
 
 @Component({
-    selector: 'app-add-logbook',
-    templateUrl: './add-logbook.component.html',
-    styleUrls: ['./add-logbook.component.css'],
-    providers: [IsAllowedService],
-    imports: [MatDialogTitle, CdkScrollable, MatDialogContent, GridsterComponent, GridsterItemComponent, FormsModule, ReactiveFormsModule, MatFormField, MatLabel, MatInput, MatTooltip, NgIf, MatError, MatSelect, NgFor, MatOption, MatAutocompleteTrigger, MatAutocomplete, MatChipGrid, MatChipRow, MatIcon, MatChipRemove, MatChipInput, MatSlideToggle, MatCardImage, MatDialogActions, MatButton, AsyncPipe]
+  selector: 'app-add-logbook',
+  templateUrl: './add-logbook.component.html',
+  styleUrls: ['./add-logbook.component.css'],
+  providers: [IsAllowedService],
+  imports: [
+    MatDialogTitle,
+    CdkScrollable,
+    MatDialogContent,
+    GridsterComponent,
+    GridsterItemComponent,
+    FormsModule,
+    ReactiveFormsModule,
+    MatFormField,
+    MatLabel,
+    MatInput,
+    MatTooltip,
+    NgIf,
+    MatError,
+    MatSelect,
+    NgFor,
+    MatOption,
+    MatAutocompleteTrigger,
+    MatAutocomplete,
+    MatChipGrid,
+    MatChipRow,
+    MatIcon,
+    MatChipRemove,
+    MatChipInput,
+    MatSlideToggle,
+    MatCardImage,
+    MatDialogActions,
+    MatButton,
+    AsyncPipe,
+  ],
 })
 export class AddLogbookComponent implements OnInit, OnDestroy {
-
-
   logbook: Logbooks;
 
   // general form settings and variables
   optionsFormGroup: UntypedFormGroup;
   fileId: string = '';
-
-
 
   imageToShow: string | ArrayBuffer;
   imageLoaded = false;
@@ -63,7 +124,7 @@ export class AddLogbookComponent implements OnInit, OnDestroy {
   selectedLocation: any;
 
   thumbnailText = 'Add thumbnail';
-  uploadThumbnailFile: File = null
+  uploadThumbnailFile: File = null;
 
   // grid settings
   formGrid: Array<GridsterItem>;
@@ -106,7 +167,7 @@ export class AddLogbookComponent implements OnInit, OnDestroy {
     displayGrid: DisplayGrid.None,
     disableWindowResize: false,
     disableWarnings: false,
-    scrollToNewItems: true
+    scrollToNewItems: true,
   };
 
   // chips for accessGroups
@@ -122,7 +183,6 @@ export class AddLogbookComponent implements OnInit, OnDestroy {
   @ViewChild('accessGroupsInput') accessGroupsInput: ElementRef<HTMLInputElement>;
   @ViewChild('auto') matAutocomplete: MatAutocomplete;
 
-
   constructor(
     fb: UntypedFormBuilder,
     private dialogRef: MatDialogRef<AddLogbookComponent>,
@@ -131,7 +191,8 @@ export class AddLogbookComponent implements OnInit, OnDestroy {
     private logbookDataService: LogbookDataService,
     private snackBar: SnackbarService,
     protected isActionAllowed: IsAllowedService,
-    @Inject(MAT_DIALOG_DATA) data) {
+    @Inject(MAT_DIALOG_DATA) data,
+  ) {
     this.optionsFormGroup = fb.group({
       hideRequired: new UntypedFormControl(false),
       floatLabel: new UntypedFormControl('auto'),
@@ -140,11 +201,11 @@ export class AddLogbookComponent implements OnInit, OnDestroy {
       location: new UntypedFormControl('', Validators.required),
       ownerGroup: new UntypedFormControl('', Validators.required),
       accessGroups: new UntypedFormControl([]),
-      isPrivate: new UntypedFormControl(false)
+      isPrivate: new UntypedFormControl(false),
     });
     this.logbook = data;
     this.isActionAllowed.snippet = data;
-    console.log("inputData: ", data);
+    console.log('inputData: ', data);
   }
 
   ngOnInit(): void {
@@ -166,8 +227,7 @@ export class AddLogbookComponent implements OnInit, OnDestroy {
 
   private setOwnerGroupWithEditability() {
     this.setForm('ownerGroup');
-    if (this.isActionAllowed.canChangeOwnerGroup()) 
-      return
+    if (this.isActionAllowed.canChangeOwnerGroup()) return;
     this.getForm('ownerGroup').disable();
   }
 
@@ -178,42 +238,59 @@ export class AddLogbookComponent implements OnInit, OnDestroy {
     if (this.isActionAllowed.tooltips.expired) this.getForm(toKey).disable();
   }
 
-  setDefaults(){
+  setDefaults() {
     this.accessGroupsAvail = this.userPreferences.userInfo?.roles;
     if (!this.isActionAllowed.isAdmin())
       this.getForm('ownerGroup').addValidators(ownerGroupMemberValidator(this.accessGroupsAvail));
     if (this.logbook) {
       this.isActionAllowed.isNotExpired();
-      ['title', 'description', 'location', 'isPrivate'].map(field => this.setWithEditability(field));
+      ['title', 'description', 'location', 'isPrivate'].map((field) =>
+        this.setWithEditability(field),
+      );
       this.setOwnerGroupWithEditability();
       this.accessGroups.setValue(this.logbook.accessGroups);
       this.fileId = this.logbook.thumbnail;
       if (this.fileId) {
         this.getImageFromService();
       }
-      console.log("editing existing logbook");
-    }
-    else {
+      console.log('editing existing logbook');
+    } else {
       this.accessGroups.addValidators(groupCreationValidator);
       this.getForm('ownerGroup').addValidators(groupCreationValidator);
-      this.accessGroupsAvail = this.accessGroupsAvail.filter((g: string) => g !== 'any-authenticated-user');
+      this.accessGroupsAvail = this.accessGroupsAvail.filter(
+        (g: string) => g !== 'any-authenticated-user',
+      );
     }
-    this.filteredAccessGroups = this.accessGroupsCtrl.valueChanges.pipe(startWith(null), map((accessGroup: string | null) => accessGroup ? this._filter(accessGroup) : this.accessGroupsAvail.slice()));
-    this.filteredOwnerGroups = this.getForm('ownerGroup').valueChanges.pipe(startWith(null), map((accessGroup: string | null) => accessGroup ? this._filter(accessGroup) : this.accessGroupsAvail.slice()));
+    this.filteredAccessGroups = this.accessGroupsCtrl.valueChanges.pipe(
+      startWith(null),
+      map((accessGroup: string | null) =>
+        accessGroup ? this._filter(accessGroup) : this.accessGroupsAvail.slice(),
+      ),
+    );
+    this.filteredOwnerGroups = this.getForm('ownerGroup').valueChanges.pipe(
+      startWith(null),
+      map((accessGroup: string | null) =>
+        accessGroup ? this._filter(accessGroup) : this.accessGroupsAvail.slice(),
+      ),
+    );
   }
 
-  async getLocations(){
+  async getLocations() {
     let data = await this.logbookDataService.getLocations();
-    if (data.length > 0){
+    if (data.length > 0) {
       this.availLocations = data[0].subsnippets;
     }
   }
 
   createImageFromBlob(image: Blob) {
     let reader = new FileReader();
-    reader.addEventListener("load", () => {
-      this.imageToShow = reader.result;
-    }, false);
+    reader.addEventListener(
+      'load',
+      () => {
+        this.imageToShow = reader.result;
+      },
+      false,
+    );
 
     if (image) {
       reader.readAsDataURL(image);
@@ -228,29 +305,26 @@ export class AddLogbookComponent implements OnInit, OnDestroy {
     this.uploadThumbnailFile = null;
   }
 
-
   close() {
     this.dialogRef.close();
   }
 
   async addLogbook($event) {
-
     if (this.optionsFormGroup.invalid) {
-      console.log("form invalid")
+      console.log('form invalid');
       const invalidKeys = [];
       for (const key in this.optionsFormGroup.controls) {
-          if (this.getForm(key).invalid){
-            invalidKeys.push(key);
-            this.getForm(key).setErrors({'required': true});
-          }
+        if (this.getForm(key).invalid) {
+          invalidKeys.push(key);
+          this.getForm(key).setErrors({ required: true });
+        }
       }
       this.showSnackbarMessage(`Invalid keys: '${invalidKeys}'`, 'warning');
       return;
     }
 
-
     let logbookId: string = null;
-    if ((this.logbook != null) && (this.logbook.id)) {
+    if (this.logbook != null && this.logbook.id) {
       logbookId = this.logbook.id;
     }
     this.logbook = {
@@ -259,16 +333,16 @@ export class AddLogbookComponent implements OnInit, OnDestroy {
       ownerGroup: this.getForm('ownerGroup').value,
       accessGroups: this.accessGroups.value,
       isPrivate: this.getForm('isPrivate').value,
-      description: this.getForm('description').value
-    }
+      description: this.getForm('description').value,
+    };
 
-    let fileData: {id: string};
+    let fileData: { id: string };
     // now that we have the id, let's upload the image
     if (this.uploadThumbnailFile != null) {
       // upload selected file
       let formData = new FormData();
       if (this.logbook.ownerGroup)
-        formData.append('fields', JSON.stringify({accessGroups: [this.logbook.ownerGroup]}))
+        formData.append('fields', JSON.stringify({ accessGroups: [this.logbook.ownerGroup] }));
       formData.append('file', this.uploadThumbnailFile);
       fileData = await this.logbookDataService.uploadLogbookThumbnail(formData);
     }
@@ -281,13 +355,15 @@ export class AddLogbookComponent implements OnInit, OnDestroy {
         await this.logbookDataService.patchLogbook(logbookId, this.logbook);
       } catch (error) {
         console.log(error);
-        this.showSnackbarMessage('Error while updating the logbook. If the error persists contact an administrator', 'warning');
+        this.showSnackbarMessage(
+          'Error while updating the logbook. If the error persists contact an administrator',
+          'warning',
+        );
         return;
-      }
-      finally {
+      } finally {
         this.logbook.id = logbookId;
       }
-      this.showSnackbarMessage('Edit successful', 'resolved')
+      this.showSnackbarMessage('Edit successful', 'resolved');
     } else {
       // create new logbook
       try {
@@ -295,7 +371,10 @@ export class AddLogbookComponent implements OnInit, OnDestroy {
         this.logbook.id = data.id;
       } catch (error) {
         console.log(error);
-        this.showSnackbarMessage('Error while creating the logbook. If the error persists contact an administrator', 'warning');
+        this.showSnackbarMessage(
+          'Error while creating the logbook. If the error persists contact an administrator',
+          'warning',
+        );
         return;
       }
       this.showSnackbarMessage('Creation successful', 'resolved');
@@ -306,24 +385,24 @@ export class AddLogbookComponent implements OnInit, OnDestroy {
   private showSnackbarMessage(message: string, messageClass: 'warning' | 'resolved') {
     return this.snackBar._showMessage({
       message: message,
-      panelClass: [`${messageClass}-snackbar`], 
+      panelClass: [`${messageClass}-snackbar`],
       action: 'Dismiss',
       show: true,
       duration: 4000,
       type: 'serverMessage',
       horizontalPosition: 'center',
       verticalPosition: 'top',
-    })
+    });
   }
 
   selectLocation(id: any) {
-    console.log("locationId:", id.value);
-    this.availLocations.forEach(loc => {
+    console.log('locationId:', id.value);
+    this.availLocations.forEach((loc) => {
       if (loc.id == id.value) {
         this.selectedLocation = loc;
         console.log(this.selectedLocation);
         if (!this.customImageLoaded) {
-          console.log(this.selectedLocation)
+          console.log(this.selectedLocation);
           if (this.selectedLocation?.files?.[0]) {
             this.fileId = this.selectedLocation?.files[0].fileId;
             this.getImageFromService();
@@ -334,9 +413,7 @@ export class AddLogbookComponent implements OnInit, OnDestroy {
           }
         }
       }
-    })
-
-
+    });
   }
 
   addAccessGroup(event: MatChipInputEvent): void {
@@ -376,14 +453,16 @@ export class AddLogbookComponent implements OnInit, OnDestroy {
   private _filter(value: string): string[] {
     const filterValue = value.toLowerCase();
 
-    return this.accessGroupsAvail.filter(accessGroup => accessGroup.toLowerCase().indexOf(filterValue) === 0);
+    return this.accessGroupsAvail.filter(
+      (accessGroup) => accessGroup.toLowerCase().indexOf(filterValue) === 0,
+    );
   }
 
   onFileChanged($event) {
-    // For now, just save the file name and show the image. 
+    // For now, just save the file name and show the image.
     // If the user really decides to add the logbook, the upload of the image will be triggered
     this.uploadThumbnailFile = $event.target.files[0];
-    console.log(this.uploadThumbnailFile)
+    console.log(this.uploadThumbnailFile);
     this.fileId = this.uploadThumbnailFile.name;
     this.createImageFromBlob(this.uploadThumbnailFile);
     this.showThumbnail();
@@ -407,9 +486,8 @@ export class AddLogbookComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
-    this.subscriptions.forEach(sub => {
+    this.subscriptions.forEach((sub) => {
       sub.unsubscribe();
     });
   }
-
 }

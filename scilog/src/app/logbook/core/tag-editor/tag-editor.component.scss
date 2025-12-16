@@ -1,42 +1,42 @@
 .tagOption {
-    height: 25px;
+  height: 25px;
 }
 
 .tagContainer {
-    width: 100%;
+  width: 100%;
 }
 
 :host ::ng-deep .mat-mdc-form-field {
-    width: 80%;
+  width: 80%;
 }
 :host ::ng-deep .mat-mdc-form-field-infix {
-    padding: 0;
+  padding: 0;
 }
 
 .tag {
-    background-color: #e0e0e0;
-    color: rgba(0, 0, 0, 0.87);
-    width: max-content;
-    border-radius: 5px;
-    padding: 2px 2px !important;
-    float: right;
-    margin: 1px;
+  background-color: #e0e0e0;
+  color: rgba(0, 0, 0, 0.87);
+  width: max-content;
+  border-radius: 5px;
+  padding: 2px 2px !important;
+  float: right;
+  margin: 1px;
 }
 
 .renewButton {
-    border: none;
-    background-color: var(--ck-toolbar-color-background);
-    margin: var(--ck-spacing-small);
-    padding: unset;
-    height: 28px;
-    width: 28px;
-    vertical-align: middle;
+  border: none;
+  background-color: var(--ck-toolbar-color-background);
+  margin: var(--ck-spacing-small);
+  padding: unset;
+  height: 28px;
+  width: 28px;
+  vertical-align: middle;
 }
 .renewButton:hover {
-    background-color: var(--ck-color-list-button-hover-background);
-    border-radius: var(--ck-border-radius);
+  background-color: var(--ck-color-list-button-hover-background);
+  border-radius: var(--ck-border-radius);
 }
 .renewButtonIcon {
-    font-size: 18px;
-    line-height: unset;
+  font-size: 18px;
+  line-height: unset;
 }

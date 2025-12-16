@@ -1,7 +1,6 @@
-import { Basesnippets } from "./basesnippets";
+import { Basesnippets } from './basesnippets';
 
 export interface Filesnippet extends Basesnippets {
-    fileExtension?: string;
-    accessHash?: string;
+  fileExtension?: string;
+  accessHash?: string;
 }
-

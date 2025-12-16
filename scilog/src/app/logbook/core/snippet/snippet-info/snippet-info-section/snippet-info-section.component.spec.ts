@@ -8,9 +8,8 @@ describe('SnippetInfoSectionComponent', () => {
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-    imports: [SnippetInfoSectionComponent]
-})
-    .compileComponents();
+      imports: [SnippetInfoSectionComponent],
+    }).compileComponents();
   }));
 
   beforeEach(() => {

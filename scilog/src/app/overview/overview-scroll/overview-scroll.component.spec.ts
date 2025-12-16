@@ -8,27 +8,26 @@ import { ElementRef, QueryList } from '@angular/core';
 import { ScrollingModule } from '@angular/cdk/scrolling';
 
 class UserPreferencesMock {
-  userInfo = { roles: ["roles"] };
+  userInfo = { roles: ['roles'] };
 }
 
 describe('OverviewScrollComponent', () => {
   let component: OverviewScrollComponent;
   let fixture: ComponentFixture<OverviewScrollComponent>;
-  const logbookDataSpy = jasmine.createSpyObj(
-    'LogbookDataService',
-    ['getDataBuffer', 'deleteLogbook'],
-  );
-  logbookDataSpy.getDataBuffer.and.returnValue([{ abc: 1 }, {def: 2}, {ghi: 3}, {jkl: 4}]);
+  const logbookDataSpy = jasmine.createSpyObj('LogbookDataService', [
+    'getDataBuffer',
+    'deleteLogbook',
+  ]);
+  logbookDataSpy.getDataBuffer.and.returnValue([{ abc: 1 }, { def: 2 }, { ghi: 3 }, { jkl: 4 }]);
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-    providers: [
+      providers: [
         { provide: LogbookDataService, useValue: logbookDataSpy },
         { provide: UserPreferencesService, useClass: UserPreferencesMock },
-    ],
-    imports: [ScrollingModule, OverviewScrollComponent]
-})
-      .compileComponents();
+      ],
+      imports: [ScrollingModule, OverviewScrollComponent],
+    }).compileComponents();
   }));
 
   beforeEach(() => {
@@ -58,48 +57,58 @@ describe('OverviewScrollComponent', () => {
 
   it('should test setGroupSize', () => {
     component['groupSize'] = 3;
-    component['setGroupSize']({width: 332 * 2.6, height: 432 * 6});
+    component['setGroupSize']({ width: 332 * 2.6, height: 432 * 6 });
     expect(component['groupSize']).toEqual(2);
     expect(component['pageSize']).toEqual(20);
   });
 
   it('should test elementSize', () => {
     fixture.detectChanges();
-    expect(component['elementSize'](
-      {nativeElement: {getBoundingClientRect: () => ({width: 10, height: 20})}})
-    ).toEqual({width: 10, height: 20})
+    expect(
+      component['elementSize']({
+        nativeElement: { getBoundingClientRect: () => ({ width: 10, height: 20 }) },
+      }),
+    ).toEqual({ width: 10, height: 20 });
   });
 
   it('should test splitIntoGroups', () => {
-    const groups = component['splitIntoGroups']([0,1,2,3,4,5,6,7,8,9] as Logbooks[]);
-    expect(groups).toEqual([[0,1,2],[3,4,5],[6,7,8],[9]]);
+    const groups = component['splitIntoGroups']([0, 1, 2, 3, 4, 5, 6, 7, 8, 9] as Logbooks[]);
+    expect(groups).toEqual([[0, 1, 2], [3, 4, 5], [6, 7, 8], [9]]);
   });
 
   it('should test regroupLogbooks', () => {
-    component.logbooks = [[0,1,2],[3,4,5],[6,7,8],[9]] as Logbooks[][];
+    component.logbooks = [[0, 1, 2], [3, 4, 5], [6, 7, 8], [9]] as Logbooks[][];
     component['groupSize'] = 4;
-    expect(component['regroupLogbooks']()).toEqual([[0,1,2,3],[4,5,6,7],[8,9]]);
+    expect(component['regroupLogbooks']()).toEqual([
+      [0, 1, 2, 3],
+      [4, 5, 6, 7],
+      [8, 9],
+    ]);
   });
 
   it('should test getLogbooks', async () => {
     logbookDataSpy.getDataBuffer.calls.reset();
     await component['getLogbooks']();
-    expect(logbookDataSpy.getDataBuffer).toHaveBeenCalledOnceWith(0, 20, { general: {}, filter: {}, view: {} });
+    expect(logbookDataSpy.getDataBuffer).toHaveBeenCalledOnceWith(0, 20, {
+      general: {},
+      filter: {},
+      view: {},
+    });
   });
-  
+
   it('should test getAndGroupLogbooks', fakeAsync(async () => {
-    logbookDataSpy.getDataBuffer.and.returnValue([{ abc: 1 }, {def: 2}, {ghi: 3}, {jkl: 4}]);
+    logbookDataSpy.getDataBuffer.and.returnValue([{ abc: 1 }, { def: 2 }, { ghi: 3 }, { jkl: 4 }]);
     const logbooks = await component['getAndGroupLogbooks']();
     expect(component['currentPage']).toEqual(1);
-    expect(logbooks).toEqual([[{ abc: 1 }, {def: 2}, {ghi: 3}], [{jkl: 4}]]);
+    expect(logbooks).toEqual([[{ abc: 1 }, { def: 2 }, { ghi: 3 }], [{ jkl: 4 }]]);
     expect(component['endOfData']).toEqual(true);
     expect(component.isLoaded).toEqual(true);
   }));
 
   [
-    {sizes: [3, 19], spy: 'reshapeOnResize'},
-    {sizes: [7, 20], spy: 'reshapeOnResize'},
-    {sizes: [5, 21], spy: 'regroupLogbooks'},
+    { sizes: [3, 19], spy: 'reshapeOnResize' },
+    { sizes: [7, 20], spy: 'reshapeOnResize' },
+    { sizes: [5, 21], spy: 'regroupLogbooks' },
   ].forEach((t, i) => {
     it(`should test refreshLogbooks ${i}`, async () => {
       const spy = spyOn<any>(component, t.spy);
@@ -111,7 +120,7 @@ describe('OverviewScrollComponent', () => {
   it('should test compareAndRefreshSizes', async () => {
     const setGroupSizeSpy = spyOn<any>(component, 'setGroupSize');
     const refreshLogbooksSpy = spyOn<any>(component, 'refreshLogbooks');
-    await component['compareAndRefreshSizes']({width: 10, height: 20});
+    await component['compareAndRefreshSizes']({ width: 10, height: 20 });
     expect(setGroupSizeSpy).toHaveBeenCalledTimes(1);
     expect(refreshLogbooksSpy).toHaveBeenCalledTimes(1);
   });
@@ -125,12 +134,12 @@ describe('OverviewScrollComponent', () => {
 
   it('should test onResized', async () => {
     const compareAndRefreshSizesSpy = spyOn<any>(component, 'compareAndRefreshSizes');
-    await component.onResized({newRect: {width: 1, height: 2}} as ResizedEvent);
-    expect(compareAndRefreshSizesSpy).toHaveBeenCalledOnceWith({width: 1, height: 2});
+    await component.onResized({ newRect: { width: 1, height: 2 } } as ResizedEvent);
+    expect(compareAndRefreshSizesSpy).toHaveBeenCalledOnceWith({ width: 1, height: 2 });
   });
 
   it('should test trackByGroupId', () => {
-    const _id = component.trackByGroupId(1, [{id: '123'}, {id: '456'}, {id: '789'}]);
+    const _id = component.trackByGroupId(1, [{ id: '123' }, { id: '456' }, { id: '789' }]);
     expect(_id).toEqual('123456789');
   });
 
@@ -146,13 +155,27 @@ describe('OverviewScrollComponent', () => {
   }));
 
   [
-    {pageSize: 18, spyCalls: 1, logbooks: [[1,2,3],[4,5,6],[7,8,9]]},
-    {pageSize: 22, logbooks: [[1,2,3],[4,5]]},
-    {endOfData: true, logbooks: [[1,2,3],[4,5,6],[7]]}
+    {
+      pageSize: 18,
+      spyCalls: 1,
+      logbooks: [
+        [1, 2, 3],
+        [4, 5, 6],
+        [7, 8, 9],
+      ],
+    },
+    {
+      pageSize: 22,
+      logbooks: [
+        [1, 2, 3],
+        [4, 5],
+      ],
+    },
+    { endOfData: true, logbooks: [[1, 2, 3], [4, 5, 6], [7]] },
   ].forEach((t, i) => {
     it(`should test reshapeOnResize ${i}`, async () => {
-      const getLogbooksSpy = spyOn<any>(component, 'getLogbooks').and.resolveTo([8,9]);
-      component.logbooks = [[1,2,3], [4,5,6], [7]] as Logbooks[][];
+      const getLogbooksSpy = spyOn<any>(component, 'getLogbooks').and.resolveTo([8, 9]);
+      component.logbooks = [[1, 2, 3], [4, 5, 6], [7]] as Logbooks[][];
       await component['reshapeOnResize'](t.pageSize);
       expect(getLogbooksSpy).toHaveBeenCalledTimes(t.spyCalls ?? 0);
       if (t.spyCalls) expect(getLogbooksSpy).toHaveBeenCalledOnceWith(t.pageSize, 2);
@@ -160,46 +183,36 @@ describe('OverviewScrollComponent', () => {
     });
   });
 
-  [true, false, 'abc']
-  .forEach((t, i) => {
+  [true, false, 'abc'].forEach((t, i) => {
     it(`should test reloadLogbooks ${i}`, fakeAsync(async () => {
       spyOn<any>(component, 'getAndGroupLogbooks');
       const scrollToOffset = spyOn(component.viewPort, 'scrollToOffset');
       await component.reloadLogbooks(t && true);
-      if (typeof t === 'string')
-        component['dataService'].searchString === 'abc';
+      if (typeof t === 'string') component['dataService'].searchString === 'abc';
       expect(scrollToOffset).toHaveBeenCalledTimes(1);
     }));
   });
 
   it('should test deleteLogbook', fakeAsync(async () => {
     const reshapeOnResizeSpy = spyOn<any>(component, 'reshapeOnResize').and.callThrough();
-    spyOn<any>(component, 'getLogbooks').and.returnValue([{id: '5'}]);
-    component.logbooks = [
-      [{id: '1'},{id: '2'}, {id: '3'}],
-      [{id: '4'}]
-    ];
+    spyOn<any>(component, 'getLogbooks').and.returnValue([{ id: '5' }]);
+    component.logbooks = [[{ id: '1' }, { id: '2' }, { id: '3' }], [{ id: '4' }]];
     component['pageSize'] = 3;
     component['endOfData'] = false;
     await component.deleteLogbook('3');
-    expect(reshapeOnResizeSpy).toHaveBeenCalledOnceWith(
-      2,
-      [{id: '1'}, {id: '2'}, {id: '4'}]
-    );
-    expect(component.logbooks).toEqual([
-      [{id: '1'}, {id: '2'}, {id: '4'}], [{id: '5'}]])
+    expect(reshapeOnResizeSpy).toHaveBeenCalledOnceWith(2, [{ id: '1' }, { id: '2' }, { id: '4' }]);
+    expect(component.logbooks).toEqual([[{ id: '1' }, { id: '2' }, { id: '4' }], [{ id: '5' }]]);
   }));
 
   it('should test afterLogbookEdit', async () => {
     component.logbooks = [
-      [{id: '1'},{id: '2'},{id: '3'}], 
-      [{id: '4'},{id: '5'},{id: '6'}]
+      [{ id: '1' }, { id: '2' }, { id: '3' }],
+      [{ id: '4' }, { id: '5' }, { id: '6' }],
     ];
-    component.afterLogbookEdit({id: '4', name: '9'} as unknown as Logbooks)
+    component.afterLogbookEdit({ id: '4', name: '9' } as unknown as Logbooks);
     expect(component.logbooks).toEqual([
-      [{id: '1'},{id: '2'},{id: '3'}], 
-      [{id: '4', name: '9'},{id: '5'},{id: '6'}]
+      [{ id: '1' }, { id: '2' }, { id: '3' }],
+      [{ id: '4', name: '9' }, { id: '5' }, { id: '6' }],
     ]);
   });
-
-})
+});

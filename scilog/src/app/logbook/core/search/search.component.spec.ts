@@ -14,14 +14,13 @@ describe('SearchComponent', () => {
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-    imports: [BrowserAnimationsModule, SearchComponent],
-    providers: [
+      imports: [BrowserAnimationsModule, SearchComponent],
+      providers: [
         { provide: AppConfigService, useValue: { getConfig } },
         provideHttpClient(withInterceptorsFromDi()),
         provideHttpClientTesting(),
-    ]
-})
-    .compileComponents();
+      ],
+    }).compileComponents();
   }));
 
   beforeEach(() => {
@@ -43,5 +42,4 @@ describe('SearchComponent', () => {
       config: undefined,
     });
   });
-
 });

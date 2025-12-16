@@ -7,14 +7,13 @@ import { of } from 'rxjs';
 import { AppConfigService } from 'src/app/app-config.service';
 
 const mockDialogRef = {
-  close: jasmine.createSpy('close')
+  close: jasmine.createSpy('close'),
 };
 
 class NativeElementMock {
-  href:string = "";
-  download:string = "";
-  click(){}
-
+  href: string = '';
+  download: string = '';
+  click() {}
 }
 
 const getConfig = () => ({});
@@ -22,21 +21,22 @@ const getConfig = () => ({});
 describe('ExportDialogComponent', () => {
   let component: ExportDialogComponent;
   let fixture: ComponentFixture<ExportDialogComponent>;
-  let logbookItemDataSpy:any;
-  logbookItemDataSpy = jasmine.createSpyObj("LogbookItemDataService", ["exportLogbook"]);
-  logbookItemDataSpy.exportLogbook.and.returnValue(of(new Blob(['data:image/png;base64,iVBORw0KGgoAAAANSUhE'], {type: 'image/png'})).toPromise());
+  let logbookItemDataSpy: any;
+  logbookItemDataSpy = jasmine.createSpyObj('LogbookItemDataService', ['exportLogbook']);
+  logbookItemDataSpy.exportLogbook.and.returnValue(
+    of(new Blob(['data:image/png;base64,iVBORw0KGgoAAAANSUhE'], { type: 'image/png' })).toPromise(),
+  );
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-    imports: [ExportDialogComponent],
-    providers: [
+      imports: [ExportDialogComponent],
+      providers: [
         { provide: MatDialogRef, useValue: mockDialogRef },
         { provide: MAT_DIALOG_DATA, useValue: {} },
         { provide: LogbookItemDataService, useValue: logbookItemDataSpy },
         { provide: AppConfigService, useValue: { getConfig } },
-    ]
-})
-    .compileComponents();
+      ],
+    }).compileComponents();
   }));
 
   beforeEach(() => {
@@ -45,30 +45,32 @@ describe('ExportDialogComponent', () => {
     fixture.detectChanges();
   });
 
-  afterEach(()=>{
+  afterEach(() => {
     logbookItemDataSpy.exportLogbook.calls.reset();
     mockDialogRef.close.calls.reset();
-  })
+  });
 
   it('should create', () => {
-    spyOn(component, 'exportData')
+    spyOn(component, 'exportData');
     expect(component).toBeTruthy();
     expect(component.exportData).toHaveBeenCalledTimes(0);
   });
 
-  it('should close the dialog', ()=>{
+  it('should close the dialog', () => {
     component.close();
     expect(mockDialogRef.close).toHaveBeenCalledTimes(1);
-  })
-  
-  it('should close the dialog after export', async ()=>{
-    component['downloadLink'].nativeElement = new NativeElementMock;
-    spyOn(component['downloadLink'].nativeElement, 'click')
+  });
+
+  it('should close the dialog after export', async () => {
+    component['downloadLink'].nativeElement = new NativeElementMock();
+    spyOn(component['downloadLink'].nativeElement, 'click');
     const datePrefix = '2023-02-1';
     spyOn(Date, 'now').and.returnValue(Date.parse(`${datePrefix}5`));
-    await component.exportData("pdf");
+    await component.exportData('pdf');
     expect(mockDialogRef.close).toHaveBeenCalledTimes(1);
     expect(component['downloadLink'].nativeElement.click).toHaveBeenCalledTimes(1);
-    expect(component['downloadLink'].nativeElement.download.slice(0, 18)).toEqual(`export - ${datePrefix}`);
-  })
+    expect(component['downloadLink'].nativeElement.download.slice(0, 18)).toEqual(
+      `export - ${datePrefix}`,
+    );
+  });
 });

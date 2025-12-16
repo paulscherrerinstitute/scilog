@@ -1,53 +1,60 @@
 <section class="scrollable-container mat-elevation-z8" tabindex="0">
-  <table mat-table [dataSource]="dataSource" matSort cdkDropList cdkDropListOrientation="horizontal"
-    (cdkDropListDropped)="drop($event)" (matSortChange)="onSortChange()">
+  <table
+    mat-table
+    [dataSource]="dataSource"
+    matSort
+    cdkDropList
+    cdkDropListOrientation="horizontal"
+    (cdkDropListDropped)="drop($event)"
+    (matSortChange)="onSortChange()"
+  >
     <ng-container matColumnDef="name">
-      <th mat-header-cell cdkDrag *matHeaderCellDef mat-sort-header>Title </th>
+      <th mat-header-cell cdkDrag *matHeaderCellDef mat-sort-header>Title</th>
       <td mat-cell *matCellDef="let row">
         <div class="scrollable-text">
-          {{row.name}}
+          {{ row.name }}
         </div>
       </td>
     </ng-container>
 
     <ng-container matColumnDef="description">
-      <th mat-header-cell cdkDrag *matHeaderCellDef mat-sort-header>Description </th>
+      <th mat-header-cell cdkDrag *matHeaderCellDef mat-sort-header>Description</th>
       <td mat-cell *matCellDef="let row">
         <div class="scrollable-text">
-          {{row.description}}
+          {{ row.description }}
         </div>
       </td>
     </ng-container>
 
     <ng-container matColumnDef="ownerGroup">
-      <th mat-header-cell cdkDrag *matHeaderCellDef mat-sort-header>ownerGroup </th>
+      <th mat-header-cell cdkDrag *matHeaderCellDef mat-sort-header>ownerGroup</th>
       <td mat-cell *matCellDef="let row">
         <div class="scrollable-text">
-          {{row.ownerGroup}}
+          {{ row.ownerGroup }}
         </div>
       </td>
     </ng-container>
 
     <ng-container matColumnDef="createdAt">
-      <th mat-header-cell cdkDrag *matHeaderCellDef mat-sort-header>Created on </th>
+      <th mat-header-cell cdkDrag *matHeaderCellDef mat-sort-header>Created on</th>
       <td mat-cell *matCellDef="let row">
         <div class="scrollable-text">
-          {{row.createdAt | date}}
+          {{ row.createdAt | date }}
         </div>
       </td>
     </ng-container>
 
     <ng-container matColumnDef="touchedAt">
-      <th mat-header-cell cdkDrag *matHeaderCellDef mat-sort-header>Last opened </th>
+      <th mat-header-cell cdkDrag *matHeaderCellDef mat-sort-header>Last opened</th>
       <td mat-cell *matCellDef="let row">
         <div class="scrollable-text">
-          {{row.touchedAt | date}}
+          {{ row.touchedAt | date }}
         </div>
       </td>
     </ng-container>
 
     <ng-container matColumnDef="thumbnail">
-      <th mat-header-cell cdkDrag *matHeaderCellDef>Thumbnail </th>
+      <th mat-header-cell cdkDrag *matHeaderCellDef>Thumbnail</th>
       <td mat-cell *matCellDef="let row">
         <div class="scrollable-text">
           <img [src]="getImage(row.thumbnail)" />
@@ -58,16 +65,28 @@
     <ng-container matColumnDef="actions">
       <th mat-header-cell *matHeaderCellDef class="mat-fab-top-right"></th>
       <td mat-cell *matCellDef="let row">
-        <app-actions-menu [logbook]="row" (logbookEdit)="editLogbook($event)"
-          (logbookDelete)="deleteLogbook($event)"></app-actions-menu>
+        <app-actions-menu
+          [logbook]="row"
+          (logbookEdit)="editLogbook($event)"
+          (logbookDelete)="deleteLogbook($event)"
+        ></app-actions-menu>
       </td>
     </ng-container>
 
     <tr mat-header-row *matHeaderRowDef="displayedColumns; sticky: true"></tr>
-    <tr mat-row class="logbooks" *matRowDef="let row; columns: displayedColumns;" (dblclick)="openLogbook(row.id)"></tr>
+    <tr
+      mat-row
+      class="logbooks"
+      *matRowDef="let row; columns: displayedColumns"
+      (dblclick)="openLogbook(row.id)"
+    ></tr>
   </table>
-
 </section>
 
-<mat-paginator [length]="totalItems" [pageSize]="10" [pageSizeOptions]="[10, 20, 50, 100]" (page)="onPageChange()"
-  showFirstLastButtons></mat-paginator>
+<mat-paginator
+  [length]="totalItems"
+  [pageSize]="10"
+  [pageSizeOptions]="[10, 20, 50, 100]"
+  (page)="onPageChange()"
+  showFirstLastButtons
+></mat-paginator>

@@ -1,20 +1,28 @@
 <div class="divButtons">
-    <ng-container *ngIf="container.length>1">
-        <button mat-fab [matMenuTriggerFor]="menuItem" [matTooltip]="iconTip">
-            <mat-icon [matBadge]="badgeNumber" [matBadgeHidden]="badgeNumber<1" matBadgeColor="warn">{{iconName}}</mat-icon>
+  <ng-container *ngIf="container.length > 1">
+    <button mat-fab [matMenuTriggerFor]="menuItem" [matTooltip]="iconTip">
+      <mat-icon [matBadge]="badgeNumber" [matBadgeHidden]="badgeNumber < 1" matBadgeColor="warn">{{
+        iconName
+      }}</mat-icon>
+    </button>
+    <mat-menu #menuItem="matMenu">
+      <ng-container *ngFor="let entry of container">
+        <button mat-menu-item (click)="navigateToItem(entry)">
+          <span>{{ widgetConfigs[entry].config.general.title }}</span>
         </button>
-      <mat-menu #menuItem="matMenu" >
-          <ng-container *ngFor="let entry of container">
-            <button mat-menu-item (click)="navigateToItem(entry)">
-                <span>{{ widgetConfigs[entry].config.general.title }}</span>
-              </button>
-          </ng-container>
-      </mat-menu>
-
-    </ng-container>
-    <ng-container *ngIf="container.length===1">
-      <button mat-fab (click)="navigateToItem(container[0])" class="divButtons-button" [matTooltip]="iconTip">
-        <mat-icon [matBadge]="badgeNumber" [matBadgeHidden]="badgeNumber<1" matBadgeColor="warn">{{ iconName }}</mat-icon>
-      </button>
-    </ng-container>
+      </ng-container>
+    </mat-menu>
+  </ng-container>
+  <ng-container *ngIf="container.length === 1">
+    <button
+      mat-fab
+      (click)="navigateToItem(container[0])"
+      class="divButtons-button"
+      [matTooltip]="iconTip"
+    >
+      <mat-icon [matBadge]="badgeNumber" [matBadgeHidden]="badgeNumber < 1" matBadgeColor="warn">{{
+        iconName
+      }}</mat-icon>
+    </button>
+  </ng-container>
 </div>

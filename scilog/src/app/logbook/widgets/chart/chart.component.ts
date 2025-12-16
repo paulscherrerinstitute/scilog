@@ -9,20 +9,18 @@ import { WidgetConfig, WidgetItemConfig } from '@model/config';
 import { NgChartsModule } from 'ng2-charts';
 
 @Component({
-    selector: 'app-chart',
-    templateUrl: './chart.component.html',
-    styleUrls: ['./chart.component.css'],
-    imports: [NgChartsModule]
+  selector: 'app-chart',
+  templateUrl: './chart.component.html',
+  styleUrls: ['./chart.component.css'],
+  imports: [NgChartsModule],
 })
 export class ChartComponent implements OnInit, OnDestroy {
-
   @Input()
   configIndex: number;
 
   config: WidgetItemConfig;
   snippetId: string;
   snippetData: Basesnippets = null;
-
 
   public lineChartLabels = [];
   public lineChartData = [
@@ -38,88 +36,99 @@ export class ChartComponent implements OnInit, OnDestroy {
     maintainAspectRatio: false,
     maxTicksLimit: 5,
     scales: {
-      yAxes: [{
-        scaleLabel: {
-          display: true,
-          labelString: 'Counts'
+      yAxes: [
+        {
+          scaleLabel: {
+            display: true,
+            labelString: 'Counts',
+          },
+          type: 'logarithmic',
         },
-        type: 'logarithmic'
-      }],
-      xAxes: [{
-        ticks: {
-          maxTicksLimit: 5
-        }
-      }]
+      ],
+      xAxes: [
+        {
+          ticks: {
+            maxTicksLimit: 5,
+          },
+        },
+      ],
     },
     animation: {
-      duration: 50
-    }
+      duration: 50,
+    },
   };
   snippetSubscription: any;
   notificationSubscription: any;
 
-
-  constructor(private views: ViewsService,
+  constructor(
+    private views: ViewsService,
     private dataService: PlotDataService,
     private logbookInfo: LogbookInfoService,
-    private notificationService: ChangeStreamService) { }
+    private notificationService: ChangeStreamService,
+  ) {}
 
   ngOnInit(): void {
-    console.log("create chartComponent")
-    this.subscriptions.push(this.views.currentWidgetConfigs.subscribe((config:WidgetConfig[]) => {
-      console.log(this.configIndex)
-      console.log(config)
-      if ((config != null) && (typeof this.configIndex != "undefined") && (this.configIndex < config.length)) {
-        console.log(config)
-        this.snippetId = config[this.configIndex].config.filter.targetId;
-        this.config = config[this.configIndex].config;
-        if (this.snippetId){
-          this.getPlotSnippets();
+    console.log('create chartComponent');
+    this.subscriptions.push(
+      this.views.currentWidgetConfigs.subscribe((config: WidgetConfig[]) => {
+        console.log(this.configIndex);
+        console.log(config);
+        if (
+          config != null &&
+          typeof this.configIndex != 'undefined' &&
+          this.configIndex < config.length
+        ) {
+          console.log(config);
+          this.snippetId = config[this.configIndex].config.filter.targetId;
+          this.config = config[this.configIndex].config;
+          if (this.snippetId) {
+            this.getPlotSnippets();
+          }
+          this.startNotificationManager();
         }
-        this.startNotificationManager();
-        
-      }
-    }));
+      }),
+    );
   }
 
-  startNotificationManager(){
+  startNotificationManager() {
     if (this.notificationSubscription != null) {
       this.notificationSubscription.unsubscribe();
     }
-    console.log(this.logbookInfo.logbookInfo.id)
+    console.log(this.logbookInfo.logbookInfo.id);
     let configPlot = this.config;
-    configPlot.filter.snippetType = ["plot"];
-    this.notificationSubscription = this.notificationService.getNotification(this.logbookInfo.logbookInfo.id, configPlot).subscribe(data => {
-      console.log(data);
-      if (this.snippetData != null){
-        if (data.id == this.snippetData.id) {
-          for (const key in data.content) {
-            this.snippetData[key] = data.content[key];
+    configPlot.filter.snippetType = ['plot'];
+    this.notificationSubscription = this.notificationService
+      .getNotification(this.logbookInfo.logbookInfo.id, configPlot)
+      .subscribe((data) => {
+        console.log(data);
+        if (this.snippetData != null) {
+          if (data.id == this.snippetData.id) {
+            for (const key in data.content) {
+              this.snippetData[key] = data.content[key];
+            }
           }
+          this.updateChartData();
         }
-        this.updateChartData();
-      }
-    });
+      });
   }
 
-  async getPlotSnippets(){
-
-    let snippet = await this.dataService.getPlotSnippets(this.snippetId); 
+  async getPlotSnippets() {
+    let snippet = await this.dataService.getPlotSnippets(this.snippetId);
     this.snippetData = snippet[0];
     console.log(this.snippetData);
-    if (typeof this.snippetData != 'undefined'){
+    if (typeof this.snippetData != 'undefined') {
       this.updateChartData();
     }
   }
 
-  updateChartData(){
+  updateChartData() {
     this.lineChartLabels = [];
-    this.lineChartData[0]["data"] = [];
-    this.lineChartData[0]["label"] = this.snippetData["name"];
-    if (typeof this.snippetData['plottable'] != 'undefined'){
-      this.snippetData['plottable'].forEach(entry => {
-        this.lineChartLabels.push(entry["x"])
-        this.lineChartData[0]["data"].push(entry["y"])
+    this.lineChartData[0]['data'] = [];
+    this.lineChartData[0]['label'] = this.snippetData['name'];
+    if (typeof this.snippetData['plottable'] != 'undefined') {
+      this.snippetData['plottable'].forEach((entry) => {
+        this.lineChartLabels.push(entry['x']);
+        this.lineChartData[0]['data'].push(entry['y']);
       });
     }
   }
@@ -127,10 +136,10 @@ export class ChartComponent implements OnInit, OnDestroy {
   ngOnDestroy(): void {
     //Called once, before the instance is destroyed.
     //Add 'implements OnDestroy' to the class.
-    console.log("destroy snippetViewerComponent")
-    this.subscriptions.forEach(sub => {
+    console.log('destroy snippetViewerComponent');
+    this.subscriptions.forEach((sub) => {
       sub.unsubscribe();
-    })
+    });
     if (this.snippetSubscription != null) {
       this.snippetSubscription.unsubscribe();
     }
@@ -138,6 +147,4 @@ export class ChartComponent implements OnInit, OnDestroy {
       this.notificationSubscription.unsubscribe();
     }
   }
-
 }
-

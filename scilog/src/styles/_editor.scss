@@ -1,14 +1,13 @@
 @import './theme';
 
 @mixin editor-container($input) {
-
-    @if #{$light-mode} {
-        @include default-shadow;
-        width: 100%;
-    } @else {
-        @debug "divider offset: #{$light-mode}";
-        border: 1px var(--default-text-color) solid;
-        margin: 7px;
-        width: calc(100% - 20px);
-    }
+  @if #{$light-mode} {
+    @include default-shadow;
+    width: 100%;
+  } @else {
+    @debug 'divider offset: #{$light-mode}';
+    border: 1px var(--default-text-color) solid;
+    margin: 7px;
+    width: calc(100% - 20px);
+  }
 }

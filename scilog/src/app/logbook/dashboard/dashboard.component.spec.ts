@@ -14,15 +14,14 @@ describe('DashboardComponent', () => {
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-    imports: [RouterTestingModule, DashboardComponent],
-    providers: [
+      imports: [RouterTestingModule, DashboardComponent],
+      providers: [
         { provide: AppConfigService, useValue: { getConfig } },
         { provide: MatDialog, useValue: {} },
         provideHttpClient(withInterceptorsFromDi()),
         provideHttpClientTesting(),
-    ]
-})
-    .compileComponents();
+      ],
+    }).compileComponents();
   }));
 
   beforeEach(() => {
@@ -40,5 +39,4 @@ describe('DashboardComponent', () => {
     component.onResized();
     expect(component.mobile).toEqual(true);
   });
-
 });

@@ -14,10 +14,13 @@ describe('LogbookComponent', () => {
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-    imports: [RouterTestingModule, LogbookComponent],
-    providers: [{ provide: AppConfigService, useValue: { getConfig } }, provideHttpClient(withInterceptorsFromDi()), provideHttpClientTesting()]
-})
-    .compileComponents();
+      imports: [RouterTestingModule, LogbookComponent],
+      providers: [
+        { provide: AppConfigService, useValue: { getConfig } },
+        provideHttpClient(withInterceptorsFromDi()),
+        provideHttpClientTesting(),
+      ],
+    }).compileComponents();
   }));
 
   beforeEach(() => {
@@ -47,7 +50,10 @@ describe('LogbookComponent', () => {
   });
 
   it('should call touchLogbook on init', () => {
-    const logbookDataServiceSpy = spyOn(component['logbookDataService'], 'touchLogbook').and.callThrough();
+    const logbookDataServiceSpy = spyOn(
+      component['logbookDataService'],
+      'touchLogbook',
+    ).and.callThrough();
     component.ngOnInit();
     expect(logbookDataServiceSpy).toHaveBeenCalledWith(component.logbookId);
   });

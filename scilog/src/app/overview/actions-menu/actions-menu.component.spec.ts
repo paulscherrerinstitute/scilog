@@ -5,9 +5,8 @@ import { MatMenuModule } from '@angular/material/menu';
 
 class UserPreferencesMock {
   userInfo = {
-    roles: ["roles"]
-
-  }
+    roles: ['roles'],
+  };
 }
 
 describe('ActionsMenuComponent', () => {
@@ -16,12 +15,9 @@ describe('ActionsMenuComponent', () => {
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-    imports: [MatMenuModule, ActionsMenuComponent],
-    providers: [
-        { provide: UserPreferencesService, useClass: UserPreferencesMock },
-    ]
-})
-      .compileComponents();
+      imports: [MatMenuModule, ActionsMenuComponent],
+      providers: [{ provide: UserPreferencesService, useClass: UserPreferencesMock }],
+    }).compileComponents();
   }));
 
   beforeEach(() => {
@@ -39,5 +35,4 @@ describe('ActionsMenuComponent', () => {
     component['enableActions']();
     expect(isAllowedSpy).toHaveBeenCalledTimes(1);
   });
-
 });

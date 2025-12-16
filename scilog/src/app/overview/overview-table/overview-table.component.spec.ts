@@ -8,7 +8,7 @@ import { MatPaginatorModule } from '@angular/material/paginator';
 import { NoopAnimationsModule } from '@angular/platform-browser/animations';
 
 class UserPreferencesMock {
-  userInfo = { roles: ["roles"] };
+  userInfo = { roles: ['roles'] };
 }
 
 describe('OverviewTableComponent', () => {
@@ -17,23 +17,21 @@ describe('OverviewTableComponent', () => {
   const logbookDataSpy = jasmine.createSpyObj(
     'LogbookDataService',
     ['getDataBuffer', 'getCount', 'deleteLogbook'],
-    { imagesLocation: 'server/images' }
+    { imagesLocation: 'server/images' },
   );
   logbookDataSpy.getCount.and.returnValue({ count: 1 });
   logbookDataSpy.getDataBuffer.and.returnValue([{ abc: 1 }]);
-  const paginatorSpy = jasmine.createSpyObj("MatPaginator", {}, { pageIndex: 0, pageSize: 5 });
-  const sortSpy = jasmine.createSpyObj("MatSort", ['sort']);
-
+  const paginatorSpy = jasmine.createSpyObj('MatPaginator', {}, { pageIndex: 0, pageSize: 5 });
+  const sortSpy = jasmine.createSpyObj('MatSort', ['sort']);
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-    imports: [MatPaginatorModule, NoopAnimationsModule, OverviewTableComponent],
-    providers: [
+      imports: [MatPaginatorModule, NoopAnimationsModule, OverviewTableComponent],
+      providers: [
         { provide: LogbookDataService, useValue: logbookDataSpy },
         { provide: UserPreferencesService, useClass: UserPreferencesMock },
-    ]
-})
-      .compileComponents();
+      ],
+    }).compileComponents();
   }));
 
   beforeEach(() => {
@@ -71,12 +69,28 @@ describe('OverviewTableComponent', () => {
   });
 
   it('should test drop', () => {
-    expect(component.displayedColumns).toEqual(['name', 'description', 'ownerGroup', 'touchedAt', 'createdAt', 'thumbnail', 'actions']);
+    expect(component.displayedColumns).toEqual([
+      'name',
+      'description',
+      'ownerGroup',
+      'touchedAt',
+      'createdAt',
+      'thumbnail',
+      'actions',
+    ]);
     component.drop({ previousIndex: 1, currentIndex: 2 } as CdkDragDrop<string[]>);
-    expect(component.displayedColumns).toEqual(['name', 'ownerGroup', 'description', 'touchedAt', 'createdAt', 'thumbnail', 'actions']);
+    expect(component.displayedColumns).toEqual([
+      'name',
+      'ownerGroup',
+      'description',
+      'touchedAt',
+      'createdAt',
+      'thumbnail',
+      'actions',
+    ]);
   });
 
-  [undefined, '123'].forEach(t => {
+  [undefined, '123'].forEach((t) => {
     it(`should test getImage ${t}`, () => {
       expect(component.getImage(t)).toEqual(t ? 'server/images/123' : t);
     });
@@ -95,14 +109,12 @@ describe('OverviewTableComponent', () => {
     expect(getDatasetsSpy).toHaveBeenCalledTimes(1);
   });
 
-  [true, false, 'abc']
-  .forEach((t, i) => {
+  [true, false, 'abc'].forEach((t, i) => {
     it(`should test reloadLogbooks ${i}`, async () => {
       const getLogbooksSpy = spyOn(component, 'getLogbooks');
       await component.reloadLogbooks();
       expect(getLogbooksSpy).toHaveBeenCalledTimes(1);
-      if (typeof t === 'string')
-        component['dataService'].searchString === 'abc';
+      if (typeof t === 'string') component['dataService'].searchString === 'abc';
       else if (t) {
         expect(component.sort.active).toEqual('');
         expect(component.sort.direction).toEqual('');
@@ -123,5 +135,4 @@ describe('OverviewTableComponent', () => {
     await component.afterLogbookEdit();
     expect(reloadSpy).toHaveBeenCalledOnceWith(false);
   });
-
-})
+});

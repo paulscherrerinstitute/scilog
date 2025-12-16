@@ -8,11 +8,9 @@
   <mat-form-field
     ><mat-label for="dataset-select">Select Dataset:</mat-label>
     <mat-select id="dataset-select" (selectionChange)="onDatasetSelect($event)">
-      <mat-option
-        *ngFor="let dataset of datasetSummary"
-        [value]="dataset.pid"
-        >{{ dataset.datasetName }}</mat-option
-      >
+      <mat-option *ngFor="let dataset of datasetSummary" [value]="dataset.pid">{{
+        dataset.datasetName
+      }}</mat-option>
     </mat-select></mat-form-field
   >
 </div>
@@ -29,7 +27,7 @@
         <tr>
           <th>Creation time</th>
           <td>
-            {{ selectedDataset.creationTime | date : "dd.MM.yyyy HH:mm" }}
+            {{ selectedDataset.creationTime | date: 'dd.MM.yyyy HH:mm' }}
           </td>
         </tr>
         <tr>

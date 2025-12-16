@@ -18,74 +18,138 @@
   </mat-form-field> -->
   <div #snippetContainer class="logbook-content">
     <div *uiScroll="let snippet of logbookScrollService.datasource; let i = index">
-      <app-snippet [snippet]="snippet" [updatedAt]="snippet.updatedAt" [index]=i+1 [config]="config" [indexOrdered]="_indexOrder(i)" (isLoading)="logbookScrollService.setItemStatus(snippet.id, $event)">
+      <app-snippet
+        [snippet]="snippet"
+        [updatedAt]="snippet.updatedAt"
+        [index]="i + 1"
+        [config]="config"
+        [indexOrdered]="_indexOrder(i)"
+        (isLoading)="logbookScrollService.setItemStatus(snippet.id, $event)"
+      >
       </app-snippet>
     </div>
   </div>
 
-  <button mat-mini-fab class="float" (click)="scrollOnClickTo('end')" [@scrollButton] *ngIf="!isAt('end') && !isDescending">
+  <button
+    mat-mini-fab
+    class="float"
+    (click)="scrollOnClickTo('end')"
+    [@scrollButton]
+    *ngIf="!isAt('end') && !isDescending"
+  >
     <mat-icon>keyboard_double_arrow_down</mat-icon>
   </button>
-  <button mat-mini-fab class="float" (click)="scrollOnClickTo('start')" [@scrollButton] *ngIf="!isAt('start') && isDescending">
+  <button
+    mat-mini-fab
+    class="float"
+    (click)="scrollOnClickTo('start')"
+    [@scrollButton]
+    *ngIf="!isAt('start') && isDescending"
+  >
     <mat-icon>keyboard_double_arrow_up</mat-icon>
   </button>
-  <div *ngIf="!mobile && !isReadOnly" [ngClass]="isLightMode ? 'editor-container' : 'editor-container-no-border'">
-    <div #editor class="content-editor"
-      [ngStyle]="{'padding-left':dashboardView === true ? '0px' : '78px', 'width': dashboardView === true ? '97%' : '92%'}"
-      (appResized)="onResized()">
-      <div class='accessSettings'>
-        <span [ngStyle]="{'flex':'1 1 auto'}"></span>
+  <div
+    *ngIf="!mobile && !isReadOnly"
+    [ngClass]="isLightMode ? 'editor-container' : 'editor-container-no-border'"
+  >
+    <div
+      #editor
+      class="content-editor"
+      [ngStyle]="{
+        'padding-left': dashboardView === true ? '0px' : '78px',
+        width: dashboardView === true ? '97%' : '92%',
+      }"
+      (appResized)="onResized()"
+    >
+      <div class="accessSettings">
+        <span [ngStyle]="{ flex: '1 1 auto' }"></span>
         <span matTooltip="ownerGroup">
-          <span [ngStyle]="{'vertical-align':'middle'}">
-            <mat-icon [inline]='true'>person</mat-icon>
+          <span [ngStyle]="{ 'vertical-align': 'middle' }">
+            <mat-icon [inline]="true">person</mat-icon>
           </span>
-          <span>{{ logbookInfo.logbookInfo.ownerGroup}}</span>
+          <span>{{ logbookInfo.logbookInfo.ownerGroup }}</span>
         </span>
-        <span *ngIf='logbookInfo.logbookInfo.accessGroups.length>0' matTooltip='accessGroups'>
+        <span *ngIf="logbookInfo.logbookInfo.accessGroups.length > 0" matTooltip="accessGroups">
           <span> / </span>
-          <span [ngStyle]="{'vertical-align':'middle'}">
-            <mat-icon [inline]='true'>group</mat-icon>
+          <span [ngStyle]="{ 'vertical-align': 'middle' }">
+            <mat-icon [inline]="true">group</mat-icon>
           </span>
-          <span> {{ logbookInfo.logbookInfo.accessGroups}}</span>
+          <span> {{ logbookInfo.logbookInfo.accessGroups }}</span>
         </span>
       </div>
-      <ckeditor #contentEditor [config]="editorConfig" [editor]="Editor" [data]="dataEditor"
-        (ready)="onEditorReady($event)"></ckeditor>
-        <div class='tagsContainer'>
-          <span class='tagEditor'>
-            <app-tag-editor [ngStyle]="{'width': '100%'}" #tagEditor [tagIn]="tag" [configIndex]="configIndex"></app-tag-editor>
-          </span>
-            <span class="addButton">
-              <button mat-mini-fab (click)="addContent()" matTooltip="Send">
-                <mat-icon>send</mat-icon>
-              </button>
-              <button mat-mini-fab (click)="addMessage()" *ngIf="messagesEnabled" matTooltip="Send as message">
-                <mat-icon>message</mat-icon>
-              </button>
-          </span>
-        </div>
-
+      <ckeditor
+        #contentEditor
+        [config]="editorConfig"
+        [editor]="Editor"
+        [data]="dataEditor"
+        (ready)="onEditorReady($event)"
+      ></ckeditor>
+      <div class="tagsContainer">
+        <span class="tagEditor">
+          <app-tag-editor
+            [ngStyle]="{ width: '100%' }"
+            #tagEditor
+            [tagIn]="tag"
+            [configIndex]="configIndex"
+          ></app-tag-editor>
+        </span>
+        <span class="addButton">
+          <button mat-mini-fab (click)="addContent()" matTooltip="Send">
+            <mat-icon>send</mat-icon>
+          </button>
+          <button
+            mat-mini-fab
+            (click)="addMessage()"
+            *ngIf="messagesEnabled"
+            matTooltip="Send as message"
+          >
+            <mat-icon>message</mat-icon>
+          </button>
+        </span>
+      </div>
     </div>
-
   </div>
-
 </div>
 <ng-container *ngIf="mobile && !isReadOnly">
-  <button mat-fab color="accent" aria-label="Add snippet" class="mat-fab-bottom-right" (click)="toggle()"
-    [@rotatedState]="isOpen ? 'rotated' : 'default'" (focusout)="closeToolSelection()" style="z-index: 1001;">
+  <button
+    mat-fab
+    color="accent"
+    aria-label="Add snippet"
+    class="mat-fab-bottom-right"
+    (click)="toggle()"
+    [@rotatedState]="isOpen ? 'rotated' : 'default'"
+    (focusout)="closeToolSelection()"
+    style="z-index: 1001"
+  >
     <mat-icon>add</mat-icon>
   </button>
-  <button #editButton mat-fab color="accent" aria-label="Edit" class="mat-fab-bottom-right"
-    [@buttonEdit]="isOpen ? 'end' : 'start'" (click)="addSnippet($event)" style="z-index: 1000;">
+  <button
+    #editButton
+    mat-fab
+    color="accent"
+    aria-label="Edit"
+    class="mat-fab-bottom-right"
+    [@buttonEdit]="isOpen ? 'end' : 'start'"
+    (click)="addSnippet($event)"
+    style="z-index: 1000"
+  >
     <mat-icon>edit</mat-icon>
   </button>
   <!-- <button #taskButton mat-fab color="accent" aria-label="Edit" class="mat-fab-bottom-right"
     [@buttonTask]="isOpen ? 'end' : 'start'" (click)="addSnippet($event)" style="z-index: 1000;">
     <mat-icon>add_task</mat-icon>
   </button> -->
-  <input style="display: none" type="file" (change)="onFileChanged($event)" #fileInput>
-  <button #photoButton mat-fab color="accent" aria-label="Photo" class="mat-fab-bottom-right"
-    [@buttonPhoto]="isOpen ? 'end' : 'start'" (click)="fileInput.click()" style="z-index: 1000;">
+  <input style="display: none" type="file" (change)="onFileChanged($event)" #fileInput />
+  <button
+    #photoButton
+    mat-fab
+    color="accent"
+    aria-label="Photo"
+    class="mat-fab-bottom-right"
+    [@buttonPhoto]="isOpen ? 'end' : 'start'"
+    (click)="fileInput.click()"
+    style="z-index: 1000"
+  >
     <mat-icon>add_a_photo</mat-icon>
   </button>
   <!-- <button #fileButton mat-fab color="accent" aria-label="File" class="mat-fab-bottom-right"

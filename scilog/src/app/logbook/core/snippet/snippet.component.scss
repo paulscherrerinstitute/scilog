@@ -108,7 +108,7 @@
   align-items: center;
   /* opacity: 0.1; */
 }
-.mat-fab-top-right-user{
+.mat-fab-top-right-user {
   position: absolute;
   top: 4px;
   left: 3px;
@@ -118,7 +118,7 @@
   align-items: center;
   width: 20px;
   height: 20px;
-  border-radius: 50%
+  border-radius: 50%;
 }
 
 .card-content {
@@ -149,17 +149,17 @@
   display: inline;
 }
 
-.snippet-tag{
+.snippet-tag {
   background-color: #e0e0e0;
   color: rgba(0, 0, 0, 0.87);
   width: max-content;
   border-radius: 5px;
   padding: 2px;
   float: right;
-  margin: 1px;  
+  margin: 1px;
 }
 
-.card-header{
+.card-header {
   position: absolute;
   display: inline;
   top: 4px;
@@ -177,10 +177,10 @@
   /* align-items: center; */
   width: 20px;
   height: 20px;
-  border-radius: 50%
+  border-radius: 50%;
 }
 
-.message-timestamp{
+.message-timestamp {
   /* top: 4px; */
   /* left: 3px; */
   /* padding-left: 2px; */
@@ -191,7 +191,7 @@
   align-items: center;
 }
 
-.snippet-header{
+.snippet-header {
   width: 100%;
   font-size-adjust: 0.4;
   opacity: 0.6;

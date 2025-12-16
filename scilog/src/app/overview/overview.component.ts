@@ -26,21 +26,30 @@ enum ContentType {
 export type MatCardType = 'logbook-module' | 'logbook-headline';
 
 @Component({
-    selector: 'app-overview',
-    templateUrl: './overview.component.html',
-    styleUrls: ['./overview.component.css'],
-    animations: [
-        trigger('spinner', [
-            transition(':enter', [
-                style({ opacity: 0 }),
-                animate('1ms 0.2s ease-out', style({ opacity: 1 }))
-            ])
-        ]),
-    ],
-    imports: [ToolbarComponent, MatButtonToggleGroup, FormsModule, MatButtonToggle, MatIcon, NgIf, MatProgressSpinner, OverviewTableComponent, OverviewScrollComponent]
+  selector: 'app-overview',
+  templateUrl: './overview.component.html',
+  styleUrls: ['./overview.component.css'],
+  animations: [
+    trigger('spinner', [
+      transition(':enter', [
+        style({ opacity: 0 }),
+        animate('1ms 0.2s ease-out', style({ opacity: 1 })),
+      ]),
+    ]),
+  ],
+  imports: [
+    ToolbarComponent,
+    MatButtonToggleGroup,
+    FormsModule,
+    MatButtonToggle,
+    MatIcon,
+    NgIf,
+    MatProgressSpinner,
+    OverviewTableComponent,
+    OverviewScrollComponent,
+  ],
 })
 export class OverviewComponent implements OnInit, OnDestroy {
-
   config: WidgetItemConfig;
 
   showViewSelection = false;
@@ -58,40 +67,40 @@ export class OverviewComponent implements OnInit, OnDestroy {
     private userPreferences: UserPreferencesService,
     public dialog: MatDialog,
     private logbookInfo: LogbookInfoService,
-    private cookie: CookiesService) {}
+    private cookie: CookiesService,
+  ) {}
 
   ngOnInit(): void {
     this.logbookInfo.logbookInfo = null;
     console.log(this.logbookInfo.logbookInfo);
-    this.subscriptions.push(this.userPreferences.currentCollectionsConfig.subscribe(data => {
-      console.log("collections:", data);
-      this.collections = data;
+    this.subscriptions.push(
+      this.userPreferences.currentCollectionsConfig.subscribe((data) => {
+        console.log('collections:', data);
+        this.collections = data;
 
-      // if there is only one collection, select it! -- TODO: save last collection in userPreferences
-      if (this.collections.length == 1) {
-        this.collectionSelected(this.collections[0]);
-      }
-      this.config = this._prepareConfig();
-    }));
+        // if there is only one collection, select it! -- TODO: save last collection in userPreferences
+        if (this.collections.length == 1) {
+          this.collectionSelected(this.collections[0]);
+        }
+        this.config = this._prepareConfig();
+      }),
+    );
   }
 
   get overviewComponent() {
-    return this.matCardType === 'logbook-module'
-      ? this.overviewSroll:
-      this.overviewTable;
+    return this.matCardType === 'logbook-module' ? this.overviewSroll : this.overviewTable;
   }
 
   collectionSelected(collection: CollectionConfig) {
     this.showViewSelection = true;
     // this.views = [];
-    console.log("selected collection: ", collection)
-
+    console.log('selected collection: ', collection);
   }
 
   logbookSelected(logbookID: string) {
     this.cookie.lastLogbook = logbookID;
-    console.log("selected logbook: ", logbookID);
-    console.log("opening logbook...");
+    console.log('selected logbook: ', logbookID);
+    console.log('opening logbook...');
   }
 
   setView(view: string) {
@@ -109,14 +118,15 @@ export class OverviewComponent implements OnInit, OnDestroy {
     let dialogRef: any;
     dialogRef = this.dialog.open(AddLogbookComponent, dialogConfig);
 
-    this.subscriptions.push(dialogRef.afterClosed()
-    .subscribe(async (result: Logbooks) => {
-      await this.reloadData(result, 'edit');
-    }));
+    this.subscriptions.push(
+      dialogRef.afterClosed().subscribe(async (result: Logbooks) => {
+        await this.reloadData(result, 'edit');
+      }),
+    );
   }
 
   async reloadData(logbook: Logbooks, action: 'edit' | 'add') {
-    if (!logbook) return
+    if (!logbook) return;
     if (action === 'edit') await this.overviewComponent.afterLogbookEdit(logbook);
     if (action === 'add') await this.overviewComponent.reloadLogbooks();
   }
@@ -136,28 +146,30 @@ export class OverviewComponent implements OnInit, OnDestroy {
       default:
         break;
     }
-    this.subscriptions.push(dialogRef.afterClosed().subscribe(async (result: Logbooks) => {
-      await this.reloadData(result, 'add');
-    }));
+    this.subscriptions.push(
+      dialogRef.afterClosed().subscribe(async (result: Logbooks) => {
+        await this.reloadData(result, 'add');
+      }),
+    );
   }
 
   private _prepareConfig() {
     // let searchResult = this._parseSearchString();
     let _config: WidgetItemConfig = {
       filter: {
-        targetId: "",
+        targetId: '',
       },
       general: {
-        type: "logbook",
-        title: "",
-        readonly: true
+        type: 'logbook',
+        title: '',
+        readonly: true,
       },
       view: {
-        order: ["touchedAt DESC"],
+        order: ['touchedAt DESC'],
         hideMetadata: false,
-        showSnippetHeader: false
-      }
-    }
+        showSnippetHeader: false,
+      },
+    };
     return _config;
   }
 
@@ -166,8 +178,6 @@ export class OverviewComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
-    this.subscriptions.forEach(
-      (subscription) => subscription.unsubscribe());
+    this.subscriptions.forEach((subscription) => subscription.unsubscribe());
   }
-
 }

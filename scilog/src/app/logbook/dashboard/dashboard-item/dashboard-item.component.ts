@@ -1,4 +1,13 @@
-import { Component, OnInit, Input, Output, EventEmitter, ViewChild, HostListener, OnDestroy } from '@angular/core';
+import {
+  Component,
+  OnInit,
+  Input,
+  Output,
+  EventEmitter,
+  ViewChild,
+  HostListener,
+  OnDestroy,
+} from '@angular/core';
 import { MatDialogConfig, MatDialog } from '@angular/material/dialog';
 import { WidgetPreferencesComponent } from '../../widgets/widget-preferences/widget-preferences.component';
 import { LogbookItemComponent } from '../../widgets/logbook-item/logbook-item.component';
@@ -19,13 +28,27 @@ import { SnippetViewerComponent } from '../../widgets/snippet-viewer/snippet-vie
 import { ScicatViewerComponent } from '../../widgets/scicat-viewer/scicat-viewer.component';
 
 @Component({
-    selector: 'app-dashboard-item',
-    templateUrl: './dashboard-item.component.html',
-    styleUrls: ['./dashboard-item.component.scss'],
-    imports: [NgStyle, NgIf, MatIconButton, MatTooltip, MatIcon, NgSwitch, NgSwitchCase, LogbookItemComponent, ChatComponent, ChartComponent, TodosComponent, SnippetViewerComponent, ScicatViewerComponent, NgSwitchDefault]
+  selector: 'app-dashboard-item',
+  templateUrl: './dashboard-item.component.html',
+  styleUrls: ['./dashboard-item.component.scss'],
+  imports: [
+    NgStyle,
+    NgIf,
+    MatIconButton,
+    MatTooltip,
+    MatIcon,
+    NgSwitch,
+    NgSwitchCase,
+    LogbookItemComponent,
+    ChatComponent,
+    ChartComponent,
+    TodosComponent,
+    SnippetViewerComponent,
+    ScicatViewerComponent,
+    NgSwitchDefault,
+  ],
 })
 export class DashboardItemComponent implements OnInit, ComponentCanDeactivate, OnDestroy {
-
   @Input()
   configIndex: number;
 
@@ -41,45 +64,46 @@ export class DashboardItemComponent implements OnInit, ComponentCanDeactivate, O
   dashboardView = true;
   viewSubscription: Subscription = null;
 
-  constructor(private dialog: MatDialog,
+  constructor(
+    private dialog: MatDialog,
     private route: ActivatedRoute,
-    private views: ViewsService) {
-  }
+    private views: ViewsService,
+  ) {}
 
   ngOnInit(): void {
-    this.subscriptions.push(this.route.queryParamMap.subscribe(data => {
-      console.log("query params: ", data);
-      if (data['params'].id) {
-        this.configIndex = data['params'].id;
-        this.dashboardView = false;
-      }
-      if (this.viewSubscription != null){
-        this.viewSubscription.unsubscribe();
-      }
-      this.viewSubscription = this.views.currentWidgetConfigs.subscribe(config => {
-        console.log(config);
-        if ((config != null) && (config.length>0) && (this.configIndex<config.length)){
-          if (typeof this.configIndex !== 'undefined') {
-            console.log(config)
-            console.log(this.configIndex);
-            this.config = config[this.configIndex].config;
-          } else {
-            this.configIndex = this.route.snapshot.queryParams.id;
-            this.config = config[this.configIndex].config;
-          }
+    this.subscriptions.push(
+      this.route.queryParamMap.subscribe((data) => {
+        console.log('query params: ', data);
+        if (data['params'].id) {
+          this.configIndex = data['params'].id;
+          this.dashboardView = false;
         }
-      });
-    }));
-    console.log("configIndex", this.configIndex);
-
-
+        if (this.viewSubscription != null) {
+          this.viewSubscription.unsubscribe();
+        }
+        this.viewSubscription = this.views.currentWidgetConfigs.subscribe((config) => {
+          console.log(config);
+          if (config != null && config.length > 0 && this.configIndex < config.length) {
+            if (typeof this.configIndex !== 'undefined') {
+              console.log(config);
+              console.log(this.configIndex);
+              this.config = config[this.configIndex].config;
+            } else {
+              this.configIndex = this.route.snapshot.queryParams.id;
+              this.config = config[this.configIndex].config;
+            }
+          }
+        });
+      }),
+    );
+    console.log('configIndex', this.configIndex);
   }
 
   requestFullscreen() {
     this.openFullscreen.emit(this.configIndex);
   }
 
-  exportLogbook(){
+  exportLogbook() {
     const dialogConfig = new MatDialogConfig();
     dialogConfig.autoFocus = true;
     dialogConfig.disableClose = true;
@@ -91,15 +115,15 @@ export class DashboardItemComponent implements OnInit, ComponentCanDeactivate, O
     const dialogConfig = new MatDialogConfig();
     dialogConfig.autoFocus = false;
     dialogConfig.disableClose = true;
-    dialogConfig.data = {config: this.config};
+    dialogConfig.data = { config: this.config };
     const dialogRef = this.dialog.open(WidgetPreferencesComponent, dialogConfig);
     let data = await dialogRef.afterClosed().toPromise();
     if (data) {
-      console.log("Dialog output:", data);
+      console.log('Dialog output:', data);
       this.views.updateWidgetConfig(data, this.configIndex);
       this.config = data;
       switch (this.config.general.type) {
-        case "logbook":
+        case 'logbook':
           this.logbookChild.ngOnInit();
           break;
         default:
@@ -108,8 +132,7 @@ export class DashboardItemComponent implements OnInit, ComponentCanDeactivate, O
     }
   }
   ngOnDestroy(): void {
-    this.subscriptions.forEach(
-      (subscription) => subscription.unsubscribe());
+    this.subscriptions.forEach((subscription) => subscription.unsubscribe());
   }
 
   @HostListener('window:beforeunload')
@@ -117,5 +140,4 @@ export class DashboardItemComponent implements OnInit, ComponentCanDeactivate, O
     if (false) return true;
     return false;
   }
-
 }

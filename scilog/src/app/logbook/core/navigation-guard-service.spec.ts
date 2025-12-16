@@ -10,8 +10,8 @@ describe('CanDeactivateGuard', () => {
     TestBed.configureTestingModule({
       providers: [
         NavigationGuardService,
-        { provide: LogbookInfoService, useValue: { logbookInfo: { id: 'id' } } }
-      ]
+        { provide: LogbookInfoService, useValue: { logbookInfo: { id: 'id' } } },
+      ],
     });
     service = TestBed.inject(NavigationGuardService);
   });
@@ -22,12 +22,11 @@ describe('CanDeactivateGuard', () => {
 
   it('should return true on back', () => {
     spyOn(window, 'confirm').and.returnValue(true);
-    expect(service.canDeactivate({canDeactivate: () => false})).toBeTrue();
+    expect(service.canDeactivate({ canDeactivate: () => false })).toBeTrue();
   });
 
   it('should return false on back', () => {
     spyOn(window, 'confirm').and.returnValue(false);
-    expect(service.canDeactivate({canDeactivate: () => false})).toBeFalse();
+    expect(service.canDeactivate({ canDeactivate: () => false })).toBeFalse();
   });
-
 });

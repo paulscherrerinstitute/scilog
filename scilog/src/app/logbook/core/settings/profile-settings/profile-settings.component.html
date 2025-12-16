@@ -1,41 +1,55 @@
 <div class="profile">
-
-<form [formGroup]="profileFormGroup" style="width: 80%;">
+  <form [formGroup]="profileFormGroup" style="width: 80%">
     <div>
-        <mat-form-field required>
-            <mat-label>First name</mat-label>
-            <input matInput placeholder="Title of the view" [formControl]="profileFormGroup.get('name')">
-          </mat-form-field>
+      <mat-form-field required>
+        <mat-label>First name</mat-label>
+        <input
+          matInput
+          placeholder="Title of the view"
+          [formControl]="profileFormGroup.get('name')"
+        />
+      </mat-form-field>
     </div>
 
     <div>
-        <mat-form-field required>
-            <mat-label>Last name</mat-label>
-            <input matInput placeholder="Title of the view" [formControl]="profileFormGroup.get('lastname')">
-          </mat-form-field>
+      <mat-form-field required>
+        <mat-label>Last name</mat-label>
+        <input
+          matInput
+          placeholder="Title of the view"
+          [formControl]="profileFormGroup.get('lastname')"
+        />
+      </mat-form-field>
     </div>
     <div>
-        <mat-form-field required>
-            <mat-label>Email</mat-label>
-            <input matInput placeholder="Title of the view" [formControl]="profileFormGroup.get('email')">
-          </mat-form-field>
+      <mat-form-field required>
+        <mat-label>Email</mat-label>
+        <input
+          matInput
+          placeholder="Title of the view"
+          [formControl]="profileFormGroup.get('email')"
+        />
+      </mat-form-field>
     </div>
     <div>
-        <mat-form-field required>
-            <mat-label>Username</mat-label>
-            <input matInput placeholder="Title of the view" [formControl]="profileFormGroup.get('username')">
-          </mat-form-field>
+      <mat-form-field required>
+        <mat-label>Username</mat-label>
+        <input
+          matInput
+          placeholder="Title of the view"
+          [formControl]="profileFormGroup.get('username')"
+        />
+      </mat-form-field>
     </div>
 
     <div>
-        <mat-form-field required>
-            <mat-label>SciLog token</mat-label>
-            <input matInput [formControl]="profileFormGroup.get('token')">
-            <button mat-icon-button matSuffix (click)="copyToClipboard()">
-                <mat-icon>content_copy</mat-icon>
-            </button>
-        </mat-form-field>
+      <mat-form-field required>
+        <mat-label>SciLog token</mat-label>
+        <input matInput [formControl]="profileFormGroup.get('token')" />
+        <button mat-icon-button matSuffix (click)="copyToClipboard()">
+          <mat-icon>content_copy</mat-icon>
+        </button>
+      </mat-form-field>
     </div>
-</form>
-
+  </form>
 </div>

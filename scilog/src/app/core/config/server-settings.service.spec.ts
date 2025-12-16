@@ -19,12 +19,12 @@ describe('ServerSettingsService', () => {
     expect(service).toBeTruthy();
   });
   it('getServerAddress should return string', () => {
-    expect(typeof(service.getServerAddress())=="string").toBe(true);
-  })
-  it('getServerAddress should return string with trailing slash', () =>{
-    expect(service.getServerAddress().slice(-1)).toBe("/");
-  })
+    expect(typeof service.getServerAddress() == 'string').toBe(true);
+  });
+  it('getServerAddress should return string with trailing slash', () => {
+    expect(service.getServerAddress().slice(-1)).toBe('/');
+  });
   it('getSocketAddress should return string with leading ws', () => {
-    expect(service.getSocketAddress().substring(0,2)).toBe("ws");
-  })
+    expect(service.getSocketAddress().substring(0, 2)).toBe('ws');
+  });
 });

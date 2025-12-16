@@ -1,8 +1,28 @@
 import { COMMA, ENTER, SPACE } from '@angular/cdk/keycodes';
 import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
-import { AbstractControl, AsyncValidator, UntypedFormBuilder, UntypedFormControl, UntypedFormGroup, ValidatorFn, Validators, FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { MatAutocomplete, MatAutocompleteSelectedEvent, MatAutocompleteTrigger } from '@angular/material/autocomplete';
-import { MatChipInputEvent, MatChipGrid, MatChipRow, MatChipRemove, MatChipInput } from '@angular/material/chips';
+import {
+  AbstractControl,
+  AsyncValidator,
+  UntypedFormBuilder,
+  UntypedFormControl,
+  UntypedFormGroup,
+  ValidatorFn,
+  Validators,
+  FormsModule,
+  ReactiveFormsModule,
+} from '@angular/forms';
+import {
+  MatAutocomplete,
+  MatAutocompleteSelectedEvent,
+  MatAutocompleteTrigger,
+} from '@angular/material/autocomplete';
+import {
+  MatChipInputEvent,
+  MatChipGrid,
+  MatChipRow,
+  MatChipRemove,
+  MatChipInput,
+} from '@angular/material/chips';
 import { Observable, Subscription } from 'rxjs';
 import { LogbookInfoService } from '@shared/logbook-info.service';
 import { UserPreferencesService } from '@shared/user-preferences.service';
@@ -24,9 +44,6 @@ import { MatIcon } from '@angular/material/icon';
 import { MatTooltip } from '@angular/material/tooltip';
 import { MatButton } from '@angular/material/button';
 import { ViewEditComponent } from './view-edit/view-edit.component';
-
-
-
 
 export function forbiddenNameValidator(nameRe: RegExp): ValidatorFn {
   return (control: AbstractControl): { [key: string]: any } | null => {
@@ -55,28 +72,54 @@ export function ownerGroupMemberValidator(groups: string[]): ValidatorFn {
 export function accessGroupsMemberValidator(groups: string[], chips: string[]): ValidatorFn {
   return (control: AbstractControl): { [key: string]: any } | null => {
     const groupEntriesForbidden = (chip: string) => !groups.includes(chip);
-    const forbidden = ((control.value!=null) && (control.value !== "")&& (!groups.includes(control.value))) || (chips.length > 0 && chips.some(groupEntriesForbidden));
-    console.log(typeof control.value)
-    console.log(control.value)
-    console.log(chips)
+    const forbidden =
+      (control.value != null && control.value !== '' && !groups.includes(control.value)) ||
+      (chips.length > 0 && chips.some(groupEntriesForbidden));
+    console.log(typeof control.value);
+    console.log(control.value);
+    console.log(chips);
     return forbidden ? { forbiddenGroup: { value: control.value } } : null;
   };
 }
 
-
 @Component({
-    selector: 'app-view-settings',
-    templateUrl: './view-settings.component.html',
-    styleUrls: ['./view-settings.component.css'],
-    imports: [MatSidenavContainer, MatTabGroup, MatTab, FormsModule, ReactiveFormsModule, MatFormField, MatLabel, MatInput, NgIf, MatError, MatSlideToggle, MatDivider, MatSelect, NgFor, MatOption, MatAutocompleteTrigger, MatAutocomplete, MatChipGrid, MatChipRow, MatIcon, MatChipRemove, MatChipInput, MatTooltip, MatButton, ViewEditComponent, AsyncPipe]
+  selector: 'app-view-settings',
+  templateUrl: './view-settings.component.html',
+  styleUrls: ['./view-settings.component.css'],
+  imports: [
+    MatSidenavContainer,
+    MatTabGroup,
+    MatTab,
+    FormsModule,
+    ReactiveFormsModule,
+    MatFormField,
+    MatLabel,
+    MatInput,
+    NgIf,
+    MatError,
+    MatSlideToggle,
+    MatDivider,
+    MatSelect,
+    NgFor,
+    MatOption,
+    MatAutocompleteTrigger,
+    MatAutocomplete,
+    MatChipGrid,
+    MatChipRow,
+    MatIcon,
+    MatChipRemove,
+    MatChipInput,
+    MatTooltip,
+    MatButton,
+    ViewEditComponent,
+    AsyncPipe,
+  ],
 })
 export class ViewSettingsComponent implements OnInit {
-
   sidenavOpened = true;
   sidenavOver = 'side';
   views: Views[] = [];
   viewFormGroup: UntypedFormGroup;
-
 
   selectedLocation: any;
   subscriptions: Subscription[] = [];
@@ -94,35 +137,35 @@ export class ViewSettingsComponent implements OnInit {
   saveMessage: string = '';
   formBuilder: UntypedFormBuilder;
 
-
   @ViewChild('accessGroupsInput') accessGroupsInput: ElementRef<HTMLInputElement>;
   @ViewChild('auto') matAutocomplete: MatAutocomplete;
 
-  constructor(public viewService: ViewsService,
+  constructor(
+    public viewService: ViewsService,
     fb: UntypedFormBuilder,
     private logbookService: LogbookInfoService,
     private userPreferences: UserPreferencesService,
     private logbookDataService: LogbookDataService,
-    private viewDataService: ViewDataService) {
+    private viewDataService: ViewDataService,
+  ) {
     this.formBuilder = fb;
-
   }
 
   ngOnInit(): void {
-    if (this.viewService.views.length > 0){
+    if (this.viewService.views.length > 0) {
       this.views = JSON.parse(JSON.stringify(this.viewService.views));
     }
     let indexToRemove = null;
     for (let index = 0; index < this.views.length; index++) {
-      if (this.views[index].name == this.views[index].ownerGroup + "_personal"){
+      if (this.views[index].name == this.views[index].ownerGroup + '_personal') {
         indexToRemove = index;
       }
     }
-    if (indexToRemove != null){
+    if (indexToRemove != null) {
       this.views.splice(indexToRemove, 1);
     }
 
-    this.logbook = this.logbookService.logbookInfo
+    this.logbook = this.logbookService.logbookInfo;
     this.getData();
 
     this.viewFormGroup = this.formBuilder.group({
@@ -135,27 +178,26 @@ export class ViewSettingsComponent implements OnInit {
       shareWithLocation: new UntypedFormControl({ value: false, disabled: true }),
       shareWithLogbook: new UntypedFormControl(false),
     });
-
   }
 
   async getData() {
-    
     let data = await this.logbookDataService.getLocations();
-    if (typeof data[0].subsnippets != "undefined"){
+    if (typeof data[0].subsnippets != 'undefined') {
       this.availLocations = data[0].subsnippets;
-      this.availLocations.forEach(loc => {
+      this.availLocations.forEach((loc) => {
         if (loc.id == this.logbook.location) {
           this.currentLocation = loc;
-          this.userPreferences.userInfo.roles.forEach(role => {
+          this.userPreferences.userInfo.roles.forEach((role) => {
             if (role == this.currentLocation.ownerGroup) {
-              this.viewFormGroup.get("shareWithLocation").setValue({ value: false, disabled: false });
+              this.viewFormGroup
+                .get('shareWithLocation')
+                .setValue({ value: false, disabled: false });
             }
-          })
+          });
         }
-      })
+      });
       this.setDefaults();
     }
-
   }
 
   setDefaults() {
@@ -164,22 +206,39 @@ export class ViewSettingsComponent implements OnInit {
     this.accessGroupsSelected = [];
     this.viewFormGroup.get('location').setValue(this.currentLocation.id);
     this.accessGroupsAvail = this.userPreferences.userInfo?.roles;
-    this.filteredAccessGroups = this.viewFormGroup.get('accessGroupsCtrl').valueChanges.pipe(startWith(null), map((accessGroup: string | null) => accessGroup ? this._filter(accessGroup) : this.accessGroupsAvail.slice()));
-    
-    this.viewFormGroup.get('name').setValidators([Validators.required, existingNameValidator(this.views), forbiddenNameValidator(/_personal/i)])
-    this.viewFormGroup.get('accessGroupsCtrl').setValidators([accessGroupsMemberValidator(this.accessGroupsAvail, this.accessGroupsSelected)]);
-    this.viewFormGroup.get('ownerGroup').setValidators([Validators.required, ownerGroupMemberValidator(this.accessGroupsAvail)]);
+    this.filteredAccessGroups = this.viewFormGroup.get('accessGroupsCtrl').valueChanges.pipe(
+      startWith(null),
+      map((accessGroup: string | null) =>
+        accessGroup ? this._filter(accessGroup) : this.accessGroupsAvail.slice(),
+      ),
+    );
+
+    this.viewFormGroup
+      .get('name')
+      .setValidators([
+        Validators.required,
+        existingNameValidator(this.views),
+        forbiddenNameValidator(/_personal/i),
+      ]);
+    this.viewFormGroup
+      .get('accessGroupsCtrl')
+      .setValidators([
+        accessGroupsMemberValidator(this.accessGroupsAvail, this.accessGroupsSelected),
+      ]);
+    this.viewFormGroup
+      .get('ownerGroup')
+      .setValidators([Validators.required, ownerGroupMemberValidator(this.accessGroupsAvail)]);
     this.viewFormGroup.get('name').updateValueAndValidity();
   }
 
   selectLocation(id: any) {
-    console.log("locationId:", id.value);
-    this.availLocations.forEach(loc => {
+    console.log('locationId:', id.value);
+    this.availLocations.forEach((loc) => {
       if (loc.id == id.value) {
         this.selectedLocation = loc;
         console.log(this.selectedLocation);
       }
-    })
+    });
   }
 
   addAccessGroup(event: MatChipInputEvent): void {
@@ -217,56 +276,55 @@ export class ViewSettingsComponent implements OnInit {
   private _filter(value: string): string[] {
     const filterValue = value.toLowerCase();
 
-    return this.accessGroupsAvail.filter(accessGroup => accessGroup.toLowerCase().indexOf(filterValue) === 0);
+    return this.accessGroupsAvail.filter(
+      (accessGroup) => accessGroup.toLowerCase().indexOf(filterValue) === 0,
+    );
   }
 
   shareWithLogbookSlide() {
-    console.log("change");
-    console.log(this.viewFormGroup.get('shareWithLogbook'))
-    if (this.viewFormGroup.get('shareWithLogbook').value){
+    console.log('change');
+    console.log(this.viewFormGroup.get('shareWithLogbook'));
+    if (this.viewFormGroup.get('shareWithLogbook').value) {
       this.viewFormGroup.get('ownerGroup').setValue(this.logbook.ownerGroup);
     } else {
       this.viewFormGroup.get('ownerGroup').setValue(this.userPreferences.userInfo.username);
       this.viewFormGroup.get('accessGroupsCtrl').setValue('');
     }
-
   }
 
   shareWithLocationSlide($event) {
-    if (this.viewFormGroup.get('shareWithLocation').value){
-      this.viewFormGroup.get('shareWithLogbook').setValue(true)
+    if (this.viewFormGroup.get('shareWithLocation').value) {
+      this.viewFormGroup.get('shareWithLogbook').setValue(true);
       this.viewFormGroup.get('ownerGroup').setValue(this.currentLocation.ownerGroup);
       this.viewFormGroup.get('accessGroupsCtrl').setValue(this.currentLocation.accessGroups);
     } else {
       this.shareWithLogbookSlide();
     }
-
   }
 
   async saveLogbook() {
-    console.log(this.viewFormGroup.get('shareWithLogbook'))
+    console.log(this.viewFormGroup.get('shareWithLogbook'));
     let payload: Views = {
       name: this.viewFormGroup.get('name').value,
       location: this.viewFormGroup.get('location').value,
       ownerGroup: this.viewFormGroup.get('ownerGroup').value,
       accessGroups: this.accessGroupsSelected,
-      snippetType: "view",
-      configuration: this.viewService.view.configuration
-    }
-    if (payload.ownerGroup == this.currentLocation.ownerGroup){
+      snippetType: 'view',
+      configuration: this.viewService.view.configuration,
+    };
+    if (payload.ownerGroup == this.currentLocation.ownerGroup) {
       payload.parentId = this.currentLocation.id;
     } else {
       payload.parentId = this.logbook.id;
     }
     let data = await this.viewDataService.postView(payload);
-    console.log(payload)
+    console.log(payload);
     console.log(data);
-    console.log(this.viewService.view)
+    console.log(this.viewService.view);
     this.showSaveMessage = true;
     this.saveMessage = 'Saved successfully';
     setTimeout(() => {
       this.showSaveMessage = false;
-    }, 5000)
+    }, 5000);
   }
-
 }

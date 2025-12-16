@@ -1,5 +1,25 @@
-import { Component, EventEmitter, Input, OnInit, Output, ViewChild, AfterViewInit } from '@angular/core';
-import { MatTableDataSource, MatTable, MatColumnDef, MatHeaderCellDef, MatHeaderCell, MatCellDef, MatCell, MatHeaderRowDef, MatHeaderRow, MatRowDef, MatRow } from '@angular/material/table';
+import {
+  Component,
+  EventEmitter,
+  Input,
+  OnInit,
+  Output,
+  ViewChild,
+  AfterViewInit,
+} from '@angular/core';
+import {
+  MatTableDataSource,
+  MatTable,
+  MatColumnDef,
+  MatHeaderCellDef,
+  MatHeaderCell,
+  MatCellDef,
+  MatCell,
+  MatHeaderRowDef,
+  MatHeaderRow,
+  MatRowDef,
+  MatRow,
+} from '@angular/material/table';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatSort, MatSortHeader } from '@angular/material/sort';
 import { CdkDragDrop, moveItemInArray, CdkDropList, CdkDrag } from '@angular/cdk/drag-drop';
@@ -11,13 +31,30 @@ import { ActionsMenuComponent } from '../actions-menu/actions-menu.component';
 import { DatePipe } from '@angular/common';
 
 @Component({
-    selector: 'app-overview-table',
-    templateUrl: './overview-table.component.html',
-    styleUrls: ['./overview-table.component.scss'],
-    imports: [MatTable, MatSort, CdkDropList, MatColumnDef, MatHeaderCellDef, MatHeaderCell, CdkDrag, MatSortHeader, MatCellDef, MatCell, ActionsMenuComponent, MatHeaderRowDef, MatHeaderRow, MatRowDef, MatRow, MatPaginator, DatePipe]
+  selector: 'app-overview-table',
+  templateUrl: './overview-table.component.html',
+  styleUrls: ['./overview-table.component.scss'],
+  imports: [
+    MatTable,
+    MatSort,
+    CdkDropList,
+    MatColumnDef,
+    MatHeaderCellDef,
+    MatHeaderCell,
+    CdkDrag,
+    MatSortHeader,
+    MatCellDef,
+    MatCell,
+    ActionsMenuComponent,
+    MatHeaderRowDef,
+    MatHeaderRow,
+    MatRowDef,
+    MatRow,
+    MatPaginator,
+    DatePipe,
+  ],
 })
 export class OverviewTableComponent implements OnInit, AfterViewInit {
-
   @Input() config: WidgetItemConfig;
 
   @Output() logbookEdit = new EventEmitter<Logbooks>();
@@ -28,7 +65,15 @@ export class OverviewTableComponent implements OnInit, AfterViewInit {
 
   dataSource: MatTableDataSource<Logbooks>;
   totalItems: number;
-  displayedColumns = ['name', 'description', 'ownerGroup', 'touchedAt', 'createdAt', 'thumbnail', 'actions'];
+  displayedColumns = [
+    'name',
+    'description',
+    'ownerGroup',
+    'touchedAt',
+    'createdAt',
+    'thumbnail',
+    'actions',
+  ];
   private _config: WidgetItemConfig;
   isLoaded: boolean;
 
@@ -48,9 +93,11 @@ export class OverviewTableComponent implements OnInit, AfterViewInit {
 
   onSortChange(): void {
     this.paginator.pageIndex = 0;
-    this._config.view.order = [`${this.sort.active || 'defaultOrder'} ${this.sort.direction || 'DESC'}`];
+    this._config.view.order = [
+      `${this.sort.active || 'defaultOrder'} ${this.sort.direction || 'DESC'}`,
+    ];
     this.getLogbooks();
-  };
+  }
 
   onPageChange(): void {
     this.getLogbooks();
@@ -62,7 +109,11 @@ export class OverviewTableComponent implements OnInit, AfterViewInit {
 
   async getLogbooks() {
     this.isLoaded = false;
-    const data = await this.dataService.getDataBuffer(this.paginator.pageIndex * this.paginator.pageSize, this.paginator.pageSize, this._config);
+    const data = await this.dataService.getDataBuffer(
+      this.paginator.pageIndex * this.paginator.pageSize,
+      this.paginator.pageSize,
+      this._config,
+    );
     this.isLoaded = true;
     this.dataSource = new MatTableDataSource<Logbooks>(data);
   }
@@ -108,5 +159,4 @@ export class OverviewTableComponent implements OnInit, AfterViewInit {
   logbookSelected(logbookId: string) {
     this.logbookSelection.emit(logbookId);
   }
-
 }

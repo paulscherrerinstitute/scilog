@@ -8,35 +8,33 @@ import { ViewsService } from '@shared/views.service';
 import { of } from 'rxjs';
 
 class ViewsServiceMock {
-  currentWidgetConfigs = of([{config: {filter: {targetId: 1}}}]);
-
+  currentWidgetConfigs = of([{ config: { filter: { targetId: 1 } } }]);
 }
 
 describe('SnippetViewerComponent', () => {
   let component: SnippetViewerComponent;
   let fixture: ComponentFixture<SnippetViewerComponent>;
-  let logbookInfoSpy:any;
-  let snippetViewerDataSpy:any;
-  let changestreamSpy:any;
+  let logbookInfoSpy: any;
+  let snippetViewerDataSpy: any;
+  let changestreamSpy: any;
 
-  logbookInfoSpy = jasmine.createSpyObj("LogbookInfoService", ["logbookInfo", "getAvailLogbooks"]);
+  logbookInfoSpy = jasmine.createSpyObj('LogbookInfoService', ['logbookInfo', 'getAvailLogbooks']);
   logbookInfoSpy.logbookInfo.and.returnValue([]);
-  snippetViewerDataSpy = jasmine.createSpyObj("SnippetViewerDataService", ["getSnippetViewerData"]);
+  snippetViewerDataSpy = jasmine.createSpyObj('SnippetViewerDataService', ['getSnippetViewerData']);
 
-  changestreamSpy = jasmine.createSpyObj("ChangeStreamService", ["getNotification"]);
+  changestreamSpy = jasmine.createSpyObj('ChangeStreamService', ['getNotification']);
   changestreamSpy.getNotification.and.returnValue(of({}));
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-    imports: [SnippetViewerComponent],
-    providers: [
+      imports: [SnippetViewerComponent],
+      providers: [
         { provide: LogbookInfoService, useValue: logbookInfoSpy },
         { provide: ViewsService, useClass: ViewsServiceMock },
         { provide: SnippetViewerDataService, useValue: snippetViewerDataSpy },
         { provide: ChangeStreamService, useValue: changestreamSpy },
-    ]
-})
-    .compileComponents();
+      ],
+    }).compileComponents();
   }));
 
   beforeEach(() => {
@@ -47,7 +45,9 @@ describe('SnippetViewerComponent', () => {
   });
 
   it('should get data from dataService', () => {
-    expect(snippetViewerDataSpy.getSnippetViewerData).toHaveBeenCalledWith(component.config.filter.targetId);
+    expect(snippetViewerDataSpy.getSnippetViewerData).toHaveBeenCalledWith(
+      component.config.filter.targetId,
+    );
   });
 
   it('should create', () => {

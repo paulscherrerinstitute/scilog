@@ -15,13 +15,17 @@ describe('LoginComponent', () => {
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-    imports: [RouterTestingModule, LoginComponent],
-    providers: [UntypedFormBuilder, {
-            provide: AppConfigService,
-            useValue: { getConfig },
-        }, provideHttpClient(withInterceptorsFromDi()), provideHttpClientTesting(),]
-})
-    .compileComponents();
+      imports: [RouterTestingModule, LoginComponent],
+      providers: [
+        UntypedFormBuilder,
+        {
+          provide: AppConfigService,
+          useValue: { getConfig },
+        },
+        provideHttpClient(withInterceptorsFromDi()),
+        provideHttpClientTesting(),
+      ],
+    }).compileComponents();
   }));
 
   beforeEach(() => {
@@ -34,23 +38,22 @@ describe('LoginComponent', () => {
     expect(component).toBeTruthy();
   });
 
-  it("should not display OAuth2 provider", () => {
+  it('should not display OAuth2 provider', () => {
     const compiled = fixture.debugElement.nativeElement;
-    expect(compiled.querySelector("oauth-login-button")).toBeFalsy();
+    expect(compiled.querySelector('oauth-login-button')).toBeFalsy();
   });
-  it("should display OAuth2 provider", () => {
+  it('should display OAuth2 provider', () => {
     const endpoint: Oauth2Endpoint = {
-      displayText: "oauth provider",
-      authURL: "/auth/foo",
+      displayText: 'oauth provider',
+      authURL: '/auth/foo',
     };
     component.appConfig.oAuth2Endpoint = endpoint;
-    const dispatchSpy = spyOn(component, "redirectOIDC");
+    const dispatchSpy = spyOn(component, 'redirectOIDC');
     console.log(`!!!!!     ${component.document.location.href}`);
-    component.redirectOIDC("/auth/foo");
+    component.redirectOIDC('/auth/foo');
 
     expect(dispatchSpy).toHaveBeenCalledTimes(1);
-    expect(dispatchSpy).toHaveBeenCalledWith("/auth/foo");
+    expect(dispatchSpy).toHaveBeenCalledWith('/auth/foo');
     console.log(`!!!!!     ${component.document.location.href}`);
   });
-
 });

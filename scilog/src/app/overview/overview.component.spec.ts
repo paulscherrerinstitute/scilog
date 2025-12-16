@@ -19,9 +19,8 @@ import { provideRouter } from '@angular/router';
 
 class UserPreferencesMock {
   userInfo = {
-    roles: ["roles"]
-
-  }
+    roles: ['roles'],
+  };
   currentCollectionsConfig = of({});
 }
 
@@ -36,31 +35,32 @@ class OverviewScrollStubComponent {
 describe('OverviewComponent', () => {
   let component: OverviewComponent;
   let fixture: ComponentFixture<OverviewComponent>;
-  let logbookInfoSpy:any;
-  let logbookDataSpy:any;
-  let cookiesSpy:any;
+  let logbookInfoSpy: any;
+  let logbookDataSpy: any;
+  let cookiesSpy: any;
 
-
-  logbookInfoSpy = jasmine.createSpyObj("LogbookInfoService", ["logbookInfo", "getAvailLogbooks"]);
+  logbookInfoSpy = jasmine.createSpyObj('LogbookInfoService', ['logbookInfo', 'getAvailLogbooks']);
   logbookInfoSpy.logbookInfo.and.returnValue([]);
 
-  logbookDataSpy = jasmine.createSpyObj("LogbookDataService", ["deleteLogbook"]);
+  logbookDataSpy = jasmine.createSpyObj('LogbookDataService', ['deleteLogbook']);
   logbookDataSpy.deleteLogbook.and.returnValue(of({}));
 
-  cookiesSpy = jasmine.createSpyObj("CookieService", ["lastLogbook"]);
+  cookiesSpy = jasmine.createSpyObj('CookieService', ['lastLogbook']);
   cookiesSpy.lastLogbook.and.returnValue([]);
-  const tableSpy = jasmine.createSpyObj("OverviewTableComponent", ['reloadLogbooks', 'afterLogbookEdit']);
-  const scrollSpy = jasmine.createSpyObj("OverviewScrollComponent", ['reloadLogbooks', 'afterLogbookEdit']);
+  const tableSpy = jasmine.createSpyObj('OverviewTableComponent', [
+    'reloadLogbooks',
+    'afterLogbookEdit',
+  ]);
+  const scrollSpy = jasmine.createSpyObj('OverviewScrollComponent', [
+    'reloadLogbooks',
+    'afterLogbookEdit',
+  ]);
 
   const returnEmpty = () => ({});
-  
+
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      imports: [
-        MatDialogModule,
-        BrowserAnimationsModule,
-        OverviewComponent,
-      ],
+      imports: [MatDialogModule, BrowserAnimationsModule, OverviewComponent],
       providers: [
         { provide: MAT_DIALOG_DATA, useValue: {} },
         { provide: LogbookInfoService, useValue: logbookInfoSpy },
@@ -71,7 +71,7 @@ describe('OverviewComponent', () => {
           provide: AppConfigService,
           useValue: { getConfig: returnEmpty, getScicatSettings: returnEmpty },
         },
-        provideRouter([{path: '', component: ToolbarStubComponent}]),
+        provideRouter([{ path: '', component: ToolbarStubComponent }]),
         provideHttpClient(withInterceptorsFromDi()),
         provideHttpClientTesting(),
       ],
@@ -104,7 +104,7 @@ describe('OverviewComponent', () => {
     it(`should test reloadData ${i}`, async () => {
       t[1].calls.reset();
       component.matCardType = t[0];
-      await component['reloadData']({id: '1'}, t[2]);
+      await component['reloadData']({ id: '1' }, t[2]);
       expect(t[1]).toHaveBeenCalledTimes(1);
     });
   });
@@ -120,5 +120,4 @@ describe('OverviewComponent', () => {
       expect(t[1].reloadLogbooks).toHaveBeenCalledOnceWith(true, 'abc');
     });
   });
-
 });

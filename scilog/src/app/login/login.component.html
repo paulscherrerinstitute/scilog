@@ -1,44 +1,65 @@
 <div class="background-image"></div>
 <div class="login-form-flex">
-  <mat-card appearance="raised" class='card'>
-
+  <mat-card appearance="raised" class="card">
     <mat-card-title class="card-title">
-      <img mat-card-image src="assets/scilog_logo.png" alt="SciLog" width="120" height="120">
+      <img mat-card-image src="assets/scilog_logo.png" alt="SciLog" width="120" height="120" />
     </mat-card-title>
     <mat-card-content>
       <mat-tab-group mat-align-tabs="center" dynamicHeight="true">
-        <mat-tab label="{{oAuth2Endpoint.displayText}}" *ngIf="oAuth2Endpoint">
+        <mat-tab label="{{ oAuth2Endpoint.displayText }}" *ngIf="oAuth2Endpoint">
           <ng-template mat-tab-label>
-            <label matTooltip="{{ oAuth2Endpoint.tooltipText }}" matTooltipClass="example-tooltip-red1" [matTooltipPosition]="'above'">
-              {{oAuth2Endpoint.displayText}}
+            <label
+              matTooltip="{{ oAuth2Endpoint.tooltipText }}"
+              matTooltipClass="example-tooltip-red1"
+              [matTooltipPosition]="'above'"
+            >
+              {{ oAuth2Endpoint.displayText }}
             </label>
           </ng-template>
-          <div style="padding: 20px;">
-            <button class="oauth-login-button" mat-raised-button type="submit" color="primary"
-              (click)=" redirectOIDC(oAuth2Endpoint.authURL)">
-              <img class="oauth-login-image" *ngIf="oAuth2Endpoint.displayImage" [src]="oAuth2Endpoint.displayImage" />
+          <div style="padding: 20px">
+            <button
+              class="oauth-login-button"
+              mat-raised-button
+              type="submit"
+              color="primary"
+              (click)="redirectOIDC(oAuth2Endpoint.authURL)"
+            >
+              <img
+                class="oauth-login-image"
+                *ngIf="oAuth2Endpoint.displayImage"
+                [src]="oAuth2Endpoint.displayImage"
+              />
               Login
             </button>
           </div>
         </mat-tab>
         <mat-tab label="Admin">
           <ng-template mat-tab-label>
-            <label matTooltip="Login with functional or admin accounts." matTooltipClass="example-tooltip-red1" [matTooltipPosition]="'above'">
+            <label
+              matTooltip="Login with functional or admin accounts."
+              matTooltipClass="example-tooltip-red1"
+              [matTooltipPosition]="'above'"
+            >
               Admin
             </label>
           </ng-template>
-          <form [formGroup]="form" (keyup.enter)="login()" style="padding-top: 20px;">
+          <form [formGroup]="form" (keyup.enter)="login()" style="padding-top: 20px">
             <mat-form-field appearance="outline" class="form-field">
               <mat-label>User name</mat-label>
-              <input matInput [type]="'text'" formControlName="email">
+              <input matInput [type]="'text'" formControlName="email" />
             </mat-form-field>
             <br />
             <mat-form-field appearance="outline" class="form-field">
               <mat-label>Enter your password</mat-label>
-              <input matInput [type]="hide ? 'password' : 'text'" formControlName="password">
-              <button mat-icon-button matSuffix (mousedown)="hide = !hide" [attr.aria-label]="'Hide password'"
-                [attr.aria-pressed]="hide">
-                <mat-icon>{{hide ? 'visibility_off' : 'visibility'}}</mat-icon>
+              <input matInput [type]="hide ? 'password' : 'text'" formControlName="password" />
+              <button
+                mat-icon-button
+                matSuffix
+                (mousedown)="hide = !hide"
+                [attr.aria-label]="'Hide password'"
+                [attr.aria-pressed]="hide"
+              >
+                <mat-icon>{{ hide ? 'visibility_off' : 'visibility' }}</mat-icon>
               </button>
             </mat-form-field>
             <div class="errorText">

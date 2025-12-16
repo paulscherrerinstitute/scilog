@@ -4,10 +4,10 @@
 }
 
 .logbook-module .mat-mdc-card-content {
-    padding: 15px;
-    height: 170px;
-    overflow-y: scroll;
-    scrollbar-width: none;
+  padding: 15px;
+  height: 170px;
+  overflow-y: scroll;
+  scrollbar-width: none;
 }
 
 :host ::ng-deep .mat-mdc-card-header-text {
@@ -49,11 +49,14 @@
 .logbook-module mat-divider {
   position: absolute;
   bottom: 50px;
-  width: 100%;;
+  width: 100%;
 }
 
 .logbook-module img {
   max-width: 250px;
   height: 80px;
-  box-shadow: 0 1px 4px 0 rgba(0, 0, 0, .2), 0 2px 8px 0 rgba(0, 0, 0, .14), 0 4px 8px -1px rgba(0, 0, 0, .12);
+  box-shadow:
+    0 1px 4px 0 rgba(0, 0, 0, 0.2),
+    0 2px 8px 0 rgba(0, 0, 0, 0.14),
+    0 4px 8px -1px rgba(0, 0, 0, 0.12);
 }

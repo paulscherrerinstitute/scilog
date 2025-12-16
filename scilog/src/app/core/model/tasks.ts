@@ -1,6 +1,6 @@
-import { Basesnippets } from "./basesnippets";
+import { Basesnippets } from './basesnippets';
 
-export interface Tasks extends Basesnippets{
-    content: string,
-    isDone: boolean
+export interface Tasks extends Basesnippets {
+  content: string;
+  isDone: boolean;
 }

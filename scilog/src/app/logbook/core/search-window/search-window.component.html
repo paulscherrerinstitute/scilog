@@ -1,54 +1,65 @@
-<div class='windowContainer'>
-    <div class='searchBarTop'>
-        <span class="searchInput">
-            <mat-form-field *ngIf="searchStringFromConfig" class="searchConfigField">
-                <input matInput class="searchConfig" 
-                    [ngModel]="searchStringFromConfig" disabled="true" 
-                    matTooltip="Remove from widget preferences">
-            </mat-form-field>
-            <mat-form-field subscriptSizing="dynamic">
-                <input placeholder="Search" #searchSnippets matInput type="text" [(ngModel)]="searchString">
-            </mat-form-field>
+<div class="windowContainer">
+  <div class="searchBarTop">
+    <span class="searchInput">
+      <mat-form-field *ngIf="searchStringFromConfig" class="searchConfigField">
+        <input
+          matInput
+          class="searchConfig"
+          [ngModel]="searchStringFromConfig"
+          disabled="true"
+          matTooltip="Remove from widget preferences"
+        />
+      </mat-form-field>
+      <mat-form-field subscriptSizing="dynamic">
+        <input
+          placeholder="Search"
+          #searchSnippets
+          matInput
+          type="text"
+          [(ngModel)]="searchString"
+        />
+      </mat-form-field>
+    </span>
+    <span>
+      <button mat-icon-button (click)="submitSearch()">
+        <mat-icon>search</mat-icon>
+      </button>
+      <button mat-icon-button (click)="closeSearch()">
+        <mat-icon>close</mat-icon>
+      </button>
+    </span>
+  </div>
+  <app-search *ngIf="logbookId && searched" [config]="config" (closed)="closeSearch()"></app-search>
+  <div class="searchHelp" *ngIf="!logbookId || !searched">
+    <mat-divider></mat-divider>
+    <div class="header">
+      Suggestions...
+      <div>
+        Created by (prepend "-" to negate):
+        <button class="suggestion-button" (click)="addToSearch('@' + _sample_user)">
+          &#64;{{ _sample_user }}
+        </button>
+      </div>
+      <div *ngIf="tags[0]">
+        Tag (prepend "-" to negate):
+        <span *ngFor="let tag of tags.slice(0, 3)">
+          <button class="suggestion-button" (click)="addToSearch('#' + tag)">#{{ tag }}</button>
         </span>
-        <span>
-            <button mat-icon-button (click)="submitSearch()">
-                <mat-icon>search</mat-icon>
-            </button>
-            <button mat-icon-button (click)="closeSearch()">
-                <mat-icon>close</mat-icon>
-            </button>
-        </span>
-
-    </div>
-    <app-search *ngIf="logbookId && searched" [config]="config" (closed)="closeSearch()"></app-search>
-    <div class="searchHelp" *ngIf="!logbookId || !searched ">
-        <mat-divider></mat-divider>
-        <div class="header">
-            Suggestions...
-            <div>
-                Created by (prepend "-" to negate):
-                <button class="suggestion-button" (click)="addToSearch('@' + _sample_user)">
-                    &#64;{{_sample_user}}
-                </button>
-            </div>
-            <div *ngIf="tags[0]">
-                Tag (prepend "-" to negate):
-                <span *ngFor="let tag of tags.slice(0,3)">
-                    <button class="suggestion-button" (click)="addToSearch('#' + tag)">
-                        #{{tag}}
-                    </button>
-                </span>
-            </div>
-        <mat-divider></mat-divider>
-        <div class="header">
-            Examples:
-            <div>
-                Search everywhere for entries created by "{{_sample_user}}" that contain the word "alignment" {{tags[0]? "and have a tag \"" + tags[0] + "\"": ""}}:
-                <button class="suggestion-button" (click)="addToSearch('#' + tags[0] + ' @' + _sample_user + ' alignment')">
-                    {{tags[0]? "#" + tags[0]: ""}} &#64;{{_sample_user}} alignment
-                </button>
-            </div>
+      </div>
+      <mat-divider></mat-divider>
+      <div class="header">
+        Examples:
+        <div>
+          Search everywhere for entries created by "{{ _sample_user }}" that contain the word
+          "alignment" {{ tags[0] ? 'and have a tag "' + tags[0] + '"' : '' }}:
+          <button
+            class="suggestion-button"
+            (click)="addToSearch('#' + tags[0] + ' @' + _sample_user + ' alignment')"
+          >
+            {{ tags[0] ? '#' + tags[0] : '' }} &#64;{{ _sample_user }} alignment
+          </button>
         </div>
-
+      </div>
     </div>
+  </div>
 </div>

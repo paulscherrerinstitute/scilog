@@ -1,17 +1,8 @@
-import {
-  enableProdMode,
-  provideAppInitializer,
-  inject,
-  importProvidersFrom,
-} from '@angular/core';
+import { enableProdMode, provideAppInitializer, inject, importProvidersFrom } from '@angular/core';
 
 import { environment } from './environments/environment';
 import { AppConfigService } from './app/app-config.service';
-import {
-  HTTP_INTERCEPTORS,
-  provideHttpClient,
-  withInterceptorsFromDi,
-} from '@angular/common/http';
+import { HTTP_INTERCEPTORS, provideHttpClient, withInterceptorsFromDi } from '@angular/common/http';
 import { AuthInterceptor } from '@shared/auth-services/auth.interceptor';
 import { AuthService } from '@shared/auth-services/auth.service';
 import { Router } from '@angular/router';

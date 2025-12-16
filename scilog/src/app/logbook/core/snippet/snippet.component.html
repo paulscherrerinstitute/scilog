@@ -1,14 +1,27 @@
-<mat-card appearance="raised" #snippetContainer [ngClass]="styleClass" (click)="selectSnippet($event)" [@highlightSnippet]="highlightState">
+<mat-card
+  appearance="raised"
+  #snippetContainer
+  [ngClass]="styleClass"
+  (click)="selectSnippet($event)"
+  [@highlightSnippet]="highlightState"
+>
   <!-- [ngStyle]="{'border':isSelected ? '2px solid #26677a' : '2px solid #ffffff' }"> -->
   <mat-icon class="mat-fab-top-right-star" *ngIf="isHighlighted">star</mat-icon>
   <!-- <mat-icon class="mat-fab-top-right-user" *ngIf="!enableEdit" matTooltip="Another user is currently editing this snippet.">account_circle</mat-icon> -->
-  <svg class="mat-fab-top-right-user" [data-jdenticon-value]="avatarHash"
+  <svg
+    class="mat-fab-top-right-user"
+    [data-jdenticon-value]="avatarHash"
     *ngIf="snippetIsAccessedByAnotherUser && !snippet.isMessage"
-    matTooltip="Another user is currently editing this snippet."></svg>
+    matTooltip="Another user is currently editing this snippet."
+  ></svg>
   <!-- <svg class="mat-fab-top-right-user" [data-jdenticon-value]="avatarHash" *ngIf="snippet.isMessage" [matTooltip]="snippet.updatedBy"></svg> -->
   <ng-container *ngIf="showEditButtonsMenu">
-    <button mat-icon-button [matMenuTriggerFor]="menu" aria-label="Example icon-button with a menu"
-      class="mat-fab-top-right">
+    <button
+      mat-icon-button
+      [matMenuTriggerFor]="menu"
+      aria-label="Example icon-button with a menu"
+      class="mat-fab-top-right"
+    >
       <mat-icon>more_vert</mat-icon>
     </button>
     <mat-menu #menu="matMenu">
@@ -16,11 +29,22 @@
         <mat-icon>info</mat-icon>
         <span>Info</span>
       </button>
-      <button mat-menu-item (click)="editSnippet()" [disabled]="!enableEdit.update" *ngIf="showEditButtons" matTooltip="{{ isActionAllowed.tooltips.update }}">
+      <button
+        mat-menu-item
+        (click)="editSnippet()"
+        [disabled]="!enableEdit.update"
+        *ngIf="showEditButtons"
+        matTooltip="{{ isActionAllowed.tooltips.update }}"
+      >
         <mat-icon>edit</mat-icon>
         <span>Edit</span>
       </button>
-      <button mat-menu-item (click)="setDashboardName()" [disabled]="!enableEdit.update" matTooltip="{{ isActionAllowed.tooltips.update }}">
+      <button
+        mat-menu-item
+        (click)="setDashboardName()"
+        [disabled]="!enableEdit.update"
+        matTooltip="{{ isActionAllowed.tooltips.update }}"
+      >
         <mat-icon>assistant</mat-icon>
         <span>Dashboard name</span>
       </button>
@@ -33,14 +57,18 @@
         <span>Reply</span>
       </button>
       <!-- <button mat-menu-item disabled> -->
-      <button mat-menu-item (click)="deleteSnippet()" [disabled]="!enableEdit.delete" matTooltip="{{ isActionAllowed.tooltips.delete }}"
-        *ngIf="showEditButtons">
+      <button
+        mat-menu-item
+        (click)="deleteSnippet()"
+        [disabled]="!enableEdit.delete"
+        matTooltip="{{ isActionAllowed.tooltips.delete }}"
+        *ngIf="showEditButtons"
+      >
         <mat-icon>delete</mat-icon>
         <span>Delete</span>
       </button>
     </mat-menu>
   </ng-container>
-
 
   <!-- <button mat-mini-fab color="primary" aria-label="Example icon button with a menu icon" class="mat-fab-top-right">
             <mat-icon>menu</mat-icon>
@@ -56,18 +84,27 @@
 
   <span *ngIf="snippet.isMessage" class="card-header">
     <span>
-      <svg class='message-avatar' [data-jdenticon-value]="avatarHash" [matTooltip]="snippet.updatedBy"></svg>
+      <svg
+        class="message-avatar"
+        [data-jdenticon-value]="avatarHash"
+        [matTooltip]="snippet.updatedBy"
+      ></svg>
     </span>
 
     <span class="message-timestamp">
-      {{ snippet.createdAt | date:'medium' }}
+      {{ snippet.createdAt | date: 'medium' }}
     </span>
   </span>
 
   <mat-card-content class="card-content">
     <div *ngFor="let snippet of snippet?.subsnippets; let i = index">
-      <ng-container *ngIf="snippet?.linkType==='quote'">
-        <app-snippet [snippet]="snippet" [updatedAt]="snippet?.updatedAt" [index]=i [hideMetadata]='hideMetadata'></app-snippet>
+      <ng-container *ngIf="snippet?.linkType === 'quote'">
+        <app-snippet
+          [snippet]="snippet"
+          [updatedAt]="snippet?.updatedAt"
+          [index]="i"
+          [hideMetadata]="hideMetadata"
+        ></app-snippet>
       </ng-container>
     </div>
     <!-- <div *ngIf="snippet.quote">
@@ -75,24 +112,32 @@
     </div> -->
     <!-- {{index}} -->
     <span class="snippet-header" *ngIf="config.view.showSnippetHeader">
-      {{indexOrdered}} / {{ snippet.createdAt | date:'medium' }} / {{snippet.createdBy}}
+      {{ indexOrdered }} / {{ snippet.createdAt | date: 'medium' }} / {{ snippet.createdBy }}
     </span>
-    <app-snippet-content #snippetContent [snippet]='snippet' (htmlContent)="updateHtmlContent($event)"
-      (isLoading)="setElementLoading($event)">
+    <app-snippet-content
+      #snippetContent
+      [snippet]="snippet"
+      (htmlContent)="updateHtmlContent($event)"
+      (isLoading)="setElementLoading($event)"
+    >
     </app-snippet-content>
     <div class="snippet-tags-container" *ngIf="!_hideMetadata">
       <span class="snippet-tag" *ngFor="let tag of snippet?.tags">
         {{ tag }}
       </span>
     </div>
-
   </mat-card-content>
-
 </mat-card>
 
 <div *ngFor="let snippet of snippet?.subsnippets; let i = index">
-  <ng-container *ngIf="snippet.linkType!=='quote' && snippet.snippetType === 'paragraph'">
-    <app-snippet [snippet]="snippet" [updatedAt]="snippet.updatedAt" [index]=i [config]="config"
-      [hideMetadata]='hideMetadata' [subsnippets]="snippet.subsnippets"></app-snippet>
+  <ng-container *ngIf="snippet.linkType !== 'quote' && snippet.snippetType === 'paragraph'">
+    <app-snippet
+      [snippet]="snippet"
+      [updatedAt]="snippet.updatedAt"
+      [index]="i"
+      [config]="config"
+      [hideMetadata]="hideMetadata"
+      [subsnippets]="snippet.subsnippets"
+    ></app-snippet>
   </ng-container>
 </div>

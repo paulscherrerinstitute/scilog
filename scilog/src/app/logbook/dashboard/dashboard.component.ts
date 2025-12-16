@@ -1,5 +1,12 @@
 import { Component, HostListener, OnInit, OnDestroy } from '@angular/core';
-import { CompactType, DisplayGrid, GridsterConfig, GridsterItemComponent, GridType, GridsterComponent } from 'angular-gridster2';
+import {
+  CompactType,
+  DisplayGrid,
+  GridsterConfig,
+  GridsterItemComponent,
+  GridType,
+  GridsterComponent,
+} from 'angular-gridster2';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Subscription } from 'rxjs';
 import { ViewsService } from '@shared/views.service';
@@ -14,14 +21,26 @@ import { MatIcon } from '@angular/material/icon';
 import { DashboardItemComponent } from './dashboard-item/dashboard-item.component';
 
 @Component({
-    selector: 'app-dashboard',
-    templateUrl: './dashboard.component.html',
-    styleUrls: ['./dashboard.component.scss'],
-    imports: [ResizedDirective, NgIf, MatIconButton, MatTooltip, MatIcon, MatButton, NgStyle, GridsterComponent, NgClass, NgFor, GridsterItemComponent, DashboardItemComponent, MatMiniFabButton]
+  selector: 'app-dashboard',
+  templateUrl: './dashboard.component.html',
+  styleUrls: ['./dashboard.component.scss'],
+  imports: [
+    ResizedDirective,
+    NgIf,
+    MatIconButton,
+    MatTooltip,
+    MatIcon,
+    MatButton,
+    NgStyle,
+    GridsterComponent,
+    NgClass,
+    NgFor,
+    GridsterItemComponent,
+    DashboardItemComponent,
+    MatMiniFabButton,
+  ],
 })
 export class DashboardComponent implements OnInit, ComponentCanDeactivate, OnDestroy {
-
-
   urlPath: object;
   dashboard: WidgetConfig[] = [];
   itemToPush: GridsterItemComponent;
@@ -85,7 +104,7 @@ export class DashboardComponent implements OnInit, ComponentCanDeactivate, OnDes
     displayGrid: DisplayGrid.None,
     disableWindowResize: false,
     disableWarnings: false,
-    scrollToNewItems: false
+    scrollToNewItems: false,
   };
 
   viewId: string;
@@ -95,39 +114,50 @@ export class DashboardComponent implements OnInit, ComponentCanDeactivate, OnDes
     private route: ActivatedRoute,
     private router: Router,
     private views: ViewsService,
-    private hotkeys: Hotkeys) { }
+    private hotkeys: Hotkeys,
+  ) {}
 
   ngOnInit(): void {
     this.optionsEdit = JSON.parse(JSON.stringify(this.options)); // seriously??? I cannot believe that's the only way to perform a deep copy of an object
-    this.optionsEdit.draggable = { 'enabled': true };
-    this.optionsEdit.resizable = { 'enabled': true };
+    this.optionsEdit.draggable = { enabled: true };
+    this.optionsEdit.resizable = { enabled: true };
     this.optionsEdit.displayGrid = DisplayGrid.Always;
 
-    this.subscriptions.push(this.hotkeys.addShortcut({ keys: 'shift.control.d', description: { label: 'Add dashboard widget', group: "Dashboard" } }).subscribe(() => {
-      this.addItemToDashboard("right");
-      console.log("adding widget");
-    }));
-    this.subscriptions.push(this.views.currentWidgetConfigs.subscribe(config => {
-      if (config != null) {
-        console.log(config);
-        this.dashboard = config;
-      }
-    }));
+    this.subscriptions.push(
+      this.hotkeys
+        .addShortcut({
+          keys: 'shift.control.d',
+          description: { label: 'Add dashboard widget', group: 'Dashboard' },
+        })
+        .subscribe(() => {
+          this.addItemToDashboard('right');
+          console.log('adding widget');
+        }),
+    );
+    this.subscriptions.push(
+      this.views.currentWidgetConfigs.subscribe((config) => {
+        if (config != null) {
+          console.log(config);
+          this.dashboard = config;
+        }
+      }),
+    );
     console.log(this.optionsEdit);
     console.log(this.options);
 
     if (this.route.parent != null) {
-      this.subscriptions.push(this.route.parent.url.subscribe((urlPath) => {
-        this.urlPath = urlPath;
-      }));
+      this.subscriptions.push(
+        this.route.parent.url.subscribe((urlPath) => {
+          this.urlPath = urlPath;
+        }),
+      );
     }
   }
 
   editGrid() {
-
     this.editMode = !this.editMode;
     if (this.editMode) {
-      console.log("editing grid");
+      console.log('editing grid');
       this.renderContent = false;
       this.editGridText = 'Done';
     } else {
@@ -136,7 +166,6 @@ export class DashboardComponent implements OnInit, ComponentCanDeactivate, OnDes
       this.editGridText = 'Edit dashboard';
       this.views.updateAllWidgets(this.dashboard);
     }
-
   }
 
   removeItem($event: MouseEvent | TouchEvent, item): void {
@@ -148,21 +177,25 @@ export class DashboardComponent implements OnInit, ComponentCanDeactivate, OnDes
   addItemToDashboard(position = null): void {
     if (position == null) {
       this.dashboard.push({
-        x: 0, y: 0, cols: 1, rows: 1, config: {
+        x: 0,
+        y: 0,
+        cols: 1,
+        rows: 1,
+        config: {
           general: {
-            type: "",
-            title: ""
+            type: '',
+            title: '',
           },
           filter: {},
-          view: {}
-        }
+          view: {},
+        },
       });
     } else {
       let xMax: number = 0;
       let yMax: number = 0;
       let minWidth: number = 999;
       let minHeight: number = 999;
-      this.dashboard.forEach(dashboardItem => {
+      this.dashboard.forEach((dashboardItem) => {
         if (dashboardItem.x > xMax) {
           xMax = dashboardItem.x;
         }
@@ -175,35 +208,42 @@ export class DashboardComponent implements OnInit, ComponentCanDeactivate, OnDes
         if (dashboardItem.rows < minHeight) {
           minHeight = dashboardItem.rows;
         }
-      })
+      });
       switch (position) {
-        case "left":
+        case 'left':
           this.dashboard.push({
-            x: 0, y: 0, cols: minWidth, rows: minHeight, config: {
+            x: 0,
+            y: 0,
+            cols: minWidth,
+            rows: minHeight,
+            config: {
               general: {
-                type: "",
-                title: ""
+                type: '',
+                title: '',
               },
               filter: {},
-              view: {}
-            }
+              view: {},
+            },
           });
           break;
 
         default:
           this.dashboard.push({
-            x: xMax + 1, y: yMax, cols: minWidth, rows: minHeight, config: {
+            x: xMax + 1,
+            y: yMax,
+            cols: minWidth,
+            rows: minHeight,
+            config: {
               general: {
-                type: "",
-                title: ""
+                type: '',
+                title: '',
               },
               filter: {},
-              view: {}
-            }
+              view: {},
+            },
           });
           break;
       }
-
     }
   }
 
@@ -211,7 +251,7 @@ export class DashboardComponent implements OnInit, ComponentCanDeactivate, OnDes
     let routerPath = '';
     for (const key in this.urlPath) {
       console.log(this.urlPath[key]);
-      routerPath += "/" + this.urlPath[key]["path"];
+      routerPath += '/' + this.urlPath[key]['path'];
     }
     // console.log("routerPath:", routerPath, $event["type"]);
     this.router.navigate([routerPath, 'dashboard-item'], { queryParams: { id: index } });
@@ -223,8 +263,7 @@ export class DashboardComponent implements OnInit, ComponentCanDeactivate, OnDes
   }
 
   ngOnDestroy(): void {
-    this.subscriptions.forEach(
-      (subscription) => subscription.unsubscribe());
+    this.subscriptions.forEach((subscription) => subscription.unsubscribe());
   }
 
   @HostListener('window:beforeunload')
@@ -232,5 +271,4 @@ export class DashboardComponent implements OnInit, ComponentCanDeactivate, OnDes
     if (false) return true;
     return false;
   }
-
 }

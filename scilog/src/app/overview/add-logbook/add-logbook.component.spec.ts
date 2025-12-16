@@ -2,7 +2,10 @@ import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 import { UntypedFormBuilder } from '@angular/forms';
 import { AddLogbookComponent } from './add-logbook.component';
 import { MatDialogModule, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
-import { MatAutocompleteModule, MatAutocompleteSelectedEvent } from '@angular/material/autocomplete';
+import {
+  MatAutocompleteModule,
+  MatAutocompleteSelectedEvent,
+} from '@angular/material/autocomplete';
 import { UserPreferencesService } from '@shared/user-preferences.service';
 import { LogbookDataService, LogbookItemDataService } from '@shared/remote-data.service';
 import { of } from 'rxjs';
@@ -12,35 +15,38 @@ import { IsAllowedService } from '../is-allowed.service';
 
 class UserPreferencesMock {
   userInfo = {
-    roles: ["roles"]
-
-  }
+    roles: ['roles'],
+  };
 }
-
 
 describe('AddLogbookComponent', () => {
   const mockDialogRef = {
-    close: jasmine.createSpy('close')
+    close: jasmine.createSpy('close'),
   };
 
   let component: AddLogbookComponent;
   let fixture: ComponentFixture<AddLogbookComponent>;
-  let logbookItemDataServiceSpy:any;
-  let logbookDataSpy:any;
+  let logbookItemDataServiceSpy: any;
+  let logbookDataSpy: any;
   let snackBarSpy: SnackbarService;
   let isActionAllowedService: IsAllowedService;
 
-  logbookItemDataServiceSpy = jasmine.createSpyObj("LogbookItemDataService", ["getFile"]);
+  logbookItemDataServiceSpy = jasmine.createSpyObj('LogbookItemDataService', ['getFile']);
   logbookItemDataServiceSpy.getFile.and.returnValue([]);
 
-  logbookDataSpy = jasmine.createSpyObj("LogbookDataService", ["getLocations", "patchLogbook", "postLogbook", "uploadLogbookThumbnail"]);
+  logbookDataSpy = jasmine.createSpyObj('LogbookDataService', [
+    'getLocations',
+    'patchLogbook',
+    'postLogbook',
+    'uploadLogbookThumbnail',
+  ]);
   logbookDataSpy.getLocations.and.returnValue(of([{}]));
-  snackBarSpy = jasmine.createSpyObj("SnackbarService", ["_showMessage"]);
+  snackBarSpy = jasmine.createSpyObj('SnackbarService', ['_showMessage']);
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-    imports: [MatDialogModule, MatAutocompleteModule, AddLogbookComponent],
-    providers: [
+      imports: [MatDialogModule, MatAutocompleteModule, AddLogbookComponent],
+      providers: [
         UntypedFormBuilder,
         { provide: MatDialogRef, useValue: mockDialogRef },
         { provide: MAT_DIALOG_DATA, useValue: null },
@@ -48,10 +54,9 @@ describe('AddLogbookComponent', () => {
         { provide: UserPreferencesService, useClass: UserPreferencesMock },
         { provide: LogbookDataService, useValue: logbookDataSpy },
         { provide: SnackbarService, useValue: snackBarSpy },
-        { provide: IsAllowedService, useClass: isActionAllowedService }
-    ],
-})
-      .compileComponents();
+        { provide: IsAllowedService, useClass: isActionAllowedService },
+      ],
+    }).compileComponents();
   }));
 
   beforeEach(() => {
@@ -67,18 +72,22 @@ describe('AddLogbookComponent', () => {
 
   it('#addAccessGroup', () => {
     const spyUpdate = spyOn(component.optionsFormGroup, 'updateValueAndValidity').and.callThrough();
-    component.addAccessGroup({value: 'addAccessGroup '} as MatChipInputEvent);
+    component.addAccessGroup({ value: 'addAccessGroup ' } as MatChipInputEvent);
     expect(component.accessGroups.value).toEqual(['startGroup', 'addAccessGroup']);
     expect(component.accessGroups.valid).toBeTrue();
-    component.addAccessGroup({value: 'any-authenticated-user'} as MatChipInputEvent);
-    expect(component.accessGroups.value).toEqual(['startGroup', 'addAccessGroup', 'any-authenticated-user']);
+    component.addAccessGroup({ value: 'any-authenticated-user' } as MatChipInputEvent);
+    expect(component.accessGroups.value).toEqual([
+      'startGroup',
+      'addAccessGroup',
+      'any-authenticated-user',
+    ]);
     expect(component.accessGroups.valid).toBeFalse();
     expect(component.accessGroups.errors.anyAuthGroup).not.toEqual(null);
     expect(spyUpdate).toHaveBeenCalledTimes(2);
   });
 
   it('#removeAccessGroup', () => {
-    component.addAccessGroup({value: 'any-authenticated-user'} as MatChipInputEvent);
+    component.addAccessGroup({ value: 'any-authenticated-user' } as MatChipInputEvent);
     expect(component.accessGroups.valid).toBeFalse();
     const spyUpdate = spyOn(component.optionsFormGroup, 'updateValueAndValidity').and.callThrough();
     component.removeAccessGroup('any-authenticated-user');
@@ -89,11 +98,19 @@ describe('AddLogbookComponent', () => {
 
   it('#selectedAccessGroup', () => {
     const spyUpdate = spyOn(component.optionsFormGroup, 'updateValueAndValidity').and.callThrough();
-    component.selectedAccessGroup({option: {viewValue: 'selectedAccessGroup'}} as MatAutocompleteSelectedEvent);
+    component.selectedAccessGroup({
+      option: { viewValue: 'selectedAccessGroup' },
+    } as MatAutocompleteSelectedEvent);
     expect(component.accessGroups.value).toEqual(['startGroup', 'selectedAccessGroup']);
     expect(component.accessGroups.valid).toBeTrue();
-    component.selectedAccessGroup({option: {viewValue: 'any-authenticated-user'}} as MatAutocompleteSelectedEvent);
-    expect(component.accessGroups.value).toEqual(['startGroup', 'selectedAccessGroup', 'any-authenticated-user']);
+    component.selectedAccessGroup({
+      option: { viewValue: 'any-authenticated-user' },
+    } as MatAutocompleteSelectedEvent);
+    expect(component.accessGroups.value).toEqual([
+      'startGroup',
+      'selectedAccessGroup',
+      'any-authenticated-user',
+    ]);
     expect(component.accessGroups.valid).toBeFalse();
     expect(component.accessGroups.errors.anyAuthGroup).not.toEqual(null);
     expect(spyUpdate).toHaveBeenCalledTimes(2);
@@ -106,32 +123,26 @@ describe('AddLogbookComponent', () => {
   });
 
   it('should test setForm', () => {
-    component['logbook'] = {ownerGroup: 'testOwner', name: 'a'};
+    component['logbook'] = { ownerGroup: 'testOwner', name: 'a' };
     component['setForm']('ownerGroup');
     component['setForm']('title', 'name');
     expect(component['getForm']('ownerGroup').value).toEqual('testOwner');
     expect(component['getForm']('title').value).toEqual('a');
   });
 
-  [
-    true,
-    false
-  ].forEach((t, i) => {
+  [true, false].forEach((t, i) => {
     it(`should test setOwnerGroupWithEditability ${i}`, () => {
-      component['logbook'] = {ownerGroup: 'ownerGroup'};
-      spyOn(component['isActionAllowed'], 'canChangeOwnerGroup').and.returnValue(t)
+      component['logbook'] = { ownerGroup: 'ownerGroup' };
+      spyOn(component['isActionAllowed'], 'canChangeOwnerGroup').and.returnValue(t);
       component['setOwnerGroupWithEditability']();
       expect(component['getForm']('ownerGroup').disabled).toEqual(!t);
     });
   });
 
-  [
-    true,
-    false
-  ].forEach((t, i) => {
+  [true, false].forEach((t, i) => {
     it(`should test setWithEditability ${i}`, () => {
-      component['logbook'] = {name: 'a', location: 'b'};
-      component['isActionAllowed'].tooltips.expired = t? 'Expired': '';
+      component['logbook'] = { name: 'a', location: 'b' };
+      component['isActionAllowed'].tooltips.expired = t ? 'Expired' : '';
       component['setWithEditability']('title');
       component['setWithEditability']('location');
       expect(component['getForm']('title').disabled).toEqual(t);
@@ -143,14 +154,14 @@ describe('AddLogbookComponent', () => {
     component['showSnackbarMessage']('aMessage', 'warning');
     expect(snackBarSpy._showMessage).toHaveBeenCalledOnceWith({
       message: 'aMessage',
-      panelClass: ['warning-snackbar'], 
+      panelClass: ['warning-snackbar'],
       action: 'Dismiss',
       show: true,
       duration: 4000,
       type: 'serverMessage',
       horizontalPosition: 'center',
       verticalPosition: 'top',
-    })
+    });
   });
 
   it('should test setDefaults on creation', () => {
@@ -164,20 +175,20 @@ describe('AddLogbookComponent', () => {
   });
 
   [
-    {input: {isAdmin: true}, output: 0},
-    {input: {isAdmin: false}, output: 1},
-    {input: {expired: 'expired'}, output: true},
-    {input: {expired: undefined}, output: false},
+    { input: { isAdmin: true }, output: 0 },
+    { input: { isAdmin: false }, output: 1 },
+    { input: { expired: 'expired' }, output: true },
+    { input: { expired: undefined }, output: false },
   ].forEach((t, i) => {
     it(`should test setDefaults on update ${i}`, () => {
       component.logbook = {
-        ownerGroup: 'ownerGroup', 
+        ownerGroup: 'ownerGroup',
         accessGroups: ['accessGroups'],
         name: 'name',
         location: 'location',
         description: 'description',
         isPrivate: true,
-      }
+      };
       const ownerGroupValidatorsSpy = spyOn(component['getForm']('ownerGroup'), 'addValidators');
       spyOn(component['isActionAllowed'], 'isAdmin').and.returnValue(t.input.isAdmin);
       spyOn(component['isActionAllowed'], 'isNotExpired');
@@ -200,5 +211,4 @@ describe('AddLogbookComponent', () => {
       }
     });
   });
-  
 });

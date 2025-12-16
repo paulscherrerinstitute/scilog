@@ -1,4 +1,4 @@
-.login-form-flex{
+.login-form-flex {
   color: rgb(231, 231, 231);
   font-weight: bold;
   position: absolute;
@@ -14,8 +14,8 @@
   padding: 8px;
 }
 
-.background-image{
-  background-image: url("../../psi_background.jpg");
+.background-image {
+  background-image: url('../../psi_background.jpg');
   filter: blur(4px);
   -webkit-filter: blur(4px);
   height: 100vh;
@@ -24,24 +24,26 @@
   background-size: cover;
 }
 
-.card{
-  box-shadow: 0 1px 4px 0 rgba(0, 0, 0, .2), 0 2px 8px 0 rgba(0, 0, 0, .14), 0 4px 8px -1px rgba(0, 0, 0, .12);
+.card {
+  box-shadow:
+    0 1px 4px 0 rgba(0, 0, 0, 0.2),
+    0 2px 8px 0 rgba(0, 0, 0, 0.14),
+    0 4px 8px -1px rgba(0, 0, 0, 0.12);
 }
 
-.form-field{
-  width:100%
-}
-
-
-.card-actions{
+.form-field {
   width: 100%;
-  align-items:center;
 }
 
-.errorText{
+.card-actions {
+  width: 100%;
+  align-items: center;
+}
+
+.errorText {
   color: rgb(194, 0, 0);
 }
 
-.content-container{
+.content-container {
   padding-top: 20px;
 }

@@ -1,9 +1,38 @@
-import { Component, OnInit, Inject, ViewChild, NgZone, ElementRef, ChangeDetectorRef, AfterViewInit, OnDestroy } from '@angular/core';
-import { UntypedFormArray, UntypedFormBuilder, UntypedFormControl, UntypedFormGroup, FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { MatChipInputEvent, MatChipGrid, MatChipRow, MatChipRemove, MatChipInput } from '@angular/material/chips';
+import {
+  Component,
+  OnInit,
+  Inject,
+  ViewChild,
+  NgZone,
+  ElementRef,
+  ChangeDetectorRef,
+  AfterViewInit,
+  OnDestroy,
+} from '@angular/core';
+import {
+  UntypedFormArray,
+  UntypedFormBuilder,
+  UntypedFormControl,
+  UntypedFormGroup,
+  FormsModule,
+  ReactiveFormsModule,
+} from '@angular/forms';
+import {
+  MatChipInputEvent,
+  MatChipGrid,
+  MatChipRow,
+  MatChipRemove,
+  MatChipInput,
+} from '@angular/material/chips';
 import { COMMA, ENTER, SPACE } from '@angular/cdk/keycodes';
-import { MatDialogRef, MAT_DIALOG_DATA, MatDialogTitle, MatDialogContent, MatDialogActions } from '@angular/material/dialog';
-import { Tags } from '@model/metadata'
+import {
+  MatDialogRef,
+  MAT_DIALOG_DATA,
+  MatDialogTitle,
+  MatDialogContent,
+  MatDialogActions,
+} from '@angular/material/dialog';
+import { Tags } from '@model/metadata';
 import { Observable, Subscription } from 'rxjs';
 import { Basesnippets } from '@model/basesnippets';
 import { map, startWith, take } from 'rxjs/operators';
@@ -28,14 +57,41 @@ import { MatIcon } from '@angular/material/icon';
 import { MatButton } from '@angular/material/button';
 
 @Component({
-    selector: 'app-widget-preferences',
-    templateUrl: './widget-preferences.component.html',
-    styleUrls: ['./widget-preferences.component.scss'],
-    imports: [MatDialogTitle, CdkScrollable, MatDialogContent, FormsModule, ReactiveFormsModule, MatDivider, MatFormField, MatLabel, MatInput, MatSelect, MatOption, NgIf, NgSwitch, NgSwitchCase, MatSlideToggle, MatTooltip, CdkTextareaAutosize, MatAutocompleteTrigger, MatAutocomplete, NgFor, MatChipGrid, MatChipRow, MatIcon, MatChipRemove, MatChipInput, MatDialogActions, MatButton, AsyncPipe]
+  selector: 'app-widget-preferences',
+  templateUrl: './widget-preferences.component.html',
+  styleUrls: ['./widget-preferences.component.scss'],
+  imports: [
+    MatDialogTitle,
+    CdkScrollable,
+    MatDialogContent,
+    FormsModule,
+    ReactiveFormsModule,
+    MatDivider,
+    MatFormField,
+    MatLabel,
+    MatInput,
+    MatSelect,
+    MatOption,
+    NgIf,
+    NgSwitch,
+    NgSwitchCase,
+    MatSlideToggle,
+    MatTooltip,
+    CdkTextareaAutosize,
+    MatAutocompleteTrigger,
+    MatAutocomplete,
+    NgFor,
+    MatChipGrid,
+    MatChipRow,
+    MatIcon,
+    MatChipRemove,
+    MatChipInput,
+    MatDialogActions,
+    MatButton,
+    AsyncPipe,
+  ],
 })
 export class WidgetPreferencesComponent implements OnInit, AfterViewInit, OnDestroy {
-
-
   data: WidgetItemConfig;
   filters = new UntypedFormArray([]);
   options: UntypedFormGroup;
@@ -87,7 +143,8 @@ export class WidgetPreferencesComponent implements OnInit, AfterViewInit, OnDest
     @Inject(MAT_DIALOG_DATA) data,
     private _ngZone: NgZone,
     protected changeDetectorRef: ChangeDetectorRef,
-    private appConfigService: AppConfigService) {
+    private appConfigService: AppConfigService,
+  ) {
     this.data = data.config;
     this.options = fb.group({
       hideRequired: this.hideRequiredControl,
@@ -97,9 +154,10 @@ export class WidgetPreferencesComponent implements OnInit, AfterViewInit, OnDest
     this.filterBasics = fb.group({
       ownerGroup: new UntypedFormControl(''),
       logbook: new UntypedFormControl(''),
-      description: new UntypedFormControl({ value: "", disabled: true })
+      description: new UntypedFormControl({ value: '', disabled: true }),
     });
-    this.scicatWidgetEnabled = this.appConfigService.getScicatSettings()?.scicatWidgetEnabled || false;
+    this.scicatWidgetEnabled =
+      this.appConfigService.getScicatSettings()?.scicatWidgetEnabled || false;
   }
 
   ngOnInit(): void {
@@ -110,27 +168,27 @@ export class WidgetPreferencesComponent implements OnInit, AfterViewInit, OnDest
       this.data.filter.tags.forEach((tag: string) => {
         console.log(tag);
         this.tag.push({ name: tag });
-      })
+      });
     }
     if (this.data.filter.excludeTags?.length > 0) {
       this.data.filter.excludeTags.forEach((tag: string) => {
         console.log(tag);
         this.excludeTag.push({ name: tag });
-      })
+      });
     }
-    if (typeof this.data.view.hideMetadata != "undefined") {
+    if (typeof this.data.view.hideMetadata != 'undefined') {
       this.hideMetadata.setValue(this.data.view.hideMetadata);
     }
-    if (typeof this.data.view.showSnippetHeader != "undefined") {
+    if (typeof this.data.view.showSnippetHeader != 'undefined') {
       this.showSnippetHeader.setValue(this.data.view.showSnippetHeader);
     }
-    if (typeof this.data.general.readonly != "undefined") {
+    if (typeof this.data.general.readonly != 'undefined') {
       this.readOnlyLogbook.setValue(this.data.general.readonly);
     }
-    if (typeof this.data.view.order != "undefined") {
-      let orderTag = this.data.view.order[0].split(" ")[1];
-      console.log(this.data.view.order)
-      console.log(orderTag)
+    if (typeof this.data.view.order != 'undefined') {
+      let orderTag = this.data.view.order[0].split(' ')[1];
+      console.log(this.data.view.order);
+      console.log(orderTag);
       this.descendingOrder.setValue(this.orderTagToBoolean(orderTag));
     }
     this.getSnippetViewerOptions();
@@ -144,25 +202,32 @@ export class WidgetPreferencesComponent implements OnInit, AfterViewInit, OnDest
     this.setUpAdditionalLogbooks();
 
     // target logbook description
-    this.subscriptions.push(this.filterBasics.get('logbook').valueChanges.subscribe(logbook => {
-      if (logbook && logbook.description) {
-        this.filterBasics.get('description').setValue(logbook.description);
-      } else {
-        this.filterBasics.get('description').setValue("");
-      }
-    }));
+    this.subscriptions.push(
+      this.filterBasics.get('logbook').valueChanges.subscribe((logbook) => {
+        if (logbook && logbook.description) {
+          this.filterBasics.get('description').setValue(logbook.description);
+        } else {
+          this.filterBasics.get('description').setValue('');
+        }
+      }),
+    );
 
     // ownerGroups
     this.ownerGroupsAvail = this.userPreferences.userInfo?.roles;
     this.filteredOwnerGroups = this.filterBasics.get('ownerGroup').valueChanges.pipe(
-      startWith(null), 
-      map((ownerGroup: string | null) => ownerGroup ? this._filterOwnerGroups(ownerGroup) : this.ownerGroupsAvail.slice()));
-    this.filterBasics.get('ownerGroup').setValidators([ownerGroupMemberValidator(this.ownerGroupsAvail)]);
+      startWith(null),
+      map((ownerGroup: string | null) =>
+        ownerGroup ? this._filterOwnerGroups(ownerGroup) : this.ownerGroupsAvail.slice(),
+      ),
+    );
+    this.filterBasics
+      .get('ownerGroup')
+      .setValidators([ownerGroupMemberValidator(this.ownerGroupsAvail)]);
     this.changeDetectorRef.detectChanges();
     // let ownerGroupIndex = Object.keys(this.data.filters).find(k => this.data.filters[k].name == 'ownerGroup');
     // if (typeof ownerGroupIndex != 'undefined') {
     //   this.filterBasics.get('ownerGroup').setValue(this.data.filters[ownerGroupIndex].value);
-    // } 
+    // }
   }
 
   private async setUpAdditionalLogbooks() {
@@ -185,32 +250,32 @@ export class WidgetPreferencesComponent implements OnInit, AfterViewInit, OnDest
     // basic filter forms
     this.setupLogbookSelection();
   }
-  
+
   async getSnippetViewerOptions() {
     let data = await this.dataService.getSnippetsForLogbook(this.logbookInfo.logbookInfo.id);
     // TODO this should be done in the backend, not here!
     this.snippetViewerOptions = [];
-    data.forEach(snippet => {
+    data.forEach((snippet) => {
       if (snippet?.dashboardName) {
-        this.snippetViewerOptions.push(snippet)
+        this.snippetViewerOptions.push(snippet);
       }
-    })
+    });
     this.filteredOptions = this.snippetViewerControl.valueChanges.pipe(
       startWith(''),
-      map(value => typeof value === 'string' ? value : value.name),
-      map(name => name ? this._filter(name) : this.snippetViewerOptions.slice())
+      map((value) => (typeof value === 'string' ? value : value.name)),
+      map((name) => (name ? this._filter(name) : this.snippetViewerOptions.slice())),
     );
-    console.log(this.snippetViewerOptions)
+    console.log(this.snippetViewerOptions);
   }
 
   async getFilterOptionsPlot() {
     let data = await this.dataService.getPlotSnippets(this.logbookInfo.logbookInfo.id);
-    console.log(data)
+    console.log(data);
     this.plotOptions = data;
     this.filteredOptionsPlot = this.plotControl.valueChanges.pipe(
       startWith(''),
-      map(value => typeof value === 'string' ? value : value.name),
-      map(name => name ? this._filter(name) : this.plotOptions.slice())
+      map((value) => (typeof value === 'string' ? value : value.name)),
+      map((name) => (name ? this._filter(name) : this.plotOptions.slice())),
     );
   }
 
@@ -219,11 +284,16 @@ export class WidgetPreferencesComponent implements OnInit, AfterViewInit, OnDest
     // taget logbooks
     this.filteredLogbooks = this.filterBasics.get('logbook').valueChanges.pipe(
       startWith(''),
-      map(value => typeof value === 'string' ? value : value.name),
-      map(name => name ? this._filterLogbooks(name) : this.logbookInfo.availLogbooks.slice())
+      map((value) => (typeof value === 'string' ? value : value.name)),
+      map((name) => (name ? this._filterLogbooks(name) : this.logbookInfo.availLogbooks.slice())),
     );
     // additional logbooks
-    this.filteredAdditionalLogbooks = this.additionalLogbooksCtrl.valueChanges.pipe(startWith(null), map((logbook: string) => logbook ? this._filterAdditionalLogbooks(logbook) : this._getAvailAdditionalLogbooks()));
+    this.filteredAdditionalLogbooks = this.additionalLogbooksCtrl.valueChanges.pipe(
+      startWith(null),
+      map((logbook: string) =>
+        logbook ? this._filterAdditionalLogbooks(logbook) : this._getAvailAdditionalLogbooks(),
+      ),
+    );
   }
 
   selectedWidgetType($event) {
@@ -234,7 +304,7 @@ export class WidgetPreferencesComponent implements OnInit, AfterViewInit, OnDest
     const input = event.input;
     const value = event.value;
 
-    if ((value ?? "").trim()) {
+    if ((value ?? '').trim()) {
       this.tag.push({ name: value.trim() });
     }
 
@@ -260,18 +330,18 @@ export class WidgetPreferencesComponent implements OnInit, AfterViewInit, OnDest
     let availLogbooks = this.logbookInfo.availLogbooks;
     if (this.filterBasics.get('logbook').value.id) {
       availLogbooks = availLogbooks.filter((log) => {
-        return log.id != this.filterBasics.get('logbook').value.id
-      })
+        return log.id != this.filterBasics.get('logbook').value.id;
+      });
     }
     if (this.additionalLogbooks.length > 0) {
       availLogbooks = availLogbooks.filter((log) => {
         return this.additionalLogbooks.indexOf(log) < 0;
-      })
+      });
     }
-    if ((this.additionalLogbooksCtrl.value != null) && (this.additionalLogbooksCtrl.value?.id)) {
-      availLogbooks = availLogbooks.filter(log => {
+    if (this.additionalLogbooksCtrl.value != null && this.additionalLogbooksCtrl.value?.id) {
+      availLogbooks = availLogbooks.filter((log) => {
         return log.id != this.additionalLogbooksCtrl.value.id;
-      })
+      });
     }
     return availLogbooks;
   }
@@ -285,11 +355,11 @@ export class WidgetPreferencesComponent implements OnInit, AfterViewInit, OnDest
     this.additionalLogbooks.push($event.option.value);
     // }
 
-    this.logbookInput.nativeElement.value = "";
+    this.logbookInput.nativeElement.value = '';
   }
 
   addNewFormGroupAfterEmpty() {
-    if (this.filters.at(this.filters.length - 1).value.name != "" && this.filters.length < 20) {
+    if (this.filters.at(this.filters.length - 1).value.name != '' && this.filters.length < 20) {
       this.addFormGroup();
     }
   }
@@ -298,7 +368,7 @@ export class WidgetPreferencesComponent implements OnInit, AfterViewInit, OnDest
     const group = new UntypedFormGroup({
       name: new UntypedFormControl(''),
       operator: new UntypedFormControl(''),
-      value: new UntypedFormControl('')
+      value: new UntypedFormControl(''),
     });
     this.filters.push(group);
   }
@@ -332,37 +402,45 @@ export class WidgetPreferencesComponent implements OnInit, AfterViewInit, OnDest
 
   private _filter(value: string): Basesnippets[] {
     const filterValue = value.toLowerCase();
-    return this.snippetViewerOptions.filter(option => option?.dashboardName && option.dashboardName.toLowerCase().indexOf(filterValue) === 0);
+    return this.snippetViewerOptions.filter(
+      (option) =>
+        option?.dashboardName && option.dashboardName.toLowerCase().indexOf(filterValue) === 0,
+    );
   }
 
   private _filterOwnerGroups(value: string): string[] {
-    console.log(value)
+    console.log(value);
     const filterValue = value.toLowerCase();
 
-    return this.ownerGroupsAvail.filter(ownerGroup => ownerGroup.toLowerCase().indexOf(filterValue) === 0);
+    return this.ownerGroupsAvail.filter(
+      (ownerGroup) => ownerGroup.toLowerCase().indexOf(filterValue) === 0,
+    );
   }
 
   private _filterAdditionalLogbooks(value: string): Logbooks[] {
     console.log(value);
     let additionalLogbooks = this._getAvailAdditionalLogbooks();
 
-    return additionalLogbooks.filter(log => {
+    return additionalLogbooks.filter((log) => {
       if (typeof value == 'string') {
         if (log?.name) {
-          return (log?.name.toLowerCase().includes(value.toLowerCase()) || (log?.description.toLowerCase().includes(value.toLowerCase())) || (log?.ownerGroup.toLowerCase().includes(value.toLowerCase())));
+          return (
+            log?.name.toLowerCase().includes(value.toLowerCase()) ||
+            log?.description.toLowerCase().includes(value.toLowerCase()) ||
+            log?.ownerGroup.toLowerCase().includes(value.toLowerCase())
+          );
         }
         return false;
       } else {
         return true;
       }
-    }
-    );
+    });
   }
 
   private _filterLogbooks(value: string): Logbooks[] {
-    console.log(value)
+    console.log(value);
     const filterValue = value.toLowerCase();
-    return this.logbookInfo.availLogbooks.filter(log => {
+    return this.logbookInfo.availLogbooks.filter((log) => {
       if (log?.name) {
         return log?.name.toLowerCase().includes(value.toLowerCase());
       }
@@ -375,7 +453,7 @@ export class WidgetPreferencesComponent implements OnInit, AfterViewInit, OnDest
   }
 
   displayFnSnippetSelectionPlot(snippet: Basesnippets): string {
-    return snippet && snippet["name"] ? snippet["name"] : '';
+    return snippet && snippet['name'] ? snippet['name'] : '';
   }
 
   displayFnLogbookSelection(logbook: Logbooks): string {
@@ -384,19 +462,17 @@ export class WidgetPreferencesComponent implements OnInit, AfterViewInit, OnDest
 
   triggerResize() {
     // Wait for changes to be applied, then trigger textarea resize.
-    this._ngZone.onStable.pipe(take(1))
-      .subscribe(() => this.autosize.resizeToFitContent(true));
+    this._ngZone.onStable.pipe(take(1)).subscribe(() => this.autosize.resizeToFitContent(true));
   }
 
   applyChanges($event) {
     this.data.general.title = this.title.value;
     this.data.general.type = this.widgetType.value;
 
-
     switch (this.data.general.type) {
       case 'logbook':
         this.data.filter.targetId = this.filterBasics.get('logbook').value.id;
-        this.data.filter.additionalLogbooks = this.additionalLogbooks.map(log => log.id);
+        this.data.filter.additionalLogbooks = this.additionalLogbooks.map((log) => log.id);
         break;
       case 'snippetViewer':
         this.data.filter.targetId = this.snippetViewerControl.value?.id;
@@ -408,8 +484,8 @@ export class WidgetPreferencesComponent implements OnInit, AfterViewInit, OnDest
         break;
     }
     // this.data.filter.targetId = this.filterBasics.get('logbook').value.id;
-    this.data.filter.tags = this.tag.map(tag => tag.name);
-    this.data.filter.excludeTags = this.excludeTag.map(tag => tag.name);
+    this.data.filter.tags = this.tag.map((tag) => tag.name);
+    this.data.filter.excludeTags = this.excludeTag.map((tag) => tag.name);
     this.data.view.hideMetadata = this.hideMetadata.value;
     this.data.view.showSnippetHeader = this.showSnippetHeader.value;
     this.data.general.readonly = this.readOnlyLogbook.value;
@@ -419,18 +495,18 @@ export class WidgetPreferencesComponent implements OnInit, AfterViewInit, OnDest
   }
 
   booleanToOrderTag(descending: boolean): string {
-    return descending ? "DESC" : "ASC"
+    return descending ? 'DESC' : 'ASC';
   }
 
   orderTagToBoolean(orderTag: string) {
-    return orderTag == "DESC" ? true : false;
+    return orderTag == 'DESC' ? true : false;
   }
 
   ngOnDestroy(): void {
     //Called once, before the instance is destroyed.
     //Add 'implements OnDestroy' to the class.
-    this.subscriptions.forEach(sub => {
+    this.subscriptions.forEach((sub) => {
       sub.unsubscribe();
-    })
+    });
   }
 }

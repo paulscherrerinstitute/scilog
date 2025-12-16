@@ -9,16 +9,14 @@ describe('AuthInterceptor', () => {
   const serverSettingsService = jasmine.createSpyObj('ServerSettingsService', [
     'getSciCatServerAddress',
   ]);
-  serverSettingsService.getSciCatServerAddress.and.returnValue(
-    'https://scicat-backend.psi.ch'
-  );
+  serverSettingsService.getSciCatServerAddress.and.returnValue('https://scicat-backend.psi.ch');
   beforeEach(() =>
     TestBed.configureTestingModule({
       providers: [
         AuthInterceptor,
         { provide: ServerSettingsService, useValue: serverSettingsService },
       ],
-    })
+    }),
   );
 
   it('should be created', () => {
@@ -29,7 +27,7 @@ describe('AuthInterceptor', () => {
   it('should append scicat token if request to scicat backend', (done: DoneFn) => {
     localStorage.setItem('scicat_token', 'test_scicat_token');
     const interceptor: AuthInterceptor = TestBed.inject(AuthInterceptor);
-    const req = new HttpRequest("GET", 'https://scicat-backend.psi.ch/api/v3/datasets');
+    const req = new HttpRequest('GET', 'https://scicat-backend.psi.ch/api/v3/datasets');
     const next = jasmine.createSpyObj<HttpHandler>('HttpHandler', ['handle']);
     next.handle.and.returnValue(of({} as HttpEvent<any>));
     interceptor.intercept(req, next).subscribe({
@@ -46,7 +44,7 @@ describe('AuthInterceptor', () => {
   it('should append scilog token if request is not to scicat backend', (done: DoneFn) => {
     localStorage.setItem('id_token', 'test_scilog_token');
     const interceptor: AuthInterceptor = TestBed.inject(AuthInterceptor);
-    const req = new HttpRequest("GET", 'https://scilog-backend.psi.ch/api/v1');
+    const req = new HttpRequest('GET', 'https://scilog-backend.psi.ch/api/v1');
     const next = jasmine.createSpyObj<HttpHandler>('HttpHandler', ['handle']);
     next.handle.and.returnValue(of({} as HttpEvent<any>));
     interceptor.intercept(req, next).subscribe({
@@ -60,4 +58,3 @@ describe('AuthInterceptor', () => {
     });
   });
 });
-

@@ -23,7 +23,6 @@
   box-shadow: unset;
 }
 
-
 ::ng-deep .mat-mdc-dialog-container {
   width: 120vh;
 }
@@ -38,8 +37,8 @@
 }
 
 ::ng-deep .fileLink::before {
-  font-family: "Material Icons";
-  content: "attach_file";
+  font-family: 'Material Icons';
+  content: 'attach_file';
   display: inline-block;
   font-size: initial;
   vertical-align: middle;
@@ -47,8 +46,7 @@
 
 ::ng-deep .ck-insert-table-dropdown__grid {
   width: calc(
-    var(--ck-insert-table-dropdown-box-width)*10 + 
-    var(--ck-insert-table-dropdown-box-margin)*2 + 
-    var(--ck-insert-table-dropdown-padding)*2
-  )!important
+    var(--ck-insert-table-dropdown-box-width) * 10 + var(--ck-insert-table-dropdown-box-margin) *
+      2 + var(--ck-insert-table-dropdown-padding) * 2
+  ) !important;
 }

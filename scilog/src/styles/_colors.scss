@@ -12,37 +12,45 @@
 @include mat.app-background();
 
 $scilog-colors-light: (
-    50 : #f0f0f0, // background
-    100 : #b3c9d0,
-    200 : #80a6b1,
-    300 : #4d8292,
-    400 : #26677a,
-    500 : #004c63,
-    600 : #00455b,
-    700 : #003c51,
-    800 : #003347,
-    900 : #002435,
-    A100 : #86a7b1,
-    A200 : #ffffff,
-    A400 : #000000, // default text color
-    A700 : #ec2300,
+  50: #f0f0f0,
+  // background
+  100: #b3c9d0,
+  200: #80a6b1,
+  300: #4d8292,
+  400: #26677a,
+  500: #004c63,
+  600: #00455b,
+  700: #003c51,
+  800: #003347,
+  900: #002435,
+  A100: #86a7b1,
+  A200: #ffffff,
+  A400: #000000,
+  // default text color
+  A700: #ec2300,
 );
 
 $scilog-colors-dark: (
-    50 : #2e3d4a, // background
-    100 : #b3c9d0,
-    200 : #bec3c9, 
-    300 : #4d8292,
-    400 : #26677a,
-    500 : #196934,
-    600 : #2e3c49, // sidenav
-    700 : #1c2631, // dashboard
-    800 : #26313d, // main background
-    900 : #002435, // toolbar
-    A100 : #86a7b1,
-    A200 : #3aacff,
-    A400 : #bec3c9, // default text color
-    A700 : #ec2300,
+  50: #2e3d4a,
+  // background
+  100: #b3c9d0,
+  200: #bec3c9,
+  300: #4d8292,
+  400: #26677a,
+  500: #196934,
+  600: #2e3c49,
+  // sidenav
+  700: #1c2631,
+  // dashboard
+  800: #26313d,
+  // main background
+  900: #002435,
+  // toolbar
+  A100: #86a7b1,
+  A200: #3aacff,
+  A400: #bec3c9,
+  // default text color
+  A700: #ec2300,
 );
 // 1ea54c
 $header-color: mat.m2-get-color-from-palette($scilog-colors-light, 500);
@@ -72,7 +80,7 @@ $ckeditor-content-border-dark: mat.m2-get-color-from-palette($scilog-colors-dark
 $default-text-color: mat.m2-get-color-from-palette($scilog-colors-light, A400);
 $default-text-color-dark: mat.m2-get-color-from-palette($scilog-colors-dark, A400);
 
-$accent-color: #FF0000;
+$accent-color: #ff0000;
 $accent-color-dark: mat.m2-get-color-from-palette($scilog-colors-dark, 500);
 
 $button-accent: mat.m2-get-color-from-palette($scilog-colors-light, 500);
@@ -90,14 +98,14 @@ $toolbar-color-dark: mat.m2-get-color-from-palette($scilog-colors-dark, 900);
 $toolbar-text-color: mat.m2-get-color-from-palette($scilog-colors-light, A200);
 $toolbar-text-color-dark: $toolbar-color;
 
-$default-shadow-0: rgba(0, 0, 0, .2);
-$default-shadow-0-dark: rgba(40, 60, 73, .12);
+$default-shadow-0: rgba(0, 0, 0, 0.2);
+$default-shadow-0-dark: rgba(40, 60, 73, 0.12);
 
-$default-shadow-1: rgba(0, 0, 0, .14);
-$default-shadow-1-dark: rgba(40, 60, 73, .14);
+$default-shadow-1: rgba(0, 0, 0, 0.14);
+$default-shadow-1-dark: rgba(40, 60, 73, 0.14);
 
-$default-shadow-2: rgba(0, 0, 0, .12);
-$default-shadow-2-dark:rgba(40, 60, 73, .2);
+$default-shadow-2: rgba(0, 0, 0, 0.12);
+$default-shadow-2-dark: rgba(40, 60, 73, 0.2);
 
 $sidenav-color: mat.m2-get-color-from-palette($scilog-colors-light, A100);
 $sidenav-color-dark: mat.m2-get-color-from-palette($scilog-colors-dark, 600);
@@ -126,38 +134,125 @@ $logbook-name-tag-dark: rgba(179, 201, 208, 0.5);
 $main-background: mat.m2-get-color-from-palette($scilog-colors-light, 50);
 $main-background-dark: mat.m2-get-color-from-palette($scilog-colors-dark, 800);
 
-
 $colors: (
-  --light-mode: (true, false),
-  --header-color: ($header-color, $header-color-dark),
-  --subheader-color: ($subheader-color, $subheader-color-dark),
-  --subsubheader-color: ($subsubheader-color, $subsubheader-color-dark),
-  --slider-checked: ($slider-checked, $slider-checked-dark),
-  --slider-not-checked: ($slider-not-checked, $slider-not-checked-dark),
-  --slider-checked-bg: ($slider-checked-bg, $slider-checked-bg-dark),
-  --slider-not-checked-bg: ($slider-not-checked-bg, $slider-not-checked-bg-dark),
-  --accent-color: ($accent-color, $accent-color-dark),
-  --button-accent: ($button-accent, $button-accent-dark),
-  --button-accent-icon: ($button-accent-icon, $button-accent-icon-dark),
-  --editor: ($dashboard-item, $main-background-dark),
-  --toolbar-color: ($toolbar-color, $toolbar-color-dark),
-  --toolbar-text-color: ($toolbar-text-color, $toolbar-text-color-dark),
-  --dashboard-item: ($dashboard-item, $dashboard-item-dark),
-  --default-shadow-0: ($default-shadow-0, $default-shadow-0-dark),
-  --default-shadow-1: ($default-shadow-1, $default-shadow-1-dark),
-  --default-shadow-2: ($default-shadow-2, $default-shadow-2-dark),
-  --default-text-color: ($default-text-color, $default-text-color-dark),
-  --sidenav-color: ($sidenav-color, $sidenav-color-dark),
-  --sidenav-text-color: ($sidenav-text-color, $sidenav-text-color-dark),
-  --snippet-color: ($snippet, $snippet-dark),
-  --logbook-name-tag: ($logbook-name-tag, $logbook-name-tag-dark),
-  --main-background: ($main-background, $main-background-dark),
-  --ck-toolbar-color-background: ($ckeditor-toolbar, $ckeditor-toolbar-dark),
-  --ck-toolbar-border-color: ($ckeditor-toolbar-border, $ckeditor-toolbar-dark),
-  --ck-color-base-background: ($ckeditor-content, $ckeditor-content-dark),
-  --ck-color-base-border: ($ckeditor-content-border, $ckeditor-content-border-dark),
-  --ck-color-base-text: ($default-text-color, $default-text-color-dark),
-  --ck-color-input-border: ($default-text-color, $default-text-color-dark),
-
-
-)
+  --light-mode: (
+    true,
+    false,
+  ),
+  --header-color: (
+    $header-color,
+    $header-color-dark,
+  ),
+  --subheader-color: (
+    $subheader-color,
+    $subheader-color-dark,
+  ),
+  --subsubheader-color: (
+    $subsubheader-color,
+    $subsubheader-color-dark,
+  ),
+  --slider-checked: (
+    $slider-checked,
+    $slider-checked-dark,
+  ),
+  --slider-not-checked: (
+    $slider-not-checked,
+    $slider-not-checked-dark,
+  ),
+  --slider-checked-bg: (
+    $slider-checked-bg,
+    $slider-checked-bg-dark,
+  ),
+  --slider-not-checked-bg: (
+    $slider-not-checked-bg,
+    $slider-not-checked-bg-dark,
+  ),
+  --accent-color: (
+    $accent-color,
+    $accent-color-dark,
+  ),
+  --button-accent: (
+    $button-accent,
+    $button-accent-dark,
+  ),
+  --button-accent-icon: (
+    $button-accent-icon,
+    $button-accent-icon-dark,
+  ),
+  --editor: (
+    $dashboard-item,
+    $main-background-dark,
+  ),
+  --toolbar-color: (
+    $toolbar-color,
+    $toolbar-color-dark,
+  ),
+  --toolbar-text-color: (
+    $toolbar-text-color,
+    $toolbar-text-color-dark,
+  ),
+  --dashboard-item: (
+    $dashboard-item,
+    $dashboard-item-dark,
+  ),
+  --default-shadow-0: (
+    $default-shadow-0,
+    $default-shadow-0-dark,
+  ),
+  --default-shadow-1: (
+    $default-shadow-1,
+    $default-shadow-1-dark,
+  ),
+  --default-shadow-2: (
+    $default-shadow-2,
+    $default-shadow-2-dark,
+  ),
+  --default-text-color: (
+    $default-text-color,
+    $default-text-color-dark,
+  ),
+  --sidenav-color: (
+    $sidenav-color,
+    $sidenav-color-dark,
+  ),
+  --sidenav-text-color: (
+    $sidenav-text-color,
+    $sidenav-text-color-dark,
+  ),
+  --snippet-color: (
+    $snippet,
+    $snippet-dark,
+  ),
+  --logbook-name-tag: (
+    $logbook-name-tag,
+    $logbook-name-tag-dark,
+  ),
+  --main-background: (
+    $main-background,
+    $main-background-dark,
+  ),
+  --ck-toolbar-color-background: (
+    $ckeditor-toolbar,
+    $ckeditor-toolbar-dark,
+  ),
+  --ck-toolbar-border-color: (
+    $ckeditor-toolbar-border,
+    $ckeditor-toolbar-dark,
+  ),
+  --ck-color-base-background: (
+    $ckeditor-content,
+    $ckeditor-content-dark,
+  ),
+  --ck-color-base-border: (
+    $ckeditor-content-border,
+    $ckeditor-content-border-dark,
+  ),
+  --ck-color-base-text: (
+    $default-text-color,
+    $default-text-color-dark,
+  ),
+  --ck-color-input-border: (
+    $default-text-color,
+    $default-text-color-dark,
+  ),
+);

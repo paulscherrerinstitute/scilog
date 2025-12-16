@@ -2,12 +2,17 @@
 /* @import '@angular/material/prebuilt-themes/indigo-pink.css'; */
 /* @import '@angular/material/prebuilt-themes/deeppurple-amber.css'; */
 
-html, 
-body { height: calc(100%); margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; background-color: #f0f0f0}
-@import "styles/colors";
-@import "styles/animations";
-@import "styles/theme";
-@import "styles/roboto.scss";
-@import "styles/material-icons.scss";
-@import "prismjs/themes/prism.css";
-@import "styles/global";
+html,
+body {
+  height: calc(100%);
+  margin: 0;
+  font-family: Roboto, 'Helvetica Neue', sans-serif;
+  background-color: #f0f0f0;
+}
+@import 'styles/colors';
+@import 'styles/animations';
+@import 'styles/theme';
+@import 'styles/roboto.scss';
+@import 'styles/material-icons.scss';
+@import 'prismjs/themes/prism.css';
+@import 'styles/global';

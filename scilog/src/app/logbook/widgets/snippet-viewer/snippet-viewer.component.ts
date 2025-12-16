@@ -11,14 +11,12 @@ import { NgFor } from '@angular/common';
 import { SnippetComponent as SnippetComponent_1 } from '../../core/snippet/snippet.component';
 
 @Component({
-    selector: 'app-snippet-viewer',
-    templateUrl: './snippet-viewer.component.html',
-    styleUrls: ['./snippet-viewer.component.css'],
-    imports: [NgFor, SnippetComponent_1]
+  selector: 'app-snippet-viewer',
+  templateUrl: './snippet-viewer.component.html',
+  styleUrls: ['./snippet-viewer.component.css'],
+  imports: [NgFor, SnippetComponent_1],
 })
 export class SnippetViewerComponent implements OnInit, OnDestroy {
-
-
   @Input()
   configIndex: number;
 
@@ -33,45 +31,52 @@ export class SnippetViewerComponent implements OnInit, OnDestroy {
 
   @ViewChildren(SnippetComponent) childSnippets: QueryList<SnippetComponent>;
 
-
-  constructor(private views: ViewsService,
+  constructor(
+    private views: ViewsService,
     private dataService: SnippetViewerDataService,
     private logbookInfo: LogbookInfoService,
-    private notificationService: ChangeStreamService) { }
+    private notificationService: ChangeStreamService,
+  ) {}
 
   ngOnInit(): void {
-    console.log("create SnippetViewerComponent")
-    this.subscriptions.push(this.views.currentWidgetConfigs.subscribe(config => {
-      this.getSnippetData(config);
-      this.config = config[this.configIndex].config;
-      this.startNotificationManager();
-    }));
-
-    
+    console.log('create SnippetViewerComponent');
+    this.subscriptions.push(
+      this.views.currentWidgetConfigs.subscribe((config) => {
+        this.getSnippetData(config);
+        this.config = config[this.configIndex].config;
+        this.startNotificationManager();
+      }),
+    );
   }
 
-  startNotificationManager(){
+  startNotificationManager() {
     if (this.notificationSubscription != null) {
       this.notificationSubscription.unsubscribe();
     }
-    this.notificationSubscription = this.notificationService.getNotification(this.logbookInfo.logbookInfo.id, this.config).subscribe(data => {
-      console.log(data);
-      this.snippetData.forEach(snippet => {
-        if (data.id == snippet.id) {
-          for (const key in data.content) {
-            snippet[key] = data.content[key];
+    this.notificationSubscription = this.notificationService
+      .getNotification(this.logbookInfo.logbookInfo.id, this.config)
+      .subscribe((data) => {
+        console.log(data);
+        this.snippetData.forEach((snippet) => {
+          if (data.id == snippet.id) {
+            for (const key in data.content) {
+              snippet[key] = data.content[key];
+            }
           }
-        }
-        console.log(this.childSnippets.length)
-        this.childSnippets.toArray()[0].updateContent();
-      })
-    });
+          console.log(this.childSnippets.length);
+          this.childSnippets.toArray()[0].updateContent();
+        });
+      });
   }
 
-  async getSnippetData(config:WidgetConfig[]){
-    console.log(this.configIndex)
-    if ((config != null) && (typeof this.configIndex != "undefined") && (this.configIndex < config.length)) {
-      console.log(config)
+  async getSnippetData(config: WidgetConfig[]) {
+    console.log(this.configIndex);
+    if (
+      config != null &&
+      typeof this.configIndex != 'undefined' &&
+      this.configIndex < config.length
+    ) {
+      console.log(config);
       this.snippetId = config[this.configIndex].config.filter.targetId;
       this.snippetData = await this.dataService.getSnippetViewerData(this.snippetId);
     }
@@ -80,10 +85,10 @@ export class SnippetViewerComponent implements OnInit, OnDestroy {
   ngOnDestroy(): void {
     //Called once, before the instance is destroyed.
     //Add 'implements OnDestroy' to the class.
-    console.log("destroy snippetViewerComponent")
-    this.subscriptions.forEach(sub => {
+    console.log('destroy snippetViewerComponent');
+    this.subscriptions.forEach((sub) => {
       sub.unsubscribe();
-    })
+    });
     if (this.snippetSubscription != null) {
       this.snippetSubscription.unsubscribe();
     }
@@ -91,5 +96,4 @@ export class SnippetViewerComponent implements OnInit, OnDestroy {
       this.notificationSubscription.unsubscribe();
     }
   }
-
 }

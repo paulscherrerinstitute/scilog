@@ -1,49 +1,48 @@
 .settings-container {
-    width: calc(100%);
-    height: 80vh;
+  width: calc(100%);
+  height: 80vh;
 }
 
-.sidenav-container{
-    height: calc(100%);
+.sidenav-container {
+  height: calc(100%);
 }
 
 .left-sidenav {
-    background: #86a7b1;
-    color: #ffffff;
-    box-shadow: 0 1px 4px 0 rgba(0, 0, 0, .2), 0 2px 8px 0 rgba(0, 0, 0, .14), 0 4px 8px -1px rgba(0, 0, 0, .12);
-    width:100px;
-
+  background: #86a7b1;
+  color: #ffffff;
+  box-shadow:
+    0 1px 4px 0 rgba(0, 0, 0, 0.2),
+    0 2px 8px 0 rgba(0, 0, 0, 0.14),
+    0 4px 8px -1px rgba(0, 0, 0, 0.12);
+  width: 100px;
 }
 
 .main-content {
+  /* padding-bottom: 60px; */
+  /* padding-top: 10px; */
+  background: #f0f0f0;
+  padding: 0px;
+  width: calc(80vw - 100px);
 
-    /* padding-bottom: 60px; */
-    /* padding-top: 10px; */
-    background: #f0f0f0;
-    padding: 0px;
-    width: calc(80vw - 100px);
-
-    /* min-height: 100vh; */
+  /* min-height: 100vh; */
 }
 
 .divButtons {
-    margin: 20px;
-    display: block;
+  margin: 20px;
+  display: block;
 }
 
-.dialog-footer{
-    top:5px;
-    right:6px;
-    z-index: 1000;
-    position: absolute;
-  }
+.dialog-footer {
+  top: 5px;
+  right: 6px;
+  z-index: 1000;
+  position: absolute;
+}
 
-  .logo{
-      width: 100%;
-      height: 50px;
-      display: flex;
-      justify-content: center;
-      background-color: #002435;
-  }
-
-
+.logo {
+  width: 100%;
+  height: 50px;
+  display: flex;
+  justify-content: center;
+  background-color: #002435;
+}

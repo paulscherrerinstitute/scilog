@@ -6,18 +6,21 @@ import { of } from 'rxjs';
 
 describe('UserPreferencesService', () => {
   let service: UserPreferencesService;
-  let dataServiceSpy:any;
+  let dataServiceSpy: any;
 
-  dataServiceSpy = jasmine.createSpyObj("UserPreferencesDataService", 
-  ["getUserPreferences", "getUserInfo", "postUserPreferences"]);
+  dataServiceSpy = jasmine.createSpyObj('UserPreferencesDataService', [
+    'getUserPreferences',
+    'getUserInfo',
+    'postUserPreferences',
+  ]);
   dataServiceSpy.getUserPreferences.and.returnValue(of({}));
-  dataServiceSpy.postUserPreferences.and.returnValue(Promise.resolve({id: "1"}));
+  dataServiceSpy.postUserPreferences.and.returnValue(Promise.resolve({ id: '1' }));
 
   beforeEach(() => {
     TestBed.configureTestingModule({
       providers: [
         UserPreferencesService,
-        {provide: UserPreferencesDataService, useValue: dataServiceSpy}
+        { provide: UserPreferencesDataService, useValue: dataServiceSpy },
       ],
     });
     service = TestBed.inject(UserPreferencesService);

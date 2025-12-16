@@ -3,8 +3,7 @@ import { SearchDataService, LogbookDataService } from '@shared/remote-data.servi
 import { ScrollBaseService } from '@shared/scroll-base.service';
 
 export class SearchScrollBaseService extends ScrollBaseService {
-
-  protected dataService: SearchDataService | LogbookDataService
+  protected dataService: SearchDataService | LogbookDataService;
 
   private setSearchString(searchString: string) {
     this.dataService.searchString = searchString;
@@ -14,21 +13,15 @@ export class SearchScrollBaseService extends ScrollBaseService {
     this.setSearchString(searchString);
     super.reset();
   }
-
 }
 
 @Injectable({ providedIn: 'root' })
 export class SearchScrollService extends SearchScrollBaseService {
-
-  constructor(
-    protected dataService: SearchDataService,
-  ) {
+  constructor(protected dataService: SearchDataService) {
     super();
   }
 
-
-  getDataBuffer(index:number, count:number, config:any){
+  getDataBuffer(index: number, count: number, config: any) {
     return this.dataService.getDataBuffer(index, count, config);
   }
-
 }

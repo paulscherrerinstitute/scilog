@@ -1,40 +1,39 @@
 @import './shadows';
 
-
 @mixin fab-mini-button {
-    ::ng-deep .mat-mdc-mini-fab.mat-accent {
-        background-color: var(--button-accent);
-        color: var(-button-accent-icon);
-    }
+  ::ng-deep .mat-mdc-mini-fab.mat-accent {
+    background-color: var(--button-accent);
+    color: var(-button-accent-icon);
+  }
 }
 @mixin fab-button {
-    ::ng-deep .mat-mdc-fab.mat-primary {
-        background-color: var(--button-accent);
-        color: var(-button-accent-icon);
-    }
+  ::ng-deep .mat-mdc-fab.mat-primary {
+    background-color: var(--button-accent);
+    color: var(-button-accent-icon);
+  }
 
-    ::ng-deep .mat-mdc-fab:not([class*="mat-elevation-z"]){
-        @include default-shadow;
-    }
-    
-    ::ng-deep .mat-mdc-fab.mat-accent {
-      background-color: var(--button-accent);
-      color: var(-button-accent-icon);
-    }
+  ::ng-deep .mat-mdc-fab:not([class*='mat-elevation-z']) {
+    @include default-shadow;
+  }
+
+  ::ng-deep .mat-mdc-fab.mat-accent {
+    background-color: var(--button-accent);
+    color: var(-button-accent-icon);
+  }
 }
 
 @mixin fab-button-nav {
-    ::ng-deep .mat-mdc-fab.mat-primary {
-        background-color: var(--toolbar-color);
-        color: var(-button-accent-icon);
-    }
+  ::ng-deep .mat-mdc-fab.mat-primary {
+    background-color: var(--toolbar-color);
+    color: var(-button-accent-icon);
+  }
 
-    ::ng-deep .mat-mdc-fab:not([class*="mat-elevation-z"]){
-        @include default-shadow;
-    }
-    
-    ::ng-deep .mat-mdc-fab.mat-accent {
-      background-color: var(--toolbar-color);
-      color: var(-button-accent-icon);
-    }
+  ::ng-deep .mat-mdc-fab:not([class*='mat-elevation-z']) {
+    @include default-shadow;
+  }
+
+  ::ng-deep .mat-mdc-fab.mat-accent {
+    background-color: var(--toolbar-color);
+    color: var(-button-accent-icon);
+  }
 }

@@ -7,19 +7,18 @@ import { MatTooltip } from '@angular/material/tooltip';
 import { MatIcon } from '@angular/material/icon';
 
 @Component({
-    selector: 'app-actions-menu',
-    templateUrl: './actions-menu.component.html',
-    providers: [IsAllowedService],
-    imports: [MatIconButton, MatMenuTrigger, MatTooltip, MatIcon, MatMenu, MatMenuItem]
+  selector: 'app-actions-menu',
+  templateUrl: './actions-menu.component.html',
+  providers: [IsAllowedService],
+  imports: [MatIconButton, MatMenuTrigger, MatTooltip, MatIcon, MatMenu, MatMenuItem],
 })
 export class ActionsMenuComponent implements OnInit {
-
   @Input() logbook: Logbooks;
   @Output() logbookEdit = new EventEmitter<Logbooks>();
   @Output() logbookDelete = new EventEmitter<string>();
 
   constructor(protected isAllowedService: IsAllowedService) {}
-  
+
   ngOnInit(): void {
     this.enableActions();
   }
@@ -36,5 +35,4 @@ export class ActionsMenuComponent implements OnInit {
   deleteLogbook() {
     this.logbookDelete.emit(this.logbook.id);
   }
-
 }

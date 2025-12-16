@@ -1,32 +1,32 @@
-
-.task-mat-card{
-    margin-bottom: 1px;
-    margin-left: 20px;
-    margin-right: 20px;
-    margin-top: 1px;
-    min-height: 100%;
-    text-align: left;
-    border-radius: 5px;
-    padding: 4px 0px;
-    box-shadow: 0 1px 4px 0 rgba(0, 0, 0, .2), 0 2px 8px 0 rgba(0, 0, 0, .14), 0 4px 8px -1px rgba(0, 0, 0, .12);
-    // background-color: var(--sidenav-color);
-    color: var(--default-text-color);
-  
+.task-mat-card {
+  margin-bottom: 1px;
+  margin-left: 20px;
+  margin-right: 20px;
+  margin-top: 1px;
+  min-height: 100%;
+  text-align: left;
+  border-radius: 5px;
+  padding: 4px 0px;
+  box-shadow:
+    0 1px 4px 0 rgba(0, 0, 0, 0.2),
+    0 2px 8px 0 rgba(0, 0, 0, 0.14),
+    0 4px 8px -1px rgba(0, 0, 0, 0.12);
+  // background-color: var(--sidenav-color);
+  color: var(--default-text-color);
 }
 
-
-.task-content{
-    display: flex;
-    align-items: center;
-    padding: 5px 5px 5px 15px !important;
-    max-width: 100%;
+.task-content {
+  display: flex;
+  align-items: center;
+  padding: 5px 5px 5px 15px !important;
+  max-width: 100%;
 }
 
 .task-text {
-    padding-left: 20px;
-    padding-right: 10px;
+  padding-left: 20px;
+  padding-right: 10px;
 }
 
 .flexExpand {
-    flex: 1 1 auto;
+  flex: 1 1 auto;
 }

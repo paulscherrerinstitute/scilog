@@ -1,9 +1,25 @@
-import { Component, OnInit, EventEmitter, Output, Input, ViewChild, ElementRef, AfterViewInit } from '@angular/core';
+import {
+  Component,
+  OnInit,
+  EventEmitter,
+  Output,
+  Input,
+  ViewChild,
+  ElementRef,
+  AfterViewInit,
+} from '@angular/core';
 import { Logbooks } from '@model/logbooks';
 import { LogbookInfoService } from '@shared/logbook-info.service';
 import { LogbookItemDataService } from '@shared/remote-data.service';
 import { Router, RouterLink } from '@angular/router';
-import { MatCard, MatCardHeader, MatCardTitle, MatCardSubtitle, MatCardContent, MatCardActions } from '@angular/material/card';
+import {
+  MatCard,
+  MatCardHeader,
+  MatCardTitle,
+  MatCardSubtitle,
+  MatCardContent,
+  MatCardActions,
+} from '@angular/material/card';
 import { MatTooltip } from '@angular/material/tooltip';
 import { ActionsMenuComponent } from '../actions-menu/actions-menu.component';
 import { NgIf } from '@angular/common';
@@ -11,13 +27,25 @@ import { MatDivider } from '@angular/material/divider';
 import { MatButton } from '@angular/material/button';
 
 @Component({
-    selector: 'app-logbook-cover',
-    templateUrl: './logbook-cover.component.html',
-    styleUrls: ['./logbook-cover.component.css'],
-    imports: [MatCard, MatCardHeader, MatCardTitle, MatTooltip, MatCardSubtitle, ActionsMenuComponent, NgIf, RouterLink, MatCardContent, MatDivider, MatCardActions, MatButton]
+  selector: 'app-logbook-cover',
+  templateUrl: './logbook-cover.component.html',
+  styleUrls: ['./logbook-cover.component.css'],
+  imports: [
+    MatCard,
+    MatCardHeader,
+    MatCardTitle,
+    MatTooltip,
+    MatCardSubtitle,
+    ActionsMenuComponent,
+    NgIf,
+    RouterLink,
+    MatCardContent,
+    MatDivider,
+    MatCardActions,
+    MatButton,
+  ],
 })
 export class LogbookWidgetComponent implements OnInit, AfterViewInit {
-
   @Output() logbookSelection = new EventEmitter<string>();
   @Output() logbookEdit = new EventEmitter<Logbooks>();
   @Output() logbookDelete = new EventEmitter<string>();
@@ -34,7 +62,8 @@ export class LogbookWidgetComponent implements OnInit, AfterViewInit {
   constructor(
     private logbookItemDataService: LogbookItemDataService,
     private logbookInfo: LogbookInfoService,
-    private router: Router) { }
+    private router: Router,
+  ) {}
 
   ngOnInit(): void {
     if (this.logbook?.thumbnail) {
@@ -46,14 +75,17 @@ export class LogbookWidgetComponent implements OnInit, AfterViewInit {
     setTimeout(() => {
       this.isOverflowing = this.isOverflown(this.cardHeader);
     });
-
   }
 
   createImageFromBlob(image: Blob) {
     let reader = new FileReader();
-    reader.addEventListener("load", () => {
-      this.imageToShow = reader.result;
-    }, false);
+    reader.addEventListener(
+      'load',
+      () => {
+        this.imageToShow = reader.result;
+      },
+      false,
+    );
 
     if (image) {
       reader.readAsDataURL(image);
@@ -70,7 +102,7 @@ export class LogbookWidgetComponent implements OnInit, AfterViewInit {
   selection() {
     this.logbookSelection.emit(this.logbook.id);
     this.logbookInfo.logbookInfo = this.logbook;
-    console.log("updating logbook in service:", this.logbookInfo.logbookInfo)
+    console.log('updating logbook in service:', this.logbookInfo.logbookInfo);
   }
 
   editLogbook() {
@@ -89,5 +121,4 @@ export class LogbookWidgetComponent implements OnInit, AfterViewInit {
     this.router.navigateByUrl(`/logbooks/${this.logbook.id}/dashboard`);
     this.selection();
   }
-
 }

@@ -7,12 +7,10 @@ import { AppConfigService } from 'src/app/app-config.service';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { AuthService } from '@shared/auth-services/auth.service';
 
-
 class UserPreferencesMock {
   userInfo = {
-    roles: ["roles"]
-
-  }
+    roles: ['roles'],
+  };
 }
 
 class AuthServiceMock {
@@ -33,16 +31,15 @@ describe('ProfileSettingsComponent', () => {
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-    imports: [ProfileSettingsComponent],
-    providers: [
+      imports: [ProfileSettingsComponent],
+      providers: [
         UntypedFormBuilder,
         { provide: UserPreferencesService, useClass: UserPreferencesMock },
         { provide: AppConfigService, useValue: { getConfig } },
         { provide: MatSnackBar, useClass: MatSnackBarMock },
-        { provide: AuthService, useClass: AuthServiceMock }
-    ]
-})
-    .compileComponents();
+        { provide: AuthService, useClass: AuthServiceMock },
+      ],
+    }).compileComponents();
   }));
 
   beforeEach(() => {
