@@ -1,27 +1,29 @@
-.counter{
-    text-align: right;
+.counter {
+  text-align: right;
 }
 
-.add-task{
-    padding-left: 20px;
+.add-task {
+  padding-left: 20px;
 }
 
-.task-mat-card{
-    margin-bottom: 1px;
-    margin-left: 20px;
-    margin-right: 20px;
-    margin-top: 1px;
-    min-height: 100%;
-    text-align: left;
-    border-radius: 5px;
-    padding: 4px 0px;
-    box-shadow: 0 1px 4px 0 rgba(0, 0, 0, .2), 0 2px 8px 0 rgba(0, 0, 0, .14), 0 4px 8px -1px rgba(0, 0, 0, .12);
-    // background-color: var(--sidenav-color);
-    color: var(--default-text-color);
-  
+.task-mat-card {
+  margin-bottom: 1px;
+  margin-left: 20px;
+  margin-right: 20px;
+  margin-top: 1px;
+  min-height: 100%;
+  text-align: left;
+  border-radius: 5px;
+  padding: 4px 0px;
+  box-shadow:
+    0 1px 4px 0 rgba(0, 0, 0, 0.2),
+    0 2px 8px 0 rgba(0, 0, 0, 0.14),
+    0 4px 8px -1px rgba(0, 0, 0, 0.12);
+  // background-color: var(--sidenav-color);
+  color: var(--default-text-color);
 }
 
 /* TODO(mdc-migration): The following rule targets internal classes of checkbox that may no longer apply for the MDC version.*/
 ::ng-deep .mat-checkbox-checked.mat-accent .mat-checkbox-background {
-    background-color: var(--button-accent);
+  background-color: var(--button-accent);
 }

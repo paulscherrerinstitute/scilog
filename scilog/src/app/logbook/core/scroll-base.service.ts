@@ -4,7 +4,6 @@ import { WidgetItemConfig } from '@model/config';
 
 @Injectable()
 export class ScrollBaseService {
-
   datasource: IDatasource = null;
   startIndex = 0;
   config: WidgetItemConfig = null;
@@ -31,18 +30,20 @@ export class ScrollBaseService {
 
   protected setupDatasource() {
     if (this.datasource != null) {
-      this.datasource.adapter.reset(new Datasource({
-        get: async (index: number, count: number) => {
-          return this.getDataBuffer(index, count, this.config);
-        },
+      this.datasource.adapter.reset(
+        new Datasource({
+          get: async (index: number, count: number) => {
+            return this.getDataBuffer(index, count, this.config);
+          },
 
-        settings: {
-          minIndex: 0,
-          startIndex: this.startIndex,
-          bufferSize: 50,
-          padding: 3,
-        }
-      }));
+          settings: {
+            minIndex: 0,
+            startIndex: this.startIndex,
+            bufferSize: 50,
+            padding: 3,
+          },
+        }),
+      );
     } else {
       this.datasource = new Datasource({
         get: async (index: number, count: number) => {
@@ -54,7 +55,7 @@ export class ScrollBaseService {
           startIndex: this.startIndex,
           bufferSize: 50,
           padding: 3,
-        }
+        },
       });
     }
   }
@@ -64,7 +65,7 @@ export class ScrollBaseService {
   }
 
   getDataBuffer(index: number, count: number, config: any) {
-    throw new Error("Abstract method needs to be implemented in derived class.")
+    throw new Error('Abstract method needs to be implemented in derived class.');
   }
 
   isLoadedDecorator(func: Function) {
@@ -73,15 +74,13 @@ export class ScrollBaseService {
       let data;
       try {
         data = await func(index, count, config);
-      }
-      catch {
+      } catch {
         console.log('scroller get data returned an error');
-      }
-      finally {
+      } finally {
         this.isLoaded = true;
         return data;
       }
-    }
+    };
     return decorated;
   }
 
@@ -91,7 +90,7 @@ export class ScrollBaseService {
   }
 
   remove(id: string) {
-    this.datasource.adapter.remove({ predicate: ({ data }) => (data as {id: string}).id === id });
+    this.datasource.adapter.remove({ predicate: ({ data }) => (data as { id: string }).id === id });
   }
 
   reset() {
@@ -130,14 +129,12 @@ export class ScrollBaseService {
   get isEOF() {
     return this.datasource.adapter.eof;
   }
-  async goToSnippetIndex(index: number, _cb_after_relax: (...args: any[]) => void = () => { }) {
+  async goToSnippetIndex(index: number, _cb_after_relax: (...args: any[]) => void = () => {}) {
     // jump to index in viewport, starting with index 0
     this.startIndex = index;
     this.setupDatasource();
     await this.datasource.adapter.reload();
     await this.datasource.adapter.relax();
     _cb_after_relax(this.startIndex + 1, ...arguments);
-
   }
-
 }

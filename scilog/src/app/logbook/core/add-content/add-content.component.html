@@ -1,15 +1,33 @@
 <h2 mat-dialog-title>{{ dialogTitle }}</h2>
 <mat-dialog-content class="mat-dialog-content">
-  <ckeditor #contentEditor [config]="editorConfig" [editor]="Editor" [data]=data (ready)="onEditorReady($event)" (change)="onChange($event)"></ckeditor>
+  <ckeditor
+    #contentEditor
+    [config]="editorConfig"
+    [editor]="Editor"
+    [data]="data"
+    (ready)="onEditorReady($event)"
+    (change)="onChange($event)"
+  ></ckeditor>
   <!-- apparently, this can also be achieved by using [(ngModel)]="postData.content" debounce="300" -->
-  <app-tag-editor [tagIn]="tag" (tagsUpdate)="updateTags($event)" [config]="config" [syncAtStart]="false"></app-tag-editor>
+  <app-tag-editor
+    [tagIn]="tag"
+    (tagsUpdate)="updateTags($event)"
+    [config]="config"
+    [syncAtStart]="false"
+  ></app-tag-editor>
 </mat-dialog-content>
-<button (click)="loadLastUnsavedEdit()" [disabled]="noUnsavedEditTooltip()" matTooltip="{{ noUnsavedEditTooltip() }}">
+<button
+  (click)="loadLastUnsavedEdit()"
+  [disabled]="noUnsavedEditTooltip()"
+  matTooltip="{{ noUnsavedEditTooltip() }}"
+>
   Load last unsaved edit
 </button>
 <mat-dialog-actions align="end">
   <button mat-button mat-dialog-close *ngIf="!liveFeedback">Cancel</button>
-  <button mat-button [mat-dialog-close]="true" (click)="addContent($event)">{{ addButtonLabel }}</button>
+  <button mat-button [mat-dialog-close]="true" (click)="addContent($event)">
+    {{ addButtonLabel }}
+  </button>
 </mat-dialog-actions>
 
 <!-- Copyright 2020 Google LLC. All Rights Reserved.

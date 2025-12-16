@@ -7,18 +7,20 @@ import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http'
 
 describe('AuthService', () => {
   let service: AuthService;
-  let spyServerSettingsService = jasmine.createSpyObj({ getServerAddress: 'http://192.168.1.21:3000/' });
+  let spyServerSettingsService = jasmine.createSpyObj({
+    getServerAddress: 'http://192.168.1.21:3000/',
+  });
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-    imports: [],
-    providers: [
+      imports: [],
+      providers: [
         AuthService,
         { provide: ServerSettingsService, useValue: spyServerSettingsService },
         provideHttpClient(withInterceptorsFromDi()),
-        provideHttpClientTesting()
-    ]
-});
+        provideHttpClientTesting(),
+      ],
+    });
     service = TestBed.inject(AuthService);
   });
 
@@ -30,15 +32,14 @@ describe('AuthService', () => {
     expect(authService).toBeTruthy();
   }));
 
-  it('should perform login correctly',
-    fakeAsync(inject(
+  it('should perform login correctly', fakeAsync(
+    inject(
       [AuthService, HttpTestingController, ServerSettingsService],
       (authService: AuthService, backend: HttpTestingController) => {
-
         // Set up
         const responseObject = {
           success: true,
-          message: 'login was successful'
+          message: 'login was successful',
         };
         const principal = 'test@example.com';
         const password = 'testPassword';
@@ -49,9 +50,8 @@ describe('AuthService', () => {
           (receivedResponse: any) => {
             response = receivedResponse;
           },
-          (error: any) => { }
+          (error: any) => {},
         );
-
 
         const requestWrapper = backend.expectOne({ url: 'http://192.168.1.21:3000/users/login' });
         requestWrapper.flush(responseObject);
@@ -60,6 +60,7 @@ describe('AuthService', () => {
 
         expect(requestWrapper.request.method).toEqual('POST');
         expect(response).toEqual(responseObject);
-      }
-    )))
+      },
+    ),
+  ));
 });

@@ -16,16 +16,15 @@ describe('SearchWindowComponent', () => {
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-    imports: [],
-    providers: [
+      imports: [],
+      providers: [
         { provide: AppConfigService, useValue: { getConfig } },
         { provide: MatDialog, useValue: {} },
         { provide: LogbookInfoService, useValue: { logbookInfo: { id: 'id' } } },
         provideHttpClient(withInterceptorsFromDi()),
         provideHttpClientTesting(),
-    ]
-})
-    .compileComponents();
+      ],
+    }).compileComponents();
   }));
 
   beforeEach(() => {
@@ -64,14 +63,14 @@ describe('SearchWindowComponent', () => {
         targetId: 'id',
       },
       general: {
-        type: "logbook",
-        readonly: true
+        type: 'logbook',
+        readonly: true,
       },
       view: {
-        order: ["defaultOrder DESC"],
+        order: ['defaultOrder DESC'],
         hideMetadata: false,
-        showSnippetHeader: false
-      }
+        showSnippetHeader: false,
+      },
     });
   });
 
@@ -82,8 +81,8 @@ describe('SearchWindowComponent', () => {
         title: 'some different',
       },
       filter: {
-        targetId: 'id'
-      }
+        targetId: 'id',
+      },
     };
     const secondConfig = JSON.parse(JSON.stringify(firstConfig));
     secondConfig.general.title = 'Logbook view';
@@ -92,66 +91,72 @@ describe('SearchWindowComponent', () => {
       { ...positions, config: firstConfig },
       { ...positions, config: secondConfig },
     ];
-    expect(component["_extractConfig"]()).toEqual(secondConfig);
+    expect(component['_extractConfig']()).toEqual(secondConfig);
   });
 
   [
     undefined,
-    {config: 
-      {
+    {
+      config: {
         general: { type: 'logbook', title: 'Logbook view' },
-        filter: { targetId: 'id' }
+        filter: { targetId: 'id' },
       } as WidgetItemConfig,
       searchStringFromConfig: '',
-      configOut: 
-      {
+      configOut: {
         general: { type: 'logbook', title: 'Logbook view' },
-        filter: { targetId: 'id' }
+        filter: { targetId: 'id' },
       } as WidgetItemConfig,
     },
-    {config: 
-      {
+    {
+      config: {
         general: { type: 'logbook', title: 'Logbook view' },
-        filter: { targetId: 'id', tags: ['a', 'b'], excludeTags: ['c', 'd'] }
+        filter: { targetId: 'id', tags: ['a', 'b'], excludeTags: ['c', 'd'] },
       } as WidgetItemConfig,
       searchStringFromConfig: '-#c -#d #a #b',
       tagsIn: ['a', 'b', 'c', 'd', 'e'],
-      configOut: 
-      {
+      configOut: {
         general: { type: 'logbook', title: 'Logbook view' },
-        filter: { targetId: 'id' }
+        filter: { targetId: 'id' },
       } as WidgetItemConfig,
-      tagsOut: ['a', 'b']
-    }
+      tagsOut: ['a', 'b'],
+    },
   ].forEach((t, i) => {
     it(`should _prepareConfig ${i}`, () => {
       const defaultConfig = {
         filter: {
-          targetId: "id",
+          targetId: 'id',
         },
         general: {
-          type: "logbook",
-          readonly: true
+          type: 'logbook',
+          readonly: true,
         },
         view: {
-          order: ["defaultOrder DESC"],
+          order: ['defaultOrder DESC'],
           hideMetadata: false,
-          showSnippetHeader: false
-        }
+          showSnippetHeader: false,
+        },
       };
-      if (t)
-        component.configsArray = [{ cols: 0, rows: 1, y: 2, x: 3, config: t.config }];
+      if (t) component.configsArray = [{ cols: 0, rows: 1, y: 2, x: 3, config: t.config }];
       component.tags = t?.tagsIn ?? [];
-      expect(component["_prepareConfig"]()).toEqual(t? t.configOut: defaultConfig);
-      if (t)
-        expect(component.searchStringFromConfig).toEqual(t.searchStringFromConfig);
-      expect(component.tags).toEqual(t?.tagsOut ?? [])
+      expect(component['_prepareConfig']()).toEqual(t ? t.configOut : defaultConfig);
+      if (t) expect(component.searchStringFromConfig).toEqual(t.searchStringFromConfig);
+      expect(component.tags).toEqual(t?.tagsOut ?? []);
     });
   });
 
   [
-    {filter: {tags: ['a', 'b'], excludeTags: ['c', 'd'] }, prefix: '#', key: 'tags', output: '#a #b'},
-    {filter: {tags: ['a', 'b'], excludeTags: ['c', 'd'] }, prefix: '-#', key: 'excludeTags', output: '-#c -#d'},
+    {
+      filter: { tags: ['a', 'b'], excludeTags: ['c', 'd'] },
+      prefix: '#',
+      key: 'tags',
+      output: '#a #b',
+    },
+    {
+      filter: { tags: ['a', 'b'], excludeTags: ['c', 'd'] },
+      prefix: '-#',
+      key: 'excludeTags',
+      output: '-#c -#d',
+    },
   ].forEach((t, i) => {
     it(`should tagsToString ${i}`, () => {
       expect(component['tagsToString'](t.filter, t.key, t.prefix)).toEqual(t.output);
@@ -159,19 +164,19 @@ describe('SearchWindowComponent', () => {
   });
 
   it('should composeSearchString', () => {
-    const tagFilter = {tags: ['a', 'b'], excludeTags: ['c', 'd'] };
+    const tagFilter = { tags: ['a', 'b'], excludeTags: ['c', 'd'] };
     expect(component['composeSearchString'](tagFilter)).toEqual('-#c -#d #a #b');
   });
 
   [
-    {searchString: '', searchStringFromConfig: '', output: ''},
-    {searchString: ' ', searchStringFromConfig: ' ', output: ''},
-    {searchString: ' ', searchStringFromConfig: 'def', output: 'def'},
-    {searchString: 'abc', searchStringFromConfig: '', output: 'abc'},
-    {searchString: 'abc', searchStringFromConfig: ' ', output: 'abc'},
-    {searchString: 'abc', searchStringFromConfig: 'def', output: 'abc def'},
-    {searchString: 'abc', searchStringFromConfig: 'def ', output: 'abc def'},
-    {searchString: ' abc', searchStringFromConfig: 'def ', output: 'abc def'},
+    { searchString: '', searchStringFromConfig: '', output: '' },
+    { searchString: ' ', searchStringFromConfig: ' ', output: '' },
+    { searchString: ' ', searchStringFromConfig: 'def', output: 'def' },
+    { searchString: 'abc', searchStringFromConfig: '', output: 'abc' },
+    { searchString: 'abc', searchStringFromConfig: ' ', output: 'abc' },
+    { searchString: 'abc', searchStringFromConfig: 'def', output: 'abc def' },
+    { searchString: 'abc', searchStringFromConfig: 'def ', output: 'abc def' },
+    { searchString: ' abc', searchStringFromConfig: 'def ', output: 'abc def' },
   ].forEach((t, i) => {
     it(`should concatSearchStrings ${i}`, () => {
       component.searchString = t.searchString;
@@ -181,12 +186,24 @@ describe('SearchWindowComponent', () => {
   });
 
   [
-    {config: {filter: {tags: ['a', 'b', 'c'], excludeTags: ['c', 'd'] }}, tags: ['a', 'b', 'c', 'd'], expected: ['a', 'b']},
-    {config: {filter: {tags: ['a'] }}, tags: ['a', 'b', 'c', 'd'], expected: ['a']},
-    {config: {filter: {excludeTags: ['c'] }}, tags: ['a', 'b', 'c', 'd'], expected: ['a', 'b', 'd']},
-    {config: {filter: {}}, tags: ['a', 'b', 'c', 'd'], expected: ['a', 'b', 'c', 'd']},
-    {config: {}, tags: ['a', 'b', 'c', 'd'], expected: ['a', 'b', 'c', 'd']},
-    {config: {filter: {tags: [], excludeTags: [] }}, tags: ['a', 'b', 'c', 'd'], expected: ['a', 'b', 'c', 'd']}
+    {
+      config: { filter: { tags: ['a', 'b', 'c'], excludeTags: ['c', 'd'] } },
+      tags: ['a', 'b', 'c', 'd'],
+      expected: ['a', 'b'],
+    },
+    { config: { filter: { tags: ['a'] } }, tags: ['a', 'b', 'c', 'd'], expected: ['a'] },
+    {
+      config: { filter: { excludeTags: ['c'] } },
+      tags: ['a', 'b', 'c', 'd'],
+      expected: ['a', 'b', 'd'],
+    },
+    { config: { filter: {} }, tags: ['a', 'b', 'c', 'd'], expected: ['a', 'b', 'c', 'd'] },
+    { config: {}, tags: ['a', 'b', 'c', 'd'], expected: ['a', 'b', 'c', 'd'] },
+    {
+      config: { filter: { tags: [], excludeTags: [] } },
+      tags: ['a', 'b', 'c', 'd'],
+      expected: ['a', 'b', 'c', 'd'],
+    },
   ].forEach((t, i) => {
     it(`should _prepareTags ${i}`, () => {
       component.tags = t.tags;
@@ -194,5 +211,4 @@ describe('SearchWindowComponent', () => {
       expect(component.tags).toEqual(t.expected);
     });
   });
-
 });

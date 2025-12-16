@@ -1,16 +1,25 @@
-import { Component, EventEmitter, Input, OnInit, Output, ViewChild, ElementRef, AfterViewInit, AfterViewChecked } from '@angular/core';
+import {
+  Component,
+  EventEmitter,
+  Input,
+  OnInit,
+  Output,
+  ViewChild,
+  ElementRef,
+  AfterViewInit,
+  AfterViewChecked,
+} from '@angular/core';
 import { ChangeStreamNotification } from '../../changestreamnotification.model';
 import { AppConfigService } from 'src/app/app-config.service';
 import { Filecontainer } from 'src/app/core/model/basesnippets';
 import { PrismService } from '../../prism.service';
 
 @Component({
-    selector: 'app-snippet-content',
-    templateUrl: './snippet-content.component.html',
-    styleUrls: ['./snippet-content.component.css']
+  selector: 'app-snippet-content',
+  templateUrl: './snippet-content.component.html',
+  styleUrls: ['./snippet-content.component.css'],
 })
 export class SnippetContentComponent implements OnInit, AfterViewInit, AfterViewChecked {
-
   @Input()
   snippet: ChangeStreamNotification;
 
@@ -18,22 +27,21 @@ export class SnippetContentComponent implements OnInit, AfterViewInit, AfterView
 
   @Output() isLoading = new EventEmitter<boolean>();
 
-
   _content: string;
   span: any;
   files: string[] = [];
   defaultFigureWidth = '85%';
   contentWidth = null;
   _prismed = false;
-  _edited = "";
+  _edited = '';
 
   @ViewChild('contentDiv') contentRef: ElementRef;
 
   constructor(
     private appConfigService: AppConfigService,
-    private prismservice: PrismService
+    private prismservice: PrismService,
   ) {
-    console.log(this)
+    console.log(this);
   }
 
   ngOnInit(): void {
@@ -59,14 +67,14 @@ export class SnippetContentComponent implements OnInit, AfterViewInit, AfterView
   }
 
   prepareContent() {
-    if (!this.snippet.files || (this.snippet.files.length == 0)) {
+    if (!this.snippet.files || this.snippet.files.length == 0) {
       this.content = this.snippet?.textcontent;
       return;
     }
 
     this.span = document.createElement('figure');
     this.span.innerHTML = this.snippet?.textcontent;
-    const images = this.span.querySelectorAll("img")
+    const images = this.span.querySelectorAll('img');
     this.addLinksToImages(images);
 
     images.forEach((img: HTMLImageElement) => {
@@ -74,15 +82,16 @@ export class SnippetContentComponent implements OnInit, AfterViewInit, AfterView
       if (file == undefined) {
         return;
       }
-      let imageId = file.accessHash ?? file.fileId
+      let imageId = file.accessHash ?? file.fileId;
       this.setImageUrl(img, imageId);
       this.setImageStyle(img, file.style);
     });
 
-
-    const fileLinks = this.span.querySelectorAll(".fileLink");
-    fileLinks.forEach(fileRef => {
-      let file = this.snippet.files.find(file => { return (file['fileHash'] == fileRef['pathname'].substring(1)) });
+    const fileLinks = this.span.querySelectorAll('.fileLink');
+    fileLinks.forEach((fileRef) => {
+      let file = this.snippet.files.find((file) => {
+        return file['fileHash'] == fileRef['pathname'].substring(1);
+      });
       if (typeof file != 'undefined') {
         fileRef['href'] = fileRef['baseURI'] + 'download/' + file.fileId;
       }
@@ -91,18 +100,18 @@ export class SnippetContentComponent implements OnInit, AfterViewInit, AfterView
   }
 
   private setEdited(content: string) {
-    if (this.snippet?.updatedAt === this.snippet?.createdAt || !this.snippet?.id_session) 
-      return content
-    const emptyElement = document.createElement("span");
-    const edited = document.createElement("span");
-    edited.classList.add("snippet-edited");
-    edited.innerHTML = "(edited)";
+    if (this.snippet?.updatedAt === this.snippet?.createdAt || !this.snippet?.id_session)
+      return content;
+    const emptyElement = document.createElement('span');
+    const edited = document.createElement('span');
+    edited.classList.add('snippet-edited');
+    edited.innerHTML = '(edited)';
     emptyElement.appendChild(edited);
     if (content) {
       edited.insertAdjacentHTML('beforebegin', content);
-      emptyElement.firstElementChild.classList.add("snippet-content-edited");
+      emptyElement.firstElementChild.classList.add('snippet-content-edited');
     }
-    return emptyElement.innerHTML
+    return emptyElement.innerHTML;
   }
 
   private setImageUrl(img: HTMLImageElement, id: string) {
@@ -115,28 +124,27 @@ export class SnippetContentComponent implements OnInit, AfterViewInit, AfterView
     if (style == undefined) {
       return;
     }
-    const width = (style.width != "") ? style.width : this.defaultFigureWidth;
+    const width = style.width != '' ? style.width : this.defaultFigureWidth;
     img.setAttribute('width', width);
 
-    if (style.height != "") {
+    if (style.height != '') {
       img.setAttribute('height', style.height);
     }
   }
 
   private _srcUrlFromImageId(imageId: string) {
-    return `${this.appConfigService.getConfig().lbBaseURL ?? "http://localhost:3000/"}images/${imageId}`;
+    return `${this.appConfigService.getConfig().lbBaseURL ?? 'http://localhost:3000/'}images/${imageId}`;
   }
 
   private addLinksToImages(images: any) {
-    if (images.length === 0)
-      return images;
+    if (images.length === 0) return images;
     for (const image of images) {
       if (!image.parentElement.firstChild.href) {
         const hrefElement = document.createElement('a');
         hrefElement.setAttribute('target', '_blank');
         hrefElement.setAttribute('rel', 'noopener noreferrer');
-        image.parentElement.appendChild(hrefElement)
-        hrefElement.appendChild(image)
+        image.parentElement.appendChild(hrefElement);
+        hrefElement.appendChild(image);
       } else {
         image.parentElement.firstChild.setAttribute('target', '_blank');
         image.parentElement.firstChild.setAttribute('rel', 'noopener noreferrer');
@@ -155,6 +163,4 @@ export class SnippetContentComponent implements OnInit, AfterViewInit, AfterView
   get content() {
     return this.setEdited(this._content ?? '');
   }
-
 }
-

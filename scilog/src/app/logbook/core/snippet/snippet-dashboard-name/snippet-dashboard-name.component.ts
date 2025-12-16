@@ -1,5 +1,11 @@
 import { Component, Inject } from '@angular/core';
-import { MatDialogRef, MAT_DIALOG_DATA, MatDialogTitle, MatDialogContent, MatDialogActions } from '@angular/material/dialog';
+import {
+  MatDialogRef,
+  MAT_DIALOG_DATA,
+  MatDialogTitle,
+  MatDialogContent,
+  MatDialogActions,
+} from '@angular/material/dialog';
 import { Subscription } from 'rxjs';
 import { ChangeStreamNotification } from '../../changestreamnotification.model';
 import { Basesnippets } from '@model/basesnippets';
@@ -11,34 +17,43 @@ import { FormsModule } from '@angular/forms';
 import { MatButton } from '@angular/material/button';
 
 @Component({
-    selector: 'app-snippet-dashboard-name',
-    templateUrl: './snippet-dashboard-name.component.html',
-    styleUrls: ['./snippet-dashboard-name.component.css'],
-    imports: [MatDialogTitle, CdkScrollable, MatDialogContent, MatFormField, MatLabel, MatInput, FormsModule, MatDialogActions, MatButton]
+  selector: 'app-snippet-dashboard-name',
+  templateUrl: './snippet-dashboard-name.component.html',
+  styleUrls: ['./snippet-dashboard-name.component.css'],
+  imports: [
+    MatDialogTitle,
+    CdkScrollable,
+    MatDialogContent,
+    MatFormField,
+    MatLabel,
+    MatInput,
+    FormsModule,
+    MatDialogActions,
+    MatButton,
+  ],
 })
 export class SnippetDashboardNameComponent {
-
   snippet: Basesnippets;
-  updateSubscription: Subscription = null; 
+  updateSubscription: Subscription = null;
 
   constructor(
     @Inject(MAT_DIALOG_DATA) public data: Basesnippets,
     private dialogRef: MatDialogRef<SnippetDashboardNameComponent>,
-    private dataService: LogbookItemDataService) {
-      this.snippet = data;
-     }
+    private dataService: LogbookItemDataService,
+  ) {
+    this.snippet = data;
+  }
 
-  cancelClick(){
+  cancelClick() {
     this.dialogRef.close();
   }
 
-  async saveClick(){
+  async saveClick() {
     let payload: ChangeStreamNotification = {
-      dashboardName: this.snippet.dashboardName
+      dashboardName: this.snippet.dashboardName,
     };
-    console.log(payload)
+    console.log(payload);
     await this.dataService.uploadParagraph(payload, this.snippet.id);
     this.dialogRef.close();
   }
-
 }

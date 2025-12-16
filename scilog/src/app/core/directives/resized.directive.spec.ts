@@ -5,8 +5,8 @@ import { ResizedDirective } from './resized.directive';
 import { By } from '@angular/platform-browser';
 
 @Component({
-    template: `<div style="width: 10px" (appResized)="hasBeenResized()"></div>`,
-    imports: [ResizedDirective],
+  template: `<div style="width: 10px" (appResized)="hasBeenResized()"></div>`,
+  imports: [ResizedDirective],
 })
 class TestComponent {
   isResized = false;
@@ -22,8 +22,8 @@ describe('resizedDirective', () => {
 
   beforeEach(() => {
     fixture = TestBed.configureTestingModule({
-    imports: [ResizedDirective, TestComponent],
-}).createComponent(TestComponent);
+      imports: [ResizedDirective, TestComponent],
+    }).createComponent(TestComponent);
     component = fixture.componentInstance;
     divElement = fixture.debugElement.query(By.css('div'));
     fixture.detectChanges();

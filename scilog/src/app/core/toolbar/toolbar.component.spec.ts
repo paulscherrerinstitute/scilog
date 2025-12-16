@@ -17,10 +17,13 @@ describe('ToolbarComponent', () => {
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-    imports: [RouterTestingModule, MatDialogModule, MatMenuModule, ToolbarComponent],
-    providers: [{ provide: AppConfigService, useValue: { getConfig } }, provideHttpClient(withInterceptorsFromDi()), provideHttpClientTesting(),]
-})
-    .compileComponents();
+      imports: [RouterTestingModule, MatDialogModule, MatMenuModule, ToolbarComponent],
+      providers: [
+        { provide: AppConfigService, useValue: { getConfig } },
+        provideHttpClient(withInterceptorsFromDi()),
+        provideHttpClientTesting(),
+      ],
+    }).compileComponents();
   }));
 
   beforeEach(() => {
@@ -36,10 +39,9 @@ describe('ToolbarComponent', () => {
   it('should setSearch', () => {
     component.showSearch = true;
     fixture.detectChanges();
-    fixture.debugElement.query(
-      By.css('app-search-window')
-    ).triggerEventHandler('overviewSearch', 'searched');
+    fixture.debugElement
+      .query(By.css('app-search-window'))
+      .triggerEventHandler('overviewSearch', 'searched');
     expect(component.searched).toEqual('searched');
   });
-
 });

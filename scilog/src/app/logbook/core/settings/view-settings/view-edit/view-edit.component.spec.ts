@@ -6,36 +6,37 @@ import { UserPreferencesService } from '@shared/user-preferences.service';
 import { ViewDataService } from '@shared/remote-data.service';
 import { MatAutocomplete } from '@angular/material/autocomplete';
 
-
 class UserPreferencesMock {
   userInfo = {
-    roles: ["roles"]
-
-  }
+    roles: ['roles'],
+  };
 }
 
 describe('ViewEditComponent', () => {
   let component: ViewEditComponent;
   let fixture: ComponentFixture<ViewEditComponent>;
-  let viewDataServiceSpy:any;
-  viewDataServiceSpy = jasmine.createSpyObj("ViewDataService", ["getViews", "patchView", "postView"]);
+  let viewDataServiceSpy: any;
+  viewDataServiceSpy = jasmine.createSpyObj('ViewDataService', [
+    'getViews',
+    'patchView',
+    'postView',
+  ]);
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-    providers: [
+      providers: [
         UntypedFormBuilder,
         { provide: UserPreferencesService, useClass: UserPreferencesMock },
-        { provide: ViewDataService, useValue: viewDataServiceSpy }
-    ],
-    imports: [MatAutocomplete, ViewEditComponent]
-})
-    .compileComponents();
+        { provide: ViewDataService, useValue: viewDataServiceSpy },
+      ],
+      imports: [MatAutocomplete, ViewEditComponent],
+    }).compileComponents();
   }));
 
   beforeEach(() => {
     fixture = TestBed.createComponent(ViewEditComponent);
     component = fixture.componentInstance;
-    component["availLocations"] = [];
+    component['availLocations'] = [];
     fixture.detectChanges();
   });
 

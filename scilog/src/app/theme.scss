@@ -11,44 +11,42 @@
 @include mat.all-component-typographies();
 @include mat.elevation-classes();
 @include mat.app-background();
-  
-
 
 $scilog-colors: (
-    50 : #f0f0f0, // background
-    100 : #b3c9d0,
-    200 : #80a6b1,
-    300 : #4d8292,
-    400 : #26677a,
-    500 : #004c63,
-    600 : #00455b,
-    700 : #003c51,
-    800 : #003347,
-    900 : #002435,
-    A100 : #6dc1ff,
-    A200 : #3aacff,
-    A400 : #0796ff,
-    A700 : #ec2300,
-    contrast: (
-        50 : #000000,
-        100 : #000000,
-        200 : #000000,
-        300 : #ffffff,
-        400 : #ffffff,
-        500 : #ffffff,
-        600 : #ffffff,
-        700 : #ffffff,
-        800 : #ffffff,
-        900 : #ffffff,
-        A100 : #000000,
-        A200 : #000000,
-        A400 : #ffffff,
-        A700 : #ffffff,
-    )
+  50: #f0f0f0,
+  // background
+  100: #b3c9d0,
+  200: #80a6b1,
+  300: #4d8292,
+  400: #26677a,
+  500: #004c63,
+  600: #00455b,
+  700: #003c51,
+  800: #003347,
+  900: #002435,
+  A100: #6dc1ff,
+  A200: #3aacff,
+  A400: #0796ff,
+  A700: #ec2300,
+  contrast: (
+    50: #000000,
+    100: #000000,
+    200: #000000,
+    300: #ffffff,
+    400: #ffffff,
+    500: #ffffff,
+    600: #ffffff,
+    700: #ffffff,
+    800: #ffffff,
+    900: #ffffff,
+    A100: #000000,
+    A200: #000000,
+    A400: #ffffff,
+    A700: #ffffff,
+  ),
 );
-  
 
-/* ======== Angular material custom themes ======== */ 
+/* ======== Angular material custom themes ======== */
 $my-custom-primary: mat.m2-define-palette($scilog-colors, 900, 700, 900);
 $my-custom-accent: mat.m2-define-palette($scilog-colors, 500, 200, A100);
 $my-custom-warn: mat.m2-define-palette($scilog-colors, A700);
@@ -57,12 +55,11 @@ $my-custom-theme: mat.m2-define-light-theme($my-custom-primary, $my-custom-accen
 
 @include mat.all-component-themes($my-custom-theme);
 
-
 .warning-snackbar {
-    background: rgb(236, 55, 9);
-    color: rgb(255, 255, 255)
-  }
+  background: rgb(236, 55, 9);
+  color: rgb(255, 255, 255);
+}
 .resolved-snackbar {
-    background: rgb(13, 153, 24);
-    color: rgb(255, 255, 255)
-  }
+  background: rgb(13, 153, 24);
+  color: rgb(255, 255, 255);
+}

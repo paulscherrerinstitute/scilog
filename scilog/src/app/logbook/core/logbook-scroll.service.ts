@@ -6,7 +6,6 @@ import _ from 'lodash';
 
 @Injectable()
 export class LogbookScrollService extends ScrollBaseService implements OnDestroy {
-
   currentViewSubscription: Subscription = null;
   private itemsStatus = new Map();
   isLoadedSubject: Subject<void> = new Subject();
@@ -15,9 +14,7 @@ export class LogbookScrollService extends ScrollBaseService implements OnDestroy
   scrollToEnd = false;
   targetPosition = null;
 
-  constructor(
-    private logbookItemDataService: LogbookItemDataService,
-  ) {
+  constructor(private logbookItemDataService: LogbookItemDataService) {
     super();
   }
 
@@ -25,18 +22,17 @@ export class LogbookScrollService extends ScrollBaseService implements OnDestroy
     return this.logbookItemDataService.getDataBuffer(index, count, config);
   }
 
-
   async setupStart() {
     console.log(this.config);
     let _descending = false;
-    if ((typeof this.config.view.order != 'undefined') && (this.config.view.order.length > 0)) {
-      _descending = this.config.view.order[0].split(" ")[1] == 'DESC' ? true : false;
+    if (typeof this.config.view.order != 'undefined' && this.config.view.order.length > 0) {
+      _descending = this.config.view.order[0].split(' ')[1] == 'DESC' ? true : false;
     }
     if (_descending) {
       this.startIndex = 0;
     } else {
       let count = await this.logbookItemDataService.getCount(this.config);
-      console.log(count)
+      console.log(count);
       this.startIndex = count.count - 1;
     }
   }
@@ -58,16 +54,13 @@ export class LogbookScrollService extends ScrollBaseService implements OnDestroy
         if (val) {
           _isLoading = true;
         }
-      })
+      });
     }
     return _isLoading;
-
   }
   ngOnDestroy() {
-    this.subscriptions.forEach(element => {
+    this.subscriptions.forEach((element) => {
       element.unsubscribe();
     });
   }
-
-
 }

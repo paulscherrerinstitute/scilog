@@ -10,21 +10,21 @@ import { MatIconButton } from '@angular/material/button';
 import { MatIcon } from '@angular/material/icon';
 
 @Component({
-    selector: 'app-task',
-    templateUrl: './task.component.html',
-    styleUrls: ['./task.component.scss'],
-    providers: [IsAllowedService],
-    imports: [MatCard, MatCardContent, MatCheckbox, MatTooltip, NgStyle, MatIconButton, MatIcon]
+  selector: 'app-task',
+  templateUrl: './task.component.html',
+  styleUrls: ['./task.component.scss'],
+  providers: [IsAllowedService],
+  imports: [MatCard, MatCardContent, MatCheckbox, MatTooltip, NgStyle, MatIconButton, MatIcon],
 })
 export class TaskComponent implements OnInit {
-
   @Input()
   task: Tasks;
 
   constructor(
     private tasksService: TasksService,
-    protected isActionAllowed: IsAllowedService) {
-    console.log("constructor called")
+    protected isActionAllowed: IsAllowedService,
+  ) {
+    console.log('constructor called');
   }
 
   ngOnInit(): void {
@@ -34,13 +34,13 @@ export class TaskComponent implements OnInit {
 
   toggleTaskIsDone() {
     let payload = {
-      isDone: !this.task.isDone
-    }
+      isDone: !this.task.isDone,
+    };
     this.tasksService.updateTask(payload, this.task.id);
   }
 
   deleteTask() {
-    console.log("deleting task");
+    console.log('deleting task');
     this.tasksService.deleteTask(this.task.id);
   }
 
@@ -48,5 +48,4 @@ export class TaskComponent implements OnInit {
     this.isActionAllowed.canDelete(false);
     this.isActionAllowed.canUpdate(false);
   }
-
 }

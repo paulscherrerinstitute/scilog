@@ -8,10 +8,9 @@ import { LogbookInfoService } from '@shared/logbook-info.service';
 import { TaskDataService } from '@shared/remote-data.service';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class TasksService implements OnDestroy {
-
   tasks: Tasks[] = [];
   private tasksSource = new BehaviorSubject(this.tasks);
   public currentTasks = this.tasksSource.asObservable();
@@ -19,15 +18,18 @@ export class TasksService implements OnDestroy {
 
   constructor(
     private dataService: TaskDataService,
-    private logbookInfo: LogbookInfoService) {
+    private logbookInfo: LogbookInfoService,
+  ) {
     this.currentTasks.pipe(shareReplay());
     // get tasks from server
 
-    this.subscriptions.push(this.logbookInfo.currentLogbookInfo.subscribe((data: Logbooks) => {
-      if (data != null) {
-        this.getTasks(data.id);
-      }
-    }))
+    this.subscriptions.push(
+      this.logbookInfo.currentLogbookInfo.subscribe((data: Logbooks) => {
+        if (data != null) {
+          this.getTasks(data.id);
+        }
+      }),
+    );
   }
 
   async getTasks(id: string) {
@@ -36,7 +38,7 @@ export class TasksService implements OnDestroy {
   }
 
   async addTask(task: Tasks) {
-    console.log(task)
+    console.log(task);
     await this.dataService.addTask(task);
   }
 
@@ -49,7 +51,7 @@ export class TasksService implements OnDestroy {
   }
 
   get numTasks() {
-    return this.tasks.filter(task => {
+    return this.tasks.filter((task) => {
       return !task.isDone;
     }).length;
   }
@@ -61,7 +63,7 @@ export class TasksService implements OnDestroy {
     }
     switch (data.operationType) {
       case 'insert':
-        if (data.content.snippetType == "task") {
+        if (data.content.snippetType == 'task') {
           this.tasks.push(data.content);
           this.tasksSource.next(this.tasks);
         }
@@ -84,23 +86,21 @@ export class TasksService implements OnDestroy {
             }
             this.tasks[updateIndex] = updateEntry;
           }
-          console.log(data)
-          console.log(updateIndex)
+          console.log(data);
+          console.log(updateIndex);
           this.tasksSource.next(this.tasks);
         }
         break;
       default:
         break;
     }
-
   }
 
   ngOnDestroy(): void {
     //Called once, before the instance is destroyed.
     //Add 'implements OnDestroy' to the class.
-    this.subscriptions.forEach(sub => {
+    this.subscriptions.forEach((sub) => {
       sub.unsubscribe();
-    })
+    });
   }
-
 }

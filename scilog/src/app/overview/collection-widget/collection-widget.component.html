@@ -1,14 +1,14 @@
 <mat-card appearance="outlined" class="collection-card">
-    <mat-card-header>
-        <mat-card-title *ngIf="collection">{{ collection.name }}</mat-card-title>
-    </mat-card-header>
-    <img mat-card-image [src]="imageToShow" alt="" *ngIf="!isImageLoading">
-    <mat-card-content>
-        <p>
-            {{ collection?.description }}
-        </p>
-    </mat-card-content>
-    <mat-card-actions>
-        <button mat-button (click)="selection($event)">Select</button>
-    </mat-card-actions>
+  <mat-card-header>
+    <mat-card-title *ngIf="collection">{{ collection.name }}</mat-card-title>
+  </mat-card-header>
+  <img mat-card-image [src]="imageToShow" alt="" *ngIf="!isImageLoading" />
+  <mat-card-content>
+    <p>
+      {{ collection?.description }}
+    </p>
+  </mat-card-content>
+  <mat-card-actions>
+    <button mat-button (click)="selection($event)">Select</button>
+  </mat-card-actions>
 </mat-card>

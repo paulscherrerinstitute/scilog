@@ -4,10 +4,16 @@ table {
 }
 
 .logbooks:hover {
-  background-color: var(--main-background)!important;
-  -webkit-transition: background-color 100ms linear, color 100ms linear;
-  -ms-transition: background-color 100ms linear, color 100ms linear;
-  transition: background-color 100ms linear, color 100ms linear;
+  background-color: var(--main-background) !important;
+  -webkit-transition:
+    background-color 100ms linear,
+    color 100ms linear;
+  -ms-transition:
+    background-color 100ms linear,
+    color 100ms linear;
+  transition:
+    background-color 100ms linear,
+    color 100ms linear;
 }
 
 .logbooks {
@@ -31,8 +37,8 @@ table {
 .mat-fab-top-right {
   text-align: right;
   width: 2px;
-  padding-right: 40px!important;
-  overflow: hidden!important;
+  padding-right: 40px !important;
+  overflow: hidden !important;
 }
 
 .scrollable-container {

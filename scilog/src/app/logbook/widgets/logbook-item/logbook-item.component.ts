@@ -1,18 +1,25 @@
-import { ChangeDetectorRef, Component, ElementRef, HostListener, Input, OnInit, QueryList, Renderer2, ViewChild, ViewChildren, AfterViewInit, OnDestroy } from '@angular/core';
+import {
+  ChangeDetectorRef,
+  Component,
+  ElementRef,
+  HostListener,
+  Input,
+  OnInit,
+  QueryList,
+  Renderer2,
+  ViewChild,
+  ViewChildren,
+  AfterViewInit,
+  OnDestroy,
+} from '@angular/core';
 import { ChangeStreamService } from '@shared/change-stream.service';
-import { ChangeStreamNotification } from '@shared/changestreamnotification.model'
+import { ChangeStreamNotification } from '@shared/changestreamnotification.model';
 import { HttpClient } from '@angular/common/http';
 import { AddContentComponent } from '@shared/add-content/add-content.component';
 import { AddContentService } from '@shared/add-content.service';
 import { MatDialogConfig, MatDialog } from '@angular/material/dialog';
 import { v4 as uuid } from 'uuid';
-import {
-  trigger,
-  state,
-  style,
-  animate,
-  transition,
-} from '@angular/animations';
+import { trigger, state, style, animate, transition } from '@angular/animations';
 
 import { Basesnippets, Filecontainer } from '@model/basesnippets';
 import { SnippetComponent } from '@shared/snippet/snippet.component';
@@ -45,60 +52,84 @@ import { MatTooltip } from '@angular/material/tooltip';
 import { CKEditorModule } from '@ckeditor/ckeditor5-angular';
 import { TagEditorComponent as TagEditorComponent_1 } from '../../core/tag-editor/tag-editor.component';
 
-
 @Component({
-    selector: 'app-logbook-item',
-    templateUrl: './logbook-item.component.html',
-    styleUrls: ['./logbook-item.component.scss'],
-    providers: [ChangeStreamService, LogbookScrollService],
-    animations: [
-        trigger('rotatedState', [
-            state('default', style({ transform: 'rotate(0)' })),
-            state('rotated', style({ transform: 'rotate(225deg)' })),
-            transition('rotated => default', animate('200ms ease-out')),
-            transition('default => rotated', animate('200ms ease-in'))
-        ]),
-        trigger('buttonEdit', [
-            state('start', style({ bottom: '-50px', right: '15px', opacity: '0', transform: 'translateY(-100%)' })),
-            state('end', style({ bottom: '90px', right: '15px', opacity: '1' })),
-            transition('start => end', animate('200ms ease-out')),
-            transition('end => start', animate('200ms ease-in'))
-        ]),
-        trigger('buttonPhoto', [
-            state('start', style({ bottom: '-50px', right: '15px', opacity: '0', transform: 'translateY(-100%)' })),
-            state('end', style({ bottom: '170px', right: '15px', opacity: '1' })),
-            transition('start => end', animate('200ms ease-out')),
-            transition('end => start', animate('200ms ease-in'))
-        ]),
-        trigger('buttonTask', [
-            state('start', style({ bottom: '-50px', right: '15px', opacity: '0', transform: 'translateY(-100%)' })),
-            state('end', style({ bottom: '250px', right: '15px', opacity: '1' })),
-            transition('start => end', animate('200ms ease-out')),
-            transition('end => start', animate('200ms ease-in'))
-        ]),
-        trigger('buttonFile', [
-            state('start', style({ bottom: '-50px', right: '15px', opacity: '0', transform: 'translateY(-100%)' })),
-            state('end', style({ bottom: '330px', right: '15px', opacity: '1' })),
-            transition('start => end', animate('200ms ease-out')),
-            transition('end => start', animate('200ms ease-in'))
-        ]),
-        trigger('searchExpand', [
-            state('start', style({ height: '10px' })),
-            state('end', style({ height: '50vh' })),
-            transition('start => end', animate('200ms ease-in')),
-            transition('end => start', animate('200ms ease-in'))
-        ]),
-        trigger('scrollButton', [
-            transition(':enter', [
-                style({ opacity: 0 }),
-                animate('1ms 0.2s ease-out', style({ opacity: 0.4 }))
-            ])
-        ]),
-    ],
-    imports: [NgSwitch, ResizedDirective, UiScrollModule, SnippetComponent_1, NgIf, MatMiniFabButton, MatIcon, NgClass, NgStyle, MatTooltip, CKEditorModule, TagEditorComponent_1, MatFabButton]
+  selector: 'app-logbook-item',
+  templateUrl: './logbook-item.component.html',
+  styleUrls: ['./logbook-item.component.scss'],
+  providers: [ChangeStreamService, LogbookScrollService],
+  animations: [
+    trigger('rotatedState', [
+      state('default', style({ transform: 'rotate(0)' })),
+      state('rotated', style({ transform: 'rotate(225deg)' })),
+      transition('rotated => default', animate('200ms ease-out')),
+      transition('default => rotated', animate('200ms ease-in')),
+    ]),
+    trigger('buttonEdit', [
+      state(
+        'start',
+        style({ bottom: '-50px', right: '15px', opacity: '0', transform: 'translateY(-100%)' }),
+      ),
+      state('end', style({ bottom: '90px', right: '15px', opacity: '1' })),
+      transition('start => end', animate('200ms ease-out')),
+      transition('end => start', animate('200ms ease-in')),
+    ]),
+    trigger('buttonPhoto', [
+      state(
+        'start',
+        style({ bottom: '-50px', right: '15px', opacity: '0', transform: 'translateY(-100%)' }),
+      ),
+      state('end', style({ bottom: '170px', right: '15px', opacity: '1' })),
+      transition('start => end', animate('200ms ease-out')),
+      transition('end => start', animate('200ms ease-in')),
+    ]),
+    trigger('buttonTask', [
+      state(
+        'start',
+        style({ bottom: '-50px', right: '15px', opacity: '0', transform: 'translateY(-100%)' }),
+      ),
+      state('end', style({ bottom: '250px', right: '15px', opacity: '1' })),
+      transition('start => end', animate('200ms ease-out')),
+      transition('end => start', animate('200ms ease-in')),
+    ]),
+    trigger('buttonFile', [
+      state(
+        'start',
+        style({ bottom: '-50px', right: '15px', opacity: '0', transform: 'translateY(-100%)' }),
+      ),
+      state('end', style({ bottom: '330px', right: '15px', opacity: '1' })),
+      transition('start => end', animate('200ms ease-out')),
+      transition('end => start', animate('200ms ease-in')),
+    ]),
+    trigger('searchExpand', [
+      state('start', style({ height: '10px' })),
+      state('end', style({ height: '50vh' })),
+      transition('start => end', animate('200ms ease-in')),
+      transition('end => start', animate('200ms ease-in')),
+    ]),
+    trigger('scrollButton', [
+      transition(':enter', [
+        style({ opacity: 0 }),
+        animate('1ms 0.2s ease-out', style({ opacity: 0.4 })),
+      ]),
+    ]),
+  ],
+  imports: [
+    NgSwitch,
+    ResizedDirective,
+    UiScrollModule,
+    SnippetComponent_1,
+    NgIf,
+    MatMiniFabButton,
+    MatIcon,
+    NgClass,
+    NgStyle,
+    MatTooltip,
+    CKEditorModule,
+    TagEditorComponent_1,
+    MatFabButton,
+  ],
 })
 export class LogbookItemComponent implements OnInit, AfterViewInit, OnDestroy {
-
   @Input()
   config: WidgetItemConfig;
 
@@ -114,7 +145,6 @@ export class LogbookItemComponent implements OnInit, AfterViewInit, OnDestroy {
   isOpen = false;
   selectedFile: File;
   subscriptions: Subscription[] = [];
-
 
   private _searchString: string = '';
   searchStringSubject: Subject<void> = new Subject();
@@ -147,7 +177,7 @@ export class LogbookItemComponent implements OnInit, AfterViewInit, OnDestroy {
 
   _snippetHeightRef = 0;
   _editorHeightRef = 0;
-  showSearch = false
+  showSearch = false;
   showSearchExpanded = false;
 
   forceScrollToEnd = false;
@@ -164,14 +194,12 @@ export class LogbookItemComponent implements OnInit, AfterViewInit, OnDestroy {
   @ViewChild('tagEditor') tagEditorRef: TagEditorComponent;
   @ViewChild('searchSnippets') searchSnippetsRef: ElementRef;
 
-
-
   public Editor = ClassicEditor;
   public editorConfig = CKeditorConfig;
   dataEditor: any;
 
-
-  constructor(private data: AddContentService,
+  constructor(
+    private data: AddContentService,
     private notificationService: ChangeStreamService,
     public dialog: MatDialog,
     public logbookInfo: LogbookInfoService,
@@ -185,41 +213,64 @@ export class LogbookItemComponent implements OnInit, AfterViewInit, OnDestroy {
     private tagService: TagService,
     public logbookScrollService: LogbookScrollService,
     private scrollToElementService: ScrollToElementService,
-    private cdr: ChangeDetectorRef
+    private cdr: ChangeDetectorRef,
   ) {
-
-    this.subscriptions.push(this.hotkeys.addShortcut({ keys: 'control.shift.n', description: { label: 'Set focus to editor', group: "Logbook" } }).subscribe(() => {
-      this.setFocusToEditor();
-    }));
-    this.subscriptions.push(this.hotkeys.addShortcut({ keys: 'control.enter', description: { label: 'Submit content', group: "Logbook" } }).subscribe(() => {
-      this.addContent();
-    }));
-    this.subscriptions.push(this.hotkeys.addShortcut({ keys: 'shift.alt.enter', description: { label: 'Submit message', group: "Logbook" } }).subscribe(() => {
-      this.addMessage();
-    }));
-    this.subscriptions.push(this.route.parent.url.subscribe((urlPath) => {
-      if (typeof urlPath[1] != 'undefined') {
-        this.logbookId = urlPath[1].path;
-      }
-    }));
+    this.subscriptions.push(
+      this.hotkeys
+        .addShortcut({
+          keys: 'control.shift.n',
+          description: { label: 'Set focus to editor', group: 'Logbook' },
+        })
+        .subscribe(() => {
+          this.setFocusToEditor();
+        }),
+    );
+    this.subscriptions.push(
+      this.hotkeys
+        .addShortcut({
+          keys: 'control.enter',
+          description: { label: 'Submit content', group: 'Logbook' },
+        })
+        .subscribe(() => {
+          this.addContent();
+        }),
+    );
+    this.subscriptions.push(
+      this.hotkeys
+        .addShortcut({
+          keys: 'shift.alt.enter',
+          description: { label: 'Submit message', group: 'Logbook' },
+        })
+        .subscribe(() => {
+          this.addMessage();
+        }),
+    );
+    this.subscriptions.push(
+      this.route.parent.url.subscribe((urlPath) => {
+        if (typeof urlPath[1] != 'undefined') {
+          this.logbookId = urlPath[1].path;
+        }
+      }),
+    );
     if (this.logbookInfo.logbookInfo == null) {
-      console.log("retrieving logbook info");
+      console.log('retrieving logbook info');
       this.logbookInfo.getLogbookInfo(this.logbookId);
     }
   }
 
   ngOnInit(): void {
-
-    this.isLightMode = (localStorage.getItem('light-mode') == "true");
+    this.isLightMode = localStorage.getItem('light-mode') == 'true';
     console.log(this.isLightMode);
     if (this.route.snapshot.queryParams.id) {
       this.dashboardView = false;
     }
 
-    this.subscriptions.push(this.searchStringSubject.pipe(debounceTime(500)).subscribe(() => {
-      console.log("reset")
-      this.logbookScrollService.reset();
-    }));
+    this.subscriptions.push(
+      this.searchStringSubject.pipe(debounceTime(500)).subscribe(() => {
+        console.log('reset');
+        this.logbookScrollService.reset();
+      }),
+    );
 
     this.updateViewSubscription();
 
@@ -227,21 +278,23 @@ export class LogbookItemComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   private scrollToElement() {
-    this.subscriptions.push(this.scrollToElementService.$selectedItem.subscribe(async (event) => {
-      if (this.config?.general?.title !== event?.config?.general?.title) return;
-      const element = event.event;
-      if (element != null) {
-        if (typeof element.id == 'string') {
-          let index = await this.logbookItemDataService.getIndex(element.id, this.config);
-          console.log("snippet:", element);
-          console.log("index: ", index);
-          console.log(this.config);
-          if (index >= 0) {
-            this.goToSnippetIndex(index);
+    this.subscriptions.push(
+      this.scrollToElementService.$selectedItem.subscribe(async (event) => {
+        if (this.config?.general?.title !== event?.config?.general?.title) return;
+        const element = event.event;
+        if (element != null) {
+          if (typeof element.id == 'string') {
+            let index = await this.logbookItemDataService.getIndex(element.id, this.config);
+            console.log('snippet:', element);
+            console.log('index: ', index);
+            console.log(this.config);
+            if (index >= 0) {
+              this.goToSnippetIndex(index);
+            }
           }
         }
-      }
-    }));
+      }),
+    );
   }
 
   updateViewSubscription() {
@@ -249,11 +302,11 @@ export class LogbookItemComponent implements OnInit, AfterViewInit, OnDestroy {
     if (this.currentViewSubscription != null) {
       this.currentViewSubscription.unsubscribe();
     }
-    this.currentViewSubscription = this.views.currentWidgetConfigs.subscribe(async config => {
+    this.currentViewSubscription = this.views.currentWidgetConfigs.subscribe(async (config) => {
       // console.log(config[this.configIndex].config);
       if (config != null) {
         this.config = config[this.configIndex].config;
-        this.isDescending = this.config?.view?.order[0]?.split(" ")?.[1] === 'DESC';
+        this.isDescending = this.config?.view?.order[0]?.split(' ')?.[1] === 'DESC';
         this.targetId = this.config.filter.targetId;
         this.isReadOnly = this.config.general.readonly;
         await this.logbookScrollService.initialize(this.config);
@@ -268,24 +321,25 @@ export class LogbookItemComponent implements OnInit, AfterViewInit, OnDestroy {
   startNotificationManager() {
     if (typeof this.config != 'undefined') {
       if (this.changeStreamSubscriptions.length > 0) {
-        this.changeStreamSubscriptions.forEach(sub => sub.unsubscribe());
+        this.changeStreamSubscriptions.forEach((sub) => sub.unsubscribe());
       }
       let logbooks = [this.config.filter.targetId, ...this.config.filter?.additionalLogbooks];
-      console.log("Subscribing to the following logbooks: ", logbooks);
-      logbooks.forEach(log => {
-        this.changeStreamSubscriptions.push(this.notificationService.getNotification(log, this.config).subscribe(notification => {
-          console.log(notification);
-          this.notifications.push(notification);
-          this.parseNotification(notification);
-        }));
-      })
-
+      console.log('Subscribing to the following logbooks: ', logbooks);
+      logbooks.forEach((log) => {
+        this.changeStreamSubscriptions.push(
+          this.notificationService.getNotification(log, this.config).subscribe((notification) => {
+            console.log(notification);
+            this.notifications.push(notification);
+            this.parseNotification(notification);
+          }),
+        );
+      });
 
       if (this.dataService == null) {
-        this.dataService = this.data.currentMessage.subscribe(message => {
+        this.dataService = this.data.currentMessage.subscribe((message) => {
           // console.log(message);
           this.message = message;
-          if ((message != null) && (Object.keys(this.message).length != 0)) {
+          if (message != null && Object.keys(this.message).length != 0) {
             // console.log(this.message);
             this.submitContent(message);
             this.message = null;
@@ -297,40 +351,44 @@ export class LogbookItemComponent implements OnInit, AfterViewInit, OnDestroy {
 
   async parseNotification(notification: ChangeStreamNotification) {
     switch (notification.operationType) {
-      case "update":
-        console.log("notification: ", notification);
+      case 'update':
+        console.log('notification: ', notification);
         if (notification.content) {
           let updatePos = this.findPos(notification)[0];
           let isSubsnippet = false;
           let subPos: number[];
           if (updatePos == this.childSnippets.toArray().length) {
-            subPos = this.findPos(notification, "id", "id", true);
+            subPos = this.findPos(notification, 'id', 'id', true);
             isSubsnippet = true;
             console.log(subPos);
           }
           // deleting elements is communicated by special tags. If they are present, delete the element
           if (
             notification.content.deleted ||
-            (this.config.filter?.tags?.length > 0 && 
-            !this.config.filter.tags.some((tag: string) => notification.content.tags?.includes(tag))) ||
-            this.config.filter.excludeTags?.some((tag: string) => notification.content.tags?.includes(tag))
+            (this.config.filter?.tags?.length > 0 &&
+              !this.config.filter.tags.some((tag: string) =>
+                notification.content.tags?.includes(tag),
+              )) ||
+            this.config.filter.excludeTags?.some((tag: string) =>
+              notification.content.tags?.includes(tag),
+            )
           ) {
             if (isSubsnippet && subPos.length == 2) {
-              // subsnippets don't have a viewport index so we can / have to update the childSnippet directly. 
+              // subsnippets don't have a viewport index so we can / have to update the childSnippet directly.
               // However, afterwards we need to make sure that viewport's height is updated
-              console.log("delete subsnippet:", subPos);
+              console.log('delete subsnippet:', subPos);
               this.childSnippets.toArray()[subPos[0]].snippet.subsnippets.splice(subPos[1], 1);
               this.logbookScrollService.updateViewportEstimate(); // update current viewport's buffer size estimate
             } else {
               // first-level snippets can be removed directly by using the datasource adapter
-              console.log("deleting snippet:", updatePos);
+              console.log('deleting snippet:', updatePos);
               this.logbookScrollService.remove(notification.id);
               this.logbookCount -= 1;
             }
           } else if (notification.content.parentId) {
             // if the parentID changed, we have to get the snippet from the DB
             let snippetTmp = await this.logbookItemDataService.getBasesnippet(notification.id);
-            console.log("restored snippet: ", snippetTmp);
+            console.log('restored snippet: ', snippetTmp);
             notification.operationType = 'insert';
             notification.content = snippetTmp;
             this.parseNotification(notification);
@@ -347,7 +405,7 @@ export class LogbookItemComponent implements OnInit, AfterViewInit, OnDestroy {
               let updateEntry = this.childSnippets.toArray()[updatePos];
               console.log(updatePos);
               this.updateSnippetValues(notification.content, updateEntry.snippet);
-              console.log("updated array at pos ", updatePos);
+              console.log('updated array at pos ', updatePos);
               console.log(updateEntry);
               updateEntry.updateContent();
             }
@@ -356,42 +414,59 @@ export class LogbookItemComponent implements OnInit, AfterViewInit, OnDestroy {
         }
 
         break;
-      case "insert":
-        if (notification.content.snippetType === "edit") {
-          return await this.fireEditCondition(notification)
+      case 'insert':
+        if (notification.content.snippetType === 'edit') {
+          return await this.fireEditCondition(notification);
         }
-        if ((notification.content.snippetType == "paragraph") || (notification.content.snippetType == "image")) {
+        if (
+          notification.content.snippetType == 'paragraph' ||
+          notification.content.snippetType == 'image'
+        ) {
           // first check if the incoming message satisfies the current filters
           let snippetsFiltered = this.applyFilters([notification.content]);
-          console.log("SnippetsFiltered:", snippetsFiltered);
+          console.log('SnippetsFiltered:', snippetsFiltered);
           if (snippetsFiltered.length > 0) {
             if (this.childSnippets.toArray().length == 0) {
               await this.logbookScrollService.appendToEOF(notification.content);
             } else {
               let pos: number;
               switch (notification.content?.linkType) {
-                case "quote":
-                case "comment":
-                  pos = this.findPos(notification.content, "id", "parentId")[0];
+                case 'quote':
+                case 'comment':
+                  pos = this.findPos(notification.content, 'id', 'parentId')[0];
                   if (pos < this.childSnippets.toArray().length) {
                     if (this.childSnippets.toArray()[pos].snippet?.subsnippets) {
                       await this.logbookScrollService.relax();
-                      this.childSnippets.toArray()[pos].snippet.subsnippets.push(notification.content);
+                      this.childSnippets
+                        .toArray()
+                        [pos].snippet.subsnippets.push(notification.content);
                     } else {
-                      this.childSnippets.toArray()[pos].snippet.subsnippets = [notification.content];
+                      this.childSnippets.toArray()[pos].snippet.subsnippets = [
+                        notification.content,
+                      ];
                     }
                   }
                   // this.datasource.adapter.check();
                   break;
-                case "paragraph":
+                case 'paragraph':
                   // pos = this.insertIntoSortedArray(notification.content);
                   // console.log(pos);
                   console.log(notification.content);
                   let _descending = this.isDescending;
-                  let _bof = _descending ? (notification.content.defaultOrder > this.childSnippets.toArray()[0].snippet.defaultOrder) : (notification.content.defaultOrder < this.childSnippets.toArray()[0].snippet.defaultOrder)
-                  let _eof = _descending ? (notification.content.defaultOrder < this.childSnippets.toArray()[this.childSnippets.toArray().length - 1].snippet.defaultOrder) : (notification.content.defaultOrder > this.childSnippets.toArray()[this.childSnippets.toArray().length - 1].snippet.defaultOrder);
-                  if ((this.logbookScrollService.isBOF) && (_bof)) {
-                    console.log("prepending to BOF")
+                  let _bof = _descending
+                    ? notification.content.defaultOrder >
+                      this.childSnippets.toArray()[0].snippet.defaultOrder
+                    : notification.content.defaultOrder <
+                      this.childSnippets.toArray()[0].snippet.defaultOrder;
+                  let _eof = _descending
+                    ? notification.content.defaultOrder <
+                      this.childSnippets.toArray()[this.childSnippets.toArray().length - 1].snippet
+                        .defaultOrder
+                    : notification.content.defaultOrder >
+                      this.childSnippets.toArray()[this.childSnippets.toArray().length - 1].snippet
+                        .defaultOrder;
+                  if (this.logbookScrollService.isBOF && _bof) {
+                    console.log('prepending to BOF');
                     await this.logbookScrollService.prependToBOF(notification.content);
                     // let autoScrollEnabled = ((this.snippetContainerRef.nativeElement.scrollHeight - this.snippetContainerRef.nativeElement.scrollTop - this.snippetContainerRef.nativeElement.clientHeight < this.autoScrollFraction*this.snippetContainerRef.nativeElement.clientHeight))? true: false;
                     if (true) {
@@ -399,28 +474,33 @@ export class LogbookItemComponent implements OnInit, AfterViewInit, OnDestroy {
                         this.snippetContainerRef.nativeElement.scrollTop = 0;
                       }, 50);
                     }
-                  } else if ((this.logbookScrollService.isEOF) && (_eof)) {
-                    console.log("appending to EOF")
+                  } else if (this.logbookScrollService.isEOF && _eof) {
+                    console.log('appending to EOF');
                     console.log(notification.content);
                     await this.logbookScrollService.appendToEOF(notification.content);
                     let autoScrollEnabled = this.isAt('end', this.autoScrollFraction, 0);
-                    console.log("autoscroll: ", autoScrollEnabled)
+                    console.log('autoscroll: ', autoScrollEnabled);
                     if (autoScrollEnabled || this.forceScrollToEnd) {
-                      console.log("scheduling scrolling to EOF");
+                      console.log('scheduling scrolling to EOF');
                       this.logbookScrollService.scrollToEnd = true;
                       // await this.logbookScrollService.isLoaded$;
                       setTimeout(() => {
-                        console.log("scrolling to EOF");
+                        console.log('scrolling to EOF');
                         this.scrollWindowTo('end');
                       }, 50);
                     }
                   } else {
-                    if ((notification.content.defaultOrder > this.childSnippets.toArray()[0].snippet.defaultOrder) && (notification.content.defaultOrder < this.childSnippets.toArray()[this.childSnippets.toArray().length - 1].snippet.defaultOrder)) {
-                      console.log("inserting between rendered items")
-
+                    if (
+                      notification.content.defaultOrder >
+                        this.childSnippets.toArray()[0].snippet.defaultOrder &&
+                      notification.content.defaultOrder <
+                        this.childSnippets.toArray()[this.childSnippets.toArray().length - 1]
+                          .snippet.defaultOrder
+                    ) {
+                      console.log('inserting between rendered items');
                     }
                     if (this.forceScrollToEnd) {
-                      console.log("scrolling to new item")
+                      console.log('scrolling to new item');
                       await this.scrollTo('end');
                     } else {
                       console.log(this.childSnippets.toArray());
@@ -438,11 +518,10 @@ export class LogbookItemComponent implements OnInit, AfterViewInit, OnDestroy {
               this.tagService.addTags(notification.content.tags);
             }
           }
-
         }
         break;
-      case "delete":
-        console.log("delete");
+      case 'delete':
+        console.log('delete');
         break;
       default:
         break;
@@ -465,7 +544,8 @@ export class LogbookItemComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   private scrollWindowTo(position: 'end' | 'start') {
-    this.snippetContainerRef.nativeElement.scrollTop = position === 'end'? this.snippetContainerRef.nativeElement.scrollHeight: 0;
+    this.snippetContainerRef.nativeElement.scrollTop =
+      position === 'end' ? this.snippetContainerRef.nativeElement.scrollHeight : 0;
   }
 
   private updateSnippetValues(content: Basesnippets, snippet: Basesnippets) {
@@ -487,12 +567,12 @@ export class LogbookItemComponent implements OnInit, AfterViewInit, OnDestroy {
     referenceEntry.ownerGroup = this.logbookInfo.logbookInfo.ownerGroup;
     referenceEntry.accessGroups = this.logbookInfo.logbookInfo.accessGroups;
     referenceEntry.isPrivate = this.logbookInfo.logbookInfo.isPrivate;
-    if (msg.snippetType === "edit") {
-    // POST -- EDIT SNIPPET
+    if (msg.snippetType === 'edit') {
+      // POST -- EDIT SNIPPET
       let payload: ChangeStreamNotification = this._prepareEditPostPayload(referenceEntry, msg);
       this.logbookItemDataService.uploadParagraph(payload);
-    } else if ((typeof msg.id != "undefined") && (msg.id != '')) {
-    // PATCH -- UPDATE SNIPPET
+    } else if (typeof msg.id != 'undefined' && msg.id != '') {
+      // PATCH -- UPDATE SNIPPET
       let payload = this._preparePatchPayload(referenceEntry, msg);
       this.logbookItemDataService.uploadParagraph(payload, msg.id);
     } else {
@@ -504,7 +584,10 @@ export class LogbookItemComponent implements OnInit, AfterViewInit, OnDestroy {
     this.modifiedMetadata = false;
   }
 
-  _prepareEditPostPayload(referenceEntry: ChangeStreamNotification, msg: ChangeStreamNotification): ChangeStreamNotification {
+  _prepareEditPostPayload(
+    referenceEntry: ChangeStreamNotification,
+    msg: ChangeStreamNotification,
+  ): ChangeStreamNotification {
     return {
       ownerGroup: referenceEntry.ownerGroup,
       accessGroups: referenceEntry.accessGroups,
@@ -515,15 +598,18 @@ export class LogbookItemComponent implements OnInit, AfterViewInit, OnDestroy {
     };
   }
 
-  _preparePatchPayload(referenceEntry: ChangeStreamNotification, msg: ChangeStreamNotification): ChangeStreamNotification {
+  _preparePatchPayload(
+    referenceEntry: ChangeStreamNotification,
+    msg: ChangeStreamNotification,
+  ): ChangeStreamNotification {
     // I guess it should only take these variables if they are not defined in the msg...
-    console.log("referenceEntry: ", referenceEntry)
+    console.log('referenceEntry: ', referenceEntry);
     let payload: ChangeStreamNotification = {
       ownerGroup: referenceEntry.ownerGroup,
       accessGroups: referenceEntry.accessGroups,
       isPrivate: referenceEntry.isPrivate,
       tags: msg.tags,
-      snippetType: "paragraph",
+      snippetType: 'paragraph',
       textcontent: msg.textcontent,
       id_session: localStorage.getItem('id_session'),
       files: msg.files,
@@ -535,14 +621,17 @@ export class LogbookItemComponent implements OnInit, AfterViewInit, OnDestroy {
     return payload;
   }
 
-  _preparePostPayload(referenceEntry: ChangeStreamNotification, msg: ChangeStreamNotification): ChangeStreamNotification {
+  _preparePostPayload(
+    referenceEntry: ChangeStreamNotification,
+    msg: ChangeStreamNotification,
+  ): ChangeStreamNotification {
     // I guess it should only take these variables if they are not defined in the msg...
     let payload: ChangeStreamNotification = {
       ownerGroup: referenceEntry.ownerGroup,
       accessGroups: referenceEntry.accessGroups,
       isPrivate: referenceEntry.isPrivate,
       tags: msg.tags,
-      snippetType: "paragraph",
+      snippetType: 'paragraph',
       linkType: msg.linkType,
       textcontent: msg.textcontent,
       files: msg.files,
@@ -562,19 +651,27 @@ export class LogbookItemComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   async fireEditCondition(notification: ChangeStreamNotification) {
-    const pos = this.findPos(notification.content, "id", "parentId", notification.content.linkType === LinkType.COMMENT);
-    let posChild: (SnippetComponent | Basesnippets) = this.childSnippets.toArray()[pos[0]];
+    const pos = this.findPos(
+      notification.content,
+      'id',
+      'parentId',
+      notification.content.linkType === LinkType.COMMENT,
+    );
+    let posChild: SnippetComponent | Basesnippets = this.childSnippets.toArray()[pos[0]];
     if (pos.length === 2) {
       posChild = (posChild as SnippetComponent).snippet.subsnippets[pos[1]] as Basesnippets;
       posChild.snippetType = 'paragraph';
     }
-    posChild.subsnippets = [...(posChild.subsnippets?? []).filter(s => s.snippetType !== 'edit') , notification.content];
+    posChild.subsnippets = [
+      ...(posChild.subsnippets ?? []).filter((s) => s.snippetType !== 'edit'),
+      notification.content,
+    ];
   }
 
   applyFilters(snippets: Basesnippets[]) {
     return snippets.filter((snippet) => {
       let includeSnippet = true;
-      if ((snippet.linkType) && ((snippet.linkType == "comment") || (snippet.linkType == "quote"))) {
+      if (snippet.linkType && (snippet.linkType == 'comment' || snippet.linkType == 'quote')) {
         return includeSnippet;
       }
       if (this.config.filter.tags?.length > 0) {
@@ -582,7 +679,7 @@ export class LogbookItemComponent implements OnInit, AfterViewInit, OnDestroy {
           if (!snippet.tags.includes(tag)) {
             includeSnippet = false;
           }
-        })
+        });
       }
       if (!includeSnippet) {
         return includeSnippet;
@@ -592,7 +689,7 @@ export class LogbookItemComponent implements OnInit, AfterViewInit, OnDestroy {
           if (snippet.tags.includes(tag)) {
             includeSnippet = false;
           }
-        })
+        });
       }
       if (!includeSnippet) {
         return includeSnippet;
@@ -605,24 +702,33 @@ export class LogbookItemComponent implements OnInit, AfterViewInit, OnDestroy {
     });
   }
 
-
-  findPos(newInput: ChangeStreamNotification, tagOld: string = 'id', tagNew: string = 'id', subsnippets: boolean = false) {
+  findPos(
+    newInput: ChangeStreamNotification,
+    tagOld: string = 'id',
+    tagNew: string = 'id',
+    subsnippets: boolean = false,
+  ) {
     // console.log(newInput);
     if (subsnippets) {
       for (let index = 0; index < this.childSnippets.toArray().length; index++) {
         if (this.childSnippets.toArray()[index].snippet.subsnippets) {
-          for (let indexSub = 0; indexSub < this.childSnippets.toArray()[index].snippet.subsnippets.length; indexSub++) {
-            if (this.childSnippets.toArray()[index].snippet.subsnippets[indexSub][tagOld] == newInput[tagNew]) {
+          for (
+            let indexSub = 0;
+            indexSub < this.childSnippets.toArray()[index].snippet.subsnippets.length;
+            indexSub++
+          ) {
+            if (
+              this.childSnippets.toArray()[index].snippet.subsnippets[indexSub][tagOld] ==
+              newInput[tagNew]
+            ) {
               return [index, indexSub];
             }
           }
         }
-
       }
     } else {
-      console.log("no subsnippets");
+      console.log('no subsnippets');
       for (let index = 0; index < this.childSnippets.toArray().length; index++) {
-
         if (this.childSnippets.toArray()[index].snippet[tagOld] == newInput[tagNew]) {
           // console.log("found index", index);
           return [index];
@@ -630,7 +736,7 @@ export class LogbookItemComponent implements OnInit, AfterViewInit, OnDestroy {
       }
     }
 
-    console.log("could not find entry");
+    console.log('could not find entry');
     return [this.childSnippets.toArray().length];
   }
 
@@ -648,18 +754,22 @@ export class LogbookItemComponent implements OnInit, AfterViewInit, OnDestroy {
   toggleSearch() {
     this.showSearchExpanded = !this.showSearchExpanded;
     if (!this.showSearchExpanded) {
-      setTimeout(() => { this.showSearch = false; }, 200);
+      setTimeout(() => {
+        this.showSearch = false;
+      }, 200);
     } else {
       this.showSearch = true;
     }
   }
 
-
   openDialog() {
     const dialogConfig = new MatDialogConfig();
     dialogConfig.autoFocus = true;
     dialogConfig.disableClose = true;
-    dialogConfig.data = { "defaultTags": this.childSnippets?.last?.snippet?.tags, "config": this.config }
+    dialogConfig.data = {
+      defaultTags: this.childSnippets?.last?.snippet?.tags,
+      config: this.config,
+    };
     const dialogRef = this.dialog.open(AddContentComponent, dialogConfig);
   }
 
@@ -671,26 +781,26 @@ export class LogbookItemComponent implements OnInit, AfterViewInit, OnDestroy {
 
   onFileChanged($event) {
     console.log($event.target);
-    console.log(this.selectedFile = $event.target.files[0]);
+    console.log((this.selectedFile = $event.target.files[0]));
     let fileHash = uuid();
     let snippetFiles: Filecontainer[] = [];
     let file: Filecontainer = {
       style: {
-        width: "",
-        height: ""
+        width: '',
+        height: '',
       },
-      fileExtension: "image/" + this.selectedFile.name.split(".")[1],
+      fileExtension: 'image/' + this.selectedFile.name.split('.')[1],
       file: this.selectedFile,
-      fileHash: fileHash
-    }
+      fileHash: fileHash,
+    };
     snippetFiles.push(file);
 
     var notification: ChangeStreamNotification = {
       parentId: this.targetId,
-      linkType: "paragraph",
-      textcontent: "<figure class=\"image\"><img src=\"\" title=\"" + fileHash + "\"></figure>",
-      files: snippetFiles
-    }
+      linkType: 'paragraph',
+      textcontent: '<figure class="image"><img src="" title="' + fileHash + '"></figure>',
+      files: snippetFiles,
+    };
     this.submitContent(notification);
   }
 
@@ -700,7 +810,9 @@ export class LogbookItemComponent implements OnInit, AfterViewInit, OnDestroy {
 
   @HostListener('window:resize')
   onResized() {
-    const _heightRef = this.snippetContainerRef.nativeElement.parentElement.parentElement.parentElement.parentElement.offsetHeight;
+    const _heightRef =
+      this.snippetContainerRef.nativeElement.parentElement.parentElement.parentElement.parentElement
+        .offsetHeight;
     const _editorHeight = this.editorRef?.nativeElement?.offsetHeight;
     this.isMobile();
     if (this._snippetHeightRef != _heightRef || this._editorHeightRef != _editorHeight) {
@@ -712,17 +824,33 @@ export class LogbookItemComponent implements OnInit, AfterViewInit, OnDestroy {
 
   updateViewHeights() {
     if (this.editorRef) {
-      let offset = this.mobile ? 210 - 28 : (this.dashboardView ? 130 - 28 : 195 - 25);
+      let offset = this.mobile ? 210 - 28 : this.dashboardView ? 130 - 28 : 195 - 25;
       let snippetHeight: number;
       if (this.mobile) {
-        snippetHeight = this.snippetContainerRef.nativeElement.parentElement.parentElement.parentElement.parentElement.offsetHeight - offset;
+        snippetHeight =
+          this.snippetContainerRef.nativeElement.parentElement.parentElement.parentElement
+            .parentElement.offsetHeight - offset;
       } else {
-        snippetHeight = this.snippetContainerRef.nativeElement.parentElement.parentElement.parentElement.parentElement.offsetHeight - this.editorRef.nativeElement.offsetHeight - offset;
+        snippetHeight =
+          this.snippetContainerRef.nativeElement.parentElement.parentElement.parentElement
+            .parentElement.offsetHeight -
+          this.editorRef.nativeElement.offsetHeight -
+          offset;
       }
-      this.renderer.setStyle(this.snippetContainerRef.nativeElement, 'height', `${snippetHeight}px`);
+      this.renderer.setStyle(
+        this.snippetContainerRef.nativeElement,
+        'height',
+        `${snippetHeight}px`,
+      );
     } else {
-      let snippetHeight = this.snippetContainerRef.nativeElement.parentElement.parentElement.parentElement.parentElement.offsetHeight - 130;
-      this.renderer.setStyle(this.snippetContainerRef.nativeElement, 'height', `${snippetHeight}px`);
+      let snippetHeight =
+        this.snippetContainerRef.nativeElement.parentElement.parentElement.parentElement
+          .parentElement.offsetHeight - 130;
+      this.renderer.setStyle(
+        this.snippetContainerRef.nativeElement,
+        'height',
+        `${snippetHeight}px`,
+      );
     }
   }
   ngAfterViewInit(): void {
@@ -732,26 +860,24 @@ export class LogbookItemComponent implements OnInit, AfterViewInit, OnDestroy {
     this.cdr.detectChanges();
   }
 
-
   onEditorReady($event: any) {
     console.log(Array.from($event.ui.componentFactory.names()));
     console.log($event.plugins);
-    $event.ui.getEditableElement().parentElement.insertBefore(
-      $event.ui.view.toolbar.element,
-      $event.ui.getEditableElement()
-    );
+    $event.ui
+      .getEditableElement()
+      .parentElement.insertBefore($event.ui.view.toolbar.element, $event.ui.getEditableElement());
     $event.plugins.get('FileRepository').createUploadAdapter = (loader) => {
       return new CK5ImageUploadAdapter(loader, this.httpClient);
     };
     $event.editing.view.focus();
     this.editorClassRef = $event;
-  };
+  }
 
   addMessage() {
     if (this.messagesEnabled) {
       this.addContent(true);
     } else {
-      console.log("currently disabled")
+      console.log('currently disabled');
     }
   }
 
@@ -767,52 +893,60 @@ export class LogbookItemComponent implements OnInit, AfterViewInit, OnDestroy {
 
   async goToSnippetIndex(index: number) {
     this.logbookScrollService.goToSnippetIndex(index, (index: number) => {
-      this.childSnippets.toArray().forEach(element => {
+      this.childSnippets.toArray().forEach((element) => {
         if (element.index == index) {
           element.highlightSnippetBorder();
         }
       });
-    })
+    });
   }
 
   isAt(position: 'end' | 'start', scrollPortion = 0, offset = 1) {
     const element = this.snippetContainerRef?.nativeElement;
     if (element)
-      return position === 'end'? this.stillToScrollToEnd(element, scrollPortion, offset) <= 0: element.scrollTop <= offset;
+      return position === 'end'
+        ? this.stillToScrollToEnd(element, scrollPortion, offset) <= 0
+        : element.scrollTop <= offset;
   }
 
   private stillToScrollToEnd(element: Element, scrollPortion: number, offset: number) {
-    return element.scrollHeight - element.clientHeight * (1 + scrollPortion) - element.scrollTop - offset;
+    return (
+      element.scrollHeight - element.clientHeight * (1 + scrollPortion) - element.scrollTop - offset
+    );
   }
 
   scrollOnClickTo(position: 'end' | 'start') {
-    const scrollServicePosition = position === 'end'? 'isEOF' : 'isBOF';
-    if (this.logbookScrollService[scrollServicePosition])
-      this.scrollWindowTo(position);
-    else
-      this.scrollTo(position);
+    const scrollServicePosition = position === 'end' ? 'isEOF' : 'isBOF';
+    if (this.logbookScrollService[scrollServicePosition]) this.scrollWindowTo(position);
+    else this.scrollTo(position);
   }
 
   addContent(isMessage = false) {
     this.forceScrollToEnd = true;
     console.log(this.editorContentRef.editorInstance.prel_filestorage);
-    let notification: ChangeStreamNotification = extractNotificationMessage(this.editorContentRef.editorInstance.getData(), this.editorContentRef.editorInstance.prel_filestorage);
+    let notification: ChangeStreamNotification = extractNotificationMessage(
+      this.editorContentRef.editorInstance.getData(),
+      this.editorContentRef.editorInstance.prel_filestorage,
+    );
 
     if (notification != null) {
       notification.parentId = this.targetId;
       notification.isMessage = isMessage;
       // notification.files = this.editorContentRef.editorInstance.prel_filestorage;
-      if ((!this.modifiedMetadata) && (this.childSnippets.last) && (this.childSnippets.last.snippet.tags)) {
+      if (
+        !this.modifiedMetadata &&
+        this.childSnippets.last &&
+        this.childSnippets.last.snippet.tags
+      ) {
         this.tag = this.childSnippets.last.snippet.tags;
       }
-      notification.tags = this.tagEditorRef.tag.map(tag => tag.name);
+      notification.tags = this.tagEditorRef.tag.map((tag) => tag.name);
 
       this.submitContent(notification);
       console.log(notification);
-      this.editorContentRef.editorInstance.setData("");
+      this.editorContentRef.editorInstance.setData('');
     }
-
-  };
+  }
 
   snippetIsLoading(status: boolean, id: string) {
     console.log(status, id);
@@ -832,7 +966,6 @@ export class LogbookItemComponent implements OnInit, AfterViewInit, OnDestroy {
   //   }
   // }
 
-
   public get searchString(): string {
     return this._searchString;
   }
@@ -844,9 +977,9 @@ export class LogbookItemComponent implements OnInit, AfterViewInit, OnDestroy {
 
   _indexOrder(i: number) {
     if (this.isDescending) {
-      return this.logbookCount - i
+      return this.logbookCount - i;
     }
-    return i + 1
+    return i + 1;
   }
 
   ngOnDestroy() {
@@ -854,16 +987,15 @@ export class LogbookItemComponent implements OnInit, AfterViewInit, OnDestroy {
       this.currentViewSubscription.unsubscribe();
     }
     if (this.changeStreamSubscriptions.length > 0) {
-      this.changeStreamSubscriptions.forEach(sub => sub.unsubscribe());
+      this.changeStreamSubscriptions.forEach((sub) => sub.unsubscribe());
     }
     if (this.dataService != null) {
       this.dataService.unsubscribe();
     }
 
-    console.log("unsubscribe: ", this.subscriptions.length);
-    this.subscriptions.forEach(element => {
+    console.log('unsubscribe: ', this.subscriptions.length);
+    this.subscriptions.forEach((element) => {
       element.unsubscribe();
     });
   }
-
 }

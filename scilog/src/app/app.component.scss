@@ -1,65 +1,67 @@
 // @import './theme.scss';
 
 .loading-circle {
-    display: flex;
-    justify-content: center;
-  }
- 
-  .top-menu {
-    // background: mat-color($scilog-colors, A700); 
-    padding: 10px 15px;
-    color: #ffffff;
-    /* top: 0px; */
-    box-shadow: 0 1px 4px 0 rgba(0, 0, 0, .2), 0 2px 8px 0 rgba(0, 0, 0, .14), 0 4px 8px -1px rgba(0, 0, 0, .12);
-  }
+  display: flex;
+  justify-content: center;
+}
 
-  .left-sidenav {
-    position: fixed;
-    background: #004c63;
-    padding: 10px 8px;
-    color: #ffffff;
-    top: 50px;
-  }
+.top-menu {
+  // background: mat-color($scilog-colors, A700);
+  padding: 10px 15px;
+  color: #ffffff;
+  /* top: 0px; */
+  box-shadow:
+    0 1px 4px 0 rgba(0, 0, 0, 0.2),
+    0 2px 8px 0 rgba(0, 0, 0, 0.14),
+    0 4px 8px -1px rgba(0, 0, 0, 0.12);
+}
 
-  .main-content {
-    top: 60px;
-    /* padding-bottom: 60px; */
-    /* padding-top: 10px; */
-    // background: mat-color($scilog-colors, 50);
-    /* min-height: 100vh; */
-  }
+.left-sidenav {
+  position: fixed;
+  background: #004c63;
+  padding: 10px 8px;
+  color: #ffffff;
+  top: 50px;
+}
 
-  .top-chips {
+.main-content {
+  top: 60px;
+  /* padding-bottom: 60px; */
+  /* padding-top: 10px; */
+  // background: mat-color($scilog-colors, 50);
+  /* min-height: 100vh; */
+}
+
+.top-chips {
   /* padding: 10px 15px; */
   background: #004c63;
   /* margin-bottom: 10px; */
-  box-shadow: 0 1px 4px 0 rgba(0, 0, 0, .2), 0 2px 8px 0 rgba(0, 0, 0, .14), 0 4px 8px -1px rgba(0, 0, 0, .12);
-  }
+  box-shadow:
+    0 1px 4px 0 rgba(0, 0, 0, 0.2),
+    0 2px 8px 0 rgba(0, 0, 0, 0.14),
+    0 4px 8px -1px rgba(0, 0, 0, 0.12);
+}
 
-  .form-chips {
-    /* padding: 10px 15px; */
-    background: #004c63;
-    padding-left: 20px;
-    padding-right: 20px;
-    /* bottom: 15px;
+.form-chips {
+  /* padding: 10px 15px; */
+  background: #004c63;
+  padding-left: 20px;
+  padding-right: 20px;
+  /* bottom: 15px;
     right: 15px;
     z-index: 100;
     display: flex; */
-    }
-
-    .mat-drawer-container{
-      display: block;
-      height: 100%;
-      background-color: #f0f0f0;
-    }
-    .mat-drawer-backdrop{
-      height: 100vh;
-    }
-
-  .flexExpand {
-    flex: 1 1 auto;
 }
 
+.mat-drawer-container {
+  display: block;
+  height: 100%;
+  background-color: #f0f0f0;
+}
+.mat-drawer-backdrop {
+  height: 100vh;
+}
 
-
-
+.flexExpand {
+  flex: 1 1 auto;
+}

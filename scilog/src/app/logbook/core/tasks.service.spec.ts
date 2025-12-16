@@ -6,7 +6,7 @@ import { LogbookInfoService } from '@shared/logbook-info.service';
 import { of } from 'rxjs';
 
 class LogbookInfoServiceMock {
-  getLogbookInfo(id:string){
+  getLogbookInfo(id: string) {
     return;
   }
 
@@ -15,14 +15,18 @@ class LogbookInfoServiceMock {
 
 describe('TasksService', () => {
   let service: TasksService;
-  let taskDataServiceSpy:any;
+  let taskDataServiceSpy: any;
 
-  taskDataServiceSpy = jasmine.createSpyObj("TaskDataService", ["getTasksData", "addTask", "patchTask"]);
+  taskDataServiceSpy = jasmine.createSpyObj('TaskDataService', [
+    'getTasksData',
+    'addTask',
+    'patchTask',
+  ]);
 
   beforeEach(() => {
     TestBed.configureTestingModule({
       providers: [
-        { provide: TaskDataService, useValue: taskDataServiceSpy},
+        { provide: TaskDataService, useValue: taskDataServiceSpy },
         { provide: LogbookInfoService, useClass: LogbookInfoServiceMock },
       ],
     });

@@ -5,11 +5,9 @@ import { UserInfo } from '@model/user-info';
 import { UserPreferencesDataService } from '@shared/remote-data.service';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class UserPreferencesService implements OnDestroy {
-
-
   collectionConfigs: CollectionConfig[] = [];
 
   private collectionConfigSource = new BehaviorSubject(this.collectionConfigs);
@@ -25,52 +23,51 @@ export class UserPreferencesService implements OnDestroy {
 
   subscriptions: Subscription[] = [];
 
-  constructor(
-    private dataService: UserPreferencesDataService) {
-
-    this.subscriptions.push(this.dataService.getUserPreferences().subscribe({
-      next: data => {
-        if (data.length == 1) {
-          console.log("UserPreferences:", data);
-          this.userPreferences = data[0];
-          this.collectionConfigs = data[0].collections;
-        } else if (data.length > 1) {
-          console.log("found more than one UserPreferences. Deleting older entries.")
-          this.userPreferences = data.pop();
-          this.collectionConfigs = this.userPreferences.collections;
-          for (const pref of data) {
-            this.deleteUserPreference(pref.id);
+  constructor(private dataService: UserPreferencesDataService) {
+    this.subscriptions.push(
+      this.dataService.getUserPreferences().subscribe({
+        next: (data) => {
+          if (data.length == 1) {
+            console.log('UserPreferences:', data);
+            this.userPreferences = data[0];
+            this.collectionConfigs = data[0].collections;
+          } else if (data.length > 1) {
+            console.log('found more than one UserPreferences. Deleting older entries.');
+            this.userPreferences = data.pop();
+            this.collectionConfigs = this.userPreferences.collections;
+            for (const pref of data) {
+              this.deleteUserPreference(pref.id);
+            }
+          } else {
+            console.log('uploading default user preferences');
+            this.getDefaultUserPreferences();
+            this.postUserPreferences();
           }
 
-        } else {
-          console.log("uploading default user preferences");
-          this.getDefaultUserPreferences();
-          this.postUserPreferences();
-        }
-
-        this.collectionConfigSource.next(this.collectionConfigs);
-      },
-      error: error => {
-        if (error?.statusText && error.statusText == 'Unauthorized') {
-          console.log("unauthorized");
-        } else if (error?.statusText && error.statusText == 'Unknown Error') {
-          console.error('Please check the server connection.', error)
-        } else {
-          console.error('There was an error!', error)
-        }
-      }
-    }));
+          this.collectionConfigSource.next(this.collectionConfigs);
+        },
+        error: (error) => {
+          if (error?.statusText && error.statusText == 'Unauthorized') {
+            console.log('unauthorized');
+          } else if (error?.statusText && error.statusText == 'Unknown Error') {
+            console.error('Please check the server connection.', error);
+          } else {
+            console.error('There was an error!', error);
+          }
+        },
+      }),
+    );
 
     this._getUserInfo();
   }
 
-  private async _getUserInfo(){
+  private async _getUserInfo() {
     this.userInfo = await this.dataService.getUserInfo();
   }
 
-  public set userInfo(data:UserInfo){
+  public set userInfo(data: UserInfo) {
     this._userInfo = data;
-    this.userInfoSource.next(this.userInfo)
+    this.userInfoSource.next(this.userInfo);
   }
 
   public get userInfo(): UserInfo {
@@ -89,20 +86,19 @@ export class UserPreferencesService implements OnDestroy {
 
   getDefaultUserPreferences(): void {
     this.userPreferences = {
-      collections: [{
-        name: "All logbooks",
-        description: "All logbooks",
-        filter: ''
-      }]
+      collections: [
+        {
+          name: 'All logbooks',
+          description: 'All logbooks',
+          filter: '',
+        },
+      ],
     };
   }
 
   ngOnDestroy(): void {
-    this.subscriptions.forEach(sub => {
+    this.subscriptions.forEach((sub) => {
       sub.unsubscribe();
-
     });
   }
-
-
 }

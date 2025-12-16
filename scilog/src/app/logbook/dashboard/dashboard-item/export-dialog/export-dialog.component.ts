@@ -7,49 +7,49 @@ import { MatProgressBar } from '@angular/material/progress-bar';
 import { MatButton } from '@angular/material/button';
 
 @Component({
-    selector: 'app-export-dialog',
-    templateUrl: './export-dialog.component.html',
-    styleUrls: ['./export-dialog.component.css'],
-    providers: [DatePipe],
-    imports: [CdkScrollable, MatDialogContent, NgIf, MatProgressBar, MatButton]
+  selector: 'app-export-dialog',
+  templateUrl: './export-dialog.component.html',
+  styleUrls: ['./export-dialog.component.css'],
+  providers: [DatePipe],
+  imports: [CdkScrollable, MatDialogContent, NgIf, MatProgressBar, MatButton],
 })
 export class ExportDialogComponent {
-
-  config:any;
+  config: any;
   inProgress = false;
 
   @ViewChild('downloadLink') private downloadLink: ElementRef;
 
-  constructor(@Inject(MAT_DIALOG_DATA) public data,
-  private logbookItemDataService: LogbookItemDataService,
-  private dialogRef: MatDialogRef<ExportDialogComponent>,
-  private datePipe: DatePipe,
-) {
+  constructor(
+    @Inject(MAT_DIALOG_DATA) public data,
+    private logbookItemDataService: LogbookItemDataService,
+    private dialogRef: MatDialogRef<ExportDialogComponent>,
+    private datePipe: DatePipe,
+  ) {
     this.config = data;
-
-   }
+  }
 
   close() {
     this.dialogRef.close();
   }
 
   async exportData(option: 'pdf' | 'eln') {
-    console.log(this.config)
+    console.log(this.config);
     this.inProgress = true;
-    const blob = option === 'pdf' ? await this.logbookItemDataService.exportLogbook(option, this.config, 0, Infinity)
-      : await this.logbookItemDataService.exportELN(this.config.filter.targetId);
-    if (typeof blob != "undefined"){
+    const blob =
+      option === 'pdf'
+        ? await this.logbookItemDataService.exportLogbook(option, this.config, 0, Infinity)
+        : await this.logbookItemDataService.exportELN(this.config.filter.targetId);
+    if (typeof blob != 'undefined') {
       const url = window.URL.createObjectURL(blob);
       const link = this.downloadLink.nativeElement;
       link.href = url;
       link.download = `export - ${this.datePipe.transform(
         Date.now(),
-        'yyyy-MM-dd hh:mm:ss z'
+        'yyyy-MM-dd hh:mm:ss z',
       )}${option === 'eln' ? '.eln' : ''}`;
       link.click();
       window.URL.revokeObjectURL(url);
     }
     this.close();
   }
-
 }

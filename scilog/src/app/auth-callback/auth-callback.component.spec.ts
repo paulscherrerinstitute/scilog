@@ -13,15 +13,15 @@ describe('AuthCallbackComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-    imports: [AuthCallbackComponent],
-    providers: [
+      imports: [AuthCallbackComponent],
+      providers: [
         provideRouter([
-            { path: 'overview', component: DummyComponent },
-            { path: 'auth-callback', component: AuthCallbackComponent },
-            { path: 'dashboard', component: DummyComponent },
+          { path: 'overview', component: DummyComponent },
+          { path: 'auth-callback', component: AuthCallbackComponent },
+          { path: 'dashboard', component: DummyComponent },
         ]),
-    ],
-}).compileComponents();
+      ],
+    }).compileComponents();
 
     fixture = TestBed.createComponent(AuthCallbackComponent);
     component = fixture.componentInstance;
@@ -34,9 +34,7 @@ describe('AuthCallbackComponent', () => {
 
   it('should set scicat token and redirect to returnUrl', async () => {
     const routerSpy = spyOn(router, 'navigateByUrl').and.callThrough();
-    await router.navigateByUrl(
-      '/auth-callback?access-token=123&returnUrl=/dashboard'
-    );
+    await router.navigateByUrl('/auth-callback?access-token=123&returnUrl=/dashboard');
     fixture.detectChanges();
     expect(localStorage.getItem('scicat_token')).toEqual('123');
     expect(routerSpy).toHaveBeenCalledWith('/dashboard');

@@ -1,38 +1,63 @@
-import { ChangeDetectorRef, Component, ElementRef, EventEmitter, HostListener, Input, Output, QueryList, ViewChild, ViewChildren, AfterViewInit, OnDestroy, afterNextRender } from "@angular/core";
-import { ResizedEvent } from "src/app/core/directives/resized.directive";
-import { WidgetItemConfig } from "src/app/core/model/config";
-import { Logbooks } from "src/app/core/model/logbooks";
-import { LogbookDataService } from "src/app/core/remote-data.service";
-import { LogbookWidgetComponent } from "../logbook-cover/logbook-cover.component";
-import { CdkVirtualScrollViewport, CdkFixedSizeVirtualScroll, CdkVirtualForOf } from "@angular/cdk/scrolling";
-import { Subscription } from "rxjs";
-import { ResizedDirective } from "../../core/directives/resized.directive";
-import { NgFor } from "@angular/common";
+import {
+  ChangeDetectorRef,
+  Component,
+  ElementRef,
+  EventEmitter,
+  HostListener,
+  Input,
+  Output,
+  QueryList,
+  ViewChild,
+  ViewChildren,
+  AfterViewInit,
+  OnDestroy,
+  afterNextRender,
+} from '@angular/core';
+import { ResizedEvent } from 'src/app/core/directives/resized.directive';
+import { WidgetItemConfig } from 'src/app/core/model/config';
+import { Logbooks } from 'src/app/core/model/logbooks';
+import { LogbookDataService } from 'src/app/core/remote-data.service';
+import { LogbookWidgetComponent } from '../logbook-cover/logbook-cover.component';
+import {
+  CdkVirtualScrollViewport,
+  CdkFixedSizeVirtualScroll,
+  CdkVirtualForOf,
+} from '@angular/cdk/scrolling';
+import { Subscription } from 'rxjs';
+import { ResizedDirective } from '../../core/directives/resized.directive';
+import { NgFor } from '@angular/common';
 
 type Sizes = {
-  width: number,
-  height: number,
-}
+  width: number;
+  height: number;
+};
 
 @Component({
-    selector: 'app-overview-scroll',
-    templateUrl: './overview-scroll.component.html',
-    styleUrls: ['./overview-scroll.component.css'],
-    imports: [CdkVirtualScrollViewport, CdkFixedSizeVirtualScroll, ResizedDirective, CdkVirtualForOf, NgFor, LogbookWidgetComponent]
+  selector: 'app-overview-scroll',
+  templateUrl: './overview-scroll.component.html',
+  styleUrls: ['./overview-scroll.component.css'],
+  imports: [
+    CdkVirtualScrollViewport,
+    CdkFixedSizeVirtualScroll,
+    ResizedDirective,
+    CdkVirtualForOf,
+    NgFor,
+    LogbookWidgetComponent,
+  ],
 })
 export class OverviewScrollComponent implements AfterViewInit, OnDestroy {
-
   @Input() config: WidgetItemConfig;
 
   @Output() logbookEdit = new EventEmitter<Logbooks>();
   @Output() logbookSelection = new EventEmitter<string>();
 
   @ViewChild(CdkVirtualScrollViewport) viewPort: CdkVirtualScrollViewport;
-  @ViewChildren(LogbookWidgetComponent, { read: ElementRef }) logbookWidgetComponent: QueryList<ElementRef>;
+  @ViewChildren(LogbookWidgetComponent, { read: ElementRef })
+  logbookWidgetComponent: QueryList<ElementRef>;
 
   logbooks: Logbooks[][] = [];
   isLoaded: boolean;
-  private contentSize: Sizes = {width: 300, height: 400};
+  private contentSize: Sizes = { width: 300, height: 400 };
   private minPageSize = 20;
   private currentPage = 0;
   private pageSize: number;
@@ -41,7 +66,10 @@ export class OverviewScrollComponent implements AfterViewInit, OnDestroy {
   private endOfData = false;
   private renderedRangeSubscription: Subscription;
 
-  constructor(private dataService: LogbookDataService, private changeRef: ChangeDetectorRef) {
+  constructor(
+    private dataService: LogbookDataService,
+    private changeRef: ChangeDetectorRef,
+  ) {
     afterNextRender({
       read: () => {
         if (!this.updateSizes) return;
@@ -55,7 +83,8 @@ export class OverviewScrollComponent implements AfterViewInit, OnDestroy {
     this.setGroupSize(this.elementSize(this.viewPort.elementRef));
     this.logbooks = await this.getAndGroupLogbooks();
     this.renderedRangeSubscription = this.viewPort.renderedRangeStream.subscribe(
-      async ({start, end}) => await this.onScroll(end))
+      async ({ start, end }) => await this.onScroll(end),
+    );
   }
 
   get itemSize() {
@@ -64,8 +93,9 @@ export class OverviewScrollComponent implements AfterViewInit, OnDestroy {
 
   private setPageSize(pageSize: number) {
     const minSize = this.minPageSize;
-    if (this.pageSize && this.pageSize % this.groupSize === 0) return
-    this.pageSize = pageSize > minSize? pageSize: Math.ceil(minSize /  this.groupSize) * this.groupSize;
+    if (this.pageSize && this.pageSize % this.groupSize === 0) return;
+    this.pageSize =
+      pageSize > minSize ? pageSize : Math.ceil(minSize / this.groupSize) * this.groupSize;
   }
 
   private setGroupSize(containerSize: Sizes) {
@@ -77,7 +107,7 @@ export class OverviewScrollComponent implements AfterViewInit, OnDestroy {
 
   private elementSize(element: ElementRef) {
     const elementSize = element.nativeElement.getBoundingClientRect();
-    return {width: elementSize.width, height: elementSize.height}
+    return { width: elementSize.width, height: elementSize.height };
   }
 
   private splitIntoGroups(logbooks: Logbooks[]) {
@@ -91,37 +121,32 @@ export class OverviewScrollComponent implements AfterViewInit, OnDestroy {
   }
 
   private async getLogbooks(pageSize = this.pageSize, limit = this.pageSize) {
-    return await this.dataService.getDataBuffer(pageSize  * this.currentPage, limit, this.config);
+    return await this.dataService.getDataBuffer(pageSize * this.currentPage, limit, this.config);
   }
 
   private async getAndGroupLogbooks() {
     this.isLoaded = false;
     const logbooks = await this.getLogbooks();
-    if (
-      logbooks.length < this.pageSize ||
-      logbooks.length === 0
-    ) this.endOfData = true
+    if (logbooks.length < this.pageSize || logbooks.length === 0) this.endOfData = true;
     this.currentPage++;
     this.isLoaded = true;
     return this.splitIntoGroups(logbooks);
   }
 
   private async refreshLogbooks(oldGroupSize: number, oldPageSize: number) {
-    if (this.groupSize  === oldGroupSize && this.pageSize === oldPageSize) return;
-    else if (
-      this.pageSize > oldPageSize ||
-      oldPageSize % this.groupSize
-    ) await this.reshapeOnResize(oldPageSize);
+    if (this.groupSize === oldGroupSize && this.pageSize === oldPageSize) return;
+    else if (this.pageSize > oldPageSize || oldPageSize % this.groupSize)
+      await this.reshapeOnResize(oldPageSize);
     else this.logbooks = this.regroupLogbooks();
   }
-  
+
   private async reshapeOnResize(oldPageSize: number, logbooks: Logbooks[] = undefined) {
     const pageDiff = this.pageSize - oldPageSize;
     const _logbooks = [...(logbooks ?? this.logbooks.flat())];
     if (!this.endOfData)
-      pageDiff > 0 ?
-        _logbooks.push(...(await this.getLogbooks(oldPageSize, pageDiff))) :
-        _logbooks.splice(pageDiff, -pageDiff);
+      pageDiff > 0
+        ? _logbooks.push(...(await this.getLogbooks(oldPageSize, pageDiff)))
+        : _logbooks.splice(pageDiff, -pageDiff);
     this.logbooks = this.splitIntoGroups(_logbooks);
   }
 
@@ -150,29 +175,33 @@ export class OverviewScrollComponent implements AfterViewInit, OnDestroy {
 
   @HostListener('window:resize')
   async onResized(event: ResizedEvent) {
-    if (!event) return
+    if (!event) return;
     await this.compareAndRefreshSizes(event.newRect);
   }
 
   trackByGroupId(index: number, logbooksGroup: Logbooks[]): string {
-    return logbooksGroup.reduce((previousValue, currentValue) => previousValue += currentValue.id, '');
+    return logbooksGroup.reduce(
+      (previousValue, currentValue) => (previousValue += currentValue.id),
+      '',
+    );
   }
-  
+
   editLogbook(logbook: Logbooks) {
     this.logbookEdit.emit(logbook);
   }
 
   afterLogbookEdit(logbook: Logbooks) {
-    this.logbooks.forEach(group => 
-      group.forEach((log, i) => {if (log.id === logbook.id) group[i] = logbook})
+    this.logbooks.forEach((group) =>
+      group.forEach((log, i) => {
+        if (log.id === logbook.id) group[i] = logbook;
+      }),
     );
   }
 
   async deleteLogbook(logbookId: string) {
     await this.dataService.deleteLogbook(logbookId);
-    const logbooks = this.logbooks.flat().filter(logbook => logbook.id !== logbookId);
-    await this.reshapeOnResize(
-      this.pageSize - 1, logbooks);
+    const logbooks = this.logbooks.flat().filter((logbook) => logbook.id !== logbookId);
+    await this.reshapeOnResize(this.pageSize - 1, logbooks);
   }
 
   logbookSelected(logbookId: string) {
@@ -184,5 +213,4 @@ export class OverviewScrollComponent implements AfterViewInit, OnDestroy {
       this.renderedRangeSubscription.unsubscribe();
     }
   }
-
 }

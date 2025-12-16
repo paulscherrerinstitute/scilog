@@ -18,7 +18,7 @@ describe('SnackbarService', () => {
     expect(service).toBeTruthy();
   });
   // it('should toggle snackbar', (done) =>{
-    
+
   //   setTimeout(()=>{
   //     // expect(service['serverMessageShown']).toBeTruthy();
   //     // service.hideServerMessage();
@@ -27,6 +27,6 @@ describe('SnackbarService', () => {
   //     done();
   //   }, 500);
   //   service.showServerMessage();
-    
+
   // })
 });

@@ -1,48 +1,55 @@
-<div #logbookTitle class='logbook-name-tag' *ngIf='isLogbookOpen' style="font-size: 18px;">
+<div #logbookTitle class="logbook-name-tag" *ngIf="isLogbookOpen" style="font-size: 18px">
   {{ logbookName }}
 </div>
 <mat-toolbar color="primary">
-
-  <div [ngClass]="(showMenuIcon)?'logo-center':'logo'">
+  <div [ngClass]="showMenuIcon ? 'logo-center' : 'logo'">
     <img src="../../assets/logo.png" alt="SciLog" width="50" height="50" />
   </div>
   <div>
-    <button mat-icon-button *ngIf='showMenuIcon' (click)='openSideMenu()'>
+    <button mat-icon-button *ngIf="showMenuIcon" (click)="openSideMenu()">
       <mat-icon>menu</mat-icon>
     </button>
   </div>
-  <div *ngIf='showSearch' class="searchWindow">
-    <app-search-window #searchWindow [configsArray]='config' [searched]="searched" (closed)="closeSearch()" (overviewSearch)="setSearch($event)"></app-search-window>
+  <div *ngIf="showSearch" class="searchWindow">
+    <app-search-window
+      #searchWindow
+      [configsArray]="config"
+      [searched]="searched"
+      (closed)="closeSearch()"
+      (overviewSearch)="setSearch($event)"
+    ></app-search-window>
   </div>
   <div class="flexExpand">
-    <button mat-icon-button class='searchButton' (click)="openSearch()" *ngIf="!showMenuIcon">
-      <mat-icon class='searchIcon'>
-        search
-      </mat-icon>
-      <span>
-        Search
-      </span>
-      <mat-icon class="searchIcon" style="color: red;" *ngIf="searched">
-        filter_list_alt
-      </mat-icon>
+    <button mat-icon-button class="searchButton" (click)="openSearch()" *ngIf="!showMenuIcon">
+      <mat-icon class="searchIcon"> search </mat-icon>
+      <span> Search </span>
+      <mat-icon class="searchIcon" style="color: red" *ngIf="searched"> filter_list_alt </mat-icon>
     </button>
   </div>
 
-  <div style="display: flex; align-items: center;">
+  <div style="display: flex; align-items: center">
     <div class="version-info" *ngIf="showVersionInfo" matTooltip="v0.9">
       {{ versionInfo }}
     </div>
-    <button mat-icon-button *ngIf="showMenuIcon && isLogbookOpen" (click)="openSearch()" matTooltip="Search" aria-label="Search">
+    <button
+      mat-icon-button
+      *ngIf="showMenuIcon && isLogbookOpen"
+      (click)="openSearch()"
+      matTooltip="Search"
+      aria-label="Search"
+    >
       <mat-icon>search</mat-icon>
     </button>
     <button mat-icon-button [matMenuTriggerFor]="menuViews" *ngIf="isLogbookOpen">
       <mat-icon>preview</mat-icon>
     </button>
     <mat-menu #menuViews="matMenu">
-      <ng-container *ngFor="let view of views; let i=index;">
+      <ng-container *ngFor="let view of views; let i = index">
         <button mat-menu-item (click)="loadView(i)">
           <mat-icon>visibility</mat-icon>
-          <span [ngStyle]="{'font-weight':view.id === currentView ? 'bold' : 'normal' }">{{ view.name }}</span>
+          <span [ngStyle]="{ 'font-weight': view.id === currentView ? 'bold' : 'normal' }">{{
+            view.name
+          }}</span>
         </button>
       </ng-container>
       <button mat-menu-item (click)="openSettings('viewSettings')">
@@ -50,7 +57,13 @@
         <span>Save/Edit</span>
       </button>
     </mat-menu>
-    <button mat-icon-button (click)="openHelp()" *ngIf="!showMenuIcon" matTooltip="Help" aria-label="Help">
+    <button
+      mat-icon-button
+      (click)="openHelp()"
+      *ngIf="!showMenuIcon"
+      matTooltip="Help"
+      aria-label="Help"
+    >
       <mat-icon>help</mat-icon>
     </button>
     <button mat-icon-button [matMenuTriggerFor]="menu">
@@ -58,7 +71,7 @@
         <!-- <img src="https://material.angular.io/assets/img/examples/shiba1.jpg" alt="SciLog" class="avatar-image"/> -->
         <svg class="avatar-image" [data-jdenticon-value]="avatarHash"></svg>
         <!-- <mat-icon matTooltip="Profile">account_circle</mat-icon> -->
-        <div style="margin-top: -30%; font-size: xx-small;">{{username}}</div>
+        <div style="margin-top: -30%; font-size: xx-small">{{ username }}</div>
       </span>
     </button>
     <mat-menu #menu="matMenu">

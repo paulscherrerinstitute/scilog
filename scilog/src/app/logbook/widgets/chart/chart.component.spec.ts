@@ -7,45 +7,39 @@ import { LogbookInfoService } from '@shared/logbook-info.service';
 import { ChangeStreamService } from '@shared/change-stream.service';
 import { of } from 'rxjs';
 
-
 class ViewsServiceMock {
   currentWidgetConfigs = of({});
-
 }
 
 class LogbookInfoMock {
   logbookInfo = {
-    id: '1234'
-  }
-
+    id: '1234',
+  };
 }
-
 
 describe('ChartComponent', () => {
   let component: ChartComponent;
   let fixture: ComponentFixture<ChartComponent>;
-  let plotSpy:any;
+  let plotSpy: any;
   // let logbookSpy:any;
-  let changestreamSpy:any;
+  let changestreamSpy: any;
 
   beforeEach(waitForAsync(() => {
-
-    plotSpy = jasmine.createSpyObj("PlotDataService", ["getPlotSnippets"]);
+    plotSpy = jasmine.createSpyObj('PlotDataService', ['getPlotSnippets']);
     // logbookSpy = jasmine.createSpyObj("LogbookInfoService", ['currentView']);
 
-    changestreamSpy = jasmine.createSpyObj("ChangeStreamService", ["getNotification"]);
+    changestreamSpy = jasmine.createSpyObj('ChangeStreamService', ['getNotification']);
     changestreamSpy.getNotification.and.returnValue(of({}));
-    
+
     TestBed.configureTestingModule({
-    imports: [ChartComponent],
-    providers: [
+      imports: [ChartComponent],
+      providers: [
         { provide: ViewsService, useClass: ViewsServiceMock },
         { provide: PlotDataService, useValue: plotSpy },
         { provide: LogbookInfoService, useClass: LogbookInfoMock },
         { provide: ChangeStreamService, useValue: changestreamSpy },
-    ]
-})
-    .compileComponents();
+      ],
+    }).compileComponents();
   }));
 
   beforeEach(() => {

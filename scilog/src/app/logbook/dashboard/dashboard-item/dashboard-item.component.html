@@ -1,31 +1,50 @@
-<div class="header" [ngStyle]="{'padding':dashboardView === true ? '0px' : '10px' }">
-    <span class="headerTitle">
-        {{ config?.general.title }}
-    </span>
-    <span class="flexExpand"></span>
-    <span>
-        <button mat-icon-button aria-label="Export" (click)='exportLogbook()' *ngIf="config?.general.type==='logbook'"
-            matTooltip="Export logbook">
-            <mat-icon>save_alt</mat-icon>
-        </button>
-        <button mat-icon-button aria-label="Edit" (click)='requestFullscreen()' *ngIf="dashboardView"
-            matTooltip="Switch to full screen mode">
-            <mat-icon>fullscreen</mat-icon>
-        </button>
-        <button mat-icon-button aria-label="Edit" (click)='openPreferences()' matTooltip="Open widget preferences">
-            <mat-icon>settings</mat-icon>
-        </button>
-    </span>
-
+<div class="header" [ngStyle]="{ padding: dashboardView === true ? '0px' : '10px' }">
+  <span class="headerTitle">
+    {{ config?.general.title }}
+  </span>
+  <span class="flexExpand"></span>
+  <span>
+    <button
+      mat-icon-button
+      aria-label="Export"
+      (click)="exportLogbook()"
+      *ngIf="config?.general.type === 'logbook'"
+      matTooltip="Export logbook"
+    >
+      <mat-icon>save_alt</mat-icon>
+    </button>
+    <button
+      mat-icon-button
+      aria-label="Edit"
+      (click)="requestFullscreen()"
+      *ngIf="dashboardView"
+      matTooltip="Switch to full screen mode"
+    >
+      <mat-icon>fullscreen</mat-icon>
+    </button>
+    <button
+      mat-icon-button
+      aria-label="Edit"
+      (click)="openPreferences()"
+      matTooltip="Open widget preferences"
+    >
+      <mat-icon>settings</mat-icon>
+    </button>
+  </span>
 </div>
 <ng-container [ngSwitch]="config?.general.type" class="item-container">
-    <app-logbook-item *ngSwitchCase="'logbook'" [config]="config" [configIndex]="configIndex"></app-logbook-item>
-    <app-chat *ngSwitchCase="'chat'" [configIndex]="configIndex"></app-chat>
-    <app-chart *ngSwitchCase="'graph'" [configIndex]="configIndex"></app-chart>
-    <app-todos *ngSwitchCase="'tasks'" [configIndex]="configIndex"></app-todos>
-    <app-snippet-viewer *ngSwitchCase="'snippetViewer'" [configIndex]="configIndex"></app-snippet-viewer>
-    <app-scicat-viewer *ngSwitchCase="'scicatViewer'"></app-scicat-viewer>
-    <div *ngSwitchDefault>
-        No content specified.
-    </div>
+  <app-logbook-item
+    *ngSwitchCase="'logbook'"
+    [config]="config"
+    [configIndex]="configIndex"
+  ></app-logbook-item>
+  <app-chat *ngSwitchCase="'chat'" [configIndex]="configIndex"></app-chat>
+  <app-chart *ngSwitchCase="'graph'" [configIndex]="configIndex"></app-chart>
+  <app-todos *ngSwitchCase="'tasks'" [configIndex]="configIndex"></app-todos>
+  <app-snippet-viewer
+    *ngSwitchCase="'snippetViewer'"
+    [configIndex]="configIndex"
+  ></app-snippet-viewer>
+  <app-scicat-viewer *ngSwitchCase="'scicatViewer'"></app-scicat-viewer>
+  <div *ngSwitchDefault>No content specified.</div>
 </ng-container>

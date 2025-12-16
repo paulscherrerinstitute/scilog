@@ -6,20 +6,23 @@ import { UserPreferencesService } from './user-preferences.service';
 
 describe('ViewsService', () => {
   let service: ViewsService;
-  let viewDataServiceSpy:any;
-  let userPreferencesServiceSpy:any;
+  let viewDataServiceSpy: any;
+  let userPreferencesServiceSpy: any;
 
-  viewDataServiceSpy = jasmine.createSpyObj("ViewDataService", ["getViews", "patchView", "postView"]);
-  userPreferencesServiceSpy = jasmine.createSpyObj("UserPreferencesService", ["userInfo"]);
-  userPreferencesServiceSpy.userInfo.and.returnValue({"username": "test_username"});
+  viewDataServiceSpy = jasmine.createSpyObj('ViewDataService', [
+    'getViews',
+    'patchView',
+    'postView',
+  ]);
+  userPreferencesServiceSpy = jasmine.createSpyObj('UserPreferencesService', ['userInfo']);
+  userPreferencesServiceSpy.userInfo.and.returnValue({ username: 'test_username' });
 
   beforeEach(() => {
     TestBed.configureTestingModule({
       providers: [
-        { provide: ViewDataService, useValue: viewDataServiceSpy},
-        { provide: UserPreferencesService, useValue: userPreferencesServiceSpy},
-
-      ]
+        { provide: ViewDataService, useValue: viewDataServiceSpy },
+        { provide: UserPreferencesService, useValue: userPreferencesServiceSpy },
+      ],
     });
     service = TestBed.inject(ViewsService);
   });

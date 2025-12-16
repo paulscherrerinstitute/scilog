@@ -1,19 +1,41 @@
 <div class="gridster-container" (appResized)="onResized()">
-    <div class="dashboard-edit">
-        <button mat-icon-button (click)="addItemToDashboard()" *ngIf="editMode" matTooltip="Add widget">
-            <mat-icon>add</mat-icon>
-        </button>
-        <button mat-stroked-button (click)="editGrid()" [ngStyle]="{'visibility': mobile? 'hidden' : 'visible'}">{{ editGridText }}</button>
-    </div>
-    <gridster [options]="editMode? optionsEdit : options" [ngClass]="editMode? 'gridster-edit' : 'gridster'">
-      <gridster-item [item]="item" *ngFor="let item of dashboard; let i = index" class="gridster-item">
-        <div class="dashboard-item" *ngIf="!editMode">
-            <app-dashboard-item [configIndex]="i" (openFullscreen)="openFullscreen($event)"></app-dashboard-item>
-        </div>
-        <button mat-mini-fab color="primary" (mousedown)="removeItem($event, item)"
-                (touchstart)="removeItem($event, item)" *ngIf="editMode" matTooltip="Remove widget">
-          <mat-icon>delete</mat-icon>
-        </button>
-      </gridster-item>
-    </gridster>
+  <div class="dashboard-edit">
+    <button mat-icon-button (click)="addItemToDashboard()" *ngIf="editMode" matTooltip="Add widget">
+      <mat-icon>add</mat-icon>
+    </button>
+    <button
+      mat-stroked-button
+      (click)="editGrid()"
+      [ngStyle]="{ visibility: mobile ? 'hidden' : 'visible' }"
+    >
+      {{ editGridText }}
+    </button>
   </div>
+  <gridster
+    [options]="editMode ? optionsEdit : options"
+    [ngClass]="editMode ? 'gridster-edit' : 'gridster'"
+  >
+    <gridster-item
+      [item]="item"
+      *ngFor="let item of dashboard; let i = index"
+      class="gridster-item"
+    >
+      <div class="dashboard-item" *ngIf="!editMode">
+        <app-dashboard-item
+          [configIndex]="i"
+          (openFullscreen)="openFullscreen($event)"
+        ></app-dashboard-item>
+      </div>
+      <button
+        mat-mini-fab
+        color="primary"
+        (mousedown)="removeItem($event, item)"
+        (touchstart)="removeItem($event, item)"
+        *ngIf="editMode"
+        matTooltip="Remove widget"
+      >
+        <mat-icon>delete</mat-icon>
+      </button>
+    </gridster-item>
+  </gridster>
+</div>

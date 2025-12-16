@@ -1,5 +1,5 @@
-import { Basesnippets } from "./basesnippets";
+import { Basesnippets } from './basesnippets';
 
 export interface Edits extends Basesnippets {
-    toDelete?: boolean;
+  toDelete?: boolean;
 }

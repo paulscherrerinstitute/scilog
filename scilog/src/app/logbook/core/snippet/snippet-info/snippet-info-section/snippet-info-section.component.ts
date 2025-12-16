@@ -7,15 +7,13 @@ import { MatFormField, MatLabel } from '@angular/material/form-field';
 import { MatInput } from '@angular/material/input';
 import { FormsModule } from '@angular/forms';
 
-
 @Component({
-    selector: 'app-snippet-info-section',
-    templateUrl: './snippet-info-section.component.html',
-    styleUrls: ['./snippet-info-section.component.css'],
-    imports: [NgFor, MatFormField, MatLabel, MatInput, CdkTextareaAutosize, FormsModule]
+  selector: 'app-snippet-info-section',
+  templateUrl: './snippet-info-section.component.html',
+  styleUrls: ['./snippet-info-section.component.css'],
+  imports: [NgFor, MatFormField, MatLabel, MatInput, CdkTextareaAutosize, FormsModule],
 })
 export class SnippetInfoSectionComponent {
-
   @Input()
   infoSnippets: string[];
 
@@ -30,12 +28,10 @@ export class SnippetInfoSectionComponent {
   infoFieldsCreated = ['createdBy', 'createdAt'];
   infoFieldsUpdated = ['updatedBy', 'updatedAt'];
 
-  constructor(private _ngZone: NgZone) { }
+  constructor(private _ngZone: NgZone) {}
 
   triggerResize() {
     // Wait for changes to be applied, then trigger textarea resize.
-    this._ngZone.onStable.pipe(take(1))
-        .subscribe(() => this.autosize.resizeToFitContent(true));
+    this._ngZone.onStable.pipe(take(1)).subscribe(() => this.autosize.resizeToFitContent(true));
   }
-
 }

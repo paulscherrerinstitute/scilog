@@ -17,22 +17,13 @@
               "path": "./custom-webpack.config.js",
               "replaceDuplicatePlugins": true
             },
-            "allowedCommonJsDependencies": [
-              "lodash",
-              "css-element-queries",
-              "chart.js",
-              "uuid"
-            ],
+            "allowedCommonJsDependencies": ["lodash", "css-element-queries", "chart.js", "uuid"],
             "outputPath": "dist/scilog",
             "index": "src/index.html",
             "main": "src/main.ts",
             "polyfills": "src/polyfills.ts",
             "tsConfig": "tsconfig.app.json",
-            "assets": [
-              "src/favicon.ico",
-              "src/favicon.png",
-              "src/assets"
-            ],
+            "assets": ["src/favicon.ico", "src/favicon.png", "src/assets"],
             "styles": [
               "./node_modules/@angular/material/prebuilt-themes/indigo-pink.css",
               "src/styles.scss",
@@ -101,14 +92,8 @@
             "polyfills": "src/polyfills.ts",
             "tsConfig": "tsconfig.spec.json",
             "karmaConfig": "karma.conf.js",
-            "codeCoverageExclude": [
-              "src/ckeditor5-build-classic/**"
-            ],
-            "assets": [
-              "src/favicon.ico",
-              "src/favicon.png",
-              "src/assets"
-            ],
+            "codeCoverageExclude": ["src/ckeditor5-build-classic/**"],
+            "assets": ["src/favicon.ico", "src/favicon.png", "src/assets"],
             "styles": [
               "./node_modules/@angular/material/prebuilt-themes/indigo-pink.css",
               "src/styles.scss",
@@ -120,10 +105,7 @@
         "lint": {
           "builder": "@angular-eslint/builder:lint",
           "options": {
-            "lintFilePatterns": [
-              "src/**/*.ts",
-              "src/**/*.html"
-            ]
+            "lintFilePatterns": ["src/**/*.ts", "src/**/*.html"]
           }
         },
         "e2e": {
@@ -143,8 +125,6 @@
   },
   "cli": {
     "analytics": false,
-    "schematicCollections": [
-      "@angular-eslint/schematics"
-    ]
+    "schematicCollections": ["@angular-eslint/schematics"]
   }
 }

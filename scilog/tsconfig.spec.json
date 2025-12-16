@@ -5,20 +5,17 @@
     "baseUrl": "",
     "paths": {
       "@model/*": ["src/app/core/model/*"],
-      "@shared/*": ["src/app/core/*", "src/app/logbook/core/*", "src/app/overview/core/*", "src/app/login/core/*"],
+      "@shared/*": [
+        "src/app/core/*",
+        "src/app/logbook/core/*",
+        "src/app/overview/core/*",
+        "src/app/login/core/*"
+      ],
       "@widgets/*": ["src/app/core/logbook/widgets/*"]
     },
     "outDir": "./out-tsc/spec",
-    "types": [
-      "jasmine"
-    ]
+    "types": ["jasmine"]
   },
-  "files": [
-    "src/test.ts",
-    "src/polyfills.ts"
-  ],
-  "include": [
-    "src/**/*.spec.ts",
-    "src/**/*.d.ts"
-  ]
+  "files": ["src/test.ts", "src/polyfills.ts"],
+  "include": ["src/**/*.spec.ts", "src/**/*.d.ts"]
 }

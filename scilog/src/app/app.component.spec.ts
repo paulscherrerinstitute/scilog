@@ -6,17 +6,14 @@ import { LogbookInfoService } from './core/logbook-info.service';
 describe('AppComponent', () => {
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-    imports: [
-        RouterTestingModule,
-        AppComponent
-    ],
-    providers: [
+      imports: [RouterTestingModule, AppComponent],
+      providers: [
         {
-            provide: LogbookInfoService,
-            useValue: { logbookInfo: { id: 'id' } }
-        }
-    ],
-}).compileComponents();
+          provide: LogbookInfoService,
+          useValue: { logbookInfo: { id: 'id' } },
+        },
+      ],
+    }).compileComponents();
   }));
 
   it('should create the app', () => {
@@ -30,5 +27,4 @@ describe('AppComponent', () => {
   //   const app = fixture.componentInstance;
   //   expect(app.title).toEqual('SciLog');
   // });
-
 });

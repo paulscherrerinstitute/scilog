@@ -10,7 +10,15 @@ describe('DatasetService', () => {
   const getConfig = () => ({});
 
   beforeEach(() => {
-    TestBed.configureTestingModule({ imports: [], providers: [DatasetService, { provide: AppConfigService, useValue: { getConfig } }, provideHttpClient(withInterceptorsFromDi()), provideHttpClientTesting()] });
+    TestBed.configureTestingModule({
+      imports: [],
+      providers: [
+        DatasetService,
+        { provide: AppConfigService, useValue: { getConfig } },
+        provideHttpClient(withInterceptorsFromDi()),
+        provideHttpClientTesting(),
+      ],
+    });
     service = TestBed.inject(DatasetService);
   });
 

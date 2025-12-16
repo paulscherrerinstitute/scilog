@@ -23,27 +23,36 @@ const routes: Routes = [
   { path: 'auth-callback', component: AuthCallbackComponent },
   { path: 'overview', component: OverviewComponent },
   { path: 'download/:fileId', component: DownloadComponent },
-  { path: 'logbooks/:logbookId', component: LogbookComponent,
-      children: [
-        { path: 'dashboard', component: DashboardComponent, canDeactivate: mapToCanDeactivate([NavigationGuardService]) },
-        { path: 'todos', component: TodosComponent },
-        { path: 'logbook', component: LogbookItemComponent },
-        { path: 'snippetViewer', component: SnippetViewerComponent },
-        { path: 'chat', component: ChatComponent },
-        { path: 'graph', component: ChartComponent },
-        { path: 'dashboard-item', component: DashboardItemComponent, canDeactivate: mapToCanDeactivate([NavigationGuardService]) },
-        { path: '**', redirectTo: '/overview', pathMatch: 'full' },
-      ]},
+  {
+    path: 'logbooks/:logbookId',
+    component: LogbookComponent,
+    children: [
+      {
+        path: 'dashboard',
+        component: DashboardComponent,
+        canDeactivate: mapToCanDeactivate([NavigationGuardService]),
+      },
+      { path: 'todos', component: TodosComponent },
+      { path: 'logbook', component: LogbookItemComponent },
+      { path: 'snippetViewer', component: SnippetViewerComponent },
+      { path: 'chat', component: ChatComponent },
+      { path: 'graph', component: ChartComponent },
+      {
+        path: 'dashboard-item',
+        component: DashboardItemComponent,
+        canDeactivate: mapToCanDeactivate([NavigationGuardService]),
+      },
+      { path: '**', redirectTo: '/overview', pathMatch: 'full' },
+    ],
+  },
   { path: 'viewSettings', component: ViewSettingsComponent, outlet: 'settings' },
   { path: 'profileSettings', component: ProfileSettingsComponent, outlet: 'settings' },
   { path: '**', redirectTo: '/overview', pathMatch: 'full' },
-
 ];
 
 @NgModule({
   imports: [RouterModule.forRoot(routes, { canceledNavigationResolution: 'computed' })],
   providers: [NavigationGuardService],
-  exports: [RouterModule]
+  exports: [RouterModule],
 })
-export class AppRoutingModule { }
-
+export class AppRoutingModule {}

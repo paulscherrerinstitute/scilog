@@ -2,11 +2,10 @@
 <div mat-dialog-content>
   <mat-form-field>
     <mat-label>dashboardName</mat-label>
-    <input matInput [(ngModel)]="data.dashboardName">
+    <input matInput [(ngModel)]="data.dashboardName" />
   </mat-form-field>
 </div>
 <div mat-dialog-actions>
   <button mat-button (click)="cancelClick()">Cancel</button>
   <button mat-button (click)="saveClick()" cdkFocusInitial>Save</button>
 </div>
-

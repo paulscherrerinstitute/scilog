@@ -1,6 +1,6 @@
 services:
   scilog:
-    build: 
+    build:
       context: .
       target: builder
     environment:

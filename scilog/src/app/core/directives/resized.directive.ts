@@ -1,4 +1,12 @@
-import { Directive, ElementRef, EventEmitter, NgZone, OnDestroy, OnInit, Output } from '@angular/core';
+import {
+  Directive,
+  ElementRef,
+  EventEmitter,
+  NgZone,
+  OnDestroy,
+  OnInit,
+  Output,
+} from '@angular/core';
 
 export class ResizedEvent {
   public newRect: DOMRectReadOnly;
@@ -6,9 +14,9 @@ export class ResizedEvent {
   public isFirst: boolean;
 
   public constructor(newRect: DOMRectReadOnly, oldRect: DOMRectReadOnly | undefined) {
-      this.newRect = newRect;
-      this.oldRect = oldRect;
-      this.isFirst = oldRect == null;
+    this.newRect = newRect;
+    this.oldRect = oldRect;
+    this.isFirst = oldRect == null;
   }
 }
 
@@ -22,15 +30,14 @@ export class ResizedDirective implements OnInit, OnDestroy {
 
   public constructor(
     private readonly element: ElementRef,
-    private readonly zone: NgZone
-  )
-  {
+    private readonly zone: NgZone,
+  ) {
     this.appResized = new EventEmitter<ResizedEvent>();
-    this.observer = new ResizeObserver(entries => this.zone.run(() => this.observe(entries)));
+    this.observer = new ResizeObserver((entries) => this.zone.run(() => this.observe(entries)));
   }
 
   public ngOnInit(): void {
-    this.observer.observe(this.element.nativeElement)
+    this.observer.observe(this.element.nativeElement);
   }
 
   public ngOnDestroy(): void {
@@ -44,4 +51,3 @@ export class ResizedDirective implements OnInit, OnDestroy {
     this.appResized.emit(resizedEvent);
   }
 }
-

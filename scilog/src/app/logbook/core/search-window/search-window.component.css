@@ -1,65 +1,67 @@
 .searchBarTop {
-    /* width:50vw !important; */
-    position: unset;
-    display: flex;
+  /* width:50vw !important; */
+  position: unset;
+  display: flex;
 }
 
 .searchInput {
-    display: contents;
-    color: var(--toolbar-text-color);
+  display: contents;
+  color: var(--toolbar-text-color);
 }
 
 :host ::ng-deep .mat-mdc-form-field {
-    width: 100% !important;
+  width: 100% !important;
 }
 
 .searchHelp {
-    color: var(--default-text-color);
-    overflow: inherit;
-    max-width: 100% !important;
-    max-width: 100% !important;
-    white-space: initial;
-    padding: 20px;
-    overflow-y: scroll;
-    height: calc(50vh - 100px);
+  color: var(--default-text-color);
+  overflow: inherit;
+  max-width: 100% !important;
+  max-width: 100% !important;
+  white-space: initial;
+  padding: 20px;
+  overflow-y: scroll;
+  height: calc(50vh - 100px);
 }
 .searchHelp .header {
-    font-size: 20px;
-    color: var(--header-color);
-    padding-bottom: 20px;
-    padding-top: 10px;
+  font-size: 20px;
+  color: var(--header-color);
+  padding-bottom: 20px;
+  padding-top: 10px;
 }
 
 .searchHelp .header > div {
-    font-size: 15px !important;
-    color: var(--subheader-color);
-    padding-left: 5px;
+  font-size: 15px !important;
+  color: var(--subheader-color);
+  padding-left: 5px;
 }
 
 .suggestion-button {
-    border-radius: 5px;
-    background-color: #004c63;
-    color: white;
-    box-shadow: 0 1px 4px 0 var(--default-shadow-0), 0 2px 8px 0 var(--default-shadow-1),
-        0 4px 8px -1px var(--default-shadow-2);
-    border: unset;
-    padding: 4px;
-    margin-left: 4px;
+  border-radius: 5px;
+  background-color: #004c63;
+  color: white;
+  box-shadow:
+    0 1px 4px 0 var(--default-shadow-0),
+    0 2px 8px 0 var(--default-shadow-1),
+    0 4px 8px -1px var(--default-shadow-2);
+  border: unset;
+  padding: 4px;
+  margin-left: 4px;
 }
 
 .windowContainer {
-    z-index: 2000;
-    position: absolute;
-    width: 50vw !important;
+  z-index: 2000;
+  position: absolute;
+  width: 50vw !important;
 }
 
 .searchConfig {
-    width: 50px;
-    color: var(--toolbar-text-color);
-    filter: brightness(0.5);
-    margin-inline-end: 5px;
+  width: 50px;
+  color: var(--toolbar-text-color);
+  filter: brightness(0.5);
+  margin-inline-end: 5px;
 }
 
 .searchConfigField {
-    width: 60px!important;
+  width: 60px !important;
 }

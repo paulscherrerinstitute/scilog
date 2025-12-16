@@ -49,7 +49,6 @@
 ::ng-deep.mat-form-field-ripple {
   /*change color of underline when focused*/
   background-color: var(--button-accent) !important;
-
 }
 
 /*TODO(mdc-migration): The following rule targets internal classes of form-field that may no longer apply for the MDC version.*/
@@ -71,7 +70,6 @@
   box-shadow: unset;
   background-color: var(--ck-toolbar-color-background);
 }
-
 
 .editor-container {
   position: fixed;
@@ -155,8 +153,8 @@
   border-color: var(--ck-toolbar-border-color);
 }
 
-::ng-deep .ck.ck-toolbar>.ck-toolbar__items> :not(.ck-toolbar__line-break),
-.ck.ck-toolbar>.ck.ck-toolbar__grouped-dropdown {
+::ng-deep .ck.ck-toolbar > .ck-toolbar__items > :not(.ck-toolbar__line-break),
+.ck.ck-toolbar > .ck.ck-toolbar__grouped-dropdown {
   color: var(--default-text-color);
 }
 
@@ -171,10 +169,9 @@
   padding: 4px;
   margin: 1px;
   text-decoration: none;
-
 }
 
-@supports (-moz-appearance:none) {
+@supports (-moz-appearance: none) {
   ::ng-deep .fileLink {
     display: block;
     word-wrap: break-word;
@@ -182,8 +179,8 @@
 }
 
 ::ng-deep .fileLink::before {
-  font-family: "Material Icons";
-  content: "attach_file";
+  font-family: 'Material Icons';
+  content: 'attach_file';
   display: inline-block;
   font-size: initial;
   vertical-align: middle;
@@ -199,8 +196,7 @@
 
 ::ng-deep .ck-insert-table-dropdown__grid {
   width: calc(
-    var(--ck-insert-table-dropdown-box-width)*10 + 
-    var(--ck-insert-table-dropdown-box-margin)*2 + 
-    var(--ck-insert-table-dropdown-padding)*2
-  )!important
+    var(--ck-insert-table-dropdown-box-width) * 10 + var(--ck-insert-table-dropdown-box-margin) *
+      2 + var(--ck-insert-table-dropdown-padding) * 2
+  ) !important;
 }

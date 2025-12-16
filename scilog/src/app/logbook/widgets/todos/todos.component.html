@@ -1,13 +1,23 @@
 <!-- [(ngModel)]="newTodo.title" (keyup.enter)="addTodo()" -->
 <div class="counter" *ngIf="tasks.length > 0">
-  <span><strong>{{numTasks}}</strong> {{tasks.length === 1 ? 'item' : 'items'}} left</span>
+  <span
+    ><strong>{{ numTasks }}</strong> {{ tasks.length === 1 ? 'item' : 'items' }} left</span
+  >
 </div>
 <mat-form-field class="add-task">
-  <input matInput class="new-task" placeholder="Add task" autofocus="" (keydown.shift.enter)="addTasks()" (keydown.enter)="addTasks()" [(ngModel)]="newTask">
+  <input
+    matInput
+    class="new-task"
+    placeholder="Add task"
+    autofocus=""
+    (keydown.shift.enter)="addTasks()"
+    (keydown.enter)="addTasks()"
+    [(ngModel)]="newTask"
+  />
 </mat-form-field>
 
 <div class="task-container">
-  <div *ngFor="let task of tasks" >
+  <div *ngFor="let task of tasks">
     <app-task [task]="task"></app-task>
-  </div> 
+  </div>
 </div>

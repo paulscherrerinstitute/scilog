@@ -5,36 +5,34 @@ import { ActivatedRoute, ParamMap, Router } from '@angular/router';
 import { QueryParams } from '../../logbook/widgets/logbook-item/logbook-item.component.spec';
 import { of } from 'rxjs';
 
-
 describe('NavigationButtonComponent', () => {
   let component: NavigationButtonComponent;
   let fixture: ComponentFixture<NavigationButtonComponent>;
   let routerSpy: any;
 
-  routerSpy = jasmine.createSpyObj("Router", ["navigate"]);
+  routerSpy = jasmine.createSpyObj('Router', ['navigate']);
 
   const queryParams = new QueryParams();
   queryParams.set('type', '?');
 
   const activatedRouteMock = {
     parent: { url: of(queryParams) },
-    snapshot: { queryParams: {id: '1234'}}
- };
+    snapshot: { queryParams: { id: '1234' } },
+  };
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-    imports: [NavigationButtonComponent],
-    providers: [
+      imports: [NavigationButtonComponent],
+      providers: [
         { provide: ActivatedRoute, useValue: activatedRouteMock },
         { provide: Router, useValue: routerSpy },
-    ]
-})
-    .compileComponents();
+      ],
+    }).compileComponents();
   }));
 
   beforeEach(() => {
     fixture = TestBed.createComponent(NavigationButtonComponent);
     component = fixture.componentInstance;
-    component["container"] = [];
+    component['container'] = [];
     fixture.detectChanges();
   });
 

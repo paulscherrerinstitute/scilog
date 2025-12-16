@@ -10,9 +10,8 @@ import { Component } from '@angular/core';
 
 class UserPreferencesMock {
   userInfo = {
-    roles: ["roles"]
-
-  }
+    roles: ['roles'],
+  };
 }
 
 @Component({})
@@ -21,53 +20,50 @@ class DummyComponent {}
 describe('LogbookWidgetComponent', () => {
   let component: LogbookWidgetComponent;
   let fixture: ComponentFixture<LogbookWidgetComponent>;
-  let logbookSpy:any;
-  let logbookItemDataSpy:any;
+  let logbookSpy: any;
+  let logbookItemDataSpy: any;
 
-  let logbookMock:Logbooks = {
-    "id" : "6058c1dbd9574d6f51e4b650",
-    "ownerGroup" : "p17642",
-    "accessGroups" : [
-      "slscsaxs"
-    ],
-    "snippetType" : "logbook",
-    "isPrivate" : false,
-    "defaultOrder" : 1616429531087000,
-    "createdAt" : "2021-03-22T16:12:11.087Z",
-    "createdBy" : "wakonig_k@psi.ch",
-    "updatedAt" : "2021-03-22T16:12:11.087Z",
-    "updatedBy" : "wakonig_k@psi.ch",
-    "parentId" : "602d438ddaa91a637da2181a",
-    "tags" : [ ],
-    "versionable" : true,
-    "deleted" : false,
-    "updateACL": ["updateRole"],
-    "deleteACL": ["deleteRole"],
-}
+  let logbookMock: Logbooks = {
+    id: '6058c1dbd9574d6f51e4b650',
+    ownerGroup: 'p17642',
+    accessGroups: ['slscsaxs'],
+    snippetType: 'logbook',
+    isPrivate: false,
+    defaultOrder: 1616429531087000,
+    createdAt: '2021-03-22T16:12:11.087Z',
+    createdBy: 'wakonig_k@psi.ch',
+    updatedAt: '2021-03-22T16:12:11.087Z',
+    updatedBy: 'wakonig_k@psi.ch',
+    parentId: '602d438ddaa91a637da2181a',
+    tags: [],
+    versionable: true,
+    deleted: false,
+    updateACL: ['updateRole'],
+    deleteACL: ['deleteRole'],
+  };
 
-  logbookSpy = jasmine.createSpyObj("LogbookInfoService", ["logbookInfo"]);
+  logbookSpy = jasmine.createSpyObj('LogbookInfoService', ['logbookInfo']);
   logbookSpy.logbookInfo.and.returnValue([]);
 
-  logbookItemDataSpy = jasmine.createSpyObj("LogbookItemDataService", ["getFile", "getImage"]);
+  logbookItemDataSpy = jasmine.createSpyObj('LogbookItemDataService', ['getFile', 'getImage']);
   logbookItemDataSpy.getFile.and.returnValue(of({}));
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-    imports: [LogbookWidgetComponent],
-    providers: [
+      imports: [LogbookWidgetComponent],
+      providers: [
         { provide: LogbookInfoService, useValue: logbookSpy },
         { provide: UserPreferencesService, useClass: UserPreferencesMock },
         { provide: LogbookItemDataService, useValue: logbookItemDataSpy },
-        provideRouter([{path: '', component: DummyComponent}])
-    ]
-})
-    .compileComponents();
+        provideRouter([{ path: '', component: DummyComponent }]),
+      ],
+    }).compileComponents();
   }));
 
   beforeEach(() => {
     fixture = TestBed.createComponent(LogbookWidgetComponent);
     component = fixture.componentInstance;
-    component["logbook"] = logbookMock;
+    component['logbook'] = logbookMock;
 
     fixture.detectChanges();
   });
@@ -75,5 +71,4 @@ describe('LogbookWidgetComponent', () => {
   it('should create', () => {
     expect(component).toBeTruthy();
   });
-
 });

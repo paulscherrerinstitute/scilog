@@ -12,14 +12,14 @@ describe('SearchScrollService', () => {
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-    imports: [],
-    providers: [
+      imports: [],
+      providers: [
         { provide: AppConfigService, useValue: { getConfig } },
         SearchScrollService,
         provideHttpClient(withInterceptorsFromDi()),
-        provideHttpClientTesting()
-    ]
-});
+        provideHttpClientTesting(),
+      ],
+    });
     service = TestBed.inject(SearchScrollService);
   });
 
@@ -32,5 +32,4 @@ describe('SearchScrollService', () => {
     service.reset('some');
     expect(setSearchSpy).toHaveBeenCalledOnceWith('some');
   });
-
 });

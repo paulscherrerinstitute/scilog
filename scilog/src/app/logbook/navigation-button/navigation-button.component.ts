@@ -10,13 +10,22 @@ import { MatIcon } from '@angular/material/icon';
 import { MatBadge } from '@angular/material/badge';
 
 @Component({
-    selector: 'app-navigation-button',
-    templateUrl: './navigation-button.component.html',
-    styleUrls: ['./navigation-button.component.scss'],
-    imports: [NgIf, MatFabButton, MatMenuTrigger, MatTooltip, MatIcon, MatBadge, MatMenu, NgFor, MatMenuItem]
+  selector: 'app-navigation-button',
+  templateUrl: './navigation-button.component.html',
+  styleUrls: ['./navigation-button.component.scss'],
+  imports: [
+    NgIf,
+    MatFabButton,
+    MatMenuTrigger,
+    MatTooltip,
+    MatIcon,
+    MatBadge,
+    MatMenu,
+    NgFor,
+    MatMenuItem,
+  ],
 })
 export class NavigationButtonComponent implements OnInit, OnDestroy {
-
   @Input()
   widgetConfigs: WidgetConfig[];
 
@@ -37,60 +46,65 @@ export class NavigationButtonComponent implements OnInit, OnDestroy {
   urlPath: object;
   subscriptions: Subscription[] = [];
 
-  constructor(private router: Router,
-    private route: ActivatedRoute) { }
+  constructor(
+    private router: Router,
+    private route: ActivatedRoute,
+  ) {}
 
   ngOnInit(): void {
-    if (this.route.parent != null){
-      this.subscriptions.push(this.route.parent.url.subscribe((urlPath)=>{
-        this.urlPath = urlPath;
-      }));
+    if (this.route.parent != null) {
+      this.subscriptions.push(
+        this.route.parent.url.subscribe((urlPath) => {
+          this.urlPath = urlPath;
+        }),
+      );
     }
 
     switch (this.type) {
-      case "logbook":
+      case 'logbook':
         this.iconName = 'book';
-        this.iconTip = "Logbook";
+        this.iconTip = 'Logbook';
         break;
-      case "plot":
+      case 'plot':
         this.iconName = 'show_chart';
-        this.iconTip = "Plot";
+        this.iconTip = 'Plot';
         break;
-      case "task":
+      case 'task':
         this.iconName = 'playlist_add_check';
-        this.iconTip = "Tasks";
+        this.iconTip = 'Tasks';
         break;
-      case "chat":
+      case 'chat':
         this.iconName = 'chat';
-        this.iconTip = "Chat";
+        this.iconTip = 'Chat';
         break;
-      case "snippetViewer":
+      case 'snippetViewer':
         this.iconName = 'pageview';
-        this.iconTip = "SnippetViewer";
+        this.iconTip = 'SnippetViewer';
         break;
       default:
         break;
     }
   }
 
-  navigateToItem(index:number){
-    if (typeof this.urlPath != "undefined"){
+  navigateToItem(index: number) {
+    if (typeof this.urlPath != 'undefined') {
       let routerPath = '';
       for (const key in this.urlPath) {
         console.log(this.urlPath[key]);
-        routerPath += "/" + this.urlPath[key]["path"];
+        routerPath += '/' + this.urlPath[key]['path'];
       }
       console.log([routerPath + '/logbooks/' + this.logbookId + '/dashboard-item']);
-      this.router.navigate(['logbooks/' + this.logbookId + '/dashboard-item'], {queryParams: {id: index}});
+      this.router.navigate(['logbooks/' + this.logbookId + '/dashboard-item'], {
+        queryParams: { id: index },
+      });
     }
   }
 
   ngOnDestroy(): void {
     //Called once, before the instance is destroyed.
     //Add 'implements OnDestroy' to the class.
-    this.subscriptions.forEach(sub => {
+    this.subscriptions.forEach((sub) => {
       sub.unsubscribe();
-    })
+    });
   }
-
 }

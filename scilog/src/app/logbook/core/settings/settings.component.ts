@@ -7,10 +7,20 @@ import { MatTooltip } from '@angular/material/tooltip';
 import { MatIcon } from '@angular/material/icon';
 
 @Component({
-    selector: 'app-settings',
-    templateUrl: './settings.component.html',
-    styleUrls: ['./settings.component.css'],
-    imports: [MatSidenavContainer, MatSidenav, MatFabButton, MatTooltip, RouterLink, MatIcon, MatSidenavContent, MatMiniFabButton, RouterOutlet]
+  selector: 'app-settings',
+  templateUrl: './settings.component.html',
+  styleUrls: ['./settings.component.css'],
+  imports: [
+    MatSidenavContainer,
+    MatSidenav,
+    MatFabButton,
+    MatTooltip,
+    RouterLink,
+    MatIcon,
+    MatSidenavContent,
+    MatMiniFabButton,
+    RouterOutlet,
+  ],
 })
 export class SettingsComponent implements OnInit {
   data: any;
@@ -20,11 +30,12 @@ export class SettingsComponent implements OnInit {
   constructor(
     private dialogRef: MatDialogRef<SettingsComponent>,
     @Inject(MAT_DIALOG_DATA) data,
-    private router: Router) {
+    private router: Router,
+  ) {
     this.data = data;
   }
   ngOnInit(): void {
-    this.router.navigate([{outlets: {'settings': [this.data]}}]);
+    this.router.navigate([{ outlets: { settings: [this.data] } }]);
   }
 
   close() {
@@ -34,5 +45,4 @@ export class SettingsComponent implements OnInit {
   applyChanges($event) {
     this.dialogRef.close(this.data);
   }
-
 }

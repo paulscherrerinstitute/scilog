@@ -1,12 +1,11 @@
-import { HttpClient } from "@angular/common/http";
-import { Injectable } from "@angular/core";
-
+import { HttpClient } from '@angular/common/http';
+import { Injectable } from '@angular/core';
 
 export interface Oauth2Endpoint {
-  displayText: string, 
-  authURL: string, 
-  displayImage?: string,
-  tooltipText?: string,
+  displayText: string;
+  authURL: string;
+  displayImage?: string;
+  tooltipText?: string;
 }
 export interface ScicatSettings {
   scicatWidgetEnabled: boolean;
@@ -28,11 +27,11 @@ export class AppConfigService {
   constructor(private http: HttpClient) {}
 
   async loadAppConfig(): Promise<void> {
-      try {
-        this.appConfig = await this.http.get("/assets/config.json").toPromise();
-      } catch (err) {
-        console.error("No config provided, applying defaults", err);
-      }
+    try {
+      this.appConfig = await this.http.get('/assets/config.json').toPromise();
+    } catch (err) {
+      console.error('No config provided, applying defaults', err);
+    }
   }
 
   getConfig(): AppConfig {

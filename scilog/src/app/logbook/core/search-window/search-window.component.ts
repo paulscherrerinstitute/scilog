@@ -1,4 +1,14 @@
-import { Component, OnInit, Output, EventEmitter, Input, ElementRef, ViewChild, afterNextRender, OnDestroy } from '@angular/core';
+import {
+  Component,
+  OnInit,
+  Output,
+  EventEmitter,
+  Input,
+  ElementRef,
+  ViewChild,
+  afterNextRender,
+  OnDestroy,
+} from '@angular/core';
 import { WidgetConfig, WidgetItemConfig } from '@model/config';
 import { Subscription } from 'rxjs';
 import { UserPreferencesService } from '@shared/user-preferences.service';
@@ -17,13 +27,23 @@ import { SearchComponent } from '../search/search.component';
 import { MatDivider } from '@angular/material/divider';
 
 @Component({
-    selector: 'app-search-window',
-    templateUrl: './search-window.component.html',
-    styleUrls: ['./search-window.component.css'],
-    imports: [NgIf, MatFormField, MatInput, FormsModule, MatTooltip, MatIconButton, MatIcon, SearchComponent, MatDivider, NgFor]
+  selector: 'app-search-window',
+  templateUrl: './search-window.component.html',
+  styleUrls: ['./search-window.component.css'],
+  imports: [
+    NgIf,
+    MatFormField,
+    MatInput,
+    FormsModule,
+    MatTooltip,
+    MatIconButton,
+    MatIcon,
+    SearchComponent,
+    MatDivider,
+    NgFor,
+  ],
 })
 export class SearchWindowComponent implements OnInit, OnDestroy {
-
   @Input()
   configsArray: WidgetConfig[];
 
@@ -40,7 +60,7 @@ export class SearchWindowComponent implements OnInit, OnDestroy {
   _searchString: string = '';
   searchSnippetIndex: string = '';
   tags: string[] = [];
-  _sample_user: string = "";
+  _sample_user: string = '';
   subscriptions: Subscription[] = [];
   logbookId?: string;
   searchStringFromConfig = '';
@@ -51,7 +71,7 @@ export class SearchWindowComponent implements OnInit, OnDestroy {
     private tagService: TagService,
     private hotkeys: Hotkeys,
     private searchScrollService: SearchScrollService,
-  ) { 
+  ) {
     afterNextRender({ read: () => this.searchSnippets.nativeElement.focus() });
   }
 
@@ -61,20 +81,27 @@ export class SearchWindowComponent implements OnInit, OnDestroy {
     await this._initialize_help();
     this.config = this._prepareConfig();
 
-    this.subscriptions.push(this.hotkeys.addShortcut({ keys: 'esc', description: { label: 'Close search', group: "General" } }).subscribe(() => {
-      this.closeSearch();
-    }));
-    this.subscriptions.push(this.hotkeys.addShortcut({ keys: 'enter', description: { label: 'Submit search', group: "General" } }).subscribe(() => {
-      this.submitSearch();
-    }));
-
+    this.subscriptions.push(
+      this.hotkeys
+        .addShortcut({ keys: 'esc', description: { label: 'Close search', group: 'General' } })
+        .subscribe(() => {
+          this.closeSearch();
+        }),
+    );
+    this.subscriptions.push(
+      this.hotkeys
+        .addShortcut({ keys: 'enter', description: { label: 'Submit search', group: 'General' } })
+        .subscribe(() => {
+          this.submitSearch();
+        }),
+    );
   }
 
   submitSearch() {
     this.searched = this.searchString;
     if (this.logbookId) {
       this.searchScrollService.reset(this.concatSearchStrings());
-      return
+      return;
     }
     this.overviewSearch.emit(this.searchString);
     this.closeSearch();
@@ -85,30 +112,28 @@ export class SearchWindowComponent implements OnInit, OnDestroy {
   }
 
   private async _initialize_help() {
-
     this._sample_user = this.userPreferences.userInfo.username;
     if (typeof this._sample_user == 'undefined') {
-      this._sample_user = "p12345";
+      this._sample_user = 'p12345';
     }
-    if (!this.logbookId) return
+    if (!this.logbookId) return;
     this.tags = await this.tagService?.getTags();
     if (this.tags?.length === 0) {
-      this.tags = ["alignment"];
+      this.tags = ['alignment'];
     }
   }
 
   reset() {
-    this.searchString = "";
+    this.searchString = '';
   }
 
   addToSearch(val: string) {
-    let _stringParts = val.split(" ");
+    let _stringParts = val.split(' ');
     _stringParts.forEach((subVal) => {
       if (!this.searchString?.includes(subVal)) {
         this.searchString = `${subVal} ${this.searchString ?? ''}`;
       }
-    }
-    );
+    });
   }
 
   closeSearch() {
@@ -131,21 +156,20 @@ export class SearchWindowComponent implements OnInit, OnDestroy {
         targetId: this.logbookId,
       },
       general: {
-        type: "logbook",
-        readonly: true
+        type: 'logbook',
+        readonly: true,
       },
       view: {
-        order: ["defaultOrder DESC"],
+        order: ['defaultOrder DESC'],
         hideMetadata: false,
-        showSnippetHeader: false
-      }
+        showSnippetHeader: false,
+      },
     };
   }
 
   private _prepareConfig() {
     const config = JSON.parse(JSON.stringify(this._extractConfig() ?? this.defaultConfig));
-    if (!config?.filter?.tags && !config?.filter?.excludeTags)
-      return config;
+    if (!config?.filter?.tags && !config?.filter?.excludeTags) return config;
     this._prepareTags(config);
     this.searchStringFromConfig = this.composeSearchString(config.filter);
     return config;
@@ -153,23 +177,24 @@ export class SearchWindowComponent implements OnInit, OnDestroy {
 
   private _prepareTags(config: Partial<WidgetItemConfig>) {
     if (config.filter?.tags?.length > 0)
-      this.tags = this.tags.filter(tag => config.filter.tags.includes(tag));
+      this.tags = this.tags.filter((tag) => config.filter.tags.includes(tag));
     if (config.filter?.excludeTags?.length > 0)
-      this.tags = this.tags.filter(tag => !config.filter.excludeTags.includes(tag));
+      this.tags = this.tags.filter((tag) => !config.filter.excludeTags.includes(tag));
   }
 
   private _extractConfig() {
-    return this.configsArray?.filter?.(configItem => 
-      configItem?.config?.filter?.targetId === this.logbookId &&
-      configItem?.config?.general?.type === 'logbook' &&
-      configItem?.config?.general?.title === 'Logbook view'
+    return this.configsArray?.filter?.(
+      (configItem) =>
+        configItem?.config?.filter?.targetId === this.logbookId &&
+        configItem?.config?.general?.type === 'logbook' &&
+        configItem?.config?.general?.title === 'Logbook view',
     )?.[0]?.config;
   }
 
   private tagsToString(configFilter: WidgetItemConfig['filter'], tagKey: string, prefix: string) {
-    const tagsString = `${configFilter?.[tagKey]?.length > 0? `${prefix}` + configFilter?.[tagKey].join(` ${prefix}`): ''}`
-    delete configFilter[tagKey]
-    return tagsString
+    const tagsString = `${configFilter?.[tagKey]?.length > 0 ? `${prefix}` + configFilter?.[tagKey].join(` ${prefix}`) : ''}`;
+    delete configFilter[tagKey];
+    return tagsString;
   }
 
   private composeSearchString(configFilter: WidgetItemConfig['filter']) {
@@ -179,9 +204,8 @@ export class SearchWindowComponent implements OnInit, OnDestroy {
   ngOnDestroy(): void {
     //Called once, before the instance is destroyed.
     //Add 'implements OnDestroy' to the class.
-    this.subscriptions.forEach((sub)=>{
+    this.subscriptions.forEach((sub) => {
       sub.unsubscribe();
-    })
+    });
   }
-
 }

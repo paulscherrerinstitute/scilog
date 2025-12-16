@@ -1,48 +1,48 @@
-.messages-container{
-    overflow: auto;
-    max-height: calc(100% - 160px);
-    height: calc(100vh - 80px);
+.messages-container {
+  overflow: auto;
+  max-height: calc(100% - 160px);
+  height: calc(100vh - 80px);
 }
 
-.input{
-    /* position:sticky; */
-    /* width: 50px; */
-    display: inline-block;
-    vertical-align: middle
+.input {
+  /* position:sticky; */
+  /* width: 50px; */
+  display: inline-block;
+  vertical-align: middle;
 }
 
 .chat-wrapper {
-    width: 100%;
-  }
-  
-  .message-text {
-    min-height: 5em; /* prevent height collapsing when there is no text */
-    /* max-height: 97px; */
-    /* width: 100%; */
-    align-content: center;
-    outline: none;
-    overflow: hide;
-    /* flex: 1 1 auto; */
-    padding: 14px;
-  }
-  
-  .message-wrapper {
-    border-radius: 20px;
-    padding: 24px; /* the container will keep the padding untouched */
-    height:400px;
-  }
-  
-  textarea {
-    resize: none;
-    /* box-sizing: border-box; */
-    height: auto;
-    /* min-height: 31px; */
-    max-height: 97px;
-    width: 387px;
-    border: 1px solid #e4e7ec;
-    border-radius: 10px;
-    background-color: #f9fafb;
-    overflow: scroll;
-    -ms-overflow-style: none;  /* IE and Edge */
-    scrollbar-width: none;  /* Firefox */
-  }
+  width: 100%;
+}
+
+.message-text {
+  min-height: 5em; /* prevent height collapsing when there is no text */
+  /* max-height: 97px; */
+  /* width: 100%; */
+  align-content: center;
+  outline: none;
+  overflow: hide;
+  /* flex: 1 1 auto; */
+  padding: 14px;
+}
+
+.message-wrapper {
+  border-radius: 20px;
+  padding: 24px; /* the container will keep the padding untouched */
+  height: 400px;
+}
+
+textarea {
+  resize: none;
+  /* box-sizing: border-box; */
+  height: auto;
+  /* min-height: 31px; */
+  max-height: 97px;
+  width: 387px;
+  border: 1px solid #e4e7ec;
+  border-radius: 10px;
+  background-color: #f9fafb;
+  overflow: scroll;
+  -ms-overflow-style: none; /* IE and Edge */
+  scrollbar-width: none; /* Firefox */
+}

@@ -12,13 +12,12 @@ import { FormsModule } from '@angular/forms';
 import { TaskComponent } from '../../core/task/task.component';
 
 @Component({
-    selector: 'app-todos',
-    templateUrl: './todos.component.html',
-    styleUrls: ['./todos.component.scss'],
-    imports: [NgIf, MatFormField, MatInput, FormsModule, NgFor, TaskComponent]
+  selector: 'app-todos',
+  templateUrl: './todos.component.html',
+  styleUrls: ['./todos.component.scss'],
+  imports: [NgIf, MatFormField, MatInput, FormsModule, NgFor, TaskComponent],
 })
 export class TodosComponent implements OnInit, OnDestroy {
-
   @Input()
   configIndex: number;
 
@@ -29,36 +28,43 @@ export class TodosComponent implements OnInit, OnDestroy {
 
   notificationSubscription: any = null;
 
-  constructor(private tasksService: TasksService,
+  constructor(
+    private tasksService: TasksService,
     private logbookInfo: LogbookInfoService,
     private notificationService: ChangeStreamService,
-    private views: ViewsService) {
-    console.log("constructor called")
+    private views: ViewsService,
+  ) {
+    console.log('constructor called');
   }
 
   ngOnInit(): void {
     // get TODOs from server
-    console.log("todo: adding subscriptions");
-    this.subscriptions.push(this.tasksService.currentTasks.subscribe(tasks => {
-      this.tasks = tasks;
-      this.numTasks = this.tasksService.numTasks;
-      console.log("tasks:", this.tasks);
-      console.log(this.logbookInfo.logbookInfo)
-    }));
+    console.log('todo: adding subscriptions');
+    this.subscriptions.push(
+      this.tasksService.currentTasks.subscribe((tasks) => {
+        this.tasks = tasks;
+        this.numTasks = this.tasksService.numTasks;
+        console.log('tasks:', this.tasks);
+        console.log(this.logbookInfo.logbookInfo);
+      }),
+    );
 
-    this.subscriptions.push(this.views.currentWidgetConfigs.subscribe(config => {
-      if (this.notificationSubscription == null) {
-        console.log(this.logbookInfo.logbookInfo); 
-        let configTasks = config[this.configIndex].config;
-        configTasks.filter.snippetType = ["task"];
+    this.subscriptions.push(
+      this.views.currentWidgetConfigs.subscribe((config) => {
+        if (this.notificationSubscription == null) {
+          console.log(this.logbookInfo.logbookInfo);
+          let configTasks = config[this.configIndex].config;
+          configTasks.filter.snippetType = ['task'];
 
-        this.notificationSubscription = this.notificationService.getNotification(this.logbookInfo.logbookInfo.id, configTasks).subscribe(data => {
-          console.log(data);
-          this.tasksService.taskChange(data);
-        });
-      }
-    }));
-
+          this.notificationSubscription = this.notificationService
+            .getNotification(this.logbookInfo.logbookInfo.id, configTasks)
+            .subscribe((data) => {
+              console.log(data);
+              this.tasksService.taskChange(data);
+            });
+        }
+      }),
+    );
   }
 
   addTasks() {
@@ -67,11 +73,11 @@ export class TodosComponent implements OnInit, OnDestroy {
       accessGroups: this.logbookInfo.logbookInfo.accessGroups,
       isPrivate: this.logbookInfo.logbookInfo.isPrivate,
       parentId: this.logbookInfo.logbookInfo.id,
-      snippetType: "task",
+      snippetType: 'task',
       content: this.newTask,
-      isDone: false
+      isDone: false,
     };
-    console.log("adding new task")
+    console.log('adding new task');
     this.tasksService.addTask(newTask);
     this.newTask = '';
   }
@@ -79,12 +85,11 @@ export class TodosComponent implements OnInit, OnDestroy {
   ngOnDestroy(): void {
     //Called once, before the instance is destroyed.
     //Add 'implements OnDestroy' to the class.
-    this.subscriptions.forEach(sub => {
+    this.subscriptions.forEach((sub) => {
       sub.unsubscribe();
-    })
-    if (this.notificationSubscription != null){
+    });
+    if (this.notificationSubscription != null) {
       this.notificationSubscription.unsubscribe();
     }
   }
-
 }

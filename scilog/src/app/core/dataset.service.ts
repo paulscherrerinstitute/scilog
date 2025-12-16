@@ -9,10 +9,7 @@ import {
 } from '@scicatproject/scicat-sdk-ts-angular';
 
 export type Dataset = OutputDatasetObsoleteDto;
-export type DatasetSummary = Pick<
-  Dataset,
-  'pid' | 'datasetName' | 'creationTime'
->;
+export type DatasetSummary = Pick<Dataset, 'pid' | 'datasetName' | 'creationTime'>;
 export type ScicatUser = ReturnedUserDto;
 
 @Injectable({
@@ -22,7 +19,7 @@ export class DatasetService {
   constructor(
     private serverSettingsService: ServerSettingsService,
     private datasetsService: DatasetsService,
-    private usersService: UsersService
+    private usersService: UsersService,
   ) {}
 
   getDatasets(): Observable<DatasetSummary[]> {
@@ -43,7 +40,7 @@ export class DatasetService {
 
   getDatasetDetailPageUrl(pid: string): string {
     return `${this.serverSettingsService.getScicatFrontendBaseUrl()}/datasets/${encodeURIComponent(
-      pid
+      pid,
     )}`;
   }
 }

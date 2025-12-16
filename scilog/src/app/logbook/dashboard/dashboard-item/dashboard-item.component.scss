@@ -1,35 +1,32 @@
+.item-container {
+  padding: 10px 0px;
+  /* background: #004c63; */
+  /* margin-left: 20px; */
+  /* margin-right: 20px;   */
+  /* border-radius: 12px;  */
+  /* box-shadow: 0 1px 4px 0 rgba(0, 0, 0, .2), 0 2px 8px 0 rgba(0, 0, 0, .14), 0 4px 8px -1px rgba(0, 0, 0, .12); */
+  /* overflow: inherit; */
+  /* height: calc(100% - 80px); */
 
-
-  .item-container{
-    padding: 10px 0px;
-    /* background: #004c63; */
-    /* margin-left: 20px; */
-    /* margin-right: 20px;   */
-    /* border-radius: 12px;  */
-    /* box-shadow: 0 1px 4px 0 rgba(0, 0, 0, .2), 0 2px 8px 0 rgba(0, 0, 0, .14), 0 4px 8px -1px rgba(0, 0, 0, .12); */
-    /* overflow: inherit; */
-    /* height: calc(100% - 80px); */
-
-
-    height:inherit;
-    overflow: inherit;
-  }
-
-  .sub-item{
-    /* overflow: inherit; */
-    /* max-height: calc(100% - 80px);  */
-    height:inherit;
-    overflow: inherit;
-  }
-
-  .header {
-    display: flex;
-  }
-  .flexExpand {
-    flex: 1 1 auto;
-    /* padding:50px; */
+  height: inherit;
+  overflow: inherit;
 }
-.headerTitle{
+
+.sub-item {
+  /* overflow: inherit; */
+  /* max-height: calc(100% - 80px);  */
+  height: inherit;
+  overflow: inherit;
+}
+
+.header {
+  display: flex;
+}
+.flexExpand {
+  flex: 1 1 auto;
+  /* padding:50px; */
+}
+.headerTitle {
   color: var(--header-color);
   padding: 5px;
   opacity: 0.9;

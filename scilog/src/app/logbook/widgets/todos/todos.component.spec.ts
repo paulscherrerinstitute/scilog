@@ -11,7 +11,7 @@ import { ViewsService } from '@shared/views.service';
 import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http';
 
 class ChangeStreamServiceMock {
-  getNotification(id:string){
+  getNotification(id: string) {
     return of({});
   }
 }
@@ -19,12 +19,12 @@ class ChangeStreamServiceMock {
 class TasksServiceMock {
   numTasks = 0;
   currentTasks = of([{}]);
-  taskChange(data: any){};
-  addTask(){};
+  taskChange(data: any) {}
+  addTask() {}
 }
 
 class ViewsServiceMock {
-  currentWidgetConfigs = of([{config: {filter: {}}}])
+  currentWidgetConfigs = of([{ config: { filter: {} } }]);
 }
 
 class LogbookInfoMock {
@@ -33,12 +33,11 @@ class LogbookInfoMock {
     ownerGroup: 'some',
     accessGroups: ['someAccess'],
     isPrivate: false,
-    snippetType: "task",
+    snippetType: 'task',
     content: '2',
-    isDone: false
+    isDone: false,
   };
   currentLogbookInfo = of({});
-
 }
 
 const getConfig = () => ({});
@@ -46,14 +45,17 @@ const getConfig = () => ({});
 describe('TodosComponent', () => {
   let component: TodosComponent;
   let fixture: ComponentFixture<TodosComponent>;
-  let isActionAllowedServiceSpy
- 
+  let isActionAllowedServiceSpy;
+
   beforeEach(waitForAsync(() => {
-    isActionAllowedServiceSpy = jasmine.createSpyObj("IsAllowedService", ["canUpdate", "canDelete"]);
-    isActionAllowedServiceSpy.tooltips = {update: '', delete: ''};  
+    isActionAllowedServiceSpy = jasmine.createSpyObj('IsAllowedService', [
+      'canUpdate',
+      'canDelete',
+    ]);
+    isActionAllowedServiceSpy.tooltips = { update: '', delete: '' };
     TestBed.configureTestingModule({
-    imports: [TodosComponent],
-    providers: [
+      imports: [TodosComponent],
+      providers: [
         { provide: LogbookInfoService, useClass: LogbookInfoMock },
         { provide: TasksService, useClass: TasksServiceMock },
         { provide: ChangeStreamService, useClass: ChangeStreamServiceMock },
@@ -61,9 +63,8 @@ describe('TodosComponent', () => {
         { provide: ViewsService, useClass: ViewsServiceMock },
         provideHttpClient(withInterceptorsFromDi()),
         provideHttpClientTesting(),
-    ]
-})
-    .compileComponents();
+      ],
+    }).compileComponents();
   }));
 
   beforeEach(() => {
@@ -78,7 +79,7 @@ describe('TodosComponent', () => {
   });
 
   it('should addTask', () => {
-    component.newTask = '2'
+    component.newTask = '2';
     const addTaskSpy = spyOn(component['tasksService'], 'addTask');
     component.addTasks();
     expect(addTaskSpy).toHaveBeenCalledOnceWith({
@@ -86,10 +87,9 @@ describe('TodosComponent', () => {
       accessGroups: ['someAccess'],
       isPrivate: false,
       parentId: '1234',
-      snippetType: "task",
+      snippetType: 'task',
       content: '2',
-      isDone: false
+      isDone: false,
     });
   });
-
 });

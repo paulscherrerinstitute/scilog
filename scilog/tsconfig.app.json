@@ -5,15 +5,17 @@
     "baseUrl": "",
     "paths": {
       "@model/*": ["src/app/core/model/*"],
-      "@shared/*": ["src/app/core/*", "src/app/logbook/core/*", "src/app/overview/core/*", "src/app/login/core/*"],
+      "@shared/*": [
+        "src/app/core/*",
+        "src/app/logbook/core/*",
+        "src/app/overview/core/*",
+        "src/app/login/core/*"
+      ],
       "@widgets/*": ["src/app/core/logbook/widgets/*"]
     },
     "outDir": "./out-tsc/app",
     "types": []
   },
-  "files": [
-    "src/main.ts",
-    "src/polyfills.ts"
-  ],
+  "files": ["src/main.ts", "src/polyfills.ts"],
   "include": ["src/ **/.d.ts", "src/ **/*.ts"]
 }

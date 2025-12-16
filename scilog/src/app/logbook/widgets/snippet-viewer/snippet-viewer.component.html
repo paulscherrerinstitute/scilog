@@ -1,6 +1,10 @@
 <div class="snippetViewerContainer">
-    <div *ngFor="let snippet of snippetData" class="snippets">
-        <app-snippet [snippet]="snippet" [updatedAt]="snippet.updatedAt" [hideMetadata]="true" [showEditButtonsMenu]="false"></app-snippet>
-    </div>
+  <div *ngFor="let snippet of snippetData" class="snippets">
+    <app-snippet
+      [snippet]="snippet"
+      [updatedAt]="snippet.updatedAt"
+      [hideMetadata]="true"
+      [showEditButtonsMenu]="false"
+    ></app-snippet>
+  </div>
 </div>
-

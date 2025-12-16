@@ -1,5 +1,12 @@
 import { inject, Injectable } from '@angular/core';
-import { HttpRequest, HttpHandler, HttpEvent, HttpInterceptor, HttpResponse, HttpErrorResponse } from '@angular/common/http';
+import {
+  HttpRequest,
+  HttpHandler,
+  HttpEvent,
+  HttpInterceptor,
+  HttpResponse,
+  HttpErrorResponse,
+} from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { tap } from 'rxjs/operators';
 import { ServerSettingsService } from '@shared/config/server-settings.service';
@@ -19,10 +26,7 @@ export class AuthInterceptor implements HttpInterceptor {
   private isRequestToSciCatBackend(req_url: string): boolean {
     try {
       const origin = new URL(req_url).origin;
-      return (
-        origin ===
-        new URL(this.serverSettingsService.getSciCatServerAddress()).origin
-      );
+      return origin === new URL(this.serverSettingsService.getSciCatServerAddress()).origin;
     } catch (err) {
       // new URL(...) fails for request to static assets (e.g. /assets/config.json)
       return false;
@@ -51,14 +55,11 @@ export class AuthInterceptor implements HttpInterceptor {
             }
           }
         },
-      })
+      }),
     );
   }
 
-  intercept(
-    req: HttpRequest<any>,
-    next: HttpHandler
-  ): Observable<HttpEvent<any>> {
+  intercept(req: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
     let idToken = '';
     if (this.isRequestToSciCatBackend(req.url)) {
       idToken = localStorage.getItem('scicat_token');

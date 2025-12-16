@@ -1,12 +1,16 @@
 <div class="searchResults">
-  <div class="header">
-    Logbook view:
-  </div>
+  <div class="header">Logbook view:</div>
   <mat-spinner *ngIf="!searchScrollService.isLoaded" [@spinner] class="spinner"></mat-spinner>
   <div class="searchContainer">
     <div *uiScroll="let snippet of searchScrollService.datasource; let i = index">
-      <app-snippet [snippet]="snippet" [updatedAt]="snippet.updatedAt" [index]=i+1 [config]="config"
-        [showEditButtonsMenu]="false" (selected)="selectedSnippet($event)">
+      <app-snippet
+        [snippet]="snippet"
+        [updatedAt]="snippet.updatedAt"
+        [index]="i + 1"
+        [config]="config"
+        [showEditButtonsMenu]="false"
+        (selected)="selectedSnippet($event)"
+      >
       </app-snippet>
     </div>
   </div>

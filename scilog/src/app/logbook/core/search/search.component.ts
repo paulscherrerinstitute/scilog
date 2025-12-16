@@ -9,21 +9,20 @@ import { UiScrollModule } from 'ngx-ui-scroll';
 import { SnippetComponent } from '../snippet/snippet.component';
 
 @Component({
-    selector: 'app-search',
-    templateUrl: './search.component.html',
-    styleUrls: ['./search.component.css'],
-    animations: [
-        trigger('spinner', [
-            transition(':enter', [
-                style({ opacity: 0 }),
-                animate('1ms 0.2s ease-out', style({ opacity: 1 }))
-            ])
-        ]),
-    ],
-    imports: [NgIf, MatProgressSpinner, UiScrollModule, SnippetComponent]
+  selector: 'app-search',
+  templateUrl: './search.component.html',
+  styleUrls: ['./search.component.css'],
+  animations: [
+    trigger('spinner', [
+      transition(':enter', [
+        style({ opacity: 0 }),
+        animate('1ms 0.2s ease-out', style({ opacity: 1 })),
+      ]),
+    ]),
+  ],
+  imports: [NgIf, MatProgressSpinner, UiScrollModule, SnippetComponent],
 })
 export class SearchComponent implements OnInit {
-
   @Input()
   config: WidgetItemConfig;
 
@@ -32,7 +31,7 @@ export class SearchComponent implements OnInit {
   constructor(
     public searchScrollService: SearchScrollService,
     private scrollToElementService: ScrollToElementService,
-  ) { }
+  ) {}
 
   async ngOnInit(): Promise<void> {
     this.searchScrollService.initialize(this.config);
@@ -42,9 +41,8 @@ export class SearchComponent implements OnInit {
     console.log($event);
     this.scrollToElementService.selectedItem = {
       event: $event,
-      config: this.config
+      config: this.config,
     };
     this.closed.emit();
   }
-
 }

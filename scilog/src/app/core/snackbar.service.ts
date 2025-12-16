@@ -1,32 +1,35 @@
 import { Injectable } from '@angular/core';
 import { BehaviorSubject } from 'rxjs';
-import { MatSnackBar, MatSnackBarHorizontalPosition, MatSnackBarVerticalPosition, TextOnlySnackBar, MatSnackBarRef } from '@angular/material/snack-bar';
+import {
+  MatSnackBar,
+  MatSnackBarHorizontalPosition,
+  MatSnackBarVerticalPosition,
+  TextOnlySnackBar,
+  MatSnackBarRef,
+} from '@angular/material/snack-bar';
 
 export interface SnackbarConfig {
-  message?: string,
-  show: boolean,
-  type: string,
-  action?: string,
-  duration?: number | undefined,
-  horizontalPosition?: MatSnackBarHorizontalPosition,
-  verticalPosition?: MatSnackBarVerticalPosition,
-  panelClass?: string[]
+  message?: string;
+  show: boolean;
+  type: string;
+  action?: string;
+  duration?: number | undefined;
+  horizontalPosition?: MatSnackBarHorizontalPosition;
+  verticalPosition?: MatSnackBarVerticalPosition;
+  panelClass?: string[];
 }
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class SnackbarService {
-
-  snackbarConfig: SnackbarConfig = {message:"",show:false,type:""};
+  snackbarConfig: SnackbarConfig = { message: '', show: false, type: '' };
   private serverMessageShown: boolean = false;
   private serverMessage: MatSnackBarRef<TextOnlySnackBar>;
   private snackbarConfigSource = new BehaviorSubject(this.snackbarConfig);
   public snackBar = this.snackbarConfigSource.asObservable();
 
-
-
-  constructor(private matSnackbar: MatSnackBar) { }
+  constructor(private matSnackbar: MatSnackBar) {}
 
   async showServerMessage() {
     let snack: SnackbarConfig = {
@@ -37,8 +40,8 @@ export class SnackbarService {
       duration: undefined,
       horizontalPosition: 'center',
       verticalPosition: 'top',
-      panelClass: ['warning-snackbar']
-    }
+      panelClass: ['warning-snackbar'],
+    };
     console.log(snack);
     if (this.serverMessageShown == false) {
       console.log('showing snackbar');
@@ -59,8 +62,8 @@ export class SnackbarService {
         duration: 4000,
         horizontalPosition: 'center',
         verticalPosition: 'top',
-        panelClass: ['resolved-snackbar']
-      }
+        panelClass: ['resolved-snackbar'],
+      };
       // this.serverMessage.dismiss();
       this.serverMessage = this._showMessage(snack);
       this.serverMessageShown = false;
@@ -69,15 +72,12 @@ export class SnackbarService {
     }
   }
 
-
   _showMessage(snack: SnackbarConfig): MatSnackBarRef<TextOnlySnackBar> {
     return this.matSnackbar.open(snack.message, snack.action, {
       duration: snack.duration,
       horizontalPosition: snack.horizontalPosition,
       verticalPosition: snack.verticalPosition,
-      panelClass: snack.panelClass
+      panelClass: snack.panelClass,
     });
-
   }
-
 }

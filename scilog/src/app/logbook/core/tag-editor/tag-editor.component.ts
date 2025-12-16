@@ -1,10 +1,30 @@
-import { Component, EventEmitter, Input, OnInit, Output, ViewChild, ElementRef, SimpleChange, OnChanges } from '@angular/core';
-import { MatChipInputEvent, MatChipGrid, MatChipRow, MatChipRemove, MatChipInput } from '@angular/material/chips';
+import {
+  Component,
+  EventEmitter,
+  Input,
+  OnInit,
+  Output,
+  ViewChild,
+  ElementRef,
+  SimpleChange,
+  OnChanges,
+} from '@angular/core';
+import {
+  MatChipInputEvent,
+  MatChipGrid,
+  MatChipRow,
+  MatChipRemove,
+  MatChipInput,
+} from '@angular/material/chips';
 import { Tags } from '@model/metadata';
 import { COMMA, ENTER, SPACE } from '@angular/cdk/keycodes';
 import { TagService } from '../tag.service';
 import { UntypedFormControl, FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { MatAutocompleteSelectedEvent, MatAutocompleteTrigger, MatAutocomplete } from '@angular/material/autocomplete';
+import {
+  MatAutocompleteSelectedEvent,
+  MatAutocompleteTrigger,
+  MatAutocomplete,
+} from '@angular/material/autocomplete';
 import { Observable, Subscription } from 'rxjs';
 import { startWith, map } from 'rxjs/operators';
 import { ViewsService } from '@shared/views.service';
@@ -17,15 +37,31 @@ import { MatInput } from '@angular/material/input';
 import { MatOption } from '@angular/material/select';
 
 @Component({
-    selector: 'app-tag-editor',
-    templateUrl: './tag-editor.component.html',
-    styleUrls: ['./tag-editor.component.scss'],
-    imports: [MatTooltip, MatIcon, MatFormField, MatChipGrid, NgFor, MatChipRow, NgIf, MatChipRemove, MatInput, FormsModule, MatAutocompleteTrigger, MatChipInput, ReactiveFormsModule, MatAutocomplete, MatOption, AsyncPipe]
+  selector: 'app-tag-editor',
+  templateUrl: './tag-editor.component.html',
+  styleUrls: ['./tag-editor.component.scss'],
+  imports: [
+    MatTooltip,
+    MatIcon,
+    MatFormField,
+    MatChipGrid,
+    NgFor,
+    MatChipRow,
+    NgIf,
+    MatChipRemove,
+    MatInput,
+    FormsModule,
+    MatAutocompleteTrigger,
+    MatChipInput,
+    ReactiveFormsModule,
+    MatAutocomplete,
+    MatOption,
+    AsyncPipe,
+  ],
 })
 export class TagEditorComponent implements OnInit, OnChanges {
-
   @Input()
-  tagIn: string[] = []
+  tagIn: string[] = [];
 
   @Input()
   configIndex: number = null;
@@ -48,13 +84,12 @@ export class TagEditorComponent implements OnInit, OnChanges {
 
   @ViewChild('tagInput') tagInput: ElementRef<HTMLInputElement>;
 
-
   @Output() tagsUpdate = new EventEmitter<string[]>();
 
-
-  constructor(private tagService: TagService,
-    private views: ViewsService
-    ) { }
+  constructor(
+    private tagService: TagService,
+    private views: ViewsService,
+  ) {}
 
   ngOnInit(): void {
     this.loadData();
@@ -66,35 +101,37 @@ export class TagEditorComponent implements OnInit, OnChanges {
     // console.log(this.tagService.getTags());
     this.tagsAvail = this.stringsToTags(await this.tagService.getTags());
     console.log(this.tagsAvail);
-    this.filteredTags = this.tagsCtrl.valueChanges.pipe(startWith(null), map((tag: string) => tag ? this._filter(tag) : this.tagsAvail.slice()));
+    this.filteredTags = this.tagsCtrl.valueChanges.pipe(
+      startWith(null),
+      map((tag: string) => (tag ? this._filter(tag) : this.tagsAvail.slice())),
+    );
   }
 
   private async loadLastTags() {
-    console.log(this.config)
-    if (this.configIndex != null){
+    console.log(this.config);
+    if (this.configIndex != null) {
       if (this.currentViewSubscription != null) {
         this.currentViewSubscription.unsubscribe();
       }
-      this.currentViewSubscription = this.views.currentWidgetConfigs.subscribe(async config => {
+      this.currentViewSubscription = this.views.currentWidgetConfigs.subscribe(async (config) => {
         if (config != null) {
           this.config = config[this.configIndex].config;
           this._syncWithTags();
         }
-       })
+      });
     } else if (typeof this.config != 'undefined') {
       this._syncWithTags();
     }
+  }
 
-  };
-
-  private async _syncWithTags(){
+  private async _syncWithTags() {
     await this._getLastTags();
-    if (this.syncAtStart){
+    if (this.syncAtStart) {
       this.syncWithLastEntry();
     }
   }
 
-  private async _getLastTags(){
+  private async _getLastTags() {
     let _lastTags = await this.tagService.getLastTags(this.config);
     this.lastTags = this.stringsToTags(_lastTags);
   }
@@ -124,7 +161,7 @@ export class TagEditorComponent implements OnInit, OnChanges {
 
   tagsToStrings(tagsIn: Tags[]) {
     let out: string[] = [];
-    tagsIn.forEach(data => {
+    tagsIn.forEach((data) => {
       out.push(data.name);
     });
     return out;
@@ -132,9 +169,9 @@ export class TagEditorComponent implements OnInit, OnChanges {
 
   stringsToTags(stringsIn: string[]) {
     let tags: Tags[] = [];
-    stringsIn.forEach(data => {
+    stringsIn.forEach((data) => {
       let newTag: Tags = {
-        name: data
+        name: data,
       };
       tags.push(newTag);
     });
@@ -142,10 +179,12 @@ export class TagEditorComponent implements OnInit, OnChanges {
   }
 
   selectedTags(event: MatAutocompleteSelectedEvent): void {
-    console.log(event.option.viewValue)
-    let tagEntry = this.tag.find((tag: Tags) => { return tag.name == event.option.viewValue });
+    console.log(event.option.viewValue);
+    let tagEntry = this.tag.find((tag: Tags) => {
+      return tag.name == event.option.viewValue;
+    });
     if (typeof tagEntry == 'undefined') {
-      console.log(this.tag)
+      console.log(this.tag);
       console.log(tagEntry);
       let newTag = this.stringsToTags(Array(event.option.viewValue));
       this.tag.push(newTag[0]);
@@ -164,18 +203,17 @@ export class TagEditorComponent implements OnInit, OnChanges {
     const filterValue = value.toLowerCase();
 
     return this.tagsAvail.filter((tag: Tags) => {
-      return (tag.name.toLowerCase().indexOf(filterValue) === 0);
+      return tag.name.toLowerCase().indexOf(filterValue) === 0;
     });
   }
 
-  async syncWithLastEntry(){
+  async syncWithLastEntry() {
     await this._getLastTags();
     this.tag = JSON.parse(JSON.stringify(this.lastTags));
     this.tagsUpdate.emit(this.tagsToStrings(this.tag));
   }
-  
+
   ngOnChanges(changes: { [key: string]: SimpleChange }) {
     this.tag = this.stringsToTags(changes.tagIn.currentValue);
   }
-
 }

@@ -1,9 +1,9 @@
 export interface TagsStat {
-        name: string,
-        count: number
+  name: string;
+  count: number;
 }
 export interface TagsReport {
-    recently: string[],
-    all: string[],
-    mostUsed: string[]
+  recently: string[];
+  all: string[];
+  mostUsed: string[];
 }

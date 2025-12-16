@@ -8,7 +8,7 @@ describe('ScrollBaseService', () => {
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      providers: [ScrollBaseService]
+      providers: [ScrollBaseService],
     });
     service = TestBed.inject(ScrollBaseService);
   });
@@ -18,7 +18,7 @@ describe('ScrollBaseService', () => {
   });
 
   it('should decorate with isLoadedDecorator', async () => {
-    const toDecorate = async (index, count, config) => index + count + config; 
+    const toDecorate = async (index, count, config) => index + count + config;
     const decorated = await service.isLoadedDecorator(toDecorate)(1, 2, 3);
     expect(decorated).toEqual(6);
   });
@@ -29,5 +29,4 @@ describe('ScrollBaseService', () => {
     service.reset();
     expect(service.isLoaded).toEqual(false);
   });
-
 });

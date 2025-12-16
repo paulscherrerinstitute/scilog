@@ -11,22 +11,23 @@ const getConfig = () => ({});
 
 describe('ChangeStreamService', () => {
   let service: ChangeStreamService;
-  let snackSpy:any;
-  let serverSpy:any;
-  let changeSpy:any;
+  let snackSpy: any;
+  let serverSpy: any;
+  let changeSpy: any;
 
-  snackSpy = jasmine.createSpyObj("SnackbarService", ["showServerMessage", "hideServerMessage"]);
-  serverSpy = jasmine.createSpyObj("ServerSettingsService", ["getSocketAdress"]);
-  changeSpy = jasmine.createSpyObj("ChangeStreamService", ["startWebsocket"]);
+  snackSpy = jasmine.createSpyObj('SnackbarService', ['showServerMessage', 'hideServerMessage']);
+  serverSpy = jasmine.createSpyObj('ServerSettingsService', ['getSocketAdress']);
+  changeSpy = jasmine.createSpyObj('ChangeStreamService', ['startWebsocket']);
 
-  beforeEach(async() => {
+  beforeEach(async () => {
     TestBed.configureTestingModule({
-      providers: [ChangeStreamService,
-        {providers: SnackbarService, useValue:snackSpy},
-        {providers: ServerSettingsService, useValue:serverSpy},
-        {provide: AppConfigService, useValue: { getConfig }},
+      providers: [
+        ChangeStreamService,
+        { providers: SnackbarService, useValue: snackSpy },
+        { providers: ServerSettingsService, useValue: serverSpy },
+        { provide: AppConfigService, useValue: { getConfig } },
         MatSnackBar,
-        Overlay
+        Overlay,
       ],
     });
     service = TestBed.inject(ChangeStreamService);

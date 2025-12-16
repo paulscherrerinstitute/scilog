@@ -8,45 +8,42 @@ import { ViewsService } from '@shared/views.service';
 import { UntypedFormBuilder } from '@angular/forms';
 import { of } from 'rxjs';
 
-
 class UserPreferencesMock {
   userInfo = {
-    roles: ["roles"],
-    username: "myname",
-  }
+    roles: ['roles'],
+    username: 'myname',
+  };
 }
-
 
 describe('ViewSettingsComponent', () => {
   let component: ViewSettingsComponent;
   let fixture: ComponentFixture<ViewSettingsComponent>;
-  let logbookSpy:any;
-  let logbookDataSpy:any;
-  let viewDataSpy:any;
-  let viewSpy:any;
+  let logbookSpy: any;
+  let logbookDataSpy: any;
+  let viewDataSpy: any;
+  let viewSpy: any;
 
-  viewSpy = jasmine.createSpyObj("ViewsService", ["views"]);
+  viewSpy = jasmine.createSpyObj('ViewsService', ['views']);
   viewSpy.views.and.returnValue([]);
 
-  logbookSpy = jasmine.createSpyObj("LogbookInfoService", ["logbookInfo"]);
+  logbookSpy = jasmine.createSpyObj('LogbookInfoService', ['logbookInfo']);
   logbookSpy.logbookInfo.and.returnValue([]);
 
-  logbookDataSpy = jasmine.createSpyObj("LogbookDataService", ["getLocations"]);
+  logbookDataSpy = jasmine.createSpyObj('LogbookDataService', ['getLocations']);
   logbookDataSpy.getLocations.and.returnValue([{}]);
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-    imports: [ViewSettingsComponent],
-    providers: [
+      imports: [ViewSettingsComponent],
+      providers: [
         UntypedFormBuilder,
         { provide: LogbookInfoService, useValue: logbookSpy },
         { provide: UserPreferencesService, useClass: UserPreferencesMock },
         { provide: LogbookDataService, useValue: logbookDataSpy },
         { provide: ViewDataService, useValue: viewDataSpy },
         { provide: ViewsService, useValue: viewSpy },
-    ]
-})
-    .compileComponents();
+      ],
+    }).compileComponents();
   }));
 
   beforeEach(() => {
@@ -60,13 +57,13 @@ describe('ViewSettingsComponent', () => {
     expect(component).toBeTruthy();
   });
 
-  it('should retrieve logbook data', async ()=>{
-    logbookDataSpy.getLocations.and.returnValue(of([{subsnippets: []}]).toPromise());
+  it('should retrieve logbook data', async () => {
+    logbookDataSpy.getLocations.and.returnValue(of([{ subsnippets: [] }]).toPromise());
     spyOn(component, 'setDefaults');
     await component.getData();
     expect(component['logbookDataService'].getLocations).toHaveBeenCalled();
     expect(component.setDefaults).toHaveBeenCalledTimes(1);
-  })
+  });
 
   // it('should set defaults', ()=>{
   //   component.setDefaults();

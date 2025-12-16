@@ -1,59 +1,57 @@
-.headerTitle{
+.headerTitle {
   color: var(--header-color);
   opacity: 0.9;
   font-weight: bold;
 }
 
-.preferences-container{
-    overflow-y: scroll;
-    overflow-x: hidden;
-    max-height: calc(80vh);
-    height: 50vh;
-    width: 50vw;
+.preferences-container {
+  overflow-y: scroll;
+  overflow-x: hidden;
+  max-height: calc(80vh);
+  height: 50vh;
+  width: 50vw;
 }
 
 .preferences-container .mat-mdc-form-field + .mat-form-field {
-    margin-left: 8px;
-  }
-  
-  .preferences-container .mat-mdc-form-field {
-    width: 30%;
-  }
-  
-  .advancedSlider{
-    display: flex;
-    align-items: center;
-    justify-content: right;
+  margin-left: 8px;
+}
+
+.preferences-container .mat-mdc-form-field {
+  width: 30%;
+}
+
+.advancedSlider {
+  display: flex;
+  align-items: center;
+  justify-content: right;
 }
 
 .subHeader {
-    color: var(--subheader-color);
-    margin-bottom: 10px;
-    margin-top: 10px;
-} 
+  color: var(--subheader-color);
+  margin-bottom: 10px;
+  margin-top: 10px;
+}
 .subSubHeader {
   color: var(--subsubheader-color);
   margin-bottom: 5px;
   margin-top: 5px;
   font-size: 14px;
-} 
+}
 .filterOperator {
-        width: auto !important;
+  width: auto !important;
 }
 
 .filterOperator .mat-mdc-form-field {
-    width: auto !important;
-    margin-left: 8px;
+  width: auto !important;
+  margin-left: 8px;
 }
 
-
 .filterOperator .mat-mdc-select {
-        max-width: 100%;
-        width: auto;
-        display: flex;
-    }  
+  max-width: 100%;
+  width: auto;
+  display: flex;
+}
 
-.chipList{
-  width:90% !important;
- }
-
+.chipList {
+  width: 90% !important;
+}
