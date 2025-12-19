@@ -1,25 +1,25 @@
 import { TestBed } from '@angular/core/testing';
 
-import { DatasetService } from './dataset.service';
+import { ScicatService } from './scicat.service';
 import { provideHttpClientTesting } from '@angular/common/http/testing';
 import { AppConfigService } from '../app-config.service';
 import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http';
 
-describe('DatasetService', () => {
-  let service: DatasetService;
+describe('ScicatService', () => {
+  let service: ScicatService;
   const getConfig = () => ({});
 
   beforeEach(() => {
     TestBed.configureTestingModule({
       imports: [],
       providers: [
-        DatasetService,
+        ScicatService,
         { provide: AppConfigService, useValue: { getConfig } },
         provideHttpClient(withInterceptorsFromDi()),
         provideHttpClientTesting(),
       ],
     });
-    service = TestBed.inject(DatasetService);
+    service = TestBed.inject(ScicatService);
   });
 
   it('should be created', () => {
