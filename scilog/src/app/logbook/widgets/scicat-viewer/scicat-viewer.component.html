@@ -7,7 +7,11 @@
 <div>
   <mat-form-field
     ><mat-label for="dataset-select">Select Dataset:</mat-label>
-    <mat-select id="dataset-select" (selectionChange)="onDatasetSelect($event)">
+    <mat-select
+      id="dataset-select"
+      (selectionChange)="onDatasetSelect($event)"
+      [value]="selectedDataset?.pid"
+    >
       <mat-option *ngFor="let dataset of datasetSummary" [value]="dataset.pid">{{
         dataset.datasetName
       }}</mat-option>
@@ -16,6 +20,13 @@
 </div>
 
 <div *ngIf="selectedDataset">
+  @if (isProposalLinkedDataset(selectedDataset.pid)) {
+    <p>
+      This dataset is linked to proposal
+      <a [href]="scicatProposalUrl" target="_blank">{{ selectedDataset.proposalId }}</a>
+    </p>
+  }
+
   <mat-card appearance="outlined">
     <mat-card-header>
       <mat-card-title>{{ selectedDataset.datasetName }}</mat-card-title>
