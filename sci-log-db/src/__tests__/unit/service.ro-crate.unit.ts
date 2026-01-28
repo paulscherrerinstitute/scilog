@@ -78,15 +78,19 @@ describe('ROCrateService (unit)', () => {
     // expect logbook name/description to match
     expect(logbookEntity.name).to.equal('SciLog ELN export: Test Logbook');
     expect(logbookEntity.description).to.equal('A logbook for testing');
-    // expect hasPart to contain two snippets
+    // expect hasPart to contain three snippets: two paragraphs and a comment
     expect(logbookEntity.hasPart).to.be.Array();
-    expect(logbookEntity.hasPart).to.have.length(2);
+    expect(logbookEntity.hasPart).to.have.length(3);
     expect(logbookEntity.hasPart).to.containEql({
       '@id': entityBuilder.getEntityId('snippet-1'),
     });
     expect(logbookEntity.hasPart).to.containEql({
       '@id': entityBuilder.getEntityId('snippet-2'),
     });
+    expect(logbookEntity.hasPart).to.containEql({
+      '@id': entityBuilder.getEntityId('snippet-3'),
+    });
+
     // expect second snippet to have comment as comment
     const snippet2Entity = rocrate.getEntity(
       entityBuilder.getEntityId('snippet-2'),

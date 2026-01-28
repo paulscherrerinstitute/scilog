@@ -60,6 +60,10 @@ export class RoCrateService {
   ): Promise<void> {
     this.crate.root.name = logbook.name;
     this.crate.root.description = logbook.description ?? '';
+    this.crate.root.license = this.entityBuilder.buildLicenseEntity();
+    this.crate.root.datePublished = new Date().toISOString();
+    this.crate.metadata.sdPublisher =
+      this.entityBuilder.buildOrganizationEntity();
     this.crate.root.hasPart = [];
 
     const author = this.entityBuilder.buildPerson(logbook.createdBy);
@@ -99,10 +103,15 @@ export class RoCrateService {
       const parent = this.crate.getEntity(
         this.entityBuilder.getEntityId(paragraph.parentId!),
       );
-      parent.comment ||= [];
-      parent.comment.push(
-        this.entityBuilder.buildCommentEntity(paragraph, author, parent),
+      const commentEntity = this.entityBuilder.buildCommentEntity(
+        paragraph,
+        author,
+        parent,
       );
+      parent.comment ||= [];
+      parent.comment.push(commentEntity);
+      this.logbookEntity.hasPart ||= [];
+      this.logbookEntity.hasPart.push(commentEntity);
     }
 
     await this.handleFiles(paragraph);

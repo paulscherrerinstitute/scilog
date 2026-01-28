@@ -67,8 +67,25 @@ export class EntityBuilderService {
         fileObj.fileExtension,
       ),
       '@type': 'File',
-      name: fileObj.name,
+      name: fileObj.name ?? `${fileObj._fileId}.${fileObj.fileExtension}`,
       encodingFormat: fileObj.contentType,
+    };
+  }
+
+  buildLicenseEntity() {
+    return {
+      '@id': '#license',
+      '@type': 'CreativeWork',
+      name: 'No license',
+      description: 'This .eln does not contain a license',
+    };
+  }
+
+  buildOrganizationEntity() {
+    return {
+      '@id': 'https://github.com/paulscherrerinstitute/scilog',
+      '@type': 'Organization',
+      name: 'SciLog',
     };
   }
 
