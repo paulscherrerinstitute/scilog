@@ -12,9 +12,9 @@
       (selectionChange)="onDatasetSelect($event)"
       [value]="selectedDataset?.pid"
     >
-      <mat-option *ngFor="let dataset of datasetSummary" [value]="dataset.pid">{{
-        dataset.datasetName
-      }}</mat-option>
+      @for (dataset of datasetSummary; track dataset.pid) {
+        <mat-option [value]="dataset.pid">{{ dataset.datasetName }}</mat-option>
+      }
     </mat-select></mat-form-field
   >
 </div>

@@ -24,7 +24,6 @@ import { switchMap } from 'rxjs/operators';
     MatFormField,
     MatLabel,
     MatSelect,
-    NgFor,
     MatOption,
     MatCardModule,
     MatAnchor,
