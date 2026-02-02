@@ -24,7 +24,7 @@ export class ScicatService {
     private proposalsService: ProposalsService,
   ) {}
 
-  getDatasets(): Observable<DatasetSummary[]> {
+  getDatasetsSummary(): Observable<DatasetSummary[]> {
     const filter = JSON.stringify({
       fields: ['pid', 'datasetName', 'creationTime'],
       limits: { limit: 100, order: 'creationTime:desc' },

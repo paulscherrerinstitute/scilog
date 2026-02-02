@@ -43,7 +43,7 @@ export class ScicatViewerComponent implements OnInit {
   datasetSummary: DatasetSummary[] = [];
   selectedDataset: Dataset | null = null;
   datasetFetching = false;
-  proposalLinkedDatasets: DatasetSummary[] = [];
+  private proposalLinkedPids = new Set<string>();
 
   ngOnInit(): void {
     this.scicatService.getMyself().subscribe({
@@ -58,7 +58,7 @@ export class ScicatViewerComponent implements OnInit {
     const ownerGroup = this.logbookInfoService.logbookInfo.ownerGroup;
 
     this.scicatService
-      .getDatasets()
+      .getDatasetsSummary()
       .pipe(
         switchMap((datasets: DatasetSummary[]) => {
           this.datasetSummary = datasets;
@@ -68,11 +68,10 @@ export class ScicatViewerComponent implements OnInit {
       .subscribe({
         next: (proposalDatasets: DatasetSummary[]) => {
           if (!proposalDatasets?.length) return;
-          this.proposalLinkedDatasets = proposalDatasets;
+          this.proposalLinkedPids = new Set(proposalDatasets.map((d) => d.pid));
           // add new proposal linked datasets to selection, if not already present
-          const datasetsToAdd = proposalDatasets.filter(
-            (ds) => !this.datasetSummary.some((d) => d.pid === ds.pid),
-          );
+          const existingPids = new Set(this.datasetSummary.map((d) => d.pid));
+          const datasetsToAdd = proposalDatasets.filter((ds) => !existingPids.has(ds.pid));
           this.datasetSummary = [...datasetsToAdd, ...this.datasetSummary];
           // select the first proposal-linked dataset by default
           this.onDatasetSelect({ value: proposalDatasets[0].pid } as MatSelectChange);
@@ -82,7 +81,7 @@ export class ScicatViewerComponent implements OnInit {
   }
 
   isProposalLinkedDataset(pid: string): boolean {
-    return this.proposalLinkedDatasets.some((dataset) => dataset.pid === pid);
+    return this.proposalLinkedPids.has(pid);
   }
 
   get scicatDatasetUrl(): string {

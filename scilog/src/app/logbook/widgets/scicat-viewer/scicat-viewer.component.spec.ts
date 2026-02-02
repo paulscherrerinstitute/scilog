@@ -14,7 +14,7 @@ describe('ScicatViewerComponent', () => {
   beforeEach(async () => {
     scicatServiceSpy = jasmine.createSpyObj('ScicatService', [
       'getMyself',
-      'getDatasets',
+      'getDatasetsSummary',
       'getProposalLinkedDatasets',
       'getDataset',
       'getDatasetDetailPageUrl',
@@ -22,7 +22,7 @@ describe('ScicatViewerComponent', () => {
     ]);
 
     scicatServiceSpy.getMyself.and.returnValue(of(null));
-    scicatServiceSpy.getDatasets.and.returnValue(of([]));
+    scicatServiceSpy.getDatasetsSummary.and.returnValue(of([]));
     scicatServiceSpy.getProposalLinkedDatasets.and.returnValue(of([]));
     scicatServiceSpy.getDataset.and.returnValue(of({} as Dataset));
 
@@ -49,7 +49,7 @@ describe('ScicatViewerComponent', () => {
   });
 
   it('populates dataset summary list on init', () => {
-    scicatServiceSpy.getDatasets.and.returnValue(
+    scicatServiceSpy.getDatasetsSummary.and.returnValue(
       of([
         { pid: '1', datasetName: 'Dataset 1', creationTime: '2024-01-01' },
         { pid: '2', datasetName: 'Dataset 2', creationTime: '2024-01-02' },
@@ -58,13 +58,13 @@ describe('ScicatViewerComponent', () => {
 
     component.ngOnInit();
 
-    expect(scicatServiceSpy.getDatasets).toHaveBeenCalled();
+    expect(scicatServiceSpy.getDatasetsSummary).toHaveBeenCalled();
     expect(component.datasetSummary.length).toBe(2);
     expect(component.datasetSummary[0].datasetName).toBe('Dataset 1');
   });
 
   it('appends new proposal linked datasets on init', () => {
-    scicatServiceSpy.getDatasets.and.returnValue(
+    scicatServiceSpy.getDatasetsSummary.and.returnValue(
       of([
         { pid: '1', datasetName: 'Dataset 1', creationTime: '2024-01-01' },
         { pid: '3', datasetName: 'Dataset 3', creationTime: '2022-01-01' },
@@ -84,7 +84,7 @@ describe('ScicatViewerComponent', () => {
   });
 
   it('selects the first proposal linked dataset on init', () => {
-    scicatServiceSpy.getDatasets.and.returnValue(
+    scicatServiceSpy.getDatasetsSummary.and.returnValue(
       of([{ pid: '3', datasetName: 'Dataset 3', creationTime: '2022-01-01' }]),
     );
     scicatServiceSpy.getDataset.and.returnValue(
