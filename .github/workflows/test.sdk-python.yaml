@@ -3,17 +3,17 @@ name: Test python
 on:
   pull_request:
     branches: [main]
-    paths: 
+    paths:
       - sdk/python/**
       - .github/workflows/test.sdk-python.yaml
   push:
     branches: [main]
-    paths: 
+    paths:
       - sdk/python/**
       - .github/workflows/test.sdk-python.yaml
   release:
     types: [published]
-    paths: 
+    paths:
       - sdk/python/**
       - .github/workflows/test.sdk-python.yaml
 
@@ -40,16 +40,15 @@ jobs:
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install pytest black isort
-          pip install -e .
+          pip install -e .[dev]
 
       - name: Lint with black
         run: |
-          black --check --diff --no-color --line-length=100 .
+          black --check --diff --color .
 
       - name: Isort check
         run: |
-          isort --check --diff --profile black --known-local-folder scilog .
+          isort --check --diff .
 
       - name: Test with pytest
         run: |
