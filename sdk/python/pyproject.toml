@@ -31,12 +31,10 @@ include = ["*"]
 [tool.isort]
 profile = "black"
 line_length = 100
-multi_line_output = 3
-include_trailing_comma = true
+known_local_folder = ["scilog"]
 
 [tool.black]
 line-length = 100
-skip-magic-trailing-comma = true
 
 [tool.pylint.basic]
 # Good variable names regexes, separated by a comma. If names match any regex,
