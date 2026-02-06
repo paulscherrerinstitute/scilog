@@ -3,9 +3,12 @@ from abc import ABC, abstractmethod
 from json.decoder import JSONDecodeError
 
 from .config import Config
-from .utils import typename
 
 HEADER_JSON = {"Content-type": "application/json", "Accept": "application/json"}
+
+
+def typename(obj):
+    return type(obj).__name__
 
 
 class AuthMixin(ABC):

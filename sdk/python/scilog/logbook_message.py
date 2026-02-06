@@ -3,8 +3,8 @@ from typing import List, Union
 
 from typeguard import typechecked
 
+from .models import Paragraph
 from .scilog import SciLogCore
-from .snippet import Paragraph
 
 
 class LogbookMessage:

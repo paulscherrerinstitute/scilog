@@ -8,7 +8,7 @@ from scilog import Location, SciCat, SciLog
 from psi_webpage_icon_extractor import PSIWebpageIconExtractor
 
 
-def prepare_location_snippet(log):
+def prepare_location_snippet(log: SciLog) -> str:
     snips = log.get_snippets(snippetType="location", name="root")
     if snips:
         print("location snippet exists already:", snips[0].id)
@@ -30,13 +30,13 @@ def prepare_location_snippet(log):
     return loc_id
 
 
-def update_locations_and_proposals(log, loc_id, proposals):
+def update_locations_and_proposals(log: SciLog, loc_id: str, proposals: list[dict]):
     _accessGroups, locations, proposalsStorage = _collect_data(proposals)
     locationStorage = _update_locations(log, loc_id, locations)
     _update_proposals(log, locationStorage, proposalsStorage)
 
 
-def _collect_data(proposals):
+def _collect_data(proposals: list[dict]) -> tuple[set, set, list[dict]]:
     accessGroups = set()
     locations = set()
     proposalsStorage = []
@@ -62,7 +62,7 @@ def _collect_data(proposals):
     return accessGroups, locations, proposalsStorage
 
 
-def _update_locations(log, loc_id, locations):
+def _update_locations(log: SciLog, loc_id: str, locations: set[str]) -> dict[str, Location]:
     locationStorage = {}
 
     locations_snippet = log.get_snippets(id=loc_id)[0]
@@ -102,13 +102,15 @@ def _update_locations(log, loc_id, locations):
         new_location.files = files
         new_location.parentId = loc_id
 
-        snip = log.post_location(**new_location.to_dict(include_none=False))
+        snip = log.post_location(**new_location.model_dump(exclude_none=True))
         locationStorage[loc] = snip
 
     return locationStorage
 
 
-def _update_proposals(log, locationStorage, proposalsStorage):
+def _update_proposals(
+    log: SciLog, locationStorage: dict[str, Location], proposalsStorage: list[dict]
+):
     for proposal in proposalsStorage:
         ownerGroup = proposal["ownerGroup"]
 
