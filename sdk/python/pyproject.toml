@@ -9,7 +9,7 @@ authors = [
     { name = "Paul Scherrer Institute", email = "scilog-help@lists.psi.ch" },
 ]
 description = "SciLog SDK"
-requires-python = ">=3.10"
+requires-python = ">=3.11"
 classifiers = [
     "Development Status :: 3 - Alpha",
     "Programming Language :: Python :: 3",
