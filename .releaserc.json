@@ -1,0 +1,29 @@
+{
+  "branches": ["main"],
+  "plugins": [
+    "@semantic-release/commit-analyzer",
+    "@semantic-release/release-notes-generator",
+    "@semantic-release/changelog",
+    [
+      "@semantic-release/exec",
+      {
+        "prepareCmd": "echo Releasing ${nextRelease.version} && npm version ${nextRelease.version} --no-git-tag-version --prefix sci-log-db && npm version ${nextRelease.version} --no-git-tag-version --prefix scilog && sed -i -E '/^[[]project[]]$/,/^[[]/{s/^version = \".*\"/version = \"'${nextRelease.version}'\"/}' sdk/python/pyproject.toml",
+        "publishCmd": "python -m build sdk/python --outdir sdk/python/dist && python -m twine upload sdk/python/dist/*"
+      }
+    ],
+    [
+      "@semantic-release/git",
+      {
+        "assets": [
+          "CHANGELOG.md",
+          "sci-log-db/package.json",
+          "sci-log-db/package-lock.json",
+          "scilog/package.json",
+          "scilog/package-lock.json",
+          "sdk/python/pyproject.toml"
+        ]
+      }
+    ],
+    "@semantic-release/github"
+  ]
+}
