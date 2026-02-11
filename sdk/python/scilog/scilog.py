@@ -389,6 +389,28 @@ class SciLog:
         """
         self.logbook = logbook
 
+    def new(self, text: str | None = None) -> lm.LogbookMessage:
+        """
+        Create a new LogbookMessage instance, optionally with initial text content.
+
+        Args:
+            text (str | None): Optional initial text content for the LogbookMessage.
+
+        Returns:
+            LogbookMessage: A new instance of LogbookMessage with the provided text content.
+
+        Raises:
+            ValueError: If no logbook is currently selected.
+        """
+        if self.logbook is None:
+            raise ValueError(
+                "No logbook selected. Please select a logbook before creating a message."
+            )
+        msg = lm.LogbookMessage()
+        if text:
+            msg.add_text(text)
+        return msg
+
     @pinned_to_logbook(["parentId"])
     def get_snippets(
         self,

@@ -1,10 +1,15 @@
+from __future__ import annotations
+
 import os
-from typing import List, Union
+from typing import TYPE_CHECKING, List, Union
 
 from typeguard import typechecked
 
 from .models import Paragraph
 from .scilog import SciLogCore
+
+if TYPE_CHECKING:
+    from .scilog import SciLog
 
 
 class LogbookMessage:
@@ -16,8 +21,9 @@ class LogbookMessage:
 
     """
 
-    def __init__(self, **kwargs):
+    def __init__(self, logbook: SciLog | None = None, **kwargs):
         self._content = Paragraph(**kwargs)
+        self._logbook = logbook
 
     @typechecked
     def add_text(self, msg: str):
@@ -76,3 +82,15 @@ class LogbookMessage:
         else:
             self._content.tags = tag
         return self
+
+    def send(self):
+        """Send the logbook message to the SciLog server. The logbook message must be associated with a logbook instance.
+
+        Raises:
+            ValueError: If the logbook message is not associated with a logbook instance.
+        """
+        if not self._logbook:
+            raise ValueError(
+                "LogbookMessage must be associated with a logbook instance to be sent."
+            )
+        self._logbook.send_logbook_message(self)
