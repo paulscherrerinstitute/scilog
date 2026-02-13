@@ -3,12 +3,13 @@ from pathlib import Path
 
 
 class Config(dict):
-    def __init__(self, fname, folder=None):
+    def __init__(self, fname, folder=None, auto_save=True):
         if folder is not None:
             folder = Path(folder)
         else:
             folder = Path.home()
         self.fname = folder / fname
+        self.auto_save = auto_save
         content = self._load()
         super().__init__(content)
 
@@ -30,7 +31,8 @@ class Config(dict):
         json_save(self, self.fname)
 
     def delete(self):
-        self.fname.unlink()
+        if self.fname.exists():
+            self.fname.unlink()
 
 
 def json_save(what, filename, *args, indent=4, sort_keys=True, **kwargs):

@@ -60,19 +60,15 @@ class HttpClient(AuthMixin):
     def get_request(self, url, params=None, headers=None, timeout=10):
         logger.debug(f"Getting data request: {url} , {params}")
         response = requests.get(
-            url,
-            params=params,
-            headers=headers,
-            timeout=timeout,
-            verify=self._verify_certificate,
+            url, params=params, headers=headers, timeout=timeout, verify=self._verify_certificate
         )
         if response.ok:
             logger.debug(f"Getting data response: {response.json()}")
             return response.json()
-        else:
-            if response.reason == "Unauthorized":
-                self.config.delete()
-            raise response.raise_for_status()
+
+        if response.reason == "Unauthorized":
+            self.config.delete()
+        raise response.raise_for_status()
 
     @authenticated
     @formatted_http_error
