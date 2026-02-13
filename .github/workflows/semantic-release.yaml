@@ -19,8 +19,7 @@ jobs:
             - name: Checkout
               uses: actions/checkout@v4
               with:
-                  token: ${{ secrets.GITHUB_TOKEN }}
-                  persist-credentials: true
+                  token: ${{ secrets.SEMANTIC_RELEASE_BOT }}
                   fetch-depth: 0
 
             - name: Set up Node
@@ -34,7 +33,11 @@ jobs:
                   python-version: "3.11"
 
             - name: Install semantic-release
-              run: npm install -g semantic-release @semantic-release/commit-analyzer @semantic-release/release-notes-generator @semantic-release/changelog @semantic-release/git @semantic-release/github @semantic-release/exec
+              run: >-
+                  npm install -g semantic-release @semantic-release/commit-analyzer 
+                  @semantic-release/release-notes-generator @semantic-release/changelog 
+                  @semantic-release/git @semantic-release/github @semantic-release/exec 
+                  conventional-changelog-conventionalcommits
 
             - name: Install Python build tools
               run: python -m pip install --upgrade pip build twine
