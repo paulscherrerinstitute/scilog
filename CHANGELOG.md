@@ -1,3 +1,10 @@
+## [2.0.1](https://github.com/paulscherrerinstitute/scilog/compare/v2.0.0...v2.0.1) (2026-02-13)
+
+
+### Bug Fixes
+
+* bind scilog version ([#476](https://github.com/paulscherrerinstitute/scilog/issues/476)) ([751614c](https://github.com/paulscherrerinstitute/scilog/commit/751614caf1dc7fded9fb719fe26ebceab4922b92))
+
 # [2.0.0](https://github.com/paulscherrerinstitute/scilog/compare/v1.0.0...v2.0.0) (2026-02-13)
 
 
