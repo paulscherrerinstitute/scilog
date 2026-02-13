@@ -375,8 +375,19 @@ class SciLogCore:
 
 
 class SciLog:
-    def __init__(self, *args, **kwargs):
-        self.http_client = SciLogRestAPI(*args, **kwargs)
+    def __init__(self, address: str, options: dict | None = None, **kwargs):
+        """
+        Initialize the SciLog client.
+
+        Args:
+            address (str): The base URL of the SciLog server, e.g. "https://scilog.psi.ch/api/v1"
+            options (dict | None): Optional dictionary containing authentication options such as
+                    "token", "username", "password", "login_path" and "auto_save". If not
+                    provided, the client will attempt to retrieve these from the environment or
+                    prompt the user.
+            **kwargs: Additional keyword arguments for authentication, if needed.
+        """
+        self.http_client = SciLogRestAPI(address=address, options=options, **kwargs)
         self.logbook = None
         self.core = SciLogCore(self)
 
