@@ -271,3 +271,19 @@ def test_get_snippets_with_kwargs_calls_http(scilog):
     assert headers == HEADER_JSON
     filt = json.loads(params["filter"])
     assert filt == {"where": {"and": [{"textcontent": "text", "parentId": "logbook_id_test"}]}}
+
+
+def test_scilog_without_auto_save_does_not_use_config(scilog):
+    log = SciLog("fake_url", options={"auto_save_token": False})
+    assert log.http_client._auto_save_token is False
+    with mock.patch.object(
+        log.core.http_client, "_authenticate", return_value="dummy_token"
+    ) as mock_authenticate:
+        with mock.patch.object(log.core.http_client, "config") as mock_config:
+            token = log.http_client.token
+        mock_authenticate.assert_called_once()
+
+        # Ensure that the config is neither read from nor written to when auto_save_token is False
+        mock_config.__getitem__.assert_not_called()
+        mock_config.__setitem__.assert_not_called()
+        assert token == "dummy_token"
