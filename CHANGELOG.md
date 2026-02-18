@@ -1,3 +1,10 @@
+# [2.1.0](https://github.com/paulscherrerinstitute/scilog/compare/v2.0.1...v2.1.0) (2026-02-18)
+
+
+### Features
+
+* **sdk:** add ability to disable auto save ([2cc4c7c](https://github.com/paulscherrerinstitute/scilog/commit/2cc4c7cd10f8bff5e2fead2ee5f1c4a0e44575e8))
+
 ## [2.0.1](https://github.com/paulscherrerinstitute/scilog/compare/v2.0.0...v2.0.1) (2026-02-13)
 
 
