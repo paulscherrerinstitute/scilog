@@ -7,7 +7,7 @@ import {authenticate} from '@loopback/authentication';
 import {authorize} from '@loopback/authorization';
 import {basicAuthorization} from '../services/basic.authorizor';
 import {FileRepository} from '../repositories/file.repository';
-import {RoCrateService} from '../services';
+import {RoCrateExportService} from '../services';
 import {EntityBuilderService} from '../services';
 import {ArchiveService, AssetDescriptor} from '../services/archive.service';
 import {Readable} from 'stream';
@@ -28,7 +28,8 @@ export class RoCrateController {
   static readonly ARCHIVE_ROOT = 'scilog-eln-export';
   constructor(
     @repository(FileRepository) private fileRepository: FileRepository,
-    @service(RoCrateService) private rocrateService: RoCrateService,
+    @service(RoCrateExportService)
+    private rocrateExportService: RoCrateExportService,
     @service(ArchiveService) private archiveService: ArchiveService,
     @service(EntityBuilderService) private entityBuilder: EntityBuilderService,
   ) {}
@@ -44,7 +45,7 @@ export class RoCrateController {
     },
   })
   async findById(@param.path.string('id') id: string): Promise<object> {
-    const {rocrate} = await this.rocrateService.getRoCrateMetadata(id);
+    const {rocrate} = await this.rocrateExportService.getRoCrateMetadata(id);
     return rocrate;
   }
 
@@ -63,7 +64,7 @@ export class RoCrateController {
     @inject(RestBindings.Http.RESPONSE) response: Response,
   ) {
     const {rocrate, fileMetadata} =
-      await this.rocrateService.getRoCrateMetadata(id);
+      await this.rocrateExportService.getRoCrateMetadata(id);
 
     // Build asset descriptors from GridFS streams for files referenced in snippets
     const bucket = new mongodb.GridFSBucket(

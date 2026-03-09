@@ -22,7 +22,7 @@ export interface FileMetadata {
 }
 
 @injectable({scope: BindingScope.TRANSIENT})
-export class RoCrateService {
+export class RoCrateExportService {
   private crate: ROCrate;
   private fileMetadata: FileMetadata[];
   private logbookEntity: RawEntity;
