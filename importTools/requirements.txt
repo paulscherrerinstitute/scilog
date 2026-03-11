@@ -1,4 +1,4 @@
-certifi==2022.6.15
+certifi==2024.7.4
 charset-normalizer==2.1.0
 idna==3.7
 python-dotenv==0.20.0
