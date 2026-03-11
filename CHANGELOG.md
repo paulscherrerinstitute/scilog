@@ -1,3 +1,10 @@
+## [2.1.1](https://github.com/paulscherrerinstitute/scilog/compare/v2.1.0...v2.1.1) (2026-03-11)
+
+
+### Bug Fixes
+
+* **deps:** update dependency multer to v2 [security] ([e27f6c7](https://github.com/paulscherrerinstitute/scilog/commit/e27f6c70d46f01a7b75339d6ba500a924b93a0c4))
+
 # [2.1.0](https://github.com/paulscherrerinstitute/scilog/compare/v2.0.1...v2.1.0) (2026-02-18)
 
 
