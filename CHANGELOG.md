@@ -1,3 +1,10 @@
+## [2.1.2](https://github.com/paulscherrerinstitute/scilog/compare/v2.1.1...v2.1.2) (2026-03-12)
+
+
+### Bug Fixes
+
+* **deps:** add formidable as direct dependency ([e6fbbd2](https://github.com/paulscherrerinstitute/scilog/commit/e6fbbd25738b75557db8ed98bc3b59bf43f11ef6))
+
 ## [2.1.1](https://github.com/paulscherrerinstitute/scilog/compare/v2.1.0...v2.1.1) (2026-03-11)
 
 
