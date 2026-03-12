@@ -27,3 +27,28 @@
 ::ng-deep .mat-checkbox-checked.mat-accent .mat-checkbox-background {
   background-color: var(--button-accent);
 }
+:host {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  min-height: 0;
+}
+
+.task-list-card {
+  display: flex;
+  flex-direction: column;
+  flex: 1 1 auto;
+  min-height: 0;
+}
+
+.task-list-content {
+  flex: 1 1 auto;
+  overflow-y: auto !important;
+  min-height: 0;
+  padding: 8px;          /* prevents bottom clipping */
+  box-sizing: border-box;
+  padding-bottom: 16px;
+}
+
+
+
