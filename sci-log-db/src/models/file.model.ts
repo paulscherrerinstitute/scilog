@@ -38,6 +38,18 @@ export class Filesnippet extends Basesnippet {
   filename?: string;
 
   @property({
+    type: 'number',
+    description: 'Size of the file in bytes',
+  })
+  contentSize?: number;
+
+  @property({
+    type: 'string',
+    description: 'SHA256 hash of the file content',
+  })
+  contentSha256?: string;
+
+  @property({
     type: 'string',
     description: 'File extension of the file',
   })

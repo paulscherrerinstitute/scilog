@@ -60,16 +60,23 @@ export class EntityBuilderService {
   }
 
   buildFileEntity(snippetId: string, fileObj: Filesnippet) {
-    return {
+    const result: Record<string, unknown> = {
       '@id': this.getFilePath(
         snippetId,
         fileObj._fileId,
         fileObj.fileExtension,
       ),
       '@type': 'File',
-      name: fileObj.name ?? `${fileObj._fileId}.${fileObj.fileExtension}`,
+      name: fileObj.filename ?? `${fileObj._fileId}.${fileObj.fileExtension}`,
       encodingFormat: fileObj.contentType,
     };
+    if (fileObj.contentSize) {
+      result['contentSize'] = fileObj.contentSize;
+    }
+    if (fileObj.contentSha256) {
+      result['sha256'] = fileObj.contentSha256;
+    }
+    return result;
   }
 
   buildLicenseEntity() {
