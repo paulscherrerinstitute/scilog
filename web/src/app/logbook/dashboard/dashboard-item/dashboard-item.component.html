@@ -1,36 +1,30 @@
-<div class="header" [ngStyle]="{ padding: dashboardView === true ? '0px' : '10px' }">
-  <span class="headerTitle">
-    {{ config?.general.title }}
-  </span>
-  <span class="flexExpand"></span>
-  <span>
-    <button
-      mat-icon-button
-      aria-label="Export"
-      (click)="exportLogbook()"
-      *ngIf="config?.general.type === 'logbook'"
-      matTooltip="Export logbook"
-    >
-      <mat-icon>save_alt</mat-icon>
-    </button>
-    <button
-      mat-icon-button
-      aria-label="Edit"
-      (click)="requestFullscreen()"
-      *ngIf="dashboardView"
-      matTooltip="Switch to full screen mode"
-    >
-      <mat-icon>fullscreen</mat-icon>
-    </button>
-    <button
-      mat-icon-button
-      aria-label="Edit"
-      (click)="openPreferences()"
-      matTooltip="Open widget preferences"
-    >
-      <mat-icon>settings</mat-icon>
-    </button>
-  </span>
+<div class="header" [ngStyle]="{'padding':dashboardView === true ? '0px' : '10px' }">
+    <span class="headerTitle">
+        {{ config?.general.title }}
+    </span>
+    <span class="flexExpand"></span>
+    <span>
+         <button
+            mat-icon-button
+            *ngIf="config?.general.type === 'tasks'"
+            matTooltip="Export Tasks"
+            (click)="exportTasksFromHeader()">
+
+            <mat-icon>arrow_forward</mat-icon>
+        </button>
+        <button mat-icon-button aria-label="Export" (click)='exportLogbook()' *ngIf="config?.general.type==='logbook'"
+            matTooltip="Export logbook">
+            <mat-icon>save_alt</mat-icon>
+        </button>
+        <button mat-icon-button aria-label="Edit" (click)='requestFullscreen()' *ngIf="dashboardView"
+            matTooltip="Switch to full screen mode">
+            <mat-icon>fullscreen</mat-icon>
+        </button>
+        <button mat-icon-button aria-label="Edit" (click)='openPreferences()' matTooltip="Open widget preferences">
+            <mat-icon>settings</mat-icon>
+        </button>
+    </span>
+
 </div>
 <ng-container [ngSwitch]="config?.general.type" class="item-container">
   <app-logbook-item
