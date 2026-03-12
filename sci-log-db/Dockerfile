@@ -1,5 +1,4 @@
-# Check out https://hub.docker.com/_/node to select a new base image
-FROM node:18-slim
+FROM node:22-slim
 
 # Install extra packages
 RUN apt-get update && \
