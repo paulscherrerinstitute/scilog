@@ -247,7 +247,10 @@ export class ExportService {
     files: {fileHash?: string; accessHash?: string}[] | undefined,
   ) {
     let accessHash: string | undefined;
-    if (href?.startsWith('https://') || href?.startsWith('http://')) {
+    if (
+      href != null &&
+      (href.startsWith('https://') || href.startsWith('http://'))
+    ) {
       const objectId = require('mongodb').ObjectId;
       const hrefParts = href.split('/');
       const fileId = hrefParts.pop();

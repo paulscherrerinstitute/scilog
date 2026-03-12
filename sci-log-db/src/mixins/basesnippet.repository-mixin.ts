@@ -160,7 +160,7 @@ function UpdateAndDeleteRepositoryMixin<
     private isSharing(patches: Partial<Basesnippet>) {
       if (Object.keys(patches).length === 0) return false;
       return Object.keys(patches).every(d =>
-        this.expandedACLS.includes(d as typeof this.expandedACLS[number]),
+        this.expandedACLS.includes(d as (typeof this.expandedACLS)[number]),
       );
     }
 
@@ -381,7 +381,7 @@ function FindWithSearchRepositoryMixin<
       });
       this.addSearchOr(searchText, additionalConditions);
       if (
-        (additionalConditions.or &&
+        (additionalConditions.or != null &&
           Object.keys(additionalConditions).length > 2) ||
         Object.keys(additionalConditions).length > 1
       )

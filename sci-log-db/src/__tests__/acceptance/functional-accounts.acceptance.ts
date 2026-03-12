@@ -42,7 +42,8 @@ class TestFunctionalAccountsApp extends SciLogDbApplication {
     const basesnippetRepo = await this.getRepository(BasesnippetRepository);
     const acls = basesnippetRepo.acls.reduce(
       (currentValue: Record<string, ['acl']>, previousValue: string) => (
-        (currentValue[previousValue] = ['acl']), currentValue
+        (currentValue[previousValue] = ['acl']),
+        currentValue
       ),
       {},
     );
