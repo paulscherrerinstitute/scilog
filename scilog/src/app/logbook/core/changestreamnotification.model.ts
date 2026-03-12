@@ -4,4 +4,5 @@ export interface ChangeStreamNotification extends Basesnippets{
     operationType?: string;
     content?: any;
     [key: string]: any;
+    importance?: number; 
 }

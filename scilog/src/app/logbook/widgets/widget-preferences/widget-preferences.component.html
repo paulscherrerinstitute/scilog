@@ -96,9 +96,27 @@
           </mat-autocomplete>
         </mat-form-field>
 
-        <header class="subSubHeader">
-          Data must include the following tags
-        </header>
+       <header class="subSubHeader">
+        Importance
+      </header>
+
+
+<div class="importance-checkboxes">
+  <mat-checkbox
+    *ngFor="let level of importanceLevels"
+    [checked]="importance.value?.includes(level)"
+    (change)="onImportanceChange(level, $event.checked)">
+    {{ level }}
+  </mat-checkbox>
+</div>
+
+
+
+      <header class="subSubHeader">
+        Data must include the following tags
+      </header>
+
+
         <div class="chips">
           <mat-chip-grid #chipList1 aria-label="Tag selection">
             <mat-chip-row *ngFor="let tagItem of tag" [removable]="removable"

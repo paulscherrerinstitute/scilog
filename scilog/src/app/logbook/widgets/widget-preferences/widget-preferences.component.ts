@@ -26,12 +26,14 @@ import { MatTooltip } from '@angular/material/tooltip';
 import { MatAutocompleteTrigger, MatAutocomplete } from '@angular/material/autocomplete';
 import { MatIcon } from '@angular/material/icon';
 import { MatButton } from '@angular/material/button';
+import { MatRadioModule } from '@angular/material/radio';
+import { MatCheckboxModule } from '@angular/material/checkbox';
 
 @Component({
     selector: 'app-widget-preferences',
     templateUrl: './widget-preferences.component.html',
     styleUrls: ['./widget-preferences.component.scss'],
-    imports: [MatDialogTitle, CdkScrollable, MatDialogContent, FormsModule, ReactiveFormsModule, MatDivider, MatFormField, MatLabel, MatInput, MatSelect, MatOption, NgIf, NgSwitch, NgSwitchCase, MatSlideToggle, MatTooltip, CdkTextareaAutosize, MatAutocompleteTrigger, MatAutocomplete, NgFor, MatChipGrid, MatChipRow, MatIcon, MatChipRemove, MatChipInput, MatDialogActions, MatButton, AsyncPipe]
+    imports: [MatDialogTitle, CdkScrollable, MatDialogContent, FormsModule, ReactiveFormsModule, MatDivider, MatFormField, MatLabel, MatInput, MatSelect, MatOption, NgIf, NgSwitch, NgSwitchCase, MatSlideToggle, MatTooltip, CdkTextareaAutosize, MatAutocompleteTrigger, MatAutocomplete, NgFor, MatChipGrid, MatChipRow, MatIcon, MatChipRemove, MatChipInput, MatDialogActions, MatButton, AsyncPipe,MatRadioModule,MatCheckboxModule]
 })
 export class WidgetPreferencesComponent implements OnInit, AfterViewInit, OnDestroy {
 
@@ -54,6 +56,9 @@ export class WidgetPreferencesComponent implements OnInit, AfterViewInit, OnDest
   snippetViewerControl = new UntypedFormControl();
   plotControl = new UntypedFormControl();
   additionalLogbooksCtrl = new UntypedFormControl();
+  importanceLevels = [1, 2, 3, 4, 5];
+  importance = new UntypedFormControl([]);
+
 
   visible = true;
   removable = true;
@@ -97,7 +102,8 @@ export class WidgetPreferencesComponent implements OnInit, AfterViewInit, OnDest
     this.filterBasics = fb.group({
       ownerGroup: new UntypedFormControl(''),
       logbook: new UntypedFormControl(''),
-      description: new UntypedFormControl({ value: "", disabled: true })
+      description: new UntypedFormControl({ value: "", disabled: true }),
+      importance: this.importance 
     });
     this.scicatWidgetEnabled = this.appConfigService.getScicatSettings()?.scicatWidgetEnabled || false;
   }
@@ -112,6 +118,11 @@ export class WidgetPreferencesComponent implements OnInit, AfterViewInit, OnDest
         this.tag.push({ name: tag });
       })
     }
+ if (Array.isArray(this.data.filter.importance)) {
+  this.importance.setValue(this.data.filter.importance);
+}
+
+
     if (this.data.filter.excludeTags?.length > 0) {
       this.data.filter.excludeTags.forEach((tag: string) => {
         console.log(tag);
@@ -186,6 +197,20 @@ export class WidgetPreferencesComponent implements OnInit, AfterViewInit, OnDest
     this.setupLogbookSelection();
   }
   
+onImportanceChange(level: number, checked: boolean) {
+  const current: number[] = this.importance.value || [];
+
+  if (checked) {
+    if (!current.includes(level)) {
+      this.importance.setValue([...current, level]);
+    }
+  } else {
+    this.importance.setValue(current.filter(v => v !== level));
+  }
+}
+
+
+
   async getSnippetViewerOptions() {
     let data = await this.dataService.getSnippetsForLogbook(this.logbookInfo.logbookInfo.id);
     // TODO this should be done in the backend, not here!
@@ -415,6 +440,16 @@ export class WidgetPreferencesComponent implements OnInit, AfterViewInit, OnDest
     this.data.general.readonly = this.readOnlyLogbook.value;
     this.data.view.order = ['defaultOrder ' + this.booleanToOrderTag(this.descendingOrder.value)];
     console.log(this.data);
+    if (this.importance.value && this.importance.value.length > 0) {
+  this.data.filter.importance = this.importance.value;
+  console.log("APPLY IMPORTANCE:", this.importance.value);
+
+} else {
+  delete this.data.filter.importance;
+}
+
+
+
     this.dialogRef.close(this.data);
   }
 

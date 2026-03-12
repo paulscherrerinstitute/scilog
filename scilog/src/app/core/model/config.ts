@@ -19,7 +19,9 @@ export interface WidgetItemConfig {
         excludeTags?: string[],
         ownerGroup?: string,
         accessGroups?: string[],
-        snippetType?: string[]
+        snippetType?: string[],
+        importance?: number[]
+
     },
     view: {
         order?: string[],

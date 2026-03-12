@@ -82,11 +82,21 @@ export class RemoteDataService {
     if (typeof config.view.order != 'undefined') {
       httpFilter["order"] = config.view.order;
     } else {
-      httpFilter["order"] = ["defaultOrder ASC"];
+      httpFilter["order"] = ["defaultOrder DESC"];
     }
 
     httpFilter["include"] = [{ relation: "subsnippets", ...this.addIncludeScope(config.filter) }];
-    httpFilter["where"] = { "and": [...this.staticFilters(), ...this.tagsFilter(config.filter), ...this.parentFilter(config.filter)] };
+
+
+httpFilter["where"] = {
+  "and": [
+    ...this.staticFilters(),
+    ...this.tagsFilter(config.filter),
+    ...this.parentFilter(config.filter),
+    ...this.importanceFilter(config.filter) 
+  ]
+};
+
 
     if (count < Infinity) {
       httpFilter["limit"] = count;
@@ -111,6 +121,16 @@ export class RemoteDataService {
     }
     return tagFilter;
   }
+protected importanceFilter(configFilter: { importance?: number[] }){
+ if (!configFilter?.importance || configFilter.importance.length === 0) {
+  return [];
+}
+
+return [{
+  importance: { inq: configFilter.importance }
+}];
+}
+
 
   private parentFilter(configFilter: { targetId?: string, additionalLogbooks?: string[] }) {
     const parentIds = [configFilter?.targetId, ...(configFilter?.additionalLogbooks ?? [])].filter(parentId => parentId);
@@ -376,6 +396,8 @@ export class LogbookDataService extends RemoteDataService {
     this._searchString = this._searchString.trim();
 
     let httpFilter: Object = this._prepareFilters(config, index, count);
+    console.log("FINAL WHERE:", httpFilter["where"]);
+
     let params = new HttpParams();
     params = params.set('filter', JSON.stringify(httpFilter))
 
@@ -387,6 +409,7 @@ export class LogbookDataService extends RemoteDataService {
   }
 
   protected _prepareFilters(config: WidgetItemConfig, index: number = 0, count: number = Infinity): Object {
+    
     let httpFilter: Object = {};
     httpFilter["order"] = config.view.order ?? ["defaultOrder DESC"];
 
