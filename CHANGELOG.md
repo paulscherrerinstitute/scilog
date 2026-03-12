@@ -1,3 +1,10 @@
+## [2.1.3](https://github.com/paulscherrerinstitute/scilog/compare/v2.1.2...v2.1.3) (2026-03-12)
+
+
+### Bug Fixes
+
+* **deps:** update dependency formidable to v2.1.3 [security] ([8360fa9](https://github.com/paulscherrerinstitute/scilog/commit/8360fa91285d84402efd492472b4f2403d465512))
+
 ## [2.1.2](https://github.com/paulscherrerinstitute/scilog/compare/v2.1.1...v2.1.2) (2026-03-12)
 
 
