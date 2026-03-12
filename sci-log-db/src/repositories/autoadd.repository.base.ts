@@ -147,7 +147,7 @@ export class AutoAddRepository<
   ) {
     const parentId =
       data.snippetType !== 'location'
-        ? (data as Logbook).location ?? data.parentId
+        ? ((data as Logbook).location ?? data.parentId)
         : false;
     let parentACL = {} as Basesnippet;
     if (parentId) {

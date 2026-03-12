@@ -62,9 +62,8 @@ describe('RoCrateExportService (unit)', () => {
       entityBuilder,
     );
 
-    const {rocrate} = await roCrateExportService.getRoCrateMetadata(
-      'logbook-id',
-    );
+    const {rocrate} =
+      await roCrateExportService.getRoCrateMetadata('logbook-id');
 
     console.log(JSON.stringify(rocrate, null, 2));
     // assert the structure of the ro-crate: root data entity has a logbook,
