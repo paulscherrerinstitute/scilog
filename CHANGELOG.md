@@ -1,3 +1,10 @@
+## [2.1.4](https://github.com/paulscherrerinstitute/scilog/compare/v2.1.3...v2.1.4) (2026-03-12)
+
+
+### Bug Fixes
+
+* **deps:** upgrade LB 4 packages and Node to 22 ([af0ffc9](https://github.com/paulscherrerinstitute/scilog/commit/af0ffc926e352f0003dd680d9d674f026fce4b3a))
+
 ## [2.1.3](https://github.com/paulscherrerinstitute/scilog/compare/v2.1.2...v2.1.3) (2026-03-12)
 
 
