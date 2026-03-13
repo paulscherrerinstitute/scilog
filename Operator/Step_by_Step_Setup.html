@@ -6,7 +6,7 @@
         <title>Step by Step instruction · HonKit</title>
         <meta http-equiv="X-UA-Compatible" content="IE=edge" />
         <meta name="description" content="">
-        <meta name="generator" content="HonKit 4.0.4">
+        <meta name="generator" content="HonKit 4.0.8">
         
         
         
@@ -526,27 +526,27 @@ npm run start
 </ol>
 <pre><code># Example functionalAccounts.json with admin and one beamline account
 [{
-        &quot;username&quot;: &quot;scilog-admin&quot;,
-        &quot;firstName&quot;: &quot;Admin&quot;,
-        &quot;lastName&quot;: &quot;Scilog&quot;,
-        &quot;password&quot;: &quot;...&quot;,
-        &quot;email&quot;: &quot;scilog-admin@gmail.com&quot;,
-        &quot;roles&quot;: [
-            &quot;admin&quot;,
-            &quot;any-authenticated-user&quot;
+        "username": "scilog-admin",
+        "firstName": "Admin",
+        "lastName": "Scilog",
+        "password": "...",
+        "email": "scilog-admin@gmail.com",
+        "roles": [
+            "admin",
+            "any-authenticated-user"
         ]
     },
     {
-        &quot;username&quot;: &quot;swissfelaramis-alvra&quot;,
-        &quot;firstName&quot;: &quot;Aramis&quot;,
-        &quot;lastName&quot;: &quot;Alvra&quot;,
-        &quot;password&quot;: &quot;...&quot;,
-        &quot;email&quot;: &quot;swissfelaramis-alvra@gmail.com&quot;,
-        &quot;roles&quot;: [
-            &quot;swissfelaramis-alvra&quot;,
-            &quot;any-authenticated-user&quot;
+        "username": "swissfelaramis-alvra",
+        "firstName": "Aramis",
+        "lastName": "Alvra",
+        "password": "...",
+        "email": "swissfelaramis-alvra@gmail.com",
+        "roles": [
+            "swissfelaramis-alvra",
+            "any-authenticated-user"
         ]
-        &quot;location&quot;: &quot;/PSI/SWISSFEL/ARAMIS-ALVRA
+        "location": "/PSI/SWISSFEL/ARAMIS-ALVRA
     },
 
 ]
@@ -554,36 +554,36 @@ npm run start
 
 # Example datasource.json for connection to replica set cluster ()
 {
-    &quot;name&quot;: &quot;mongo&quot;,
-    &quot;connector&quot;: &quot;mongodb&quot;,
-    &quot;url&quot;:&quot;mongodb://scilogMaster:your-PWo@my-cluster-name-rs0.mongo.svc.cluster.local/scilog-development?replicaSet=rs0&amp;authSource=scilog-development&quot;,
-    &quot;host&quot;: &quot;&quot;,
-    &quot;port&quot;: &quot;&quot;,
-    &quot;user&quot;: &quot;&quot;,
-    &quot;password&quot;: &quot;&quot;,
-    &quot;database&quot;: &quot;scilog-development&quot;,
-    &quot;useNewUrlParser&quot;: true,
-    &quot;useUnifiedTopology&quot;: true
+    "name": "mongo",
+    "connector": "mongodb",
+    "url":"mongodb://scilogMaster:your-PWo@my-cluster-name-rs0.mongo.svc.cluster.local/scilog-development?replicaSet=rs0&amp;authSource=scilog-development",
+    "host": "",
+    "port": "",
+    "user": "",
+    "password": "",
+    "database": "scilog-development",
+    "useNewUrlParser": true,
+    "useUnifiedTopology": true
 }
 
 
 ### Example OIDC configuration oidc.json
 {
-    &quot;session&quot;: false,
-    &quot;provider&quot;: &quot;oidc&quot;,
-    &quot;authScheme&quot;: &quot;openid connect&quot;,
-    &quot;module&quot;: &quot;passport-openidconnect&quot;,
-    &quot;failureFlash&quot;: true,
-    &quot;issuer&quot;: &quot;https://kc.development.psi.ch/auth/realms/awi&quot;,
-    &quot;authorizationURL&quot;: &quot;https://kc.development.psi.ch/auth/realms/awi/protocol/openid-connect/auth&quot;,
-    &quot;tokenURL&quot;: &quot;https://kc.development.psi.ch/auth/realms/awi/protocol/openid-connect/token&quot;,
-    &quot;userInfoURL&quot;: &quot;https://kc.development.psi.ch/auth/realms/awi/protocol/openid-connect/userinfo&quot;,
-    &quot;clientID&quot;: &quot;scilog&quot;,
-    &quot;clientSecret&quot;: &quot;yourSecretHere&quot;,
-    &quot;callbackURL&quot;: &quot;http://localhost:3000/auth/keycloak/callback/&quot;,
-    &quot;scope&quot;: [&quot;email&quot;, &quot;profile&quot;, &quot;openid&quot;],
-    &quot;successRedirect&quot;: &quot;http://localhost:4200/login&quot;,
-    &quot;skipUserProfile&quot;: false
+    "session": false,
+    "provider": "oidc",
+    "authScheme": "openid connect",
+    "module": "passport-openidconnect",
+    "failureFlash": true,
+    "issuer": "https://kc.development.psi.ch/auth/realms/awi",
+    "authorizationURL": "https://kc.development.psi.ch/auth/realms/awi/protocol/openid-connect/auth",
+    "tokenURL": "https://kc.development.psi.ch/auth/realms/awi/protocol/openid-connect/token",
+    "userInfoURL": "https://kc.development.psi.ch/auth/realms/awi/protocol/openid-connect/userinfo",
+    "clientID": "scilog",
+    "clientSecret": "yourSecretHere",
+    "callbackURL": "http://localhost:3000/auth/keycloak/callback/",
+    "scope": ["email", "profile", "openid"],
+    "successRedirect": "http://localhost:4200/login",
+    "skipUserProfile": false
 }
 </code></pre><h4 id="frontend">Frontend</h4>
 <ol>
@@ -591,10 +591,10 @@ npm run start
 </ol>
 <pre><code># Example config.json file
 {
-    &quot;lbBaseURL&quot;: &quot;http://localhost:3000/&quot;,
-    &quot;oAuth2Endpoint&quot;: {
-        &quot;authURL&quot;: &quot;auth/thirdparty/keycloak&quot;,
-        &quot;displayText&quot;: &quot;keycloak IDP&quot;
+    "lbBaseURL": "http://localhost:3000/",
+    "oAuth2Endpoint": {
+        "authURL": "auth/thirdparty/keycloak",
+        "displayText": "keycloak IDP"
     }
 }
 </code></pre>
@@ -640,7 +640,7 @@ npm run start
     <script>
         var gitbook = gitbook || [];
         gitbook.push(function() {
-            gitbook.page.hasChanged({"page":{"title":"Step by Step instruction","level":"1.4.2","depth":2,"next":{"title":"Deploy with Docker Compose","level":"1.4.3","depth":2,"path":"Operator/Step_by_Step_Setup_Docker.md","ref":"Operator/Step_by_Step_Setup_Docker.md","articles":[]},"previous":{"title":"Login and Accounts","level":"1.4.1","depth":2,"path":"Operator/Login.md","ref":"Operator/Login.md","articles":[]},"dir":"ltr"},"config":{"gitbook":"*","theme":"default","variables":{},"plugins":[],"pluginsConfig":{"highlight":{},"search":{},"lunr":{"maxIndexSize":1000000,"ignoreSpecialCharacters":false},"fontsettings":{"theme":"white","family":"sans","size":2},"theme-default":{"styles":{"website":"styles/website.css","pdf":"styles/pdf.css","epub":"styles/epub.css","mobi":"styles/mobi.css","ebook":"styles/ebook.css","print":"styles/print.css"},"showLevel":false}},"structure":{"langs":"LANGS.md","readme":"README.md","glossary":"GLOSSARY.md","summary":"SUMMARY.md"},"pdf":{"pageNumbers":true,"fontSize":12,"fontFamily":"Arial","paperSize":"a4","chapterMark":"pagebreak","pageBreaksBefore":"/","margin":{"right":62,"left":62,"top":56,"bottom":56},"embedFonts":false},"styles":{"website":"styles/website.css","pdf":"styles/pdf.css","epub":"styles/epub.css","mobi":"styles/mobi.css","ebook":"styles/ebook.css","print":"styles/print.css"}},"file":{"path":"Operator/Step_by_Step_Setup.md","mtime":"2025-12-05T13:31:31.158Z","type":"markdown"},"gitbook":{"version":"4.0.4","time":"2025-12-05T13:31:44.231Z"},"basePath":"..","book":{"language":""}});
+            gitbook.page.hasChanged({"page":{"title":"Step by Step instruction","level":"1.4.2","depth":2,"next":{"title":"Deploy with Docker Compose","level":"1.4.3","depth":2,"path":"Operator/Step_by_Step_Setup_Docker.md","ref":"Operator/Step_by_Step_Setup_Docker.md","articles":[]},"previous":{"title":"Login and Accounts","level":"1.4.1","depth":2,"path":"Operator/Login.md","ref":"Operator/Login.md","articles":[]},"dir":"ltr"},"config":{"gitbook":"*","theme":"default","variables":{},"plugins":[],"pluginsConfig":{"highlight":{},"search":{},"lunr":{"maxIndexSize":1000000,"ignoreSpecialCharacters":false},"fontsettings":{"theme":"white","family":"sans","size":2},"theme-default":{"styles":{"website":"styles/website.css","pdf":"styles/pdf.css","epub":"styles/epub.css","mobi":"styles/mobi.css","ebook":"styles/ebook.css","print":"styles/print.css"},"showLevel":false}},"structure":{"langs":"LANGS.md","readme":"README.md","glossary":"GLOSSARY.md","summary":"SUMMARY.md"},"pdf":{"pageNumbers":true,"fontSize":12,"fontFamily":"Arial","paperSize":"a4","chapterMark":"pagebreak","pageBreaksBefore":"/","margin":{"right":62,"left":62,"top":56,"bottom":56},"embedFonts":false},"styles":{"website":"styles/website.css","pdf":"styles/pdf.css","epub":"styles/epub.css","mobi":"styles/mobi.css","ebook":"styles/ebook.css","print":"styles/print.css"}},"file":{"path":"Operator/Step_by_Step_Setup.md","mtime":"2026-03-13T13:09:38.375Z","type":"markdown"},"gitbook":{"version":"4.0.8","time":"2026-03-13T13:09:47.353Z"},"basePath":"..","book":{"language":""}});
         });
     </script>
 </div>

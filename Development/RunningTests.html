@@ -6,7 +6,7 @@
         <title>Testing · HonKit</title>
         <meta http-equiv="X-UA-Compatible" content="IE=edge" />
         <meta name="description" content="">
-        <meta name="generator" content="HonKit 4.0.4">
+        <meta name="generator" content="HonKit 4.0.8">
         
         
         
@@ -499,19 +499,19 @@
 <h2 id="set-up">Set up</h2>
 <p>In the <code>test/config/settings.json</code> file, you should have the following fields:</p>
 <pre><code>{
-    &quot;baseURL&quot;: &quot;http://localhost:3000/&quot;,
-    &quot;apiPrefix&quot;: &quot;api/v2/&quot;,
-    &quot;users&quot;: {
-        &quot;admin&quot;: {
-            &quot;username&quot;: &quot;&lt;USER&gt;&quot;,
-            &quot;password&quot;: &quot;&lt;PWD&gt;&quot;,
-            &quot;login&quot;: &quot;api/v2/Users/login&quot;
+    "baseURL": "http://localhost:3000/",
+    "apiPrefix": "api/v2/",
+    "users": {
+        "admin": {
+            "username": "&lt;USER&gt;",
+            "password": "&lt;PWD&gt;",
+            "login": "api/v2/Users/login"
 
         },
-        &quot;user&quot;: {
-            &quot;username&quot;: &quot;&lt;USER&gt;&quot;,
-            &quot;password&quot;: &quot;&lt;PWD&gt;&quot;,
-            &quot;login&quot;:&quot;auth/msad&quot;
+        "user": {
+            "username": "&lt;USER&gt;",
+            "password": "&lt;PWD&gt;",
+            "login":"auth/msad"
         },
     },
 }
@@ -520,10 +520,10 @@
 <h3 id="simple-tests">Simple Tests</h3>
 <p>For simple tests, you can add it to the <code>test/config/tests.json</code> file. Each entry should have the following syntax:</p>
 <pre><code>{
-    &quot;method&quot;: &quot;GET&quot;,
-    &quot;route&quot;: &quot;Datasets?filter=%7B%22limit%22%3A10%7D&quot;,
-    &quot;expect&quot;: 200,
-    &quot;authenticate&quot;: &quot;admin&quot;
+    "method": "GET",
+    "route": "Datasets?filter=%7B%22limit%22%3A10%7D",
+    "expect": 200,
+    "authenticate": "admin"
 }
 </code></pre><p>Authenticate can be user or admin, depending on the type of account you have specified.</p>
 <p>If you include a <code>body</code> property, then that will be sent with the request.</p>
@@ -573,7 +573,7 @@
     <script>
         var gitbook = gitbook || [];
         gitbook.push(function() {
-            gitbook.page.hasChanged({"page":{"title":"Testing","level":"1.5.3","depth":2,"next":{"title":"Contributing","level":"1.5.4","depth":2,"path":"Development/Contributing.md","ref":"Development/Contributing.md","articles":[]},"previous":{"title":"Local Development","level":"1.5.2","depth":2,"path":"Development/LocalDevelopment.md","ref":"Development/LocalDevelopment.md","articles":[]},"dir":"ltr"},"config":{"gitbook":"*","theme":"default","variables":{},"plugins":[],"pluginsConfig":{"highlight":{},"search":{},"lunr":{"maxIndexSize":1000000,"ignoreSpecialCharacters":false},"fontsettings":{"theme":"white","family":"sans","size":2},"theme-default":{"styles":{"website":"styles/website.css","pdf":"styles/pdf.css","epub":"styles/epub.css","mobi":"styles/mobi.css","ebook":"styles/ebook.css","print":"styles/print.css"},"showLevel":false}},"structure":{"langs":"LANGS.md","readme":"README.md","glossary":"GLOSSARY.md","summary":"SUMMARY.md"},"pdf":{"pageNumbers":true,"fontSize":12,"fontFamily":"Arial","paperSize":"a4","chapterMark":"pagebreak","pageBreaksBefore":"/","margin":{"right":62,"left":62,"top":56,"bottom":56},"embedFonts":false},"styles":{"website":"styles/website.css","pdf":"styles/pdf.css","epub":"styles/epub.css","mobi":"styles/mobi.css","ebook":"styles/ebook.css","print":"styles/print.css"}},"file":{"path":"Development/RunningTests.md","mtime":"2025-12-05T13:31:31.158Z","type":"markdown"},"gitbook":{"version":"4.0.4","time":"2025-12-05T13:31:44.231Z"},"basePath":"..","book":{"language":""}});
+            gitbook.page.hasChanged({"page":{"title":"Testing","level":"1.5.3","depth":2,"next":{"title":"Contributing","level":"1.5.4","depth":2,"path":"Development/Contributing.md","ref":"Development/Contributing.md","articles":[]},"previous":{"title":"Local Development","level":"1.5.2","depth":2,"path":"Development/LocalDevelopment.md","ref":"Development/LocalDevelopment.md","articles":[]},"dir":"ltr"},"config":{"gitbook":"*","theme":"default","variables":{},"plugins":[],"pluginsConfig":{"highlight":{},"search":{},"lunr":{"maxIndexSize":1000000,"ignoreSpecialCharacters":false},"fontsettings":{"theme":"white","family":"sans","size":2},"theme-default":{"styles":{"website":"styles/website.css","pdf":"styles/pdf.css","epub":"styles/epub.css","mobi":"styles/mobi.css","ebook":"styles/ebook.css","print":"styles/print.css"},"showLevel":false}},"structure":{"langs":"LANGS.md","readme":"README.md","glossary":"GLOSSARY.md","summary":"SUMMARY.md"},"pdf":{"pageNumbers":true,"fontSize":12,"fontFamily":"Arial","paperSize":"a4","chapterMark":"pagebreak","pageBreaksBefore":"/","margin":{"right":62,"left":62,"top":56,"bottom":56},"embedFonts":false},"styles":{"website":"styles/website.css","pdf":"styles/pdf.css","epub":"styles/epub.css","mobi":"styles/mobi.css","ebook":"styles/ebook.css","print":"styles/print.css"}},"file":{"path":"Development/RunningTests.md","mtime":"2026-03-13T13:09:38.374Z","type":"markdown"},"gitbook":{"version":"4.0.8","time":"2026-03-13T13:09:47.353Z"},"basePath":"..","book":{"language":""}});
         });
     </script>
 </div>
