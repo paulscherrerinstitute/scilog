@@ -76,7 +76,7 @@
     "puppeteer": "19.11.1",
     "ro-crate": "3.6.1",
     "ro-crate-html": "0.1.6",
-    "tar": "6.2.1",
+    "tar": "7.5.11",
     "tslib": "2.0.0"
   },
   "devDependencies": {
