@@ -1,3 +1,10 @@
+## [2.1.8](https://github.com/paulscherrerinstitute/scilog/compare/v2.1.7...v2.1.8) (2026-03-17)
+
+
+### Bug Fixes
+
+* **deps:** update dependency pm2 to v6 ([90fa41d](https://github.com/paulscherrerinstitute/scilog/commit/90fa41d28cc05618fca6062f26d9abc61763988f))
+
 ## [2.1.7](https://github.com/paulscherrerinstitute/scilog/compare/v2.1.6...v2.1.7) (2026-03-17)
 
 
