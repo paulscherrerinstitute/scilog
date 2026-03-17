@@ -73,7 +73,7 @@
     "pdf-merger-js": "4.3.1",
     "pm2": "4.5.6",
     "prismjs": "1.30.0",
-    "puppeteer": "19.11.1",
+    "puppeteer": "24.39.1",
     "ro-crate": "3.6.1",
     "ro-crate-html": "0.1.6",
     "tar": "7.5.11",
