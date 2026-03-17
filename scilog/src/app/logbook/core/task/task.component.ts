@@ -14,7 +14,6 @@ import { Output, EventEmitter } from '@angular/core';
 import { MatFormField } from '@angular/material/form-field';
 import { MatInput } from '@angular/material/input';
 
-
 @Component({
   selector: 'app-task',
   templateUrl: './task.component.html',
@@ -34,12 +33,11 @@ import { MatInput } from '@angular/material/input';
     FormsModule,
     MatFormField,
     MatInput,
-  ]
+  ],
 })
 export class TaskComponent implements OnInit {
   @Input()
   task: Tasks;
-
 
   // Expand / collapse
   isExpanded = false;
@@ -54,7 +52,7 @@ export class TaskComponent implements OnInit {
 
   constructor(
     private tasksService: TasksService,
-    protected isActionAllowed: IsAllowedService
+    protected isActionAllowed: IsAllowedService,
   ) {}
 
   ngOnInit(): void {
@@ -71,11 +69,10 @@ export class TaskComponent implements OnInit {
   }
 
   // Delete
- async deleteTask() {
-  await this.tasksService.deleteTask(this.task.id);
-  this.taskDeleted.emit();
-}
-
+  async deleteTask() {
+    await this.tasksService.deleteTask(this.task.id);
+    this.taskDeleted.emit();
+  }
 
   // Expand / collapse
   toggleExpand() {
@@ -102,7 +99,7 @@ export class TaskComponent implements OnInit {
     const payload: Tasks = {
       content: this.newSubtask,
       parentId: this.task.id,
-      isDone: false
+      isDone: false,
     } as Tasks;
 
     await this.tasksService.addTask(payload);

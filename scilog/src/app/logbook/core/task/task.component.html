@@ -1,83 +1,71 @@
 <div>
-<mat-card appearance="outlined" class="task-mat-card">
-  <mat-card-content class="task-content">
+  <mat-card appearance="outlined" class="task-mat-card">
+    <mat-card-content class="task-content">
+      <!-- Expand / Collapse Arrow -->
+      <button mat-icon-button *ngIf="taskHasChildren" (click)="toggleExpand()">
+        <mat-icon>
+          {{ isExpanded ? 'expand_more' : 'chevron_right' }}
+        </mat-icon>
+      </button>
 
-    <!-- Expand / Collapse Arrow -->
-    <button
-      mat-icon-button
-      *ngIf="taskHasChildren"
-      (click)="toggleExpand()">
+      <!-- Checkbox -->
+      <mat-checkbox
+        (change)="toggleTaskIsDone()"
+        [checked]="task.isDone"
+        [disabled]="isActionAllowed.tooltips.update"
+        matTooltip="{{ isActionAllowed.tooltips.update }}"
+      >
+      </mat-checkbox>
 
-      <mat-icon>
-        {{ isExpanded ? 'expand_more' : 'chevron_right' }}
-      </mat-icon>
+      <!-- Task Text -->
+      <span
+        [ngStyle]="{
+          'text-decoration': task.isDone ? 'line-through' : 'none',
+          opacity: task.isDone ? '0.6' : '1',
+        }"
+        class="task-text"
+      >
+        {{ task.content }}
+      </span>
 
-    </button>
+      <span class="flexExpand"></span>
 
-    <!-- Checkbox -->
-    <mat-checkbox
-      (change)="toggleTaskIsDone()"
-      [checked]="task.isDone"
-      [disabled]="isActionAllowed.tooltips.update"
-      matTooltip="{{ isActionAllowed.tooltips.update }}">
-    </mat-checkbox>
+      <!-- Add Subtask -->
+      <button mat-icon-button (click)="toggleSubtaskInput()">
+        <mat-icon>add</mat-icon>
+      </button>
 
-    <!-- Task Text -->
-    <span
-      [ngStyle]="{
-        'text-decoration': task.isDone ? 'line-through' : 'none',
-        'opacity': task.isDone ? '0.6' : '1'
-      }"
-      class="task-text">
-      {{ task.content }}
-    </span>
+      <!-- Delete -->
+      <button
+        mat-icon-button
+        (click)="deleteTask()"
+        [disabled]="isActionAllowed.tooltips.delete"
+        matTooltip="{{ isActionAllowed.tooltips.delete }}"
+      >
+        <mat-icon>delete</mat-icon>
+      </button>
+    </mat-card-content>
 
-    <span class="flexExpand"></span>
+    <!-- Subtask Input -->
+    <div class="subtask-input" *ngIf="showSubtaskInput">
+      <mat-form-field appearance="outline" class="subtask-field">
+        <input
+          matInput
+          placeholder="Add subtask"
+          [(ngModel)]="newSubtask"
+          (keydown.enter)="addSubtask()"
+        />
+      </mat-form-field>
 
-    <!-- Add Subtask -->
-    <button mat-icon-button (click)="toggleSubtaskInput()">
-      <mat-icon>add</mat-icon>
-    </button>
+      <button mat-icon-button color="primary" (click)="addSubtask()">
+        <mat-icon>check</mat-icon>
+      </button>
+    </div>
 
-    <!-- Delete -->
-    <button
-      mat-icon-button
-      (click)="deleteTask()"
-      [disabled]="isActionAllowed.tooltips.delete"
-      matTooltip="{{ isActionAllowed.tooltips.delete }}">
-      <mat-icon>delete</mat-icon>
-    </button>
-
-  </mat-card-content>
-
-  <!-- Subtask Input -->
-  <div class="subtask-input" *ngIf="showSubtaskInput">
-
-    <mat-form-field appearance="outline" class="subtask-field">
-      <input
-        matInput
-        placeholder="Add subtask"
-        [(ngModel)]="newSubtask"
-        (keydown.enter)="addSubtask()" />
-    </mat-form-field>
-
-    <button mat-icon-button color="primary" (click)="addSubtask()">
-      <mat-icon>check</mat-icon>
-    </button>
-
-  </div>
-
-  <!-- Subtasks -->
- <div class="subtasks" *ngIf="isExpanded && subtasks.length > 0">
-  <app-task
-    *ngFor="let sub of subtasks"
-    [task]="sub"
-    (taskDeleted)="loadSubtasks()">
-  </app-task>
-</div>
-
-</mat-card>
-
-
-
+    <!-- Subtasks -->
+    <div class="subtasks" *ngIf="isExpanded && subtasks.length > 0">
+      <app-task *ngFor="let sub of subtasks" [task]="sub" (taskDeleted)="loadSubtasks()">
+      </app-task>
+    </div>
+  </mat-card>
 </div>
