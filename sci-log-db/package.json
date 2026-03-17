@@ -71,7 +71,7 @@
     "multer": "2.1.1",
     "passport-openidconnect": "0.1.2",
     "pdf-merger-js": "4.3.1",
-    "pm2": "4.5.6",
+    "pm2": "6.0.14",
     "prismjs": "1.30.0",
     "puppeteer": "24.39.1",
     "ro-crate": "3.6.1",
