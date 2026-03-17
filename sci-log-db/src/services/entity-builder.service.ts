@@ -60,7 +60,16 @@ export class EntityBuilderService {
   }
 
   buildFileEntity(snippetId: string, fileObj: Filesnippet) {
-    const result: Record<string, unknown> = {
+    const result: {
+      // eslint-disable-next-line @typescript-eslint/naming-convention
+      '@id': string;
+      // eslint-disable-next-line @typescript-eslint/naming-convention
+      '@type': string;
+      name: string;
+      encodingFormat: string;
+      contentSize?: number;
+      sha256?: string;
+    } = {
       '@id': this.getFilePath(
         snippetId,
         fileObj._fileId,
@@ -70,10 +79,10 @@ export class EntityBuilderService {
       name: fileObj.filename ?? `${fileObj._fileId}.${fileObj.fileExtension}`,
       encodingFormat: fileObj.contentType,
     };
-    if (fileObj.contentSize) {
+    if (fileObj.contentSize !== undefined) {
       result['contentSize'] = fileObj.contentSize;
     }
-    if (fileObj.contentSha256) {
+    if (fileObj.contentSha256 !== undefined) {
       result['sha256'] = fileObj.contentSha256;
     }
     return result;

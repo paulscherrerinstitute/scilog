@@ -40,7 +40,7 @@ import {
   STORAGE_DIRECTORY,
 } from './keys';
 import {User} from './models';
-import {ParagraphRepository} from './repositories';
+import {FileRepository, ParagraphRepository} from './repositories';
 import {MySequence} from './sequence';
 import {BcryptHasher} from './services/hash.password.bcryptjs';
 import {JWTService} from './services/jwt-service';
@@ -232,6 +232,9 @@ export class SciLogDbApplication extends BootMixin(
   async migrateSchema(options?: SchemaMigrationOptions): Promise<void> {
     const paragraphRepo = await this.getRepository(ParagraphRepository);
     await paragraphRepo.migrateHtmlTexcontent();
+
+    const fileRepo = await this.getRepository(FileRepository);
+    await fileRepo.migrateFileMetadata();
 
     const createFunctionalAccountsObserver: CreateFunctionalAccountsObserver =
       await this.get('lifeCycleObservers.CreateFunctionalAccountsObserver');
