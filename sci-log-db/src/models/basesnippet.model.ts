@@ -147,14 +147,13 @@ export class Basesnippet extends Entity {
     index: true,
   })
   tags?: string[];
-  
-  @property({
-  type: 'number',
-  description: 'Importance level of snippet (1–5)',
-  index: true,
-})
-importance?: number;
 
+  @property({
+    type: 'number',
+    description: 'Importance level of snippet (1–5)',
+    index: true,
+  })
+  importance?: number;
 
   @property({
     type: 'string',
