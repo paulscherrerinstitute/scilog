@@ -1,3 +1,10 @@
+## [2.1.9](https://github.com/paulscherrerinstitute/scilog/compare/v2.1.8...v2.1.9) (2026-03-17)
+
+
+### Bug Fixes
+
+* **deps:** update dependency jsdom to v29 ([7ed7088](https://github.com/paulscherrerinstitute/scilog/commit/7ed70884e1f87ee138285b45975044ea11815d25))
+
 ## [2.1.8](https://github.com/paulscherrerinstitute/scilog/compare/v2.1.7...v2.1.8) (2026-03-17)
 
 
