@@ -1,3 +1,10 @@
+## [2.1.6](https://github.com/paulscherrerinstitute/scilog/compare/v2.1.5...v2.1.6) (2026-03-17)
+
+
+### Bug Fixes
+
+* **deps:** upgrade tar to v7.5.11 ([0fd4116](https://github.com/paulscherrerinstitute/scilog/commit/0fd41165318130f9c8b8893b9d47b86e60faead1)), closes [microsoft/TypeScript#21745](https://github.com/microsoft/TypeScript/issues/21745)
+
 ## [2.1.5](https://github.com/paulscherrerinstitute/scilog/compare/v2.1.4...v2.1.5) (2026-03-12)
 
 
