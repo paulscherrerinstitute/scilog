@@ -9,7 +9,6 @@ import PDFMerger from 'pdf-merger-js';
 import puppeteer from 'puppeteer';
 import fspromise from 'fs/promises';
 import fs from 'fs';
-import tar from 'tar';
 
 describe('Export service unit', function (this: Suite) {
   let tests: string[] | string[][];
@@ -399,7 +398,9 @@ describe('Export service unit', function (this: Suite) {
     it(`zipAttachments ${i}`, async () => {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       exportService.attachments = t.input as any;
-      const tarSpy = sandbox.stub(tar, 'create');
+      const tarSpy = sandbox.stub();
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      exportService.createTar = tarSpy as any;
       sandbox.stub(fs, 'mkdirSync');
 
       const downloadAttachmentSpy = sandbox.stub(
