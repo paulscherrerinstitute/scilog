@@ -18,10 +18,19 @@ import { AddContentService } from '@shared/add-content.service';
 import { MatIconModule } from '@angular/material/icon';
 
 @Component({
-    selector: 'app-todos',
-    templateUrl: './todos.component.html',
-    styleUrls: ['./todos.component.scss'],
-    imports: [NgIf, MatFormField, MatInput, FormsModule, NgFor, TaskComponent,MatCardModule,MatIconModule]
+  selector: 'app-todos',
+  templateUrl: './todos.component.html',
+  styleUrls: ['./todos.component.scss'],
+  imports: [
+    NgIf,
+    MatFormField,
+    MatInput,
+    FormsModule,
+    NgFor,
+    TaskComponent,
+    MatCardModule,
+    MatIconModule,
+  ],
 })
 export class TodosComponent implements OnInit, OnDestroy {
   @Input()
@@ -39,68 +48,64 @@ export class TodosComponent implements OnInit, OnDestroy {
     private logbookInfo: LogbookInfoService,
     private notificationService: ChangeStreamService,
 
-     private addContentService: AddContentService,
-    private views: ViewsService) {
-    console.log("constructor called")
+    private addContentService: AddContentService,
+    private views: ViewsService,
+  ) {
+    console.log('constructor called');
   }
 
+  async buildTaskTree(task: Tasks, level: number = 0): Promise<string> {
+    const indent = '&nbsp;'.repeat(level * 4);
 
-async buildTaskTree(task: Tasks, level: number = 0): Promise<string> {
+    // ✅ Green tick for completed tasks
+    const statusIcon = task.isDone
+      ? '✅' // done
+      : '⬜'; // not done
 
-  const indent = '&nbsp;'.repeat(level * 4);
+    let html = `${indent}${statusIcon} ${task.content}<br>`;
 
-  // ✅ Green tick for completed tasks
-  const statusIcon = task.isDone
-    ? '✅'   // done
-    : '⬜';  // not done
+    const children = await this.tasksService.getTasksByParent(task.id);
 
-  let html = `${indent}${statusIcon} ${task.content}<br>`;
+    for (const child of children) {
+      html += await this.buildTaskTree(child, level + 1);
+    }
 
-  const children = await this.tasksService.getTasksByParent(task.id);
-
-  for (const child of children) {
-    html += await this.buildTaskTree(child, level + 1);
+    return html;
   }
 
-  return html;
-}
+  async exportTasksToLogbook() {
+    if (!this.tasks?.length) return;
 
+    let bulletHTML = '';
 
-async exportTasksToLogbook() {
+    for (const task of this.tasks) {
+      bulletHTML += await this.buildTaskTree(task);
+      bulletHTML += '<br>';
+    }
 
-  if (!this.tasks?.length) return;
+    const notification: any = {
+      ownerGroup: this.logbookInfo.logbookInfo.ownerGroup,
+      accessGroups: this.logbookInfo.logbookInfo.accessGroups,
+      isPrivate: this.logbookInfo.logbookInfo.isPrivate,
 
-  let bulletHTML = '';
+      snippetType: 'paragraph',
+      parentId: this.logbookInfo.logbookInfo.id,
+      linkType: 'paragraph',
 
-  for (const task of this.tasks) {
-    bulletHTML += await this.buildTaskTree(task);
-    bulletHTML += '<br>';
-  }
+      // ✅ Removed importance
+      tags: [],
+      id_session: localStorage.getItem('id_session'),
 
-  const notification: any = {
-    ownerGroup: this.logbookInfo.logbookInfo.ownerGroup,
-    accessGroups: this.logbookInfo.logbookInfo.accessGroups,
-    isPrivate: this.logbookInfo.logbookInfo.isPrivate,
-
-    snippetType: "paragraph",
-    parentId: this.logbookInfo.logbookInfo.id,
-    linkType: "paragraph",
-
-    // ✅ Removed importance
-    tags: [],
-    id_session: localStorage.getItem('id_session'),
-
-    textcontent: `
+      textcontent: `
       <p><strong>Tasks</strong></p>
       <p>${bulletHTML}</p>
-    `
-  };
+    `,
+    };
 
-  console.log("✅ CLEAN TASK EXPORT:", notification);
+    console.log('✅ CLEAN TASK EXPORT:', notification);
 
-  (this.addContentService as any).messageSource.next(notification);
-}
-
+    (this.addContentService as any).messageSource.next(notification);
+  }
 
   ngOnInit(): void {
     // get TODOs from server

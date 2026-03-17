@@ -17,14 +17,7 @@
 </mat-form-field>
 
 <mat-card appearance="outlined" class="task-list-card">
-
   <mat-card-content class="task-list-content">
-
-    <app-task
-      *ngFor="let task of tasks"
-      [task]="task">
-    </app-task>
-
+    <app-task *ngFor="let task of tasks" [task]="task"> </app-task>
   </mat-card-content>
 </mat-card>
-

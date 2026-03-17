@@ -113,8 +113,8 @@ export class DashboardItemComponent implements OnInit, ComponentCanDeactivate, O
   }
 
   exportTasksFromHeader() {
-  this.todosChild?.exportTasksToLogbook();
-}
+    this.todosChild?.exportTasksToLogbook();
+  }
   async openPreferences() {
     const dialogConfig = new MatDialogConfig();
     dialogConfig.autoFocus = false;
