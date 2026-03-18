@@ -1,3 +1,31 @@
+## [2.1.9](https://github.com/paulscherrerinstitute/scilog/compare/v2.1.8...v2.1.9) (2026-03-17)
+
+
+### Bug Fixes
+
+* **deps:** update dependency jsdom to v29 ([7ed7088](https://github.com/paulscherrerinstitute/scilog/commit/7ed70884e1f87ee138285b45975044ea11815d25))
+
+## [2.1.8](https://github.com/paulscherrerinstitute/scilog/compare/v2.1.7...v2.1.8) (2026-03-17)
+
+
+### Bug Fixes
+
+* **deps:** update dependency pm2 to v6 ([90fa41d](https://github.com/paulscherrerinstitute/scilog/commit/90fa41d28cc05618fca6062f26d9abc61763988f))
+
+## [2.1.7](https://github.com/paulscherrerinstitute/scilog/compare/v2.1.6...v2.1.7) (2026-03-17)
+
+
+### Bug Fixes
+
+* **deps:** update dependency puppeteer to v24 ([15dcfed](https://github.com/paulscherrerinstitute/scilog/commit/15dcfed78c634c6c66e7d6209faa30f2adab39d7))
+
+## [2.1.6](https://github.com/paulscherrerinstitute/scilog/compare/v2.1.5...v2.1.6) (2026-03-17)
+
+
+### Bug Fixes
+
+* **deps:** upgrade tar to v7.5.11 ([0fd4116](https://github.com/paulscherrerinstitute/scilog/commit/0fd41165318130f9c8b8893b9d47b86e60faead1)), closes [microsoft/TypeScript#21745](https://github.com/microsoft/TypeScript/issues/21745)
+
 ## [2.1.5](https://github.com/paulscherrerinstitute/scilog/compare/v2.1.4...v2.1.5) (2026-03-12)
 
 

@@ -37,6 +37,7 @@ export class ExportService {
   attachments: string[][] = [];
   attachmentsFolder = 'attachments';
   authorizationHeader: {authorization?: string};
+  createTar = tarCreate;
 
   constructor(
     @inject(RestBindings.SERVER)
@@ -335,10 +336,10 @@ export class ExportService {
       this.attachments.map(downloadAttachmentDestinationBinding),
     );
     const exportZip = `${exportPath.exportDir}.gz`;
-    await tarCreate({gzip: true, file: exportZip, C: exportPath.exportDir}, [
-      this.attachmentsFolder,
-      basename(exportPath.exportFile),
-    ]);
+    await this.createTar(
+      {gzip: true, file: exportZip, C: exportPath.exportDir},
+      [this.attachmentsFolder, basename(exportPath.exportFile)],
+    );
     return exportZip;
   }
 

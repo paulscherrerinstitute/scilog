@@ -1,6 +1,6 @@
 {
   "name": "sci-log-db",
-  "version": "2.1.5",
+  "version": "2.1.9",
   "description": "SciLogDB",
   "keywords": [
     "loopback-application",
@@ -65,18 +65,18 @@
     "express-session": "1.19.0",
     "formidable": "2.1.3",
     "isemail": "3.2.0",
-    "jsdom": "16.7.0",
+    "jsdom": "29.0.0",
     "ldapjs-promise": "1.0.7",
     "loopback-connector-mongodb": "5.6.0",
     "multer": "2.1.1",
     "passport-openidconnect": "0.1.2",
     "pdf-merger-js": "4.3.1",
-    "pm2": "4.5.6",
+    "pm2": "6.0.14",
     "prismjs": "1.30.0",
-    "puppeteer": "19.11.1",
+    "puppeteer": "24.39.1",
     "ro-crate": "3.6.1",
     "ro-crate-html": "0.1.6",
-    "tar": "6.2.1",
+    "tar": "7.5.11",
     "tslib": "2.0.0"
   },
   "devDependencies": {
@@ -92,7 +92,6 @@
     "@types/node": "16.18.126",
     "@types/passport": "1.0.17",
     "@types/prismjs": "1.26.6",
-    "@types/tar": "6.1.13",
     "eslint": "8.57.1",
     "source-map-support": "0.5.21",
     "tsc-watch": "5.0.3",
