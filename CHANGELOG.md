@@ -1,3 +1,10 @@
+# [2.2.0](https://github.com/paulscherrerinstitute/scilog/compare/v2.1.9...v2.2.0) (2026-03-19)
+
+
+### Features
+
+* **eln:** add content size and sha256 to file snippet and ro-crate entity ([#514](https://github.com/paulscherrerinstitute/scilog/issues/514)) ([76db6a6](https://github.com/paulscherrerinstitute/scilog/commit/76db6a688ab0abcf83ae21bd12d4966c7c62ff58))
+
 ## [2.1.9](https://github.com/paulscherrerinstitute/scilog/compare/v2.1.8...v2.1.9) (2026-03-17)
 
 
