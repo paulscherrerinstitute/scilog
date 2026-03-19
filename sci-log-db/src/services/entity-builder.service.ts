@@ -60,16 +60,32 @@ export class EntityBuilderService {
   }
 
   buildFileEntity(snippetId: string, fileObj: Filesnippet) {
-    return {
+    const result: {
+      // eslint-disable-next-line @typescript-eslint/naming-convention
+      '@id': string;
+      // eslint-disable-next-line @typescript-eslint/naming-convention
+      '@type': string;
+      name: string;
+      encodingFormat: string;
+      contentSize?: number;
+      sha256?: string;
+    } = {
       '@id': this.getFilePath(
         snippetId,
         fileObj._fileId,
         fileObj.fileExtension,
       ),
       '@type': 'File',
-      name: fileObj.name ?? `${fileObj._fileId}.${fileObj.fileExtension}`,
+      name: fileObj.filename ?? `${fileObj._fileId}.${fileObj.fileExtension}`,
       encodingFormat: fileObj.contentType,
     };
+    if (fileObj.contentSize !== undefined) {
+      result['contentSize'] = fileObj.contentSize;
+    }
+    if (fileObj.contentSha256 !== undefined) {
+      result['sha256'] = fileObj.contentSha256;
+    }
+    return result;
   }
 
   buildLicenseEntity() {
