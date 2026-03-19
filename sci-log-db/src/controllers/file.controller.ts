@@ -136,7 +136,7 @@ export class FileController {
     })
     request: Request,
   ): Promise<Object> {
-    const form = new formidable.IncomingForm();
+    const form = new formidable.IncomingForm({hashAlgorithm: 'sha256'});
     const formData: FormData = await new Promise(function (resolve, reject) {
       // eslint-disable-next-line  @typescript-eslint/no-explicit-any
       form.parse(request, (err: any, fields: any, files: any) => {
@@ -359,7 +359,7 @@ export class FileController {
     })
     request: Request,
   ): Promise<void> {
-    const form = new formidable.IncomingForm();
+    const form = new formidable.IncomingForm({hashAlgorithm: 'sha256'});
     const formData: FormData = await new Promise(function (resolve, reject) {
       // eslint-disable-next-line  @typescript-eslint/no-explicit-any
       form.parse(request, (err: any, fields: any, files: any) => {
@@ -476,6 +476,9 @@ export class FileController {
         .on('finish', async () => {
           formData.fields['_fileId'] = id;
           formData.fields['contentType'] = formData.files.file.mimetype;
+          formData.fields['filename'] = formData.files.file.originalFilename;
+          formData.fields['contentSize'] = formData.files.file.size;
+          formData.fields['contentSha256'] = formData.files.file.hash;
           // eslint-disable-next-line  @typescript-eslint/no-floating-promises
           cb(formData, resolve, reject);
         });

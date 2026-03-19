@@ -3,8 +3,13 @@ import {Suite} from 'mocha';
 import {SciLogDbApplication} from '../..';
 import {clearDatabase, setupApplication} from './test-helper';
 import {createSandbox} from 'sinon';
-import {ParagraphRepository} from '../../repositories';
+import {FileRepository, ParagraphRepository} from '../../repositories';
 import * as util from '../../utils/misc';
+import {Db, GridFSBucket} from 'mongodb';
+const mongodb = require('mongodb');
+import fs from 'fs';
+import {testdb} from '../testdb.datasource';
+import path from 'path';
 
 describe('Migrate', function (this: Suite) {
   this.timeout(5000);
@@ -55,4 +60,47 @@ describe('Migrate', function (this: Suite) {
       ).htmlTextcontent,
     ).to.be.eql('h ♥');
   });
+
+  it('test migrateFileMetadata', async () => {
+    const fileRepo = await app.getRepository(FileRepository);
+    const id = await givenFileSnippet();
+    await fileRepo.migrateFileMetadata();
+    const db: Db = testdb?.connector?.db;
+    const updatedDoc = await db.collection('Basesnippet').findOne({_id: id});
+    expect(updatedDoc).to.have.property('contentSize', 14);
+    expect(updatedDoc).to.have.property(
+      'contentSha256',
+      'c98c24b677eff44860afea6f493bbaec5bb1c4cbb209c6fc2bbb47f66ff2ad31',
+    );
+  });
+
+  async function givenFileSnippet() {
+    const db: Db = testdb?.connector?.db;
+    const bucket: GridFSBucket = new mongodb.GridFSBucket(db);
+    const uploadStream = bucket.openUploadStream('hello.txt');
+    fs.createReadStream(
+      path.resolve(__dirname, '../test-data', 'hello.txt'),
+    ).pipe(uploadStream);
+    await new Promise((resolve, reject) => {
+      uploadStream.on('error', (err: unknown) => {
+        console.error('Error uploading file:', err);
+        reject(err);
+      });
+      uploadStream.on('finish', () => {
+        console.log('File uploaded successfully with id:', uploadStream.id);
+        resolve(undefined);
+      });
+    });
+    try {
+      const doc = await db.collection('Basesnippet').insertOne({
+        snippetType: 'image',
+        _fileId: uploadStream.id,
+      });
+      console.log('File snippet inserted into Basesnippet collection');
+      return doc.insertedId;
+    } catch (error) {
+      console.error('Error inserting file snippet:', error);
+      throw error;
+    }
+  }
 });
