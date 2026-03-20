@@ -417,7 +417,7 @@ class SciLog:
             raise ValueError(
                 "No logbook selected. Please select a logbook before creating a message."
             )
-        msg = lm.LogbookMessage()
+        msg = lm.LogbookMessage(self)
         if text:
             msg.add_text(text)
         return msg

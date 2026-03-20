@@ -16,6 +16,20 @@ def scilog():
     return log
 
 
+def test_new_requires_logbook():
+    log = SciLog("fake_url")
+    with pytest.raises(ValueError, match="No logbook selected"):
+        log.new("hello")
+
+
+def test_new_with_text_sets_content_and_logbook(scilog):
+    msg = scilog.new("hello")
+
+    assert isinstance(msg, LogbookMessage)
+    assert msg._logbook is scilog
+    assert msg._content.textcontent == "<p>hello</p>"
+
+
 def test_send_logbook_message(scilog):
     log = scilog
     msg = LogbookMessage()
