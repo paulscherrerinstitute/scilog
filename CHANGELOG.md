@@ -1,3 +1,10 @@
+## [2.2.1](https://github.com/paulscherrerinstitute/scilog/compare/v2.2.0...v2.2.1) (2026-03-20)
+
+
+### Bug Fixes
+
+* **sdk:** scilog.new forwards parent to LogbookMessage ([#534](https://github.com/paulscherrerinstitute/scilog/issues/534)) ([652deeb](https://github.com/paulscherrerinstitute/scilog/commit/652deeb773a0c04240a11c272deaefda2c12e284))
+
 # [2.2.0](https://github.com/paulscherrerinstitute/scilog/compare/v2.1.9...v2.2.0) (2026-03-19)
 
 
