@@ -1,3 +1,10 @@
+## [2.2.2](https://github.com/paulscherrerinstitute/scilog/compare/v2.2.1...v2.2.2) (2026-03-23)
+
+
+### Bug Fixes
+
+* remove redundant pretest from the test command ([#535](https://github.com/paulscherrerinstitute/scilog/issues/535)) ([2d6f84e](https://github.com/paulscherrerinstitute/scilog/commit/2d6f84e1ca03ccc353eb048f31eec86886c593d2))
+
 ## [2.2.1](https://github.com/paulscherrerinstitute/scilog/compare/v2.2.0...v2.2.1) (2026-03-20)
 
 
