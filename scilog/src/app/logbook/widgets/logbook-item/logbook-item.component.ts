@@ -669,6 +669,7 @@ export class LogbookItemComponent implements OnInit, AfterViewInit, OnDestroy {
       payload.isMessage = true;
       payload.ownerGroup = this.userPreferences.userInfo.username;
     }
+    console.log('FINAL IMPORTANCE SENT:', msg.importance);
     console.log('posting data');
     console.log(payload);
 
@@ -695,6 +696,12 @@ export class LogbookItemComponent implements OnInit, AfterViewInit, OnDestroy {
 
   applyFilters(snippets: Basesnippets[]) {
     return snippets.filter((snippet) => {
+      console.log('FILTER DEBUG:', {
+        snippetTags: snippet.tags,
+        filterTags: this.config.filter.tags,
+        importance: snippet.importance,
+        filterImportance: this.config.filter.importance,
+      });
       let includeSnippet = true;
       if (snippet.linkType && (snippet.linkType == 'comment' || snippet.linkType == 'quote')) {
         return includeSnippet;
