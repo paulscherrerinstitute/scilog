@@ -1,3 +1,10 @@
+# [2.3.0](https://github.com/paulscherrerinstitute/scilog/compare/v2.2.2...v2.3.0) (2026-03-24)
+
+
+### Features
+
+* **sdk:** add support for specifying the image dimensions ([#539](https://github.com/paulscherrerinstitute/scilog/issues/539)) ([78c52ff](https://github.com/paulscherrerinstitute/scilog/commit/78c52ff0ca5fcd75b93f9fbf579e9cbe2920975d))
+
 ## [2.2.2](https://github.com/paulscherrerinstitute/scilog/compare/v2.2.1...v2.2.2) (2026-03-23)
 
 
