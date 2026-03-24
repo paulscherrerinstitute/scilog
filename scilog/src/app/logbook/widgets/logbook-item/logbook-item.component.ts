@@ -51,6 +51,8 @@ import { MatIcon } from '@angular/material/icon';
 import { MatTooltip } from '@angular/material/tooltip';
 import { CKEditorModule } from '@ckeditor/ckeditor5-angular';
 import { TagEditorComponent as TagEditorComponent_1 } from '../../core/tag-editor/tag-editor.component';
+import { FormsModule } from '@angular/forms';
+import { MatRadioModule } from '@angular/material/radio';
 
 @Component({
   selector: 'app-logbook-item',
@@ -127,6 +129,8 @@ import { TagEditorComponent as TagEditorComponent_1 } from '../../core/tag-edito
     CKEditorModule,
     TagEditorComponent_1,
     MatFabButton,
+    FormsModule,
+    MatRadioModule,
   ],
 })
 export class LogbookItemComponent implements OnInit, AfterViewInit, OnDestroy {
@@ -165,6 +169,8 @@ export class LogbookItemComponent implements OnInit, AfterViewInit, OnDestroy {
   modifiedMetadata = false;
   metadataPanelExpanded = false;
   tag: string[] = [];
+  importanceLevels = [1, 2, 3, 4, 5];
+  importance: number = 3; // default value
 
   renderedHeights: number[] = [];
   editorClassRef: any = null;
@@ -297,23 +303,40 @@ export class LogbookItemComponent implements OnInit, AfterViewInit, OnDestroy {
     );
   }
 
+  private currentConfigHash: string;
+
   updateViewSubscription() {
-    // console.log("Config: ", this.config);
     if (this.currentViewSubscription != null) {
       this.currentViewSubscription.unsubscribe();
     }
+
     this.currentViewSubscription = this.views.currentWidgetConfigs.subscribe(async (config) => {
-      // console.log(config[this.configIndex].config);
-      if (config != null) {
-        this.config = config[this.configIndex].config;
+      if (!config || config.length <= this.configIndex) return;
+
+      const newConfig = config[this.configIndex].config;
+      const configHash = JSON.stringify({
+        targetId: newConfig.filter.targetId,
+        additionalLogbooks: newConfig.filter.additionalLogbooks || [],
+        order: newConfig.view.order || [],
+        tags: newConfig.filter.tags || [],
+        excludeTags: newConfig.filter.excludeTags || [],
+        importance: newConfig.filter.importance ?? null,
+      });
+      console.log('CONFIG HASH:', configHash);
+      console.log('IMPORTANCE IN HASH:', newConfig.filter.importance);
+
+      // Only reinitialize if config actually changed
+      if (this.currentConfigHash !== configHash) {
+        this.currentConfigHash = configHash;
+        this.config = newConfig;
         this.isDescending = this.config?.view?.order[0]?.split(' ')?.[1] === 'DESC';
         this.targetId = this.config.filter.targetId;
         this.isReadOnly = this.config.general.readonly;
+
         await this.logbookScrollService.initialize(this.config);
         this.logbookCount = (await this.logbookItemDataService.getCount(this.config)).count;
         this.logbookScrollService.containerRef = this.snippetContainerRef;
-        // console.log(res)
-        this.startNotificationManager();
+        this.startNotificationManager(); // Only runs on real config change
       }
     });
   }
@@ -609,6 +632,7 @@ export class LogbookItemComponent implements OnInit, AfterViewInit, OnDestroy {
       accessGroups: referenceEntry.accessGroups,
       isPrivate: referenceEntry.isPrivate,
       tags: msg.tags,
+      importance: msg.importance,
       snippetType: 'paragraph',
       textcontent: msg.textcontent,
       id_session: localStorage.getItem('id_session'),
@@ -631,6 +655,7 @@ export class LogbookItemComponent implements OnInit, AfterViewInit, OnDestroy {
       accessGroups: referenceEntry.accessGroups,
       isPrivate: referenceEntry.isPrivate,
       tags: msg.tags,
+      importance: msg.importance,
       snippetType: 'paragraph',
       linkType: msg.linkType,
       textcontent: msg.textcontent,
@@ -691,6 +716,16 @@ export class LogbookItemComponent implements OnInit, AfterViewInit, OnDestroy {
           }
         });
       }
+
+      if (this.config.filter?.importance?.length > 0) {
+        if (!this.config.filter.importance.includes(Number(snippet.importance))) {
+          console.log('CONFIG IMPORTANCE IN LOGBOOK:', this.config.filter.importance);
+          console.log('IS ARRAY:', Array.isArray(this.config.filter.importance));
+
+          return false;
+        }
+      }
+
       if (!includeSnippet) {
         return includeSnippet;
       }
@@ -941,6 +976,8 @@ export class LogbookItemComponent implements OnInit, AfterViewInit, OnDestroy {
         this.tag = this.childSnippets.last.snippet.tags;
       }
       notification.tags = this.tagEditorRef.tag.map((tag) => tag.name);
+      notification.importance = Number(this.importance ?? 3);
+
 
       this.submitContent(notification);
       console.log(notification);
