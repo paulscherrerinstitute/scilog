@@ -23,7 +23,7 @@ import {
   RestBindings,
 } from '@loopback/rest';
 import {SecurityBindings, UserProfile} from '@loopback/security';
-import {formidable} from 'formidable';
+import {formidable, File} from 'formidable';
 import fs from 'fs';
 import _ from 'lodash';
 import {STORAGE_DIRECTORY} from '../keys';
@@ -48,8 +48,7 @@ const getModelSchemaRef = getModelSchemaRefWithStrict;
 
 interface FormData {
   fields: Filesnippet;
-  // eslint-disable-next-line  @typescript-eslint/no-explicit-any
-  files: any;
+  files: {file: File};
 }
 
 const formDataSchema = {
@@ -138,8 +137,7 @@ export class FileController {
   ): Promise<Object> {
     const form = formidable({hashAlgorithm: 'sha256'});
     const formData: FormData = await new Promise(function (resolve, reject) {
-      // eslint-disable-next-line  @typescript-eslint/no-explicit-any
-      form.parse(request, (err: any, fields: any, files: any) => {
+      form.parse(request, (err, fields, files) => {
         if (err) {
           reject(err);
           return;
@@ -149,7 +147,7 @@ export class FileController {
           reject(error);
           return error;
         }
-        const parsedFields = JSON.parse(fields?.fields?.[0] || '{}');
+        const parsedFields = JSON.parse(fields?.fields?.[0] ?? '{}');
         validateFieldsVSModel(
           parsedFields,
           ownerGroupAccessGroupsFilesnippetModel,
@@ -361,8 +359,7 @@ export class FileController {
   ): Promise<void> {
     const form = formidable({hashAlgorithm: 'sha256'});
     const formData: FormData = await new Promise(function (resolve, reject) {
-      // eslint-disable-next-line  @typescript-eslint/no-explicit-any
-      form.parse(request, (err: any, fields: any, files: any) => {
+      form.parse(request, (err, fields, files) => {
         if (err) {
           reject(err);
           return;
@@ -372,7 +369,7 @@ export class FileController {
           reject(error);
           return error;
         }
-        const parsedFields = JSON.parse(fields?.fields?.[0] || '{}');
+        const parsedFields = JSON.parse(fields?.fields?.[0] ?? '{}');
         validateFieldsVSModel(
           parsedFields,
           ownerGroupAccessGroupsFilesnippetModel,
@@ -475,10 +472,10 @@ export class FileController {
         })
         .on('finish', async () => {
           formData.fields['_fileId'] = id;
-          formData.fields['contentType'] = formData.files.file.mimetype;
-          formData.fields['filename'] = formData.files.file.originalFilename;
+          formData.fields['contentType'] = formData.files.file.mimetype!;
+          formData.fields['filename'] = formData.files.file.originalFilename!;
           formData.fields['contentSize'] = formData.files.file.size;
-          formData.fields['contentSha256'] = formData.files.file.hash;
+          formData.fields['contentSha256'] = formData.files.file.hash!;
           // eslint-disable-next-line  @typescript-eslint/no-floating-promises
           cb(formData, resolve, reject);
         });
