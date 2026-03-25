@@ -23,7 +23,7 @@ import {
   RestBindings,
 } from '@loopback/rest';
 import {SecurityBindings, UserProfile} from '@loopback/security';
-import formidable from 'formidable';
+import {formidable} from 'formidable';
 import fs from 'fs';
 import _ from 'lodash';
 import {STORAGE_DIRECTORY} from '../keys';
@@ -136,7 +136,7 @@ export class FileController {
     })
     request: Request,
   ): Promise<Object> {
-    const form = new formidable.IncomingForm({hashAlgorithm: 'sha256'});
+    const form = formidable({hashAlgorithm: 'sha256'});
     const formData: FormData = await new Promise(function (resolve, reject) {
       // eslint-disable-next-line  @typescript-eslint/no-explicit-any
       form.parse(request, (err: any, fields: any, files: any) => {
@@ -144,18 +144,18 @@ export class FileController {
           reject(err);
           return;
         }
-        if (!files.file) {
+        if (!files.file?.[0]) {
           const error = new MissingFileError();
           reject(error);
           return error;
         }
-        const parsedFields = JSON.parse(fields?.fields || '{}');
+        const parsedFields = JSON.parse(fields?.fields?.[0] || '{}');
         validateFieldsVSModel(
           parsedFields,
           ownerGroupAccessGroupsFilesnippetModel,
           reject,
         );
-        resolve({fields: parsedFields, files: files});
+        resolve({fields: parsedFields, files: {file: files.file[0]}});
       });
     });
     return this.uploadToGridfs(formData, async (fm, resolve, reject) => {
@@ -359,7 +359,7 @@ export class FileController {
     })
     request: Request,
   ): Promise<void> {
-    const form = new formidable.IncomingForm({hashAlgorithm: 'sha256'});
+    const form = formidable({hashAlgorithm: 'sha256'});
     const formData: FormData = await new Promise(function (resolve, reject) {
       // eslint-disable-next-line  @typescript-eslint/no-explicit-any
       form.parse(request, (err: any, fields: any, files: any) => {
@@ -367,18 +367,18 @@ export class FileController {
           reject(err);
           return;
         }
-        if (!files.file) {
+        if (!files.file?.[0]) {
           const error = new MissingFileError();
           reject(error);
           return error;
         }
-        const parsedFields = JSON.parse(fields?.fields || '{}');
+        const parsedFields = JSON.parse(fields?.fields?.[0] || '{}');
         validateFieldsVSModel(
           parsedFields,
           ownerGroupAccessGroupsFilesnippetModel,
           reject,
         );
-        resolve({fields: parsedFields, files: files});
+        resolve({fields: parsedFields, files: {file: files.file[0]}});
       });
     });
     return this.uploadToGridfs(formData, async (fm, resolve, reject) => {
