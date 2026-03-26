@@ -366,6 +366,18 @@ export class LogbookItemDataService extends RemoteDataService {
       params: this._prepareParams(config, skip, limit),
     }).toPromise();
   }
+  exportELN(targetId: string): Promise<Blob> {
+    let headers = new HttpHeaders();
+    headers = headers.set('Content-Type', 'application/json');
+
+    console.warn('exportELN not implemented yet');
+
+    return Promise.resolve(
+      new Blob([`ELN export for ${targetId} not implemented yet`], {
+        type: 'text/plain',
+      })
+    );
+  }
 }
 
 @Injectable({
