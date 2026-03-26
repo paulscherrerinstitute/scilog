@@ -12,6 +12,7 @@ import {
 import {
   del,
   get,
+  getModelSchemaRef,
   HttpErrors,
   modelToJsonSchema,
   param,
@@ -29,21 +30,13 @@ import _ from 'lodash';
 import {Filesnippet} from '../models/file.model';
 import {FileRepository} from '../repositories/file.repository';
 import {basicAuthorization} from '../services/basic.authorizor';
-import {
-  addOwnerGroupAccessGroups,
-  getModelSchemaRefWithStrict,
-  validateFieldsVSModel,
-} from '../utils/misc';
+import {validateFieldsVSModel} from '../utils/misc';
 import {OPERATION_SECURITY_SPEC} from '../utils/security-spec';
 
 import * as mongodb from 'mongodb';
 import crypto from 'crypto';
 
-const ownerGroupAccessGroupsFilesnippetModel = modelToJsonSchema(
-  addOwnerGroupAccessGroups(Filesnippet, true),
-);
-
-const getModelSchemaRef = getModelSchemaRefWithStrict;
+const filesnippetModel = modelToJsonSchema(Filesnippet);
 
 interface FormData {
   fields: Partial<Filesnippet>;
@@ -416,13 +409,9 @@ export class FileController {
       throw new MissingFileError();
     }
     const parsedFields = JSON.parse(fields?.fields?.[0] ?? '{}');
-    validateFieldsVSModel(
-      parsedFields,
-      ownerGroupAccessGroupsFilesnippetModel,
-      (err: unknown) => {
-        throw err;
-      },
-    );
+    validateFieldsVSModel(parsedFields, filesnippetModel, (err: unknown) => {
+      throw err;
+    });
     const file = files.file[0];
     const fileSnippet = this.addFormDataToFileSnippet(parsedFields, file);
     return {fields: fileSnippet, file};
