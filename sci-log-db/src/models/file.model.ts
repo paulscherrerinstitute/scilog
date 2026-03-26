@@ -70,6 +70,7 @@ export class Filesnippet extends Basesnippet {
   @property({
     type: 'string',
     description: 'File id of the file',
+    mongodb: {dataType: 'ObjectID'},
   })
   _fileId: string;
 
