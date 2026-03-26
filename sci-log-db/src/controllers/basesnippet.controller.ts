@@ -12,6 +12,7 @@ import {
 import {
   del,
   get,
+  getModelSchemaRef,
   param,
   patch,
   post,
@@ -23,7 +24,6 @@ import {SecurityBindings, UserProfile} from '@loopback/security';
 import {Basesnippet} from '../models';
 import {BasesnippetRepository} from '../repositories';
 import {basicAuthorization} from '../services/basic.authorizor';
-import {getModelSchemaRef} from '../utils/misc';
 import {OPERATION_SECURITY_SPEC} from '../utils/security-spec';
 
 @authenticate('jwt')
