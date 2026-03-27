@@ -1,3 +1,10 @@
+## [2.3.1](https://github.com/paulscherrerinstitute/scilog/compare/v2.3.0...v2.3.1) (2026-03-27)
+
+
+### Bug Fixes
+
+* **deps:** update dependency tar to v7.5.13 ([da6daa3](https://github.com/paulscherrerinstitute/scilog/commit/da6daa3480e139be96c9bfe6d634753681e1269e))
+
 # [2.3.0](https://github.com/paulscherrerinstitute/scilog/compare/v2.2.2...v2.3.0) (2026-03-24)
 
 
