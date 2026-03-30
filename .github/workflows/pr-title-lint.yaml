@@ -1,22 +1,28 @@
-name: Semantic PR Title Validator
+name: Semantic Commit Validator
 
 on:
-  pull_request_target:
+  merge_group:
     types:
-      - opened
-      - edited
-      - reopened
-      - synchronize
-    branches:
-      - main
+      - checks_requested
 
 jobs:
-  main:
-    name: Validate PR title
+  lint:
+    name: Lint Squashed Commit
     runs-on: ubuntu-latest
-    permissions:
-      pull-requests: read
     steps:
-      - uses: amannn/action-semantic-pull-request@v6
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: 24
+          cache: npm
+
+      - name: Install Commitlint
+        run: |
+          npm install --save-dev @commitlint/config-conventional @commitlint/cli
+
+      - name: Validate Last Commit Message
+        run: npx commitlint --from HEAD~1 --to HEAD --verbose
