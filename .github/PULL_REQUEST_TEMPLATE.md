@@ -1,12 +1,13 @@
 <!--
-Follow semantic-release guidelines for the PR title, which is used in the changelog.
+All commits in this PR will be squashed on merge.
+The resulting squashed commit must follow the [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/) standard.
 
-Title should follow the format `<type>(<scope>): <subject>`, where
-- Type is one of: build|chore|ci|docs|feat|fix|perf|refactor|revert|style|test|BREAKING CHANGE
-- Scope (optional) describes the place of the change (eg a particular milestone) and is usually omitted
-- subject should be a non-capitalized one-line description in present imperative tense and not ending with a period
+By default, the PR title serves as the commit’s subject line,
+while the PR description populates the commit body.
 
-See https://github.com/angular/angular.js/blob/master/DEVELOPERS.md#-git-commit-guidelines for more details.
+Please include the "why" behind your changes in the description; 
+this provides essential context for future maintenance and makes
+the codebase easier to evolve over time.
 -->
 
 # Description
