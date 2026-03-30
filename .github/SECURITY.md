@@ -6,7 +6,7 @@ Only the latest version is supported.
 
 ## Reporting a Vulnerability
 
-If you believe you have found a security vulnerability in SciCat, please
+If you believe you have found a security vulnerability in SciLog, please
 
 - ✅ report it to us by creating a
   [security advisory](https://github.com/paulscherrerinstitute/scilog/security/advisories/new).
