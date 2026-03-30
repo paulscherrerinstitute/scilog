@@ -6,7 +6,7 @@ on:
       - checks_requested
 
 jobs:
-  lint:
+  commitlint:
     name: Lint Squashed Commit
     runs-on: ubuntu-latest
     steps:
@@ -25,4 +25,4 @@ jobs:
           npm install --save-dev @commitlint/config-conventional @commitlint/cli
 
       - name: Validate Last Commit Message
-        run: npx commitlint --from HEAD~1 --to HEAD --verbose
+        run: npx commitlint --last --verbose
