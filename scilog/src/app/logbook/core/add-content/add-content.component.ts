@@ -22,8 +22,10 @@ import { CdkScrollable } from '@angular/cdk/scrolling';
 import { CKEditorModule } from '@ckeditor/ckeditor5-angular';
 import { TagEditorComponent } from '../tag-editor/tag-editor.component';
 import { MatTooltip } from '@angular/material/tooltip';
-import { NgIf } from '@angular/common';
+import { NgIf, NgFor } from '@angular/common';
 import { MatButton } from '@angular/material/button';
+import { FormsModule } from '@angular/forms';
+import { MatRadioModule } from '@angular/material/radio';
 
 interface editorDataInput {
   snippet: ChangeStreamNotification;
@@ -45,11 +47,15 @@ interface editorDataInput {
     MatTooltip,
     MatDialogActions,
     NgIf,
+    NgFor,
+    FormsModule,MatRadioModule,
     MatButton,
     MatDialogClose,
   ],
 })
 export class AddContentComponent implements OnInit, OnDestroy {
+  LinkType = LinkType;
+  isSubmitting: boolean = false;
   public Editor = ClassicEditor;
   public editorConfig: any = CKeditorConfig;
 
@@ -64,6 +70,8 @@ export class AddContentComponent implements OnInit, OnDestroy {
   metadataPanelExpanded = false;
   tag: string[] = [];
   defaultTags: string[] = [];
+  importanceLevels = [1, 2, 3, 4, 5];
+  importance: number = 3;
   subsnippets: Basesnippets[] = [];
   subscriptions: Subscription[] = [];
   contentChanged: boolean = false;
@@ -89,6 +97,9 @@ export class AddContentComponent implements OnInit, OnDestroy {
       this.message = data.snippet;
       this.config = data.config;
       this.data = typeof data.content == 'undefined' ? '' : data.content;
+      if (data?.snippet?.importance) {
+        this.importance = data.snippet.importance;
+      }
       if (typeof data.defaultTags != 'undefined') {
         this.tag = data.defaultTags;
       }
@@ -182,6 +193,11 @@ export class AddContentComponent implements OnInit, OnDestroy {
     if (this.liveFeedback) {
       return;
     }
+    if (this.isSubmitting) {
+      return;
+    }
+    this.isSubmitting = true;
+
 
     if (this.editor != undefined) {
       this.data = this.editor.getData();
@@ -190,9 +206,14 @@ export class AddContentComponent implements OnInit, OnDestroy {
       this.notification.snippetType = 'paragraph';
     localStorage.removeItem(`${this.message?.id}_message`);
     localStorage.removeItem(`${this.message?.id}_tags`);
-    if (this.dialogTitle === 'Modify data snippet') return this.sendEditMessage();
+    if (this.dialogTitle === 'Modify data snippet') {
+      this.sendEditMessage();
+      this.isSubmitting = false;
+      return;
+    }
     this.prepareMessage(this.data);
     this.sendMessage();
+    setTimeout(() => this.isSubmitting = false, 1000);
   }
 
   private sendEditMessage() {
@@ -201,6 +222,11 @@ export class AddContentComponent implements OnInit, OnDestroy {
       this.message?.files ? this.message.files : [],
     );
     notification.id = this.notification.id;
+    notification.tags = this.tag;
+
+    if (this.notification.linkType === LinkType.PARAGRAPH) {
+      notification.importance = this.importance;
+    }
     this.sendMessage(notification);
   }
 
@@ -220,6 +246,9 @@ export class AddContentComponent implements OnInit, OnDestroy {
   }
 
   changeChain(data: any = null) {
+    if (this.isSubmitting) {
+      return;
+    }
     if (data) this.data = data;
     if (this.notification.snippetType === 'edit') this.sendMessage();
   }
@@ -248,6 +277,9 @@ export class AddContentComponent implements OnInit, OnDestroy {
       this.notification.textcontent = notification.textcontent;
       this.notification.files = notification.files;
       this.notification.tags = this.tag;
+      if (this.notification.linkType === LinkType.PARAGRAPH) {
+        this.notification.importance = this.importance;
+      }
     } else {
       this.notification.textcontent = '';
     }
