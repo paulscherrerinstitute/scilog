@@ -285,6 +285,9 @@ export class LogbookItemComponent implements OnInit, AfterViewInit, OnDestroy {
     this.updateViewSubscription();
 
     this.scrollToElement();
+    setTimeout(() => {
+      this.scrollOnClickTo('end');
+    }, 300);
   }
 
   private scrollToElement() {
@@ -328,6 +331,7 @@ export class LogbookItemComponent implements OnInit, AfterViewInit, OnDestroy {
       });
       console.log('CONFIG HASH:', configHash);
       console.log('IMPORTANCE IN HASH:', newConfig.filter.importance);
+      
 
       // Only reinitialize if config actually changed
       if (this.currentConfigHash !== configHash) {
