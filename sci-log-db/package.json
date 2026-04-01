@@ -32,9 +32,6 @@
     "prestart": "npm run build",
     "clean": "lb-clean dist *.tsbuildinfo .eslintcache",
     "start": "node -r source-map-support/register .",
-    "stop": "pm2 stop ecosystem.config.js --env production",
-    "logs": "pm2 logs",
-    "delete-pm2": "pm2 delete 0",
     "start-local": "npm run build && node .",
     "start:watch": "tsc-watch --target es2017 --outDir ./dist --onSuccess \"node .\""
   },
@@ -71,7 +68,6 @@
     "multer": "2.1.1",
     "passport-openidconnect": "0.1.2",
     "pdf-merger-js": "4.3.1",
-    "pm2": "6.0.14",
     "prismjs": "1.30.0",
     "puppeteer": "24.39.1",
     "ro-crate": "3.6.1",
