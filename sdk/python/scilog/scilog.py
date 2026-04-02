@@ -308,7 +308,7 @@ class SciLogCore:
 
     @staticmethod
     def prepare_file_content(
-        filepath: str, fsnippet: Filesnippet | None = None
+        filepath: str, fsnippet: Filesnippet | None = None, width: str = "82.25%", height: str = ""
     ) -> Tuple[dict, str]:
         """
         Prepare file content and textcontent for appending to a snippet.
@@ -316,6 +316,8 @@ class SciLogCore:
         Args:
             filepath (str): Path to the file that ought to be prepared
             fsnippet (Filesnippet | None): Optional Filesnippet containing metadata of the file
+            width (str): Optional width for the file display (only relevant for images). Defaults to "82.25%" which corresponds to the default image width in SciLog.
+            height (str): Optional height for the file display (only relevant for images). Defaults to "" which corresponds to the default image height in SciLog.
 
         Returns:
             Tuple[dict, str]: A tuple containing the file information dictionary and the text content string
@@ -335,7 +337,7 @@ class SciLogCore:
                 "fileExtension": f"image/{file_extension}",
                 "fileId": file_id,
                 "accessHash": access_hash,
-                "style": {"width": "82.25%", "height": ""},
+                "style": {"width": width, "height": height},
             }
 
         else:
@@ -417,7 +419,7 @@ class SciLog:
             raise ValueError(
                 "No logbook selected. Please select a logbook before creating a message."
             )
-        msg = lm.LogbookMessage()
+        msg = lm.LogbookMessage(self)
         if text:
             msg.add_text(text)
         return msg
