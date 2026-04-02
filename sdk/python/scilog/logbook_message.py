@@ -46,18 +46,35 @@ class LogbookMessage:
         return self
 
     @typechecked
-    def add_file(self, file_path: str):
+    def add_file(
+        self, file_path: str, width: str | int | None = None, height: str | int | None = None
+    ):
         """Insert a file into the logbook message.
 
         Args:
             file_path (str): Full path to the file that ought to be added.
+            width (str | int | None): Optional width for the file display.
+            height (str | int | None): Optional height for the file display.
 
         Returns:
             LogbookMessage: The current logbook message.
         """
         if not os.path.exists(file_path):
             raise FileNotFoundError(f"File {file_path} could not be found.")
-        file_info, textcontent = SciLogCore.prepare_file_content(file_path)
+
+        def _convert_and_append(key, value: str | int) -> None:
+            if isinstance(value, int):
+                if value <= 0:
+                    raise ValueError(f"{key} must be a positive integer.")
+                value = f"{value}px"
+            dimensions[key] = value
+
+        dimensions = {}
+        if width is not None:
+            _convert_and_append("width", width)
+        if height is not None:
+            _convert_and_append("height", height)
+        file_info, textcontent = SciLogCore.prepare_file_content(file_path, **dimensions)
         if self._content.files:
             self._content.files.append(file_info)
         else:
@@ -70,7 +87,7 @@ class LogbookMessage:
         """Add tags to the logbook message.
 
         Args:
-            tag (List[str]): List of tags.
+            tag (List[str] | str): List of tags or a single tag.
 
         Returns:
             LogbookMessage: The current logbook message.
