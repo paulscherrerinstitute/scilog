@@ -1,3 +1,38 @@
+## [2.3.2](https://github.com/paulscherrerinstitute/scilog/compare/v2.3.1...v2.3.2) (2026-03-27)
+
+
+### Bug Fixes
+
+* **deps:** update dependency jsdom to v29.0.1 ([79f3f9c](https://github.com/paulscherrerinstitute/scilog/commit/79f3f9c38f65041e8c5535e7ac5561751d5dcab5))
+
+## [2.3.1](https://github.com/paulscherrerinstitute/scilog/compare/v2.3.0...v2.3.1) (2026-03-27)
+
+
+### Bug Fixes
+
+* **deps:** update dependency tar to v7.5.13 ([da6daa3](https://github.com/paulscherrerinstitute/scilog/commit/da6daa3480e139be96c9bfe6d634753681e1269e))
+
+# [2.3.0](https://github.com/paulscherrerinstitute/scilog/compare/v2.2.2...v2.3.0) (2026-03-24)
+
+
+### Features
+
+* **sdk:** add support for specifying the image dimensions ([#539](https://github.com/paulscherrerinstitute/scilog/issues/539)) ([78c52ff](https://github.com/paulscherrerinstitute/scilog/commit/78c52ff0ca5fcd75b93f9fbf579e9cbe2920975d))
+
+## [2.2.2](https://github.com/paulscherrerinstitute/scilog/compare/v2.2.1...v2.2.2) (2026-03-23)
+
+
+### Bug Fixes
+
+* remove redundant pretest from the test command ([#535](https://github.com/paulscherrerinstitute/scilog/issues/535)) ([2d6f84e](https://github.com/paulscherrerinstitute/scilog/commit/2d6f84e1ca03ccc353eb048f31eec86886c593d2))
+
+## [2.2.1](https://github.com/paulscherrerinstitute/scilog/compare/v2.2.0...v2.2.1) (2026-03-20)
+
+
+### Bug Fixes
+
+* **sdk:** scilog.new forwards parent to LogbookMessage ([#534](https://github.com/paulscherrerinstitute/scilog/issues/534)) ([652deeb](https://github.com/paulscherrerinstitute/scilog/commit/652deeb773a0c04240a11c272deaefda2c12e284))
+
 # [2.2.0](https://github.com/paulscherrerinstitute/scilog/compare/v2.1.9...v2.2.0) (2026-03-19)
 
 

@@ -84,6 +84,19 @@ export class Basesnippet extends Entity {
   })
   updatedBy: string;
 
+  @property({
+    type: 'string',
+    description: 'Deprecated. Use readACL, updateACL, etc. instead.',
+    jsonSchema: {deprecated: true},
+  })
+  ownerGroup?: string;
+
+  @property.array(String, {
+    description: 'Deprecated. Use readACL, updateACL, etc. instead.',
+    jsonSchema: {deprecated: true},
+  })
+  accessGroups?: string[];
+
   @property.array(String, {
     description: 'groups or users who can create this snippet',
     index: true,
@@ -147,6 +160,13 @@ export class Basesnippet extends Entity {
     index: true,
   })
   tags?: string[];
+
+  @property({
+    type: 'number',
+    description: 'Importance level of snippet (1–5)',
+    index: true,
+  })
+  importance?: number;
 
   @property({
     type: 'string',
