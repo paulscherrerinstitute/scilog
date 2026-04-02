@@ -6,10 +6,17 @@ import {
   repository,
   Where,
 } from '@loopback/repository';
-import {post, param, get, patch, del, requestBody} from '@loopback/rest';
+import {
+  post,
+  param,
+  get,
+  getModelSchemaRef,
+  patch,
+  del,
+  requestBody,
+} from '@loopback/rest';
 import {View} from '../models';
 import {ViewRepository} from '../repositories';
-import {getModelSchemaRef} from '../utils/misc';
 
 export class ViewController {
   constructor(

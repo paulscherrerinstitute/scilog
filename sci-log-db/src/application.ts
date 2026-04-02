@@ -44,6 +44,7 @@ import {FileRepository, ParagraphRepository} from './repositories';
 import {MySequence} from './sequence';
 import {BcryptHasher} from './services/hash.password.bcryptjs';
 import {JWTService} from './services/jwt-service';
+import {DeprecatedSpecEnhancer} from './services/deprecated-spec.enhancer';
 import {SecuritySpecEnhancer} from './services/jwt-spec.enhancer';
 import {MyUserService} from './services/user-service';
 import {startWebsocket} from './utils/websocket';
@@ -160,6 +161,7 @@ export class SciLogDbApplication extends BootMixin(
     this.bind(UserServiceBindings.USER_SERVICE).toClass(MyUserService);
 
     this.add(createBindingFromClass(SecuritySpecEnhancer));
+    this.add(createBindingFromClass(DeprecatedSpecEnhancer));
 
     // Bind datasource config
     this.configureDatasourceFromFile(

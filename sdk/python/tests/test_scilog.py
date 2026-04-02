@@ -16,6 +16,20 @@ def scilog():
     return log
 
 
+def test_new_requires_logbook():
+    log = SciLog("fake_url")
+    with pytest.raises(ValueError, match="No logbook selected"):
+        log.new("hello")
+
+
+def test_new_with_text_sets_content_and_logbook(scilog):
+    msg = scilog.new("hello")
+
+    assert isinstance(msg, LogbookMessage)
+    assert msg._logbook is scilog
+    assert msg._content.textcontent == "<p>hello</p>"
+
+
 def test_send_logbook_message(scilog):
     log = scilog
     msg = LogbookMessage()
@@ -60,6 +74,7 @@ def test_send_logbook_message_with_file(scilog, tmpdir):
     assert "img src" in payload["textcontent"]
     assert payload["files"][0]["fileId"] == "file1"
     assert payload["files"][0]["accessHash"] == "hash1"
+    assert payload["files"][0]["style"] == {"width": "82.25%", "height": ""}
     assert "filepath" not in payload["files"][0]
 
 
@@ -136,6 +151,40 @@ def test_prepare_file_content_image(scilog, filepath, fsnippet):
         textcontent
         == f'<figure class="image image_resized"><img src="" title="{info["fileHash"]}"></figure>'
     )
+
+
+def test_prepare_file_content_image_with_custom_dimensions(scilog):
+    log = scilog
+    info, textcontent = log.core.prepare_file_content(
+        "./test_file.png", width="640", height="480px"
+    )
+
+    assert info["style"] == {"width": "640", "height": "480px"}
+    assert (
+        textcontent
+        == f'<figure class="image image_resized"><img src="" title="{info["fileHash"]}"></figure>'
+    )
+
+
+@pytest.mark.parametrize(
+    "width,height,expected_style",
+    [
+        ("640px", "480px", {"width": "640px", "height": "480px"}),
+        (640, 480, {"width": "640px", "height": "480px"}),
+        (640, "480px", {"width": "640px", "height": "480px"}),
+    ],
+)
+def test_logbook_message_add_file_stores_dimensions(tmpdir, width, height, expected_style):
+    test_file = tmpdir.join("test_file.png")
+    test_file.write("test content")
+
+    msg = LogbookMessage()
+    msg.add_file(str(test_file), width=width, height=height)
+
+    assert msg._content.files is not None
+    assert msg._content.files[0]["filepath"] == str(test_file)
+    assert msg._content.files[0]["style"] == expected_style
+    assert '<figure class="image image_resized"><img src="" title="' in msg._content.textcontent
 
 
 @pytest.mark.parametrize("filepath,fsnippet", [("./test_file.pdf", None)])
