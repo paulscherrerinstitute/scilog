@@ -1,6 +1,6 @@
 {
   "name": "sci-log-db",
-  "version": "2.2.0",
+  "version": "2.3.2",
   "description": "SciLogDB",
   "keywords": [
     "loopback-application",
@@ -21,8 +21,8 @@
     "prettier:fix": "npm run prettier:cli -- --write",
     "eslint": "lb-eslint --report-unused-disable-directives .",
     "eslint:fix": "npm run eslint -- --fix",
-    "pretest": "npm run build && cp -r src/__tests__/test-data dist/__tests__/",
-    "test": "npm run pretest && lb-mocha --allow-console-logs --exit \"dist/__tests__\"",
+    "pretest": "npm run clean && npm run build && cp -r src/__tests__/test-data dist/__tests__/",
+    "test": "lb-mocha --allow-console-logs --exit \"dist/__tests__\"",
     "posttest": "npm run lint",
     "test:dev": "lb-mocha --allow-console-logs dist/__tests__/**/*.js && npm run posttest",
     "docker:build": "docker build -t sci-log-db .",
@@ -63,9 +63,9 @@
     "archiver": "7.0.1",
     "connect-mongo": "4.6.0",
     "express-session": "1.19.0",
-    "formidable": "2.1.3",
+    "formidable": "3.5.4",
     "isemail": "3.2.0",
-    "jsdom": "29.0.0",
+    "jsdom": "29.0.1",
     "ldapjs-promise": "1.0.7",
     "loopback-connector-mongodb": "5.6.0",
     "multer": "2.1.1",
@@ -76,7 +76,7 @@
     "puppeteer": "24.39.1",
     "ro-crate": "3.6.1",
     "ro-crate-html": "0.1.6",
-    "tar": "7.5.11",
+    "tar": "7.5.13",
     "tslib": "2.0.0"
   },
   "devDependencies": {
@@ -85,7 +85,7 @@
     "@loopback/testlab": "8.0.10",
     "@types/archiver": "6.0.4",
     "@types/express-session": "1.18.2",
-    "@types/formidable": "2.0.6",
+    "@types/formidable": "3.5.0",
     "@types/jsdom": "21.1.7",
     "@types/ldapjs": "1.0.11",
     "@types/multer": "2.1.0",
