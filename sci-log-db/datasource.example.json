@@ -1,0 +1,12 @@
+{
+    "name": "mongo",
+    "connector": "mongodb",
+    "host": "mongo",
+    "port": 27017,
+    "user": "",
+    "password": "",
+    "database": "scilog",
+    "useNewUrlParser": true,
+    "useUnifiedTopology": true,
+    "allowExtendedOperators": true
+}
