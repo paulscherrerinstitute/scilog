@@ -1,3 +1,10 @@
+## [2.3.3](https://github.com/paulscherrerinstitute/scilog/compare/v2.3.2...v2.3.3) (2026-04-09)
+
+
+### Bug Fixes
+
+* **api:** add missing ws dependency ([#568](https://github.com/paulscherrerinstitute/scilog/issues/568)) ([283cfcd](https://github.com/paulscherrerinstitute/scilog/commit/283cfcde86bb76d55c377074cf519ef79a7a5794)), closes [#567](https://github.com/paulscherrerinstitute/scilog/issues/567)
+
 ## [2.3.2](https://github.com/paulscherrerinstitute/scilog/compare/v2.3.1...v2.3.2) (2026-03-27)
 
 
