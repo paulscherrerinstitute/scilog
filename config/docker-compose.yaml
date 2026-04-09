@@ -7,10 +7,10 @@ services:
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
 
-  mongodb:
+  mongo:
     image: mongo:4.2
     volumes:
-      - mongodb_data:/data/db
+      - mongo_data:/data/db
       - ./mongo/rs-init.sh:/rs-init.sh:ro
     command: [ "--replSet", "rs0", "--bind_ip_all" ]
     healthcheck:
@@ -19,7 +19,7 @@ services:
     profiles:
       - be
 
-  mongodb_seed:
+  mongo-seed:
     image: mongo:4.2
     volumes:
       - ./seed_db/seed:/seed
@@ -30,7 +30,7 @@ services:
       - "chmod u+x /mnt/mongo_import.sh && /mnt/mongo_import.sh"
     user: "0:0"
     depends_on:
-      - mongodb
+      - mongo
     environment:
       - DATABASE=scilog
     restart: on-failure
@@ -40,7 +40,7 @@ services:
   backend:
     image: ghcr.io/paulscherrerinstitute/scilog/be
     depends_on:
-      mongodb:
+      mongo:
         condition: service_healthy
     volumes:
       # uncomment and edit the ./be/oidc.json to enable oidc
@@ -71,5 +71,4 @@ services:
       - traefik.http.routers.frontend.rule=PathPrefix(`/`)
 
 volumes:
-  mongodb_data:
-    driver: local
+  mongo_data:
