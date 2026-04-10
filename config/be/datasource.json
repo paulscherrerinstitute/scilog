@@ -1,7 +1,7 @@
 {
     "name": "mongo",
     "connector": "mongodb",
-    "host": "mongodb",
+    "host": "mongo",
     "port": 27017,
     "user": "",
     "password": "",
