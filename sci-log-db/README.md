@@ -38,11 +38,11 @@ docker compose up api-production
 
 The multi-stage Dockerfile exposes the following targets:
 
-| Target        | Purpose                                      |
-| ------------- | -------------------------------------------- |
-| `development` | Source-mounted dev server with watch mode    |
-| `test`        | Runs `npm run test`.                         |
-| `production`  | Minimal image with compiled JS and prod deps |
+| Target        | Purpose                                                                                                                                                           |
+| ------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `development` | Source-mounted dev server with watch mode. Runs as root so `npm install` works when you exec into the running container (e.g. after attaching from VSCode).      |
+| `test`        | Runs `npm run test` once and exits. Kept separate from `development` so CI can build `--target test` without duplicating env vars, user, and command overrides.  |
+| `production`  | Minimal runtime image: prod-only `node_modules` plus compiled `dist/`. No source, no dev deps, no build tooling.                                                  |
 
 ## Configuration
 
