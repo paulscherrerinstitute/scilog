@@ -1,6 +1,6 @@
 services:
   mongo:
-    image: bitnamilegacy/mongodb:4.2
+    image: bitnamilegacy/mongodb:4.4
     volumes:
       - "mongo_data:/bitnami"
   scilog:
