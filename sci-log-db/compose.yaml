@@ -5,8 +5,10 @@ services:
     command: ["--replSet", "rs0"]
     volumes:
       - mongo_data:/data/db
+    post_start:
+      - command: ["mongosh", "--eval", "try { rs.status() } catch (e) { rs.initiate({_id:'rs0', members:[{_id:0, host:'mongo:27017'}]}) }"]
     healthcheck:
-      test: ["CMD", "mongosh", "--eval", "try { rs.status() } catch(e) { rs.initiate({_id:'rs0', members:[{_id:0, host:'mongo:27017'}]}) }"]
+      test: ["CMD", "mongosh", "--eval", "rs.status()"]
 
   mongo-seed:
     image: mongo:8
