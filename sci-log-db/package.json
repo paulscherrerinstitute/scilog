@@ -13,7 +13,6 @@
   },
   "scripts": {
     "build": "lb-tsc",
-    "build:watch": "lb-tsc --watch",
     "lint": "npm run prettier:check && npm run eslint",
     "lint:fix": "npm run eslint:fix && npm run prettier:fix",
     "prettier:cli": "lb-prettier \"**/*.ts\" \"**/*.js\"",
@@ -24,16 +23,10 @@
     "pretest": "npm run clean && npm run build && cp -r src/__tests__/test-data dist/__tests__/",
     "test": "lb-mocha --allow-console-logs --exit \"dist/__tests__\"",
     "posttest": "npm run lint",
-    "test:dev": "lb-mocha --allow-console-logs dist/__tests__/**/*.js && npm run posttest",
-    "docker:build": "docker build -t sci-log-db .",
-    "docker:run": "docker run -p 3000:3000 -d sci-log-db",
     "migrate": "node ./dist/migrate",
     "openapi-spec": "node ./dist/openapi-spec",
-    "prestart": "npm run build",
     "clean": "lb-clean dist *.tsbuildinfo .eslintcache",
-    "start": "node -r source-map-support/register .",
-    "start-local": "npm run build && node .",
-    "start:watch": "tsc-watch --target es2017 --outDir ./dist --onSuccess \"node .\""
+    "dev": "tsc --watch & node --watch --enable-source-maps ."
   },
   "repository": {
     "type": "git"
@@ -89,8 +82,6 @@
     "@types/prismjs": "1.26.6",
     "@types/ws": "8.18.1",
     "eslint": "8.57.1",
-    "source-map-support": "0.5.21",
-    "tsc-watch": "5.0.3",
     "typescript": "5.2.2",
     "yauzl": "3.2.1"
   }

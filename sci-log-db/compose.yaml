@@ -1,0 +1,72 @@
+services:
+  mongo:
+    image: mongo:8
+    container_name: mongo
+    command: ["--replSet", "rs0"]
+    volumes:
+      - mongo_data:/data/db
+    healthcheck:
+      test: ["CMD", "mongosh", "--eval", "try { rs.status() } catch(e) { rs.initiate({_id:'rs0', members:[{_id:0, host:'mongo:27017'}]}) }"]
+
+  mongo-seed:
+    image: mongo:8
+    container_name: mongo-seed
+    depends_on:
+      mongo:
+        condition: service_healthy
+    volumes:
+      - ./init/seed.js:/tmp/seed.js:ro
+    command: ["mongosh", "mongo:27017/scilog", "/tmp/seed.js"]
+    restart: "no"
+
+  api-development:
+    build:
+      context: .
+      target: development
+    container_name: api-development
+    depends_on:
+      mongo-seed:
+        condition: service_completed_successfully
+    ports:
+      - 3000:3000
+    volumes:
+      - .:/app
+      - node_modules:/app/node_modules
+    tty: true
+    healthcheck:
+      test: ["CMD", "node", "-e", "fetch('http://localhost:3000/api/v1').then(r => { if (!r.ok) throw r.status })"]
+    environment:
+      JWT_SECRET: my-super-secret-key
+      BASE_PATH: /api/v1
+
+  api-test:
+    build:
+      context: .
+      target: test
+    container_name: api-test
+    depends_on:
+      mongo:
+        condition: service_healthy
+    profiles: [test]
+
+  api-production:
+    build:
+      context: .
+      target: production
+    container_name: api-production
+    depends_on:
+      mongo:
+        condition: service_healthy
+    ports:
+      - 3000:3000
+    environment:
+      JWT_SECRET: my-super-secret-key
+      BASE_PATH: /api/v1
+    volumes:
+      - ./datasource.json:/app/datasource.json:ro
+      - ./oidc.json:/app/oidc.json:ro
+    profiles: [production]
+
+volumes:
+  mongo_data:
+  node_modules:
