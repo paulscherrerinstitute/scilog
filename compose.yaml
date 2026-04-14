@@ -14,7 +14,7 @@ services:
       - ./config/fe/config.dev.json:/frontend/src/assets/config.json
       - /frontend/node_modules
       - /frontend/dist
-    command: /bin/sh -c "apk add --no-cache chromium && while true; do sleep 600; done"
+    command: ["npm", "run", "dev"]
     profiles:
       - fe
     ports:
