@@ -1,3 +1,10 @@
+## [2.3.5](https://github.com/paulscherrerinstitute/scilog/compare/v2.3.4...v2.3.5) (2026-04-15)
+
+
+### Bug Fixes
+
+* revert to workdir for backward compatibility ([#582](https://github.com/paulscherrerinstitute/scilog/issues/582)) ([1a017d4](https://github.com/paulscherrerinstitute/scilog/commit/1a017d4ba81c2e1c39c5edcffea4f5f5177c453d))
+
 ## [2.3.4](https://github.com/paulscherrerinstitute/scilog/compare/v2.3.3...v2.3.4) (2026-04-13)
 
 
