@@ -75,8 +75,8 @@ FROM base AS production
 ENV NODE_ENV=production
 
 COPY --chown=node:node package*.json ./
-COPY --from=prod-deps --chown=node:node node_modules ./node_modules
-COPY --from=build --chown=node:node dist ./dist
+COPY --from=prod-deps --chown=node:node /home/node/app/node_modules ./node_modules
+COPY --from=build --chown=node:node /home/node/app/dist ./dist
 
 USER node
 
