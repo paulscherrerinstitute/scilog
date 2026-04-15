@@ -32,8 +32,8 @@ services:
     ports:
       - 3000:3000
     volumes:
-      - .:/app
-      - node_modules:/app/node_modules
+      - .:/home/node/app
+      - node_modules:/home/node/app/node_modules
     tty: true
     healthcheck:
       test: ["CMD", "node", "-e", "fetch('http://localhost:3000/api/v1').then(r => { if (!r.ok) throw r.status })"]
@@ -65,8 +65,8 @@ services:
       JWT_SECRET: my-super-secret-key
       BASE_PATH: /api/v1
     volumes:
-      - ./datasource.json:/app/datasource.json:ro
-      - ./oidc.json:/app/oidc.json:ro
+      - ./datasource.json:/home/node/app/datasource.json:ro
+      - ./oidc.json:/home/node/app/oidc.json:ro
     profiles: [production]
 
 volumes:

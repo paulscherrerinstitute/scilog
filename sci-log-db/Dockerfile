@@ -4,9 +4,9 @@
 # (required for PDF export, even in production).
 FROM node:22.22.2-slim AS base
 
-WORKDIR /app
+WORKDIR /home/node/app
 
-RUN chown -R node:node /app
+RUN chown -R node:node .
 
 RUN apt-get update && \
     apt-get install -y chromium --no-install-recommends && \
@@ -75,8 +75,8 @@ FROM base AS production
 ENV NODE_ENV=production
 
 COPY --chown=node:node package*.json ./
-COPY --from=prod-deps --chown=node:node /app/node_modules ./node_modules
-COPY --from=build --chown=node:node /app/dist ./dist
+COPY --from=prod-deps --chown=node:node /home/node/app/node_modules ./node_modules
+COPY --from=build --chown=node:node /home/node/app/dist ./dist
 
 USER node
 
