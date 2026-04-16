@@ -1,3 +1,10 @@
+## [2.3.7](https://github.com/paulscherrerinstitute/scilog/compare/v2.3.6...v2.3.7) (2026-04-16)
+
+
+### Bug Fixes
+
+* use types from ro-crate library ([#587](https://github.com/paulscherrerinstitute/scilog/issues/587)) ([6e1f719](https://github.com/paulscherrerinstitute/scilog/commit/6e1f719fc78e4c3bc9afbfa1bf503b5eb61d4df7))
+
 ## [2.3.6](https://github.com/paulscherrerinstitute/scilog/compare/v2.3.5...v2.3.6) (2026-04-16)
 
 
