@@ -5,22 +5,28 @@
   <p>Not authenticated with SciCat, showing only public datasets:</p>
 </ng-template>
 <div>
-  <mat-form-field><mat-label for="dataset-select">Select Dataset:</mat-label>
-    <mat-select id="dataset-select" (selectionChange)="onDatasetSelect($event)" [value]="selectedDataset?.pid">
+  <mat-form-field
+    ><mat-label for="dataset-select">Select Dataset:</mat-label>
+    <mat-select
+      id="dataset-select"
+      (selectionChange)="onDatasetSelect($event)"
+      [value]="selectedDataset?.pid"
+    >
       @for (dataset of filteredDatasetSummary(); track dataset.pid) {
-      <mat-option [value]="dataset.pid">{{ dataset.datasetName }}</mat-option>
+        <mat-option [value]="dataset.pid">{{ dataset.datasetName }}</mat-option>
       }
-    </mat-select></mat-form-field>
+    </mat-select></mat-form-field
+  >
   <mat-checkbox [(ngModel)]="showProposalLinked">Proposal-linked</mat-checkbox>
   <mat-checkbox [(ngModel)]="showUserLinked">User-linked</mat-checkbox>
 </div>
 
 <div *ngIf="selectedDataset">
   @if (isProposalLinkedDataset(selectedDataset.pid)) {
-  <p>
-    This dataset is linked to proposal
-    <a [href]="scicatProposalUrl" target="_blank">{{ selectedDataset.proposalId }}</a>
-  </p>
+    <p>
+      This dataset is linked to proposal
+      <a [href]="scicatProposalUrl" target="_blank">{{ selectedDataset.proposalId }}</a>
+    </p>
   }
 
   <mat-card appearance="outlined">
@@ -56,9 +62,15 @@
       </table>
     </mat-card-content>
     <mat-card-actions>
-      <a mat-button [href]="scicatDatasetUrl" target="_blank">Open in SciCat <mat-icon>open_in_new</mat-icon></a>
-      <button mat-button matTooltip="Link logbook to dataset" (click)="linkLogbook()"
-        [disabled]="isUserLinkedDataset(selectedDataset.pid)">
+      <a mat-button [href]="scicatDatasetUrl" target="_blank"
+        >Open in SciCat <mat-icon>open_in_new</mat-icon></a
+      >
+      <button
+        mat-button
+        matTooltip="Link logbook to dataset"
+        (click)="linkLogbook()"
+        [disabled]="isUserLinkedDataset(selectedDataset.pid)"
+      >
         <mat-icon>add_link</mat-icon> Link
       </button>
     </mat-card-actions>

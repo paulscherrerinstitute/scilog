@@ -28,7 +28,6 @@ describe('ScicatViewerComponent', () => {
     scicatServiceSpy.getDataset.and.returnValue(of({} as Dataset));
     scicatServiceSpy.getUserLinkedDatasetsSummary.and.returnValue(of([]));
 
-
     logbookInfoServiceSpy = jasmine.createSpyObj('LogbookInfoService', ['logbookInfo']);
     logbookInfoServiceSpy.logbookInfo = { ownerGroup: 'group1' } as Logbooks;
 
