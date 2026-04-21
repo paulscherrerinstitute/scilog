@@ -1,5 +1,6 @@
 {
   "lbBaseURL": "http://localhost:3000/",
+  "frontendBaseURL": "http://scilog.local",
   "oAuth2Endpoint": {
     "authURL": "auth/keycloak",
     "displayText": "keycloak",

@@ -15,6 +15,7 @@ export interface ScicatSettings {
 
 export interface AppConfig {
   lbBaseURL?: string;
+  frontendBaseURL?: string;
   oAuth2Endpoint?: Oauth2Endpoint;
   help?: string;
   scicat?: ScicatSettings;

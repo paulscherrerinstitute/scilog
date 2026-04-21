@@ -19,12 +19,15 @@ describe('ScicatViewerComponent', () => {
       'getDataset',
       'getDatasetDetailPageUrl',
       'getProposalPageUrl',
+      'getUserLinkedDatasetsSummary',
     ]);
 
     scicatServiceSpy.getMyself.and.returnValue(of(null));
     scicatServiceSpy.getDatasetsSummary.and.returnValue(of([]));
     scicatServiceSpy.getProposalLinkedDatasets.and.returnValue(of([]));
     scicatServiceSpy.getDataset.and.returnValue(of({} as Dataset));
+    scicatServiceSpy.getUserLinkedDatasetsSummary.and.returnValue(of([]));
+
 
     logbookInfoServiceSpy = jasmine.createSpyObj('LogbookInfoService', ['logbookInfo']);
     logbookInfoServiceSpy.logbookInfo = { ownerGroup: 'group1' } as Logbooks;
@@ -59,8 +62,8 @@ describe('ScicatViewerComponent', () => {
     component.ngOnInit();
 
     expect(scicatServiceSpy.getDatasetsSummary).toHaveBeenCalled();
-    expect(component.datasetSummary.length).toBe(2);
-    expect(component.datasetSummary[0].datasetName).toBe('Dataset 1');
+    expect(component.datasetSummary().length).toBe(2);
+    expect(component.datasetSummary()[0].datasetName).toBe('Dataset 1');
   });
 
   it('appends new proposal linked datasets on init', () => {
@@ -79,8 +82,8 @@ describe('ScicatViewerComponent', () => {
 
     component.ngOnInit();
 
-    expect(component.datasetSummary.length).toBe(3);
-    expect(component.datasetSummary[0].datasetName).toBe('Dataset 2');
+    expect(component.datasetSummary().length).toBe(3);
+    expect(component.datasetSummary()[0].datasetName).toBe('Dataset 2');
   });
 
   it('selects the first proposal linked dataset on init', () => {
@@ -97,5 +100,22 @@ describe('ScicatViewerComponent', () => {
     component.ngOnInit();
 
     expect(component.selectedDataset?.pid).toBe('2');
+  });
+
+  it('selects the first user linked dataset on init if no proposal linked datasets', () => {
+    scicatServiceSpy.getDatasetsSummary.and.returnValue(
+      of([{ pid: '3', datasetName: 'Dataset 3', creationTime: '2022-01-01' }]),
+    );
+    scicatServiceSpy.getDataset.and.returnValue(
+      of({ pid: '4', datasetName: 'Dataset 4', creationTime: '2024-01-03' } as Dataset),
+    );
+    scicatServiceSpy.getProposalLinkedDatasets.and.returnValue(of([]));
+    scicatServiceSpy.getUserLinkedDatasetsSummary.and.returnValue(
+      of([{ pid: '4', datasetName: 'Dataset 4', creationTime: '2024-01-03' }]),
+    );
+
+    component.ngOnInit();
+
+    expect(component.selectedDataset?.pid).toBe('4');
   });
 });
