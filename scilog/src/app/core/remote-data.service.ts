@@ -111,15 +111,17 @@ export class RemoteDataService {
     if (typeof config.view.order != 'undefined') {
       httpFilter['order'] = config.view.order;
     } else {
-      httpFilter['order'] = ['defaultOrder ASC'];
+      httpFilter['order'] = ['defaultOrder DESC'];
     }
 
     httpFilter['include'] = [{ relation: 'subsnippets', ...this.addIncludeScope(config.filter) }];
+
     httpFilter['where'] = {
       and: [
         ...this.staticFilters(),
         ...this.tagsFilter(config.filter),
         ...this.parentFilter(config.filter),
+        ...this.importanceFilter(config.filter),
       ],
     };
 
@@ -145,6 +147,17 @@ export class RemoteDataService {
       tagFilter.push({ tags: { nin: configFilter.excludeTags } });
     }
     return tagFilter;
+  }
+  protected importanceFilter(configFilter: { importance?: number[] }) {
+    if (!configFilter?.importance || configFilter.importance.length === 0) {
+      return [];
+    }
+
+    return [
+      {
+        importance: { inq: configFilter.importance },
+      },
+    ];
   }
 
   private parentFilter(configFilter: { targetId?: string; additionalLogbooks?: string[] }) {
@@ -353,13 +366,17 @@ export class LogbookItemDataService extends RemoteDataService {
       params: this._prepareParams(config, skip, limit),
     }).toPromise();
   }
+  exportELN(targetId: string): Promise<Blob> {
+    let headers = new HttpHeaders();
+    headers = headers.set('Content-Type', 'application/json');
 
-  exportELN(logbookId: string): Promise<Blob> {
-    return this.httpClient
-      .get(`${this.serverSettings.getServerAddress()}rocrates/${logbookId}/download`, {
-        responseType: 'blob',
+    console.warn('exportELN not implemented yet');
+
+    return Promise.resolve(
+      new Blob([`ELN export for ${targetId} not implemented yet`], {
+        type: 'text/plain',
       })
-      .toPromise();
+    );
   }
 }
 
@@ -463,6 +480,8 @@ export class LogbookDataService extends RemoteDataService {
     this._searchString = this._searchString.trim();
 
     let httpFilter: Object = this._prepareFilters(config, index, count);
+    console.log('FINAL WHERE:', httpFilter['where']);
+
     let params = new HttpParams();
     params = params.set('filter', JSON.stringify(httpFilter));
 

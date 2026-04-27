@@ -77,6 +77,16 @@
           <span> {{ logbookInfo.logbookInfo.accessGroups }}</span>
         </span>
       </div>
+      <div class="importance-section">
+        <span><strong>Importance:</strong></span>
+
+        <mat-radio-group [(ngModel)]="importance">
+          <mat-radio-button *ngFor="let level of importanceLevels" [value]="level">
+            {{ level }}
+          </mat-radio-button>
+        </mat-radio-group>
+      </div>
+
       <ckeditor
         #contentEditor
         [config]="editorConfig"
