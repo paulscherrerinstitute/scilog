@@ -102,7 +102,7 @@ export class AddContentComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
     this.setupComponent();
     this.subscriptions.push(
-      this.dataService.currentMessage.subscribe((message) => {
+      this.dataService.currentMessage$.subscribe((message) => {
         console.log(message);
         if (message != null) {
           // this.message = message;
