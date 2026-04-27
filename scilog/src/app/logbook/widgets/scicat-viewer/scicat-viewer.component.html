@@ -12,11 +12,13 @@
       (selectionChange)="onDatasetSelect($event)"
       [value]="selectedDataset?.pid"
     >
-      @for (dataset of datasetSummary; track dataset.pid) {
+      @for (dataset of filteredDatasetSummary(); track dataset.pid) {
         <mat-option [value]="dataset.pid">{{ dataset.datasetName }}</mat-option>
       }
     </mat-select></mat-form-field
   >
+  <mat-checkbox [(ngModel)]="showProposalLinked">Proposal-linked</mat-checkbox>
+  <mat-checkbox [(ngModel)]="showUserLinked">User-linked</mat-checkbox>
 </div>
 
 <div *ngIf="selectedDataset">
@@ -63,6 +65,14 @@
       <a mat-button [href]="scicatDatasetUrl" target="_blank"
         >Open in SciCat <mat-icon>open_in_new</mat-icon></a
       >
+      <button
+        mat-button
+        matTooltip="Link logbook to dataset"
+        (click)="linkLogbook()"
+        [disabled]="isUserLinkedDataset(selectedDataset.pid)"
+      >
+        <mat-icon>add_link</mat-icon> Link
+      </button>
     </mat-card-actions>
   </mat-card>
 </div>
