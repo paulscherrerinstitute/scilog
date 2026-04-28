@@ -375,7 +375,7 @@ export class LogbookItemDataService extends RemoteDataService {
     return Promise.resolve(
       new Blob([`ELN export for ${targetId} not implemented yet`], {
         type: 'text/plain',
-      })
+      }),
     );
   }
 }
