@@ -1,3 +1,10 @@
+## [2.3.8](https://github.com/paulscherrerinstitute/scilog/compare/v2.3.7...v2.3.8) (2026-04-28)
+
+
+### Reverts
+
+* Revert "chore(api): move rs.initiate to post_start ([#576](https://github.com/paulscherrerinstitute/scilog/issues/576))" ([#599](https://github.com/paulscherrerinstitute/scilog/issues/599)) ([edd7acf](https://github.com/paulscherrerinstitute/scilog/commit/edd7acf3c4d14bce9fce3453bf22c4122c74ba1c))
+
 ## [2.3.7](https://github.com/paulscherrerinstitute/scilog/compare/v2.3.6...v2.3.7) (2026-04-16)
 
 
