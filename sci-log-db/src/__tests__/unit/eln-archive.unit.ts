@@ -1,6 +1,6 @@
 import {expect} from '@loopback/testlab';
 import {validElnCrate} from '../eln.helpers';
-import {ElnErrorCode, validateElnMetadata} from '../../services/eln-validator';
+import {ElnErrorCode, validateElnMetadata} from '../../services/eln-archive';
 
 describe('eln-validator', () => {
   it('accepts a minimal valid metadata object', () => {
