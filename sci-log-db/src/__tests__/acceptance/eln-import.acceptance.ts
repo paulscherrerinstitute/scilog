@@ -5,8 +5,8 @@ import {SciLogDbApplication} from '../..';
 import {clearDatabase, createUserToken, setupApplication} from './test-helper';
 
 const SCILOG_ELN_PATH = path.resolve(
-  __dirname,
-  '..',
+  'src',
+  '__tests__',
   'test-data',
   'scilog.eln',
 );
