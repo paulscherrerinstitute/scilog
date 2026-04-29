@@ -1,3 +1,10 @@
+## [2.3.9](https://github.com/paulscherrerinstitute/scilog/compare/v2.3.8...v2.3.9) (2026-04-29)
+
+
+### Bug Fixes
+
+* **api:** run tests inside the dev container ([#603](https://github.com/paulscherrerinstitute/scilog/issues/603)) ([eb70ac1](https://github.com/paulscherrerinstitute/scilog/commit/eb70ac114fd66fbaa73ef6035130b085a8095bba)), closes [#601](https://github.com/paulscherrerinstitute/scilog/issues/601)
+
 ## [2.3.8](https://github.com/paulscherrerinstitute/scilog/compare/v2.3.7...v2.3.8) (2026-04-28)
 
 
