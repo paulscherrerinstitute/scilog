@@ -1,3 +1,4 @@
+import crypto from 'node:crypto';
 import {ROCrate} from 'ro-crate';
 
 // Minimal RO-Crate 1.2 + ELN graph that passes validation.
@@ -41,10 +42,36 @@ export function validElnCrate(): ROCrate {
           description: 'a book',
           dateCreated: '2026-01-19T00:00:00.000Z',
           author: {'@id': '#author'},
-          hasPart: [],
+          hasPart: [{'@id': './book/file.txt'}],
+        },
+        {
+          '@id': './book/file.txt',
+          '@type': 'File',
+          name: 'file.txt',
+          encodingFormat: 'text/plain',
+          contentSize: '123',
+          sha256: '0'.repeat(64),
         },
       ],
     },
     {array: true},
   );
+}
+
+// Build a Map<string, Buffer> with valid metadata and matching file content,
+// suitable for passing to ElnArchive.parse().
+export function validElnEntries(): Map<string, Buffer> {
+  const crate = validElnCrate();
+  const fileContent = Buffer.from('hello');
+  const sha = crypto.createHash('sha256').update(fileContent).digest('hex');
+  crate.setProperty('./book/file.txt', 'sha256', sha);
+  crate.setProperty('./book/file.txt', 'contentSize', fileContent.length);
+
+  return new Map([
+    [
+      'root/ro-crate-metadata.json',
+      Buffer.from(JSON.stringify(crate.toJSON())),
+    ],
+    ['root/book/file.txt', fileContent],
+  ]);
 }
