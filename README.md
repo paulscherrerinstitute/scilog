@@ -10,8 +10,8 @@ To get an overview of the main SciLog features and design please refer to the [o
 ### Frontend (angular)
 The [scilog](./scilog) folder contains the [angular](https://angular.dev/) components and the Dockerfile that implement the SciLog UI.
 
-### Backend (loobpack4)
-The [sci-log-db](./sci-log-db) folder contains REST API based backend implementation. It is implemented using [loopback4](https://loopback.io/doc/en/lb4/index.html), a [node.js](https://nodejs.org/en) framework developed by IBM.
+### Backend (loopback4)
+The [sci-log-db](./sci-log-db) folder contains the REST API backend implementation. It is implemented using [loopback4](https://loopback.io/doc/en/lb4/index.html), a [node.js](https://nodejs.org/en) framework developed by IBM. See the [backend README](./sci-log-db/README.md) for development instructions.
 
 ### SDK (python)
 The [sdk/python](./sdk/python) folder contains a wrapper of the backend REST APIs in python. It is currently limited to the core endpoints and doesn't yet cover all HTTP endpoints.
@@ -29,7 +29,9 @@ The [docs](./docs) folder contains a preliminary and unpolished first draft of t
 The [config](./config) folder contains configuration options for creating a local environment with docker. See the [getting started](#getting-started) section for instructions.
 
 ## Getting started
-The easiest way to get started is using the provided [docker compose file](./config/docker-compose.yaml). The docker version must be later than 2.29.0 to support this project.
+
+### Full stack (frontend + backend)
+The easiest way to get started is using the provided [docker compose file](./config/docker-compose.yaml). Docker v2.29.0 or later is required.
 
 Setting the compose profiles spins up the matching services. To create all of them, the backend (with some seeded data) and the frontend, run:
 
@@ -46,5 +48,8 @@ You can then go to `http://localhost` to access the UI and `http://localhost/api
 After that, you can start creating logbooks (`Add logbook`) and play around.
 
 To change configuration options or check the default ones, have a look at the files referenced by the [docker compose file](./config/docker-compose.yaml) and their content inside the [config](./config) folder.
+
+### Backend only
+For backend development, see the [backend README](./sci-log-db/README.md).
 
 For questions or support, email us at: [scilog-help@lists.psi.ch](mailto:scilog-help@lists.psi.ch)

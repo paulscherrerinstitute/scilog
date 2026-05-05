@@ -57,6 +57,11 @@ typings/
 # dotenv environment variables file
 .env
 
+# Local config files
+datasource.json
+oidc.json
+functionalAccounts.json
+
 # Transpiled JavaScript files from Typescript
 /dist
 

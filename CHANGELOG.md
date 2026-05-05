@@ -1,3 +1,52 @@
+## [2.3.9](https://github.com/paulscherrerinstitute/scilog/compare/v2.3.8...v2.3.9) (2026-04-29)
+
+
+### Bug Fixes
+
+* **api:** run tests inside the dev container ([#603](https://github.com/paulscherrerinstitute/scilog/issues/603)) ([eb70ac1](https://github.com/paulscherrerinstitute/scilog/commit/eb70ac114fd66fbaa73ef6035130b085a8095bba)), closes [#601](https://github.com/paulscherrerinstitute/scilog/issues/601)
+
+## [2.3.8](https://github.com/paulscherrerinstitute/scilog/compare/v2.3.7...v2.3.8) (2026-04-28)
+
+
+### Reverts
+
+* Revert "chore(api): move rs.initiate to post_start ([#576](https://github.com/paulscherrerinstitute/scilog/issues/576))" ([#599](https://github.com/paulscherrerinstitute/scilog/issues/599)) ([edd7acf](https://github.com/paulscherrerinstitute/scilog/commit/edd7acf3c4d14bce9fce3453bf22c4122c74ba1c))
+
+## [2.3.7](https://github.com/paulscherrerinstitute/scilog/compare/v2.3.6...v2.3.7) (2026-04-16)
+
+
+### Bug Fixes
+
+* use types from ro-crate library ([#587](https://github.com/paulscherrerinstitute/scilog/issues/587)) ([6e1f719](https://github.com/paulscherrerinstitute/scilog/commit/6e1f719fc78e4c3bc9afbfa1bf503b5eb61d4df7))
+
+## [2.3.6](https://github.com/paulscherrerinstitute/scilog/compare/v2.3.5...v2.3.6) (2026-04-16)
+
+
+### Bug Fixes
+
+* **deps:** update loopback monorepo ([#584](https://github.com/paulscherrerinstitute/scilog/issues/584)) ([9e52b3d](https://github.com/paulscherrerinstitute/scilog/commit/9e52b3de02bdbb21cd7b4af49d5a562db21af872))
+
+## [2.3.5](https://github.com/paulscherrerinstitute/scilog/compare/v2.3.4...v2.3.5) (2026-04-15)
+
+
+### Bug Fixes
+
+* revert to workdir for backward compatibility ([#582](https://github.com/paulscherrerinstitute/scilog/issues/582)) ([1a017d4](https://github.com/paulscherrerinstitute/scilog/commit/1a017d4ba81c2e1c39c5edcffea4f5f5177c453d))
+
+## [2.3.4](https://github.com/paulscherrerinstitute/scilog/compare/v2.3.3...v2.3.4) (2026-04-13)
+
+
+### Bug Fixes
+
+* **deps:** update dependency jsdom to v29.0.2 ([#575](https://github.com/paulscherrerinstitute/scilog/issues/575)) ([afb998f](https://github.com/paulscherrerinstitute/scilog/commit/afb998f411344000c624715b5652bf79e8cf9259))
+
+## [2.3.3](https://github.com/paulscherrerinstitute/scilog/compare/v2.3.2...v2.3.3) (2026-04-09)
+
+
+### Bug Fixes
+
+* **api:** add missing ws dependency ([#568](https://github.com/paulscherrerinstitute/scilog/issues/568)) ([283cfcd](https://github.com/paulscherrerinstitute/scilog/commit/283cfcde86bb76d55c377074cf519ef79a7a5794)), closes [#567](https://github.com/paulscherrerinstitute/scilog/issues/567)
+
 ## [2.3.2](https://github.com/paulscherrerinstitute/scilog/compare/v2.3.1...v2.3.2) (2026-03-27)
 
 

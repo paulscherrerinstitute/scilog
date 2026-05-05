@@ -52,7 +52,7 @@ export class EntityBuilderService {
       '@id': this.getEntityId(logbook.id),
       '@type': ['Book', 'Dataset'],
       genre: 'experiment',
-      name: `SciLog ELN export: ${logbook.name}`,
+      name: logbook.name,
       description: logbook.description ?? '',
       dateCreated: logbook.createdAt?.toISOString(),
       author,
