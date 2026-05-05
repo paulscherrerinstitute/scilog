@@ -319,35 +319,42 @@ export class LogbookItemComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   startNotificationManager() {
-    if (typeof this.config != 'undefined') {
-      if (this.changeStreamSubscriptions.length > 0) {
-        this.changeStreamSubscriptions.forEach((sub) => sub.unsubscribe());
-      }
-      let logbooks = [this.config.filter.targetId, ...this.config.filter?.additionalLogbooks];
-      console.log('Subscribing to the following logbooks: ', logbooks);
-      logbooks.forEach((log) => {
-        this.changeStreamSubscriptions.push(
-          this.notificationService.getNotification(log, this.config).subscribe((notification) => {
-            console.log(notification);
-            this.notifications.push(notification);
-            this.parseNotification(notification);
-          }),
-        );
-      });
-
-      if (this.dataService == null) {
-        this.dataService = this.data.currentMessage.subscribe((message) => {
-          // console.log(message);
-          this.message = message;
-          if (message != null && Object.keys(this.message).length != 0) {
-            // console.log(this.message);
-            this.submitContent(message);
-            this.message = null;
-          }
-        });
-      }
+    if (!this.config) return; // Clean old changeStream subscriptions
+    if (this.changeStreamSubscriptions.length > 0) {
+      this.changeStreamSubscriptions.forEach((s) => s.unsubscribe());
+      this.changeStreamSubscriptions = [];
     }
+    const logbooks = [
+      this.config.filter.targetId,
+      ...(this.config.filter?.additionalLogbooks ?? []),
+    ];
+
+    logbooks.forEach((log) => {
+      const sub = this.notificationService
+        .getNotification(log, this.config)
+        .subscribe((notification) => {
+          this.parseNotification(notification);
+        });
+
+      this.changeStreamSubscriptions.push(sub);
+    });
+
+    //  ALWAYS unsubscribe previous message subscription
+    if (this.dataService) {
+      this.dataService.unsubscribe();
+      this.dataService = null;
+    }
+
+    this.dataService = this.data.currentMessage$.subscribe((message) => {
+      if (!message) return;
+
+      //  Only main widget should submit
+      if (this.configIndex !== 1) return;
+
+      this.submitContent(message);
+    });
   }
+
 
   async parseNotification(notification: ChangeStreamNotification) {
     switch (notification.operationType) {
