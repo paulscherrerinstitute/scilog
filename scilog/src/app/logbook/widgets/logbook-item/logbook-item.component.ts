@@ -331,7 +331,6 @@ export class LogbookItemComponent implements OnInit, AfterViewInit, OnDestroy {
       });
       console.log('CONFIG HASH:', configHash);
       console.log('IMPORTANCE IN HASH:', newConfig.filter.importance);
-      
 
       // Only reinitialize if config actually changed
       if (this.currentConfigHash !== configHash) {
