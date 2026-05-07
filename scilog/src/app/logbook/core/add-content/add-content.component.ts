@@ -48,7 +48,8 @@ interface editorDataInput {
     MatDialogActions,
     NgIf,
     NgFor,
-    FormsModule,MatRadioModule,
+    FormsModule,
+    MatRadioModule,
     MatButton,
     MatDialogClose,
   ],
@@ -198,7 +199,6 @@ export class AddContentComponent implements OnInit, OnDestroy {
     }
     this.isSubmitting = true;
 
-
     if (this.editor != undefined) {
       this.data = this.editor.getData();
     }
@@ -213,7 +213,7 @@ export class AddContentComponent implements OnInit, OnDestroy {
     }
     this.prepareMessage(this.data);
     this.sendMessage();
-    setTimeout(() => this.isSubmitting = false, 1000);
+    setTimeout(() => (this.isSubmitting = false), 1000);
   }
 
   private sendEditMessage() {

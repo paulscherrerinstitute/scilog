@@ -15,24 +15,15 @@
     [config]="config"
     [syncAtStart]="false"
   ></app-tag-editor>
-  <div *ngIf="notification?.linkType === LinkType.PARAGRAPH" style="margin-top:10px;">
-
+  <div *ngIf="notification?.linkType === LinkType.PARAGRAPH" style="margin-top: 10px">
     <label><b>Importance</b></label>
 
     <mat-radio-group [(ngModel)]="importance">
-
-      <mat-radio-button
-        *ngFor="let level of importanceLevels"
-        [value]="level">
-
+      <mat-radio-button *ngFor="let level of importanceLevels" [value]="level">
         {{ level }}
-
       </mat-radio-button>
-
     </mat-radio-group>
-
   </div>
-  
 </mat-dialog-content>
 <button
   (click)="loadLastUnsavedEdit()"
