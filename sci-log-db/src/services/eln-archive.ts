@@ -1,17 +1,15 @@
 /**
- * .eln (RO-Crate 1.1+) metadata validator.
- * Contract pinned by `__tests__/unit/eln-validator.unit.ts`.
+ * .eln (RO-Crate 1.2) parser.
+ * Contract pinned by `__tests__/unit/eln-archive.unit.ts`.
  *
  * Spec: https://github.com/TheELNConsortium/TheELNFileFormat/blob/master/SPECIFICATION.md
  */
 
+import crypto from 'node:crypto';
 import {ROCrate} from 'ro-crate';
 
-/**
- * Error codes emitted by the .eln validator.
- * One entry per distinct MUST/SHOULD clause we enforce; see the
- * spec link above for the prose behind each code.
- */
+// --- types ---
+
 export const ElnErrorCode = {
   MISSING_ELN_FIELD: 'MISSING_ELN_FIELD',
   INVALID_CONFORMS_TO: 'INVALID_CONFORMS_TO',
@@ -21,14 +19,46 @@ export const ElnErrorCode = {
   INVALID_AUTHOR: 'INVALID_AUTHOR',
   INVALID_HAS_PART: 'INVALID_HAS_PART',
   INVALID_CONTENT_SIZE: 'INVALID_CONTENT_SIZE',
+  INVALID_ELN_STRUCTURE: 'INVALID_ELN_STRUCTURE',
+  MISSING_ELN_METADATA: 'MISSING_ELN_METADATA',
+  INVALID_ELN_METADATA: 'INVALID_ELN_METADATA',
+  MISSING_ELN_FILE: 'MISSING_ELN_FILE',
+  INVALID_ELN_CHECKSUM: 'INVALID_ELN_CHECKSUM',
 } as const;
 
 export type ElnErrorCode = (typeof ElnErrorCode)[keyof typeof ElnErrorCode];
 
-export interface ElnValidationError {
+export type ElnError = {
   code: ElnErrorCode;
   message: string;
-}
+};
+
+export type ElnParseSuccess = {
+  ok: true;
+  value: ElnArchive;
+};
+
+export type ElnParseFailure = {
+  ok: false;
+  errors: ElnError[];
+};
+
+export type ElnParseResult = ElnParseSuccess | ElnParseFailure;
+
+export type ElnValidationSuccess = {
+  ok: true;
+};
+
+export type ElnValidationFailure = {
+  ok: false;
+  errors: ElnError[];
+};
+
+export type ElnValidationResult = ElnValidationSuccess | ElnValidationFailure;
+
+// --- constants ---
+
+const METADATA_FILENAME = 'ro-crate-metadata.json';
 
 const SUPPORTED_PUBLISHERS = [
   'https://github.com/paulscherrerinstitute/scilog',
@@ -39,7 +69,138 @@ const SUPPORTED_RO_CRATE_VERSIONS = [
   'https://w3id.org/ro/crate/1.2',
 ];
 
-export function validateElnMetadata(crate: ROCrate): ElnValidationError[] {
+// --- parsing ---
+
+export class ElnArchive {
+  private constructor(
+    readonly crate: ROCrate,
+    private readonly entries: Map<string, Buffer>,
+    private readonly rootFolder: string,
+  ) {}
+
+  /** Look up a file by its RO-Crate @id (e.g. "./book/file.txt"). */
+  getFile(fileId: string): Buffer | undefined {
+    const path = this.rootFolder + fileId.replace(/^\.\//, '');
+    return this.entries.get(path);
+  }
+
+  hasFile(fileId: string): boolean {
+    return this.getFile(fileId) !== undefined;
+  }
+
+  /**
+   * Parse raw zip entries into a ElnArchive.
+   * Validates archive structure and parses ro-crate-metadata.json.
+   * Never throws — all failures returned as ElnParseFailure.
+   */
+  static parse(entries: Map<string, Buffer>): ElnParseResult {
+    const prefixes = new Set<string>();
+    for (const name of entries.keys()) {
+      const slash = name.indexOf('/');
+      if (slash === -1) {
+        return {
+          ok: false,
+          errors: [
+            {
+              code: ElnErrorCode.INVALID_ELN_STRUCTURE,
+              message: 'Archive must contain a single root folder',
+            },
+          ],
+        };
+      }
+      prefixes.add(name.slice(0, slash + 1));
+    }
+    if (prefixes.size !== 1) {
+      return {
+        ok: false,
+        errors: [
+          {
+            code: ElnErrorCode.INVALID_ELN_STRUCTURE,
+            message: 'Archive must contain a single root folder',
+          },
+        ],
+      };
+    }
+
+    const rootFolder = [...prefixes][0];
+
+    const metadataPath = `${rootFolder}${METADATA_FILENAME}`;
+    if (!entries.has(metadataPath)) {
+      return {
+        ok: false,
+        errors: [
+          {
+            code: ElnErrorCode.MISSING_ELN_METADATA,
+            message: `Missing ${METADATA_FILENAME} in archive root folder`,
+          },
+        ],
+      };
+    }
+
+    let crate: ROCrate;
+    try {
+      const raw = JSON.parse(entries.get(metadataPath)!.toString());
+      crate = new ROCrate(raw, {array: true});
+    } catch {
+      return {
+        ok: false,
+        errors: [
+          {
+            code: ElnErrorCode.INVALID_ELN_METADATA,
+            message: `${METADATA_FILENAME} contains invalid JSON`,
+          },
+        ],
+      };
+    }
+
+    return {ok: true, value: new ElnArchive(crate, entries, rootFolder)};
+  }
+}
+
+// --- validation ---
+
+export function validateEln(parsed: ElnArchive): ElnValidationResult {
+  const errors = [
+    ...validateMetadata(parsed.crate),
+    ...validateIntegrity(parsed),
+  ];
+  return errors.length ? {ok: false, errors} : {ok: true};
+}
+
+export function validateIntegrity(parsed: ElnArchive): ElnError[] {
+  const errors: ElnError[] = [];
+
+  for (const entity of parsed.crate.entities()) {
+    const types = entity['@type'] as string[];
+    if (!types.includes('File')) continue;
+
+    const id = entity['@id'] as string;
+    const buf = parsed.getFile(id);
+
+    if (!buf) {
+      errors.push({
+        code: ElnErrorCode.MISSING_ELN_FILE,
+        message: `File ${id} not found in archive`,
+      });
+      continue;
+    }
+
+    const expected = entity.sha256?.[0] as string | undefined;
+    if (expected) {
+      const actual = crypto.createHash('sha256').update(buf).digest('hex');
+      if (actual !== expected) {
+        errors.push({
+          code: ElnErrorCode.INVALID_ELN_CHECKSUM,
+          message: `File ${id}: expected sha256 ${expected}, got ${actual}`,
+        });
+      }
+    }
+  }
+
+  return errors;
+}
+
+export function validateMetadata(crate: ROCrate): ElnError[] {
   return [
     ...validateConformsTo(crate),
     ...validateSdPublisher(crate),
@@ -50,7 +211,7 @@ export function validateElnMetadata(crate: ROCrate): ElnValidationError[] {
   ];
 }
 
-function validateConformsTo(crate: ROCrate): ElnValidationError[] {
+function validateConformsTo(crate: ROCrate): ElnError[] {
   const conformsTo = crate.descriptor.conformsTo;
   if (!conformsTo?.length) {
     return [
@@ -73,7 +234,7 @@ function validateConformsTo(crate: ROCrate): ElnValidationError[] {
   return [];
 }
 
-function validateSdPublisher(crate: ROCrate): ElnValidationError[] {
+function validateSdPublisher(crate: ROCrate): ElnError[] {
   const sdPublisher = crate.descriptor.sdPublisher;
   if (!sdPublisher?.length) {
     return [
@@ -104,7 +265,7 @@ function validateSdPublisher(crate: ROCrate): ElnValidationError[] {
     ];
   }
 
-  const errors: ElnValidationError[] = [];
+  const errors: ElnError[] = [];
   const types = publisher['@type'] as string[];
   if (!types.includes('Organization')) {
     errors.push({
@@ -127,8 +288,8 @@ function validateSdPublisher(crate: ROCrate): ElnValidationError[] {
   return errors;
 }
 
-function validateDatasets(crate: ROCrate): ElnValidationError[] {
-  const errors: ElnValidationError[] = [];
+function validateDatasets(crate: ROCrate): ElnError[] {
+  const errors: ElnError[] = [];
   for (const entity of crate.entities()) {
     const types = entity['@type'] as string[];
     if (!types.includes('Dataset')) continue;
@@ -149,8 +310,8 @@ function validateDatasets(crate: ROCrate): ElnValidationError[] {
   return errors;
 }
 
-function validateAuthors(crate: ROCrate): ElnValidationError[] {
-  const errors: ElnValidationError[] = [];
+function validateAuthors(crate: ROCrate): ElnError[] {
+  const errors: ElnError[] = [];
   for (const entity of crate.entities()) {
     const author = entity.author;
     if (!author?.length) continue;
@@ -184,8 +345,8 @@ function validateAuthors(crate: ROCrate): ElnValidationError[] {
   return errors;
 }
 
-function validateFiles(crate: ROCrate): ElnValidationError[] {
-  const errors: ElnValidationError[] = [];
+function validateFiles(crate: ROCrate): ElnError[] {
+  const errors: ElnError[] = [];
   for (const entity of crate.entities()) {
     const types = entity['@type'] as string[];
     if (!types.includes('File')) continue;
@@ -233,8 +394,8 @@ function isValidContentSize(value: string | number): boolean {
   return Number.isInteger(num) && num >= 0;
 }
 
-function validateHasPartReferences(crate: ROCrate): ElnValidationError[] {
-  const errors: ElnValidationError[] = [];
+function validateHasPartReferences(crate: ROCrate): ElnError[] {
+  const errors: ElnError[] = [];
   for (const entity of crate.entities()) {
     const hasPart = entity.hasPart;
     if (!hasPart?.length) continue;
