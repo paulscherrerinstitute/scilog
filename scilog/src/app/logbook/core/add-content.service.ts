@@ -3,18 +3,16 @@ import { Subject } from 'rxjs';
 import { ChangeStreamNotification } from './changestreamnotification.model';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class AddContentService {
-
   private messageSource = new Subject<ChangeStreamNotification>();
 
   currentMessage$ = this.messageSource.asObservable();
 
-  constructor() { }
+  constructor() {}
 
   changeMessage(message: ChangeStreamNotification) {
     this.messageSource.next(message);
   }
 }
-
