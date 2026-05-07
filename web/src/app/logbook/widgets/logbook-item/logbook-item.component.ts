@@ -353,7 +353,6 @@ export class LogbookItemComponent implements OnInit, AfterViewInit, OnDestroy {
     });
   }
 
-
   async parseNotification(notification: ChangeStreamNotification) {
     switch (notification.operationType) {
       case 'update':
