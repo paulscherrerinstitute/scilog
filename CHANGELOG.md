@@ -1,3 +1,17 @@
+## [2.3.9](https://github.com/paulscherrerinstitute/scilog/compare/v2.3.8...v2.3.9) (2026-04-29)
+
+
+### Bug Fixes
+
+* **api:** run tests inside the dev container ([#603](https://github.com/paulscherrerinstitute/scilog/issues/603)) ([eb70ac1](https://github.com/paulscherrerinstitute/scilog/commit/eb70ac114fd66fbaa73ef6035130b085a8095bba)), closes [#601](https://github.com/paulscherrerinstitute/scilog/issues/601)
+
+## [2.3.8](https://github.com/paulscherrerinstitute/scilog/compare/v2.3.7...v2.3.8) (2026-04-28)
+
+
+### Reverts
+
+* Revert "chore(api): move rs.initiate to post_start ([#576](https://github.com/paulscherrerinstitute/scilog/issues/576))" ([#599](https://github.com/paulscherrerinstitute/scilog/issues/599)) ([edd7acf](https://github.com/paulscherrerinstitute/scilog/commit/edd7acf3c4d14bce9fce3453bf22c4122c74ba1c))
+
 ## [2.3.7](https://github.com/paulscherrerinstitute/scilog/compare/v2.3.6...v2.3.7) (2026-04-16)
 
 
