@@ -24,8 +24,8 @@ RUN --mount=type=bind,source=package.json,target=package.json \
     --mount=type=cache,target=/root/.npm,sharing=locked \
     npm ci --no-audit --no-fund
 
-# Ahead-of-time TypeScript compilation. Its only job is to produce dist/
-# for the production stage to copy from — not meant to be run directly.
+# Ahead-of-time TypeScript compilation. Produces dist/ for the
+# test and production stages.
 FROM dev-deps AS build
 
 COPY --chown=node:node . .
@@ -48,12 +48,10 @@ CMD ["npm", "run", "dev"]
 # Runs the test suite once and exits. Kept separate from development so CI
 # (and local `docker compose up api-test`) can build --target test without
 # replicating the env vars, user, and command overrides in every caller.
-FROM dev-deps AS test
+FROM build AS test
 
 ENV NODE_ENV=test \
     CI=true
-
-COPY --chown=node:node . .
 
 USER node
 
