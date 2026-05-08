@@ -67,7 +67,7 @@ export class EntityBuilderService {
       '@type': string;
       name: string;
       encodingFormat: string;
-      contentSize?: number;
+      contentSize?: string;
       sha256?: string;
     } = {
       '@id': this.getFilePath(
@@ -80,7 +80,7 @@ export class EntityBuilderService {
       encodingFormat: fileObj.contentType,
     };
     if (fileObj.contentSize !== undefined) {
-      result['contentSize'] = fileObj.contentSize;
+      result['contentSize'] = String(fileObj.contentSize);
     }
     if (fileObj.contentSha256 !== undefined) {
       result['sha256'] = fileObj.contentSha256;
@@ -102,6 +102,7 @@ export class EntityBuilderService {
       '@id': 'https://github.com/paulscherrerinstitute/scilog',
       '@type': 'Organization',
       name: 'SciLog',
+      url: 'https://github.com/paulscherrerinstitute/scilog',
     };
   }
 
