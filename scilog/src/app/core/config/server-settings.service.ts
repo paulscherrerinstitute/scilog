@@ -23,6 +23,10 @@ export class ServerSettingsService {
     return this.appConfigService.getScicatSettings()?.frontendBaseURL;
   }
 
+  getScilogFrontendBaseUrl(): string {
+    return this.appConfigService.getConfig().frontendBaseURL ?? window.location.origin;
+  }
+
   getSocketAddress() {
     const lbBaseURL = this.appConfigService.getConfig().lbBaseURL ?? 'http://localhost:3000/';
     if (!lbBaseURL.startsWith('http'))

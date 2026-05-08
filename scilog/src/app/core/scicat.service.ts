@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { map, Observable, switchMap } from 'rxjs';
+import { map, Observable, of, switchMap } from 'rxjs';
 import { ServerSettingsService } from './config/server-settings.service';
 import {
   DatasetsService,
@@ -8,10 +8,13 @@ import {
   ReturnedUserDto,
   UsersService,
 } from '@scicatproject/scicat-sdk-ts-angular';
+import { HttpContext, HttpContextToken } from '@angular/common/http';
 
 export type Dataset = OutputDatasetObsoleteDto;
 export type DatasetSummary = Pick<Dataset, 'pid' | 'datasetName' | 'creationTime'>;
 export type ScicatUser = ReturnedUserDto;
+
+export const IF_UNMODIFIED_SINCE = new HttpContextToken<string>(() => undefined);
 
 @Injectable({
   providedIn: 'root',
@@ -70,6 +73,60 @@ export class ScicatService {
           fields: ['pid', 'datasetName', 'creationTime'],
         });
         return this.datasetsService.datasetsControllerFindAllV3(filter);
+      }),
+    );
+  }
+
+  getUserLinkedDatasetsSummary(logbookId: string): Observable<DatasetSummary[]> {
+    const filter = JSON.stringify({
+      where: { 'relationships.relationship': 'Logbook', 'relationships.externalId': logbookId },
+      fields: ['pid', 'datasetName', 'creationTime'],
+    });
+    return this.datasetsService.datasetsControllerFindAllV3(filter);
+  }
+
+  linkLogbookToDataset(logbookId: string, pid: string): Observable<boolean> {
+    return this.getDataset(pid).pipe(
+      switchMap((dataset) => {
+        const alreadyLinked = dataset.relationships?.some(
+          (rel) => rel.relationship === 'Logbook' && rel.externalId === logbookId,
+        );
+        if (alreadyLinked) {
+          return of(false);
+        }
+
+        // the actual relationship object also contains an _id, it must be removed from the update request
+        const existingRelationships = (dataset.relationships ?? []).map(
+          ({ relationship, identifier, identifierType, entityType, externalId }) => ({
+            relationship,
+            identifier,
+            identifierType,
+            entityType,
+            externalId,
+          }),
+        );
+        const relationshipsUpdate = [
+          ...existingRelationships,
+          {
+            relationship: 'Logbook',
+            identifier: `${this.serverSettingsService.getScilogFrontendBaseUrl()}/logbooks/${logbookId}/dashboard`,
+            identifierType: 'URL',
+            entityType: 'Logbook',
+            externalId: logbookId,
+          },
+        ];
+
+        return this.datasetsService
+          .datasetsControllerFindByIdAndUpdateV3(
+            pid,
+            { relationships: relationshipsUpdate },
+            undefined,
+            undefined,
+            {
+              context: new HttpContext().set(IF_UNMODIFIED_SINCE, dataset.updatedAt),
+            },
+          )
+          .pipe(map(() => true));
       }),
     );
   }

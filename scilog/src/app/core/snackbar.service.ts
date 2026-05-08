@@ -80,4 +80,17 @@ export class SnackbarService {
       panelClass: snack.panelClass,
     });
   }
+
+  showSnackbarMessage(message: string, messageClass: 'warning' | 'resolved') {
+    return this._showMessage({
+      message: message,
+      panelClass: [`${messageClass}-snackbar`],
+      action: 'Dismiss',
+      show: true,
+      duration: 4000,
+      type: 'serverMessage',
+      horizontalPosition: 'center',
+      verticalPosition: 'top',
+    });
+  }
 }

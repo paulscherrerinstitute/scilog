@@ -319,7 +319,7 @@ export class AddLogbookComponent implements OnInit, OnDestroy {
           this.getForm(key).setErrors({ required: true });
         }
       }
-      this.showSnackbarMessage(`Invalid keys: '${invalidKeys}'`, 'warning');
+      this.snackBar.showSnackbarMessage(`Invalid keys: '${invalidKeys}'`, 'warning');
       return;
     }
 
@@ -355,7 +355,7 @@ export class AddLogbookComponent implements OnInit, OnDestroy {
         await this.logbookDataService.patchLogbook(logbookId, this.logbook);
       } catch (error) {
         console.log(error);
-        this.showSnackbarMessage(
+        this.snackBar.showSnackbarMessage(
           'Error while updating the logbook. If the error persists contact an administrator',
           'warning',
         );
@@ -363,7 +363,7 @@ export class AddLogbookComponent implements OnInit, OnDestroy {
       } finally {
         this.logbook.id = logbookId;
       }
-      this.showSnackbarMessage('Edit successful', 'resolved');
+      this.snackBar.showSnackbarMessage('Edit successful', 'resolved');
     } else {
       // create new logbook
       try {
@@ -371,28 +371,15 @@ export class AddLogbookComponent implements OnInit, OnDestroy {
         this.logbook.id = data.id;
       } catch (error) {
         console.log(error);
-        this.showSnackbarMessage(
+        this.snackBar.showSnackbarMessage(
           'Error while creating the logbook. If the error persists contact an administrator',
           'warning',
         );
         return;
       }
-      this.showSnackbarMessage('Creation successful', 'resolved');
+      this.snackBar.showSnackbarMessage('Creation successful', 'resolved');
     }
     this.dialogRef.close(this.logbook);
-  }
-
-  private showSnackbarMessage(message: string, messageClass: 'warning' | 'resolved') {
-    return this.snackBar._showMessage({
-      message: message,
-      panelClass: [`${messageClass}-snackbar`],
-      action: 'Dismiss',
-      show: true,
-      duration: 4000,
-      type: 'serverMessage',
-      horizontalPosition: 'center',
-      verticalPosition: 'top',
-    });
   }
 
   selectLocation(id: any) {
