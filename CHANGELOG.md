@@ -1,3 +1,10 @@
+# [2.4.0](https://github.com/paulscherrerinstitute/scilog/compare/v2.3.9...v2.4.0) (2026-05-08)
+
+
+### Features
+
+* **api:** add url to sdPublisher Organization ([#607](https://github.com/paulscherrerinstitute/scilog/issues/607)) ([e9ab705](https://github.com/paulscherrerinstitute/scilog/commit/e9ab705c27fa7b9ec146859ba2e81e63cfe0f4a4)), closes [#600](https://github.com/paulscherrerinstitute/scilog/issues/600)
+
 ## [2.3.9](https://github.com/paulscherrerinstitute/scilog/compare/v2.3.8...v2.3.9) (2026-04-29)
 
 
