@@ -1,3 +1,10 @@
+## [2.4.1](https://github.com/paulscherrerinstitute/scilog/compare/v2.4.0...v2.4.1) (2026-05-08)
+
+
+### Bug Fixes
+
+* **api:** emit contentSize as string per ELN spec ([#609](https://github.com/paulscherrerinstitute/scilog/issues/609)) ([c9bb86b](https://github.com/paulscherrerinstitute/scilog/commit/c9bb86b7afaebecc155b846d11b16bfba8a180dd)), closes [#608](https://github.com/paulscherrerinstitute/scilog/issues/608)
+
 # [2.4.0](https://github.com/paulscherrerinstitute/scilog/compare/v2.3.9...v2.4.0) (2026-05-08)
 
 
