@@ -102,6 +102,7 @@ export class EntityBuilderService {
       '@id': 'https://github.com/paulscherrerinstitute/scilog',
       '@type': 'Organization',
       name: 'SciLog',
+      url: 'https://github.com/paulscherrerinstitute/scilog',
     };
   }
 
