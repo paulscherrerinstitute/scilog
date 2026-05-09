@@ -59,7 +59,7 @@
     "@angular/cli": "^19.2.14",
     "@angular/compiler-cli": "^19.2.14",
     "@scicatproject/scicat-sdk-ts-angular": "^4.25.1",
-    "@types/jasmine": "~3.6.0",
+    "@types/jasmine": "~3.10.0",
     "@types/jasminewd2": "~2.0.3",
     "@types/node": "^22.15.29",
     "@typescript-eslint/eslint-plugin": "^8.33.0",
