@@ -78,6 +78,7 @@
     "@types/passport": "1.0.17",
     "@types/prismjs": "1.26.6",
     "@types/ws": "8.18.1",
+    "@types/yauzl": "2.10.3",
     "eslint": "8.57.1",
     "typescript": "5.2.2",
     "yauzl": "3.2.1"
