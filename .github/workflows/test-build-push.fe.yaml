@@ -3,14 +3,8 @@ name: Test && Build && Push
 on:
   pull_request:
     branches: [main]
-    paths:
-      - scilog/**
-      - .github/workflows/test-build-push.fe.yaml
   push:
     branches: [main]
-    paths:
-      - scilog/**
-      - .github/workflows/test-build-push.fe.yaml
   release:
     types: [published]
 
