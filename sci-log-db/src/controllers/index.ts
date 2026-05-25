@@ -7,3 +7,4 @@ export * from './user.controller';
 export * from './user-preference.controller';
 export * from './oidc.controller';
 export * from './ro-crate.controller';
+export * from './eln-import.controller';

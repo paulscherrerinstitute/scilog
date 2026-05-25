@@ -11,8 +11,6 @@ import {Filesnippet} from '../models/file.model';
 import {SecurityBindings, UserProfile} from '@loopback/security';
 
 import {RawEntity} from 'ro-crate/lib/types';
-// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-// @ts-ignore
 import {ROCrate} from 'ro-crate';
 
 export interface FileMetadata {
@@ -62,7 +60,7 @@ export class RoCrateExportService {
     this.crate.root.description = logbook.description ?? '';
     this.crate.root.license = this.entityBuilder.buildLicenseEntity();
     this.crate.root.datePublished = new Date().toISOString();
-    this.crate.metadata.sdPublisher =
+    this.crate.descriptor.sdPublisher =
       this.entityBuilder.buildOrganizationEntity();
     this.crate.root.hasPart = [];
 

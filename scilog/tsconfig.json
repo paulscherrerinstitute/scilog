@@ -13,6 +13,16 @@
     "target": "ES2022",
     "module": "es2020",
     "lib": ["es2020", "dom"],
-    "useDefineForClassFields": false
+    "useDefineForClassFields": false,
+    "paths": {
+      "@model/*": ["src/app/core/model/*"],
+      "@shared/*": [
+        "src/app/core/*",
+        "src/app/logbook/core/*",
+        "src/app/overview/core/*",
+        "src/app/login/core/*"
+      ],
+      "@widgets/*": ["src/app/core/logbook/widgets/*"]
+    }
   }
 }

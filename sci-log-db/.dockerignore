@@ -1,5 +1,33 @@
-node_modules
-npm-debug.log
-/dist
-# Cache used by TypeScript's incremental build
+# Docker
+.dockerignore
+compose.yaml
+Dockerfile
+
+# Git
+**/.gitignore
+
+# Dependencies and build output
+node_modules/
+dist/
+
+# Docker init scripts (only needed by Mongo, not the app)
+init/
+
+# Environment files
+.env*
+
+# Config files
+*.txt
+*.json
+!.mocharc.json
+!package.json
+!package-lock.json
+!tsconfig.json
+
+# Logs and caches
+*.log
+.eslintcache
 *.tsbuildinfo
+
+# Documentation
+*.md

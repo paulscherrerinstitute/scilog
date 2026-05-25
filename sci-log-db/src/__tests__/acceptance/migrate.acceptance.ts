@@ -79,7 +79,7 @@ describe('Migrate', function (this: Suite) {
     const bucket: GridFSBucket = new mongodb.GridFSBucket(db);
     const uploadStream = bucket.openUploadStream('hello.txt');
     fs.createReadStream(
-      path.resolve(__dirname, '../test-data', 'hello.txt'),
+      path.resolve('src', '__tests__', 'test-data', 'hello.txt'),
     ).pipe(uploadStream);
     await new Promise((resolve, reject) => {
       uploadStream.on('error', (err: unknown) => {

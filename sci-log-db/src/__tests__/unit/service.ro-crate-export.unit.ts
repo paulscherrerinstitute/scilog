@@ -77,7 +77,7 @@ describe('RoCrateExportService (unit)', () => {
       entityBuilder.getEntityId('logbook-1'),
     );
     // expect logbook name/description to match
-    expect(logbookEntity.name).to.equal('SciLog ELN export: Test Logbook');
+    expect(logbookEntity.name).to.equal('Test Logbook');
     expect(logbookEntity.description).to.equal('A logbook for testing');
     // expect hasPart to contain three snippets: two paragraphs and a comment
     expect(logbookEntity.hasPart).to.be.Array();

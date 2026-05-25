@@ -9,7 +9,6 @@ import {User} from './models';
 import {Credentials} from './repositories';
 import {ExportService} from './services/export-snippets.service';
 import {PasswordHasher} from './services/hash.password.bcryptjs';
-import {FileUploadHandler} from './types';
 
 export namespace PasswordHasherBindings {
   export const PASSWORD_HASHER =
@@ -22,18 +21,6 @@ export namespace UserServiceBindings {
     'services.user.service',
   );
 }
-
-/**
- * Binding key for the file upload service
- */
-export const FILE_UPLOAD_SERVICE = BindingKey.create<FileUploadHandler>(
-  'services.FileUpload',
-);
-
-/**
- * Binding key for the storage directory
- */
-export const STORAGE_DIRECTORY = BindingKey.create<string>('storage.directory');
 
 /**
  * Binding key for the export service

@@ -59,7 +59,7 @@ describe('SetupApp', () => {
       expect(mongoStub.callCount).to.eql(i);
       if (t)
         expect(mongoStub.args[0]).to.eql([
-          {mongoUrl: 'mongodb://mongodb:27017/testdb'},
+          {mongoUrl: 'mongodb://mongo:27017/testdb'},
         ]);
     });
   });

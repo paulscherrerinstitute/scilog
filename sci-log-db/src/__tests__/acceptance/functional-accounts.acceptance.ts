@@ -13,12 +13,7 @@ import {Basesnippet, Location, Logbook, Paragraph} from '../../models';
 
 class TestFunctionalAccountsApp extends SciLogDbApplication {
   locations = ['location1', 'location2'];
-  idsLocation: Record<string, string>;
-
-  constructor() {
-    super(SciLogDbApplication);
-    this.idsLocation = {};
-  }
+  idsLocation: Record<string, string> = {};
 
   async createLocationSnippets(location: string) {
     const locationId = await this.createLogbook(location, {
