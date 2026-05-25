@@ -3,19 +3,10 @@ name: Test && Build && Push
 on:
   pull_request:
     branches: [main]
-    paths: 
-      - sci-log-db/**
-      - .github/workflows/test-build-push.be.yaml
   push:
     branches: [main]
-    paths: 
-      - sci-log-db/**
-      - .github/workflows/test-build-push.be.yaml
   release:
     types: [published]
-    paths: 
-      - sci-log-db/**
-      - .github/workflows/test-build-push.be.yaml
 
 env:
   CONTAINER_REGISTRY: ghcr.io
@@ -46,7 +37,8 @@ jobs:
       - name: Extract tags
         id: tags
         run: |
-          prefix=$CONTAINER_REGISTRY/$IMAGE_NAME
+          image_name="${IMAGE_NAME,,}"
+          prefix=$CONTAINER_REGISTRY/$image_name
           tags=$prefix:"${{ github.sha }}"
           if [[ "${{ github.event_name }}" == "release" ]]; then
             tags=$prefix:"${{ github.event.release.tag_name }}",$prefix:stable
