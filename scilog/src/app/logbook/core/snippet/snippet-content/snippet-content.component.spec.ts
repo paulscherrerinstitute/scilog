@@ -169,7 +169,7 @@ describe('SnippetContentComponent', () => {
 
     expect(link).toBeInstanceOf(HTMLAnchorElement);
     const base = link.baseURI;
-    expect(link.href).toEqual(`file://${snippetMock.files[0].fileHash}/`);
+    expect(link.href).toEqual(`file://${snippetMock.files[0].fileId}/`);
   });
 
   const editTest = [
