@@ -285,6 +285,9 @@ export class LogbookItemComponent implements OnInit, AfterViewInit, OnDestroy {
     this.updateViewSubscription();
 
     this.scrollToElement();
+    setTimeout(() => {
+      this.scrollOnClickTo('end');
+    }, 300);
   }
 
   private scrollToElement() {
