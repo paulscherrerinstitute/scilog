@@ -1,3 +1,10 @@
+## [2.4.2](https://github.com/paulscherrerinstitute/scilog/compare/v2.4.1...v2.4.2) (2026-05-27)
+
+
+### Bug Fixes
+
+* **api:** build once before starting dev watchers ([#615](https://github.com/paulscherrerinstitute/scilog/issues/615)) ([78efd61](https://github.com/paulscherrerinstitute/scilog/commit/78efd61d468c0cdb0604fe9ded36ef2f23ef85a0))
+
 ## [2.4.1](https://github.com/paulscherrerinstitute/scilog/compare/v2.4.0...v2.4.1) (2026-05-08)
 
 
