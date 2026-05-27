@@ -6,3 +6,4 @@
 export * from './ro-crate-export.service';
 export * from './entity-builder.service';
 export * from './archive.service';
+export * from './file-storage.service';

@@ -1,6 +1,6 @@
 import {authenticate} from '@loopback/authentication';
 import {authorize} from '@loopback/authorization';
-import {inject} from '@loopback/core';
+import {inject, service} from '@loopback/core';
 import {
   Count,
   CountSchema,
@@ -25,15 +25,15 @@ import {
 } from '@loopback/rest';
 import {SecurityBindings, UserProfile} from '@loopback/security';
 import {formidable, File} from 'formidable';
-import fs from 'fs';
+import {createReadStream} from 'node:fs';
 import _ from 'lodash';
 import {Filesnippet} from '../models/file.model';
 import {FileRepository} from '../repositories/file.repository';
 import {basicAuthorization} from '../services/basic.authorizor';
+import {FileStorageService} from '../services/file-storage.service';
 import {validateFieldsVSModel} from '../utils/misc';
 import {OPERATION_SECURITY_SPEC} from '../utils/security-spec';
 
-import * as mongodb from 'mongodb';
 import crypto from 'crypto';
 
 const filesnippetModel = modelToJsonSchema(Filesnippet);
@@ -68,16 +68,12 @@ class MissingFileError extends Error {
   voters: [basicAuthorization],
 })
 export class FileController {
-  bucket: mongodb.GridFSBucket;
   constructor(
     @inject(SecurityBindings.USER) private user: UserProfile,
     @repository(FileRepository)
     public fileRepository: FileRepository,
-  ) {
-    this.bucket = new mongodb.GridFSBucket(
-      this.fileRepository.dataSource.connector?.db,
-    );
-  }
+    @service(FileStorageService) private fileStorage: FileStorageService,
+  ) {}
 
   @post('/filesnippet', {
     security: OPERATION_SECURITY_SPEC,
@@ -132,7 +128,10 @@ export class FileController {
     request: Request,
   ): Promise<Filesnippet> {
     const formData = await this.parseFormData(request);
-    formData.fields._fileId = await this.uploadToGridfs(formData.file.filepath);
+    formData.fields._fileId = await this.fileStorage.upload(
+      createReadStream(formData.file.filepath),
+      formData.file.originalFilename ?? formData.file.filepath,
+    );
     formData.fields.accessHash = crypto.randomBytes(64).toString('hex');
     const file = await this.fileRepository.create(
       _.omit(formData.fields, ['id']),
@@ -296,7 +295,7 @@ export class FileController {
       throw new HttpErrors.BadRequest(`Retrieving sandbox data is deprecated.`);
     }
     response.set('Content-Type', data.contentType);
-    this.bucket.openDownloadStream(data._fileId).pipe(response);
+    this.fileStorage.downloadStream(data._fileId).pipe(response);
     return response;
   }
 
@@ -329,7 +328,10 @@ export class FileController {
     request: Request,
   ): Promise<void> {
     const formData = await this.parseFormData(request);
-    formData.fields._fileId = await this.uploadToGridfs(formData.file.filepath);
+    formData.fields._fileId = await this.fileStorage.upload(
+      createReadStream(formData.file.filepath),
+      formData.file.originalFilename ?? formData.file.filepath,
+    );
     await this.fileRepository.updateById(id, _.omit(formData.fields, ['id']), {
       currentUser: this.user,
     });
@@ -415,22 +417,5 @@ export class FileController {
     const file = files.file[0];
     const fileSnippet = this.addFormDataToFileSnippet(parsedFields, file);
     return {fields: fileSnippet, file};
-  }
-
-  async uploadToGridfs(filepath: string): Promise<string> {
-    return new Promise((resolve, reject) => {
-      const readStream = fs.createReadStream(filepath);
-      const uploadStream = this.bucket.openUploadStream(filepath);
-      readStream.pipe(uploadStream);
-      const id = uploadStream.id;
-      uploadStream
-        .on('error', (error: unknown) => {
-          console.error(error);
-          reject({error});
-        })
-        .on('finish', () => {
-          resolve(id.toString());
-        });
-    });
   }
 }
