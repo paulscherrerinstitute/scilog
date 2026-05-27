@@ -95,15 +95,15 @@ export class AddContentComponent implements OnInit, OnDestroy {
       this.defaultTags = data.defaultTags;
       this.adjustContentForEditor();
       this.initialized = true;
-      console.log(this.data);
+      //console.log(this.data);
     }
   }
 
   ngOnInit(): void {
     this.setupComponent();
     this.subscriptions.push(
-      this.dataService.currentMessage.subscribe((message) => {
-        console.log(message);
+      this.dataService.currentMessage$.subscribe((message) => {
+        //console.log(message);
         if (message != null) {
           // this.message = message;
         }
@@ -118,12 +118,12 @@ export class AddContentComponent implements OnInit, OnDestroy {
       this.addButtonLabel = 'Add';
       this.dialogTitle = 'Add data snippet';
       if (this.logbookInfo.logbookInfo == null) {
-        console.log('logbook cannot be null');
+        //console.log('logbook cannot be null');
       } else {
         this.notification.parentId = this.logbookInfo.logbookInfo.id;
       }
       this.notification.linkType = LinkType.PARAGRAPH;
-      console.log(this.notification);
+      //console.log(this.notification);
       return;
     }
 
@@ -146,7 +146,7 @@ export class AddContentComponent implements OnInit, OnDestroy {
       if (this.message.linkType == LinkType.QUOTE) {
         this.dialogTitle = 'Reply';
         this.notification.linkType = LinkType.QUOTE;
-        console.log(this.message);
+        //console.log(this.message);
         this.notification.subsnippets = JSON.parse(JSON.stringify(this.message.subsnippets));
         this.prepareSubsnippetsQuoteContainer();
       } else {
@@ -166,7 +166,7 @@ export class AddContentComponent implements OnInit, OnDestroy {
   }
 
   onEditorReady(editor: any) {
-    console.log(Array.from(editor.ui.componentFactory.names()));
+    //console.log(Array.from(editor.ui.componentFactory.names()));
     editor.ui
       .getEditableElement()
       .parentElement.insertBefore(editor.ui.view.toolbar.element, editor.ui.getEditableElement());
@@ -178,7 +178,7 @@ export class AddContentComponent implements OnInit, OnDestroy {
   }
 
   addContent($event: any) {
-    console.log('adding new content');
+    //console.log('adding new content');
     if (this.liveFeedback) {
       return;
     }
@@ -225,7 +225,7 @@ export class AddContentComponent implements OnInit, OnDestroy {
   }
 
   prepareSubsnippetsQuoteContainer() {
-    console.log(this.notification.subsnippets);
+    //console.log(this.notification.subsnippets);
     delete this.notification.subsnippets[0]?.id;
     delete this.notification.subsnippets[0]?.parentId;
     delete this.notification.subsnippets[0]?.updatedAt;
@@ -236,7 +236,7 @@ export class AddContentComponent implements OnInit, OnDestroy {
     delete this.notification.subsnippets[0]?.subsnippets;
 
     this.notification.subsnippets[0].linkType = LinkType.QUOTE;
-    console.log(this.notification.subsnippets);
+    //console.log(this.notification.subsnippets);
   }
 
   prepareMessage(data: string) {
@@ -253,14 +253,14 @@ export class AddContentComponent implements OnInit, OnDestroy {
     }
 
     if (this.notification.linkType == LinkType.QUOTE) {
-      console.log('preparing quote');
+      //console.log('preparing quote');
       // send paragraph and subsnippet (that is a copy of the reference);
       this.notification.linkType = LinkType.PARAGRAPH;
     }
   }
 
   sendMessage(message: ChangeStreamNotification = undefined) {
-    console.log(this.notification);
+    //console.log(this.notification);
     this.dataService.changeMessage(message ?? this.notification);
   }
 
@@ -308,7 +308,7 @@ export class AddContentComponent implements OnInit, OnDestroy {
 
   ngOnDestroy(): void {
     this.sendEditDelitionMessage();
-    console.log('deleting add-content subscriptions');
+    //console.log('deleting add-content subscriptions');
     this.subscriptions.forEach((subscription) => subscription.unsubscribe());
   }
 
@@ -328,7 +328,7 @@ export class AddContentComponent implements OnInit, OnDestroy {
 }
 
 export function extractNotificationMessage(htmlData: string, fileStorage: any = []) {
-  console.log('extracting notification');
+  //console.log('extracting notification');
 
   let dataEditor = htmlData;
   var span = document.createElement('figure');
@@ -340,7 +340,7 @@ export function extractNotificationMessage(htmlData: string, fileStorage: any = 
 
   for (let index = 0; index < imgCollection.length; index++) {
     let img = imgCollection[index];
-    console.log(img);
+    //console.log(img);
     let container: Filecontainer;
     if (img.src.startsWith('data:')) {
       // new image
@@ -375,7 +375,7 @@ export function extractNotificationMessage(htmlData: string, fileStorage: any = 
 
   let links = span.querySelectorAll('a');
   links.forEach((link) => {
-    console.log(link);
+    //console.log(link);
     let f = fileStorage.find((file) => {
       return file.fileHash == link.pathname.substring(1);
     });
@@ -387,9 +387,9 @@ export function extractNotificationMessage(htmlData: string, fileStorage: any = 
     }
   });
 
-  console.log(snippetFiles);
+  //console.log(snippetFiles);
 
-  console.log(span.innerHTML);
+  //console.log(span.innerHTML);
 
   let notification: ChangeStreamNotification = null;
   if (dataEditor != '') {

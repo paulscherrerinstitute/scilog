@@ -3,19 +3,10 @@ name: Import tools formatting
 on:
   pull_request:
     branches: [main]
-    paths: 
-      - importTools/**
-      - .github/workflows/black.importTools-python.yaml
   push:
     branches: [main]
-    paths: 
-      - importTools/**
-      - .github/workflows/black.importTools-python.yaml
   release:
     types: [published]
-    paths: 
-      - importTools/**
-      - .github/workflows/black.importTools-python.yaml
 
 jobs:
   black:

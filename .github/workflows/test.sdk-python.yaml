@@ -3,19 +3,10 @@ name: Test python
 on:
   pull_request:
     branches: [main]
-    paths:
-      - sdk/python/**
-      - .github/workflows/test.sdk-python.yaml
   push:
     branches: [main]
-    paths:
-      - sdk/python/**
-      - .github/workflows/test.sdk-python.yaml
   release:
     types: [published]
-    paths:
-      - sdk/python/**
-      - .github/workflows/test.sdk-python.yaml
 
 jobs:
   test:
