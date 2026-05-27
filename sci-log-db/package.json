@@ -25,7 +25,7 @@
     "migrate": "node ./dist/migrate",
     "openapi-spec": "node ./dist/openapi-spec",
     "clean": "lb-clean dist *.tsbuildinfo .eslintcache",
-    "dev": "tsc --watch & node --watch --enable-source-maps ."
+    "dev": "tsc && (tsc --watch & node --watch --enable-source-maps .)"
   },
   "repository": {
     "type": "git"
