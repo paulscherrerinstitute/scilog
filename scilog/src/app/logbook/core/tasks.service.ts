@@ -63,11 +63,15 @@ export class TasksService implements OnDestroy {
     }
     switch (data.operationType) {
       case 'insert':
-        if (data.content.snippetType == 'task') {
-          this.tasks.push(data.content);
-          this.tasksSource.next(this.tasks);
+        if (data.content.snippetType === 'task') {
+          // Only push root-level tasks
+          if (data.content.parentId === this.logbookInfo?.logbookInfo?.id) {
+            this.tasks.push(data.content);
+            this.tasksSource.next(this.tasks);
+          }
         }
         break;
+
       case 'update':
         let updateIndex: number = -1;
         for (let taskIndex = 0; taskIndex < this.tasks.length; taskIndex++) {
@@ -94,6 +98,9 @@ export class TasksService implements OnDestroy {
       default:
         break;
     }
+  }
+  getTasksByParent(parentId: string): Promise<Tasks[]> {
+    return this.dataService.getTasksData(parentId);
   }
 
   ngOnDestroy(): void {
