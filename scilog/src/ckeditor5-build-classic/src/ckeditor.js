@@ -136,7 +136,7 @@ import ImageToolbar from '@ckeditor/ckeditor5-image/src/imagetoolbar';
 import ImageUpload from '@ckeditor/ckeditor5-image/src/imageupload';
 import Link from '@ckeditor/ckeditor5-link/src/link';
 import List from '@ckeditor/ckeditor5-list/src/list';
-import ListStyle from '@ckeditor/ckeditor5-list/src/liststyle.js';
+import ListProperties from '@ckeditor/ckeditor5-list/src/listproperties.js';
 import MediaEmbed from '@ckeditor/ckeditor5-media-embed/src/mediaembed';
 import Paragraph from '@ckeditor/ckeditor5-paragraph/src/paragraph';
 import RemoveFormat from '@ckeditor/ckeditor5-remove-format/src/removeformat.js';
@@ -189,7 +189,7 @@ ClassicEditor.builtinPlugins = [
 	Italic,
 	Link,
 	List,
-	ListStyle,
+	ListProperties,
 	MediaEmbed,
 	Paragraph,
 	RemoveFormat,

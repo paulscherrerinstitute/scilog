@@ -89,6 +89,11 @@ export let CKeditorConfig = {
   ],
   // shouldNotGroupWhenFull: true,
   placeholder: 'Add your content here.',
+  image: {
+    insert: {
+      type: 'auto',
+    },
+  },
   // toolbarLocation: 'bottom',
   // extraPlugins: [ fontFamily ]
   codeBlock: {
