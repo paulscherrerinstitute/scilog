@@ -92,3 +92,11 @@ converted into a `where` clause. This call returns snippet models such as
 # Get all paragraphs in the currently selected logbook
 snippets = log.get_snippets(snippetType="paragraph")
 ```
+
+## Examples
+
+Runnable scripts live in [`examples/`](./examples). `logbook.py` walks through
+the `SciLog` workflow end-to-end (querying logbooks, composing a message with
+text + images + tags, then querying snippets); `proposals.py` shows the
+`SciCat` client fetching proposals from a catalog. See [examples/README.md](./examples/README.md)
+for install and run instructions.
