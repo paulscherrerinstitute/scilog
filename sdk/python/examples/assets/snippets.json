@@ -11,12 +11,12 @@
         "files": [{
                 "fileExtension": "image/png",
                 "fileHash": "id-1",
-                "filepath": "./Image1.png"
+                "filepath": "./image1.png"
             },
             {
                 "fileExtension": "image/png",
                 "fileHash": "id-2",
-                "filepath": "./Image2.png"
+                "filepath": "./image2.png"
             }
         ],
         "linkType": "paragraph",

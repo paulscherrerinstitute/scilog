@@ -1,1 +1,0 @@
-scilog @ git+https://github.com/paulscherrerinstitute/scilog.git@main#subdirectory=sdk/python

@@ -6,12 +6,15 @@
 # data back
 # The account used is predefined in the code , change it to your needs
 #
-# python3 ./demo.py -u https://scilog.qa.psi.ch/api/v1 p12345
+# python3 ./logbook.py -u https://scilog.qa.psi.ch/api/v1 p12345
 
 import argparse
 import logging
+from pathlib import Path
 
 from scilog import LogbookMessage, SciLog
+
+ASSETS = Path(__file__).parent / "assets"
 
 logging.basicConfig(format="%(levelname)s:%(message)s", level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -40,9 +43,9 @@ log.select_logbook(logbook)
 
 # example of *adding* information (text,images,tags) to this  logbook. You can concatenate as much informationas you like
 msg = LogbookMessage()
-msg.add_text("<p>Another example text<p>").add_file("./Image1.png").add_tag(["color"]).add_text(
-    "<p>After the image<p>"
-).add_file("./Image2.png").add_tag(["testtag"])
+msg.add_text("<p>Another example text<p>").add_file(str(ASSETS / "image1.png")).add_tag(
+    ["color"]
+).add_text("<p>After the image<p>").add_file(str(ASSETS / "image2.png")).add_tag(["testtag"])
 log.send_logbook_message(msg)
 
 # Querying data: (the skip and limit arguments are optional)

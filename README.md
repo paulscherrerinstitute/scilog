@@ -16,9 +16,6 @@ The [sci-log-db](./sci-log-db) folder contains the REST API backend implementati
 ### SDK (python)
 The [sdk/python](./sdk/python) folder contains a wrapper of the backend REST APIs in python. It is currently limited to the core endpoints and doesn't yet cover all HTTP endpoints.
 
-### Examples
-The [demo](./demo) folder has examples of usage of the python SDK.
-
 ### Utility tools
 The [importTools](./importTools) folder has common tooling scripts for integration with SciLog, using the SDK.
 
