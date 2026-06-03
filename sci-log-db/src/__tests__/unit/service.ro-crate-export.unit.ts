@@ -73,6 +73,9 @@ describe('RoCrateExportService (unit)', () => {
     expect(rocrate.root.hasPart).to.containEql({
       '@id': entityBuilder.getEntityId('logbook-1'),
     });
+    expect(rocrate.root.author).to.containEql({
+      '@id': 'person://user-1@test.com',
+    });
     const logbookEntity = rocrate.getEntity(
       entityBuilder.getEntityId('logbook-1'),
     );
