@@ -1,3 +1,10 @@
+# [2.5.0](https://github.com/paulscherrerinstitute/scilog/compare/v2.4.2...v2.5.0) (2026-06-03)
+
+
+### Features
+
+* **api:** surface logbook author on ELN export root ([#622](https://github.com/paulscherrerinstitute/scilog/issues/622)) ([ac6be72](https://github.com/paulscherrerinstitute/scilog/commit/ac6be72df18b2f166651a684a6a08ef00638ef9f)), closes [#617](https://github.com/paulscherrerinstitute/scilog/issues/617)
+
 ## [2.4.2](https://github.com/paulscherrerinstitute/scilog/compare/v2.4.1...v2.4.2) (2026-05-27)
 
 
