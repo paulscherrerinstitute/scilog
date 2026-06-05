@@ -1,17 +1,18 @@
 import {expect} from '@loopback/testlab';
+import crypto from 'node:crypto';
+import fs from 'node:fs/promises';
+import os from 'node:os';
+import path from 'node:path';
 import {
   ElnErrorCode,
   ElnParseFailure,
   ElnArchive,
-  validateEln,
-  validateIntegrity,
-  validateMetadata,
 } from '../../services/eln-archive';
-import {validElnCrate, validElnEntries} from '../eln.helpers';
+import {buildElnZip, validElnCrate, validElnEntries} from '../eln.helpers';
 
-describe('validateMetadata', () => {
+describe('ElnArchive.validateMetadata', () => {
   it('accepts a minimal valid metadata object', () => {
-    expect(validateMetadata(validElnCrate())).to.be.empty();
+    expect(ElnArchive.validateMetadata(validElnCrate())).to.be.empty();
   });
 
   it('rejects when sdPublisher is not a supported publisher', () => {
@@ -19,7 +20,7 @@ describe('validateMetadata', () => {
     crate.setProperty('ro-crate-metadata.json', 'sdPublisher', {
       '@id': 'https://example.org/unknown-eln',
     });
-    expect(validateMetadata(crate)).to.containDeep([
+    expect(ElnArchive.validateMetadata(crate)).to.containDeep([
       {code: ElnErrorCode.INVALID_PUBLISHER},
     ]);
   });
@@ -27,7 +28,7 @@ describe('validateMetadata', () => {
   it('rejects when sdPublisher is missing', () => {
     const crate = validElnCrate();
     crate.deleteProperty('ro-crate-metadata.json', 'sdPublisher');
-    expect(validateMetadata(crate)).to.containDeep([
+    expect(ElnArchive.validateMetadata(crate)).to.containDeep([
       {code: ElnErrorCode.MISSING_ELN_FIELD},
     ]);
   });
@@ -36,7 +37,7 @@ describe('validateMetadata', () => {
     const crate = validElnCrate();
     const id = 'https://github.com/paulscherrerinstitute/scilog';
     crate.deleteEntity(id);
-    expect(validateMetadata(crate)).to.containDeep([
+    expect(ElnArchive.validateMetadata(crate)).to.containDeep([
       {code: ElnErrorCode.INVALID_PUBLISHER},
     ]);
   });
@@ -45,7 +46,7 @@ describe('validateMetadata', () => {
     const crate = validElnCrate();
     const id = 'https://github.com/paulscherrerinstitute/scilog';
     crate.setProperty(id, '@type', 'Person');
-    expect(validateMetadata(crate)).to.containDeep([
+    expect(ElnArchive.validateMetadata(crate)).to.containDeep([
       {code: ElnErrorCode.INVALID_PUBLISHER},
     ]);
   });
@@ -54,7 +55,7 @@ describe('validateMetadata', () => {
     const crate = validElnCrate();
     const id = 'https://github.com/paulscherrerinstitute/scilog';
     crate.deleteProperty(id, 'name');
-    expect(validateMetadata(crate)).to.containDeep([
+    expect(ElnArchive.validateMetadata(crate)).to.containDeep([
       {code: ElnErrorCode.INVALID_PUBLISHER},
     ]);
   });
@@ -63,7 +64,7 @@ describe('validateMetadata', () => {
     const crate = validElnCrate();
     const id = 'https://github.com/paulscherrerinstitute/scilog';
     crate.deleteProperty(id, 'url');
-    expect(validateMetadata(crate)).to.containDeep([
+    expect(ElnArchive.validateMetadata(crate)).to.containDeep([
       {code: ElnErrorCode.INVALID_PUBLISHER},
     ]);
   });
@@ -71,7 +72,7 @@ describe('validateMetadata', () => {
   it('rejects when conformsTo is missing from descriptor', () => {
     const crate = validElnCrate();
     crate.deleteProperty('ro-crate-metadata.json', 'conformsTo');
-    expect(validateMetadata(crate)).to.containDeep([
+    expect(ElnArchive.validateMetadata(crate)).to.containDeep([
       {code: ElnErrorCode.MISSING_ELN_FIELD},
     ]);
   });
@@ -81,7 +82,7 @@ describe('validateMetadata', () => {
     crate.setProperty('ro-crate-metadata.json', 'conformsTo', {
       '@id': 'https://w3id.org/ro/crate/1.0',
     });
-    expect(validateMetadata(crate)).to.containDeep([
+    expect(ElnArchive.validateMetadata(crate)).to.containDeep([
       {code: ElnErrorCode.INVALID_CONFORMS_TO},
     ]);
   });
@@ -89,7 +90,7 @@ describe('validateMetadata', () => {
   it('rejects when a File entity is missing name', () => {
     const crate = validElnCrate();
     crate.deleteProperty('./book/file.txt', 'name');
-    expect(validateMetadata(crate)).to.containDeep([
+    expect(ElnArchive.validateMetadata(crate)).to.containDeep([
       {code: ElnErrorCode.MISSING_FILE_FIELD},
     ]);
   });
@@ -97,7 +98,7 @@ describe('validateMetadata', () => {
   it('rejects when a File entity is missing encodingFormat', () => {
     const crate = validElnCrate();
     crate.deleteProperty('./book/file.txt', 'encodingFormat');
-    expect(validateMetadata(crate)).to.containDeep([
+    expect(ElnArchive.validateMetadata(crate)).to.containDeep([
       {code: ElnErrorCode.MISSING_FILE_FIELD},
     ]);
   });
@@ -105,7 +106,7 @@ describe('validateMetadata', () => {
   it('rejects when a File entity is missing sha256', () => {
     const crate = validElnCrate();
     crate.deleteProperty('./book/file.txt', 'sha256');
-    expect(validateMetadata(crate)).to.containDeep([
+    expect(ElnArchive.validateMetadata(crate)).to.containDeep([
       {code: ElnErrorCode.MISSING_FILE_FIELD},
     ]);
   });
@@ -113,7 +114,7 @@ describe('validateMetadata', () => {
   it('rejects when a File entity is missing contentSize', () => {
     const crate = validElnCrate();
     crate.deleteProperty('./book/file.txt', 'contentSize');
-    expect(validateMetadata(crate)).to.containDeep([
+    expect(ElnArchive.validateMetadata(crate)).to.containDeep([
       {code: ElnErrorCode.MISSING_FILE_FIELD},
     ]);
   });
@@ -121,7 +122,7 @@ describe('validateMetadata', () => {
   it('rejects when a Dataset entity is missing author', () => {
     const crate = validElnCrate();
     crate.deleteProperty('./book/', 'author');
-    expect(validateMetadata(crate)).to.containDeep([
+    expect(ElnArchive.validateMetadata(crate)).to.containDeep([
       {code: ElnErrorCode.MISSING_DATASET_FIELD},
     ]);
   });
@@ -129,7 +130,7 @@ describe('validateMetadata', () => {
   it('rejects when a Dataset entity is missing name', () => {
     const crate = validElnCrate();
     crate.deleteProperty('./book/', 'name');
-    expect(validateMetadata(crate)).to.containDeep([
+    expect(ElnArchive.validateMetadata(crate)).to.containDeep([
       {code: ElnErrorCode.MISSING_DATASET_FIELD},
     ]);
   });
@@ -137,7 +138,7 @@ describe('validateMetadata', () => {
   it('rejects when author entity is not found', () => {
     const crate = validElnCrate();
     crate.setProperty('./book/', 'author', {'@id': '#nonexistent'});
-    expect(validateMetadata(crate)).to.containDeep([
+    expect(ElnArchive.validateMetadata(crate)).to.containDeep([
       {code: ElnErrorCode.INVALID_AUTHOR},
     ]);
   });
@@ -145,7 +146,7 @@ describe('validateMetadata', () => {
   it('rejects when author entity is not a Person', () => {
     const crate = validElnCrate();
     crate.setProperty('#author', '@type', 'Organization');
-    expect(validateMetadata(crate)).to.containDeep([
+    expect(ElnArchive.validateMetadata(crate)).to.containDeep([
       {code: ElnErrorCode.INVALID_AUTHOR},
     ]);
   });
@@ -153,7 +154,7 @@ describe('validateMetadata', () => {
   it('rejects when author entity is missing email', () => {
     const crate = validElnCrate();
     crate.deleteProperty('#author', 'email');
-    expect(validateMetadata(crate)).to.containDeep([
+    expect(ElnArchive.validateMetadata(crate)).to.containDeep([
       {code: ElnErrorCode.INVALID_AUTHOR},
     ]);
   });
@@ -161,7 +162,7 @@ describe('validateMetadata', () => {
   it('rejects when hasPart references a non-existent entity', () => {
     const crate = validElnCrate();
     crate.addValues('./book/', 'hasPart', {'@id': './does-not-exist/'});
-    expect(validateMetadata(crate)).to.containDeep([
+    expect(ElnArchive.validateMetadata(crate)).to.containDeep([
       {code: ElnErrorCode.INVALID_HAS_PART},
     ]);
   });
@@ -169,13 +170,13 @@ describe('validateMetadata', () => {
   it('accepts numeric contentSize', () => {
     const crate = validElnCrate();
     crate.setProperty('./book/file.txt', 'contentSize', 123);
-    expect(validateMetadata(crate)).to.be.empty();
+    expect(ElnArchive.validateMetadata(crate)).to.be.empty();
   });
 
   it('rejects contentSize with unit suffixes', () => {
     const crate = validElnCrate();
     crate.setProperty('./book/file.txt', 'contentSize', '2.5MB');
-    expect(validateMetadata(crate)).to.containDeep([
+    expect(ElnArchive.validateMetadata(crate)).to.containDeep([
       {code: ElnErrorCode.INVALID_CONTENT_SIZE},
     ]);
   });
@@ -183,7 +184,7 @@ describe('validateMetadata', () => {
   it('rejects contentSize that is non-numeric', () => {
     const crate = validElnCrate();
     crate.setProperty('./book/file.txt', 'contentSize', 'abc');
-    expect(validateMetadata(crate)).to.containDeep([
+    expect(ElnArchive.validateMetadata(crate)).to.containDeep([
       {code: ElnErrorCode.INVALID_CONTENT_SIZE},
     ]);
   });
@@ -191,7 +192,7 @@ describe('validateMetadata', () => {
   it('rejects contentSize that is negative', () => {
     const crate = validElnCrate();
     crate.setProperty('./book/file.txt', 'contentSize', '-5');
-    expect(validateMetadata(crate)).to.containDeep([
+    expect(ElnArchive.validateMetadata(crate)).to.containDeep([
       {code: ElnErrorCode.INVALID_CONTENT_SIZE},
     ]);
   });
@@ -199,21 +200,21 @@ describe('validateMetadata', () => {
   it('rejects contentSize that is empty', () => {
     const crate = validElnCrate();
     crate.setProperty('./book/file.txt', 'contentSize', '');
-    expect(validateMetadata(crate)).to.containDeep([
+    expect(ElnArchive.validateMetadata(crate)).to.containDeep([
       {code: ElnErrorCode.INVALID_CONTENT_SIZE},
     ]);
   });
 });
 
-describe('ElnArchive.parse', () => {
+describe('ElnArchive.parseRaw', () => {
   it('returns ok for valid entries', () => {
-    const result = ElnArchive.parse(validElnEntries());
+    const result = ElnArchive.parseRaw(validElnEntries());
     expect(result.ok).to.be.true();
   });
 
   it('rejects when an entry has no folder prefix', () => {
     const entries = new Map([['ro-crate-metadata.json', Buffer.from('{}')]]);
-    const result = ElnArchive.parse(entries);
+    const result = ElnArchive.parseRaw(entries);
     expect(result.ok).to.be.false();
     expect((result as ElnParseFailure).errors).to.containDeep([
       {code: ElnErrorCode.INVALID_ELN_STRUCTURE},
@@ -225,7 +226,7 @@ describe('ElnArchive.parse', () => {
       ['folder-a/ro-crate-metadata.json', Buffer.from('{}')],
       ['folder-b/other.txt', Buffer.from('x')],
     ]);
-    const result = ElnArchive.parse(entries);
+    const result = ElnArchive.parseRaw(entries);
     expect(result.ok).to.be.false();
     expect((result as ElnParseFailure).errors).to.containDeep([
       {code: ElnErrorCode.INVALID_ELN_STRUCTURE},
@@ -234,7 +235,7 @@ describe('ElnArchive.parse', () => {
 
   it('rejects when ro-crate-metadata.json is missing', () => {
     const entries = new Map([['root/other.txt', Buffer.from('x')]]);
-    const result = ElnArchive.parse(entries);
+    const result = ElnArchive.parseRaw(entries);
     expect(result.ok).to.be.false();
     expect((result as ElnParseFailure).errors).to.containDeep([
       {code: ElnErrorCode.MISSING_ELN_METADATA},
@@ -245,7 +246,7 @@ describe('ElnArchive.parse', () => {
     const entries = new Map([
       ['root/ro-crate-metadata.json', Buffer.from('not json')],
     ]);
-    const result = ElnArchive.parse(entries);
+    const result = ElnArchive.parseRaw(entries);
     expect(result.ok).to.be.false();
     expect((result as ElnParseFailure).errors).to.containDeep([
       {code: ElnErrorCode.INVALID_ELN_METADATA},
@@ -253,50 +254,55 @@ describe('ElnArchive.parse', () => {
   });
 
   it('accepts nested files under the same root folder', () => {
-    const result = ElnArchive.parse(validElnEntries());
+    const result = ElnArchive.parseRaw(validElnEntries());
     expect(result.ok).to.be.true();
   });
 
   it('resolves file IDs via getFile()', () => {
-    const result = ElnArchive.parse(validElnEntries());
+    const result = ElnArchive.parseRaw(validElnEntries());
     expect(result.ok).to.be.true();
-    const parsed = (result as {ok: true; value: ElnArchive}).value;
-    const buf = parsed.getFile('./book/file.txt');
+    const elnArchive = (result as {ok: true; elnArchive: ElnArchive})
+      .elnArchive;
+    const buf = elnArchive.getFile('./book/file.txt');
     expect(buf).to.not.be.undefined();
     expect(buf!.toString()).to.equal('hello');
   });
 
   it('returns undefined from getFile() for missing files', () => {
-    const result = ElnArchive.parse(validElnEntries());
+    const result = ElnArchive.parseRaw(validElnEntries());
     expect(result.ok).to.be.true();
-    const parsed = (result as {ok: true; value: ElnArchive}).value;
-    expect(parsed.getFile('./nonexistent.txt')).to.be.undefined();
+    const elnArchive = (result as {ok: true; elnArchive: ElnArchive})
+      .elnArchive;
+    expect(elnArchive.getFile('./nonexistent.txt')).to.be.undefined();
   });
 
   it('returns correct hasFile() results', () => {
-    const result = ElnArchive.parse(validElnEntries());
+    const result = ElnArchive.parseRaw(validElnEntries());
     expect(result.ok).to.be.true();
-    const parsed = (result as {ok: true; value: ElnArchive}).value;
-    expect(parsed.hasFile('./book/file.txt')).to.be.true();
-    expect(parsed.hasFile('./nonexistent.txt')).to.be.false();
+    const elnArchive = (result as {ok: true; elnArchive: ElnArchive})
+      .elnArchive;
+    expect(elnArchive.hasFile('./book/file.txt')).to.be.true();
+    expect(elnArchive.hasFile('./nonexistent.txt')).to.be.false();
   });
 });
 
-describe('validateIntegrity', () => {
+describe('ElnArchive#validateIntegrity', () => {
   it('accepts when file bytes match the declared sha256', () => {
-    const result = ElnArchive.parse(validElnEntries());
+    const result = ElnArchive.parseRaw(validElnEntries());
     expect(result.ok).to.be.true();
-    const parsed = (result as {ok: true; value: ElnArchive}).value;
-    expect(validateIntegrity(parsed)).to.be.empty();
+    const elnArchive = (result as {ok: true; elnArchive: ElnArchive})
+      .elnArchive;
+    expect(elnArchive.validateIntegrity()).to.be.empty();
   });
 
   it('rejects when a referenced file is missing from the archive', () => {
     const entries = validElnEntries();
     entries.delete('root/book/file.txt');
-    const result = ElnArchive.parse(entries);
+    const result = ElnArchive.parseRaw(entries);
     expect(result.ok).to.be.true();
-    const parsed = (result as {ok: true; value: ElnArchive}).value;
-    expect(validateIntegrity(parsed)).to.containDeep([
+    const elnArchive = (result as {ok: true; elnArchive: ElnArchive})
+      .elnArchive;
+    expect(elnArchive.validateIntegrity()).to.containDeep([
       {code: ElnErrorCode.MISSING_ELN_FILE},
     ]);
   });
@@ -304,38 +310,86 @@ describe('validateIntegrity', () => {
   it('rejects when file sha256 does not match', () => {
     const entries = validElnEntries();
     entries.set('root/book/file.txt', Buffer.from('wrong content'));
-    const result = ElnArchive.parse(entries);
+    const result = ElnArchive.parseRaw(entries);
     expect(result.ok).to.be.true();
-    const parsed = (result as {ok: true; value: ElnArchive}).value;
-    expect(validateIntegrity(parsed)).to.containDeep([
+    const elnArchive = (result as {ok: true; elnArchive: ElnArchive})
+      .elnArchive;
+    expect(elnArchive.validateIntegrity()).to.containDeep([
       {code: ElnErrorCode.INVALID_ELN_CHECKSUM},
     ]);
   });
 });
 
-describe('validateEln', () => {
-  it('returns ok for a fully valid ElnArchive', () => {
-    const result = ElnArchive.parse(validElnEntries());
-    expect(result.ok).to.be.true();
-    const parsed = (result as {ok: true; value: ElnArchive}).value;
-    const validated = validateEln(parsed);
-    expect(validated.ok).to.be.true();
+describe('ElnArchive.parse', () => {
+  const tmpFiles: string[] = [];
+
+  afterEach(async () => {
+    await Promise.all(tmpFiles.map(fp => fs.unlink(fp).catch(() => {})));
+    tmpFiles.length = 0;
   });
 
-  it('returns combined metadata and integrity errors', () => {
+  it('returns INVALID_ELN_ARCHIVE for non-zip bytes', async () => {
+    const filepath = path.join(
+      os.tmpdir(),
+      `test-bad-${crypto.randomUUID()}.eln`,
+    );
+    await fs.writeFile(filepath, 'not a zip');
+    tmpFiles.push(filepath);
+
+    const result = await ElnArchive.parse(filepath);
+    expect(result.ok).to.be.false();
+    expect((result as ElnParseFailure).errors).to.containDeep([
+      {code: ElnErrorCode.INVALID_ELN_ARCHIVE},
+    ]);
+  });
+
+  it('returns INVALID_ELN_ARCHIVE when the file does not exist', async () => {
+    const filepath = path.join(
+      os.tmpdir(),
+      `does-not-exist-${crypto.randomUUID()}.eln`,
+    );
+
+    const result = await ElnArchive.parse(filepath);
+    expect(result.ok).to.be.false();
+    expect((result as ElnParseFailure).errors).to.containDeep([
+      {code: ElnErrorCode.INVALID_ELN_ARCHIVE},
+    ]);
+  });
+
+  it('returns ok for a valid .eln archive', async () => {
+    const filepath = await buildElnZip(validElnEntries());
+    tmpFiles.push(filepath);
+
+    const result = await ElnArchive.parse(filepath);
+    expect(result.ok).to.be.true();
+    const elnArchive = (result as {ok: true; elnArchive: ElnArchive})
+      .elnArchive;
+    expect(elnArchive.getFile('./book/file.txt')!.toString()).to.equal('hello');
+  });
+
+  it('surfaces parseRaw errors through the full pipeline', async () => {
+    // Archive with content but no ro-crate-metadata.json → parseRaw fails
+    const entries = new Map([['root/other.txt', Buffer.from('x')]]);
+    const filepath = await buildElnZip(entries);
+    tmpFiles.push(filepath);
+
+    const result = await ElnArchive.parse(filepath);
+    expect(result.ok).to.be.false();
+    expect((result as ElnParseFailure).errors).to.containDeep([
+      {code: ElnErrorCode.MISSING_ELN_METADATA},
+    ]);
+  });
+
+  it('surfaces integrity errors through the full pipeline', async () => {
     const entries = validElnEntries();
     entries.delete('root/book/file.txt');
-    const result = ElnArchive.parse(entries);
-    expect(result.ok).to.be.true();
-    const parsed = (result as {ok: true; value: ElnArchive}).value;
-    // Mutate crate to also trigger a metadata error
-    parsed.crate.deleteProperty('ro-crate-metadata.json', 'sdPublisher');
-    const validated = validateEln(parsed);
-    expect(validated.ok).to.be.false();
-    if (!validated.ok) {
-      const codes = validated.errors.map(e => e.code);
-      expect(codes).to.containEql(ElnErrorCode.MISSING_ELN_FIELD);
-      expect(codes).to.containEql(ElnErrorCode.MISSING_ELN_FILE);
-    }
+    const filepath = await buildElnZip(entries);
+    tmpFiles.push(filepath);
+
+    const result = await ElnArchive.parse(filepath);
+    expect(result.ok).to.be.false();
+    expect((result as ElnParseFailure).errors).to.containDeep([
+      {code: ElnErrorCode.MISSING_ELN_FILE},
+    ]);
   });
 });
