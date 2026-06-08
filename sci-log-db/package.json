@@ -1,6 +1,6 @@
 {
   "name": "sci-log-db",
-  "version": "2.3.9",
+  "version": "2.5.0",
   "description": "SciLogDB",
   "keywords": [
     "loopback-application",
@@ -25,7 +25,7 @@
     "migrate": "node ./dist/migrate",
     "openapi-spec": "node ./dist/openapi-spec",
     "clean": "lb-clean dist *.tsbuildinfo .eslintcache",
-    "dev": "tsc --watch & node --watch --enable-source-maps ."
+    "dev": "tsc && (tsc --watch & node --watch --enable-source-maps .)"
   },
   "repository": {
     "type": "git"
@@ -78,6 +78,7 @@
     "@types/passport": "1.0.17",
     "@types/prismjs": "1.26.6",
     "@types/ws": "8.18.1",
+    "@types/yauzl": "2.10.3",
     "eslint": "8.57.1",
     "typescript": "5.2.2",
     "yauzl": "3.2.1"

@@ -1,3 +1,31 @@
+# [2.5.0](https://github.com/paulscherrerinstitute/scilog/compare/v2.4.2...v2.5.0) (2026-06-03)
+
+
+### Features
+
+* **api:** surface logbook author on ELN export root ([#622](https://github.com/paulscherrerinstitute/scilog/issues/622)) ([ac6be72](https://github.com/paulscherrerinstitute/scilog/commit/ac6be72df18b2f166651a684a6a08ef00638ef9f)), closes [#617](https://github.com/paulscherrerinstitute/scilog/issues/617)
+
+## [2.4.2](https://github.com/paulscherrerinstitute/scilog/compare/v2.4.1...v2.4.2) (2026-05-27)
+
+
+### Bug Fixes
+
+* **api:** build once before starting dev watchers ([#615](https://github.com/paulscherrerinstitute/scilog/issues/615)) ([78efd61](https://github.com/paulscherrerinstitute/scilog/commit/78efd61d468c0cdb0604fe9ded36ef2f23ef85a0))
+
+## [2.4.1](https://github.com/paulscherrerinstitute/scilog/compare/v2.4.0...v2.4.1) (2026-05-08)
+
+
+### Bug Fixes
+
+* **api:** emit contentSize as string per ELN spec ([#609](https://github.com/paulscherrerinstitute/scilog/issues/609)) ([c9bb86b](https://github.com/paulscherrerinstitute/scilog/commit/c9bb86b7afaebecc155b846d11b16bfba8a180dd)), closes [#608](https://github.com/paulscherrerinstitute/scilog/issues/608)
+
+# [2.4.0](https://github.com/paulscherrerinstitute/scilog/compare/v2.3.9...v2.4.0) (2026-05-08)
+
+
+### Features
+
+* **api:** add url to sdPublisher Organization ([#607](https://github.com/paulscherrerinstitute/scilog/issues/607)) ([e9ab705](https://github.com/paulscherrerinstitute/scilog/commit/e9ab705c27fa7b9ec146859ba2e81e63cfe0f4a4)), closes [#600](https://github.com/paulscherrerinstitute/scilog/issues/600)
+
 ## [2.3.9](https://github.com/paulscherrerinstitute/scilog/compare/v2.3.8...v2.3.9) (2026-04-29)
 
 

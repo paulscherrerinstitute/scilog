@@ -66,6 +66,7 @@ export class RoCrateExportService {
 
     const author = this.entityBuilder.buildPerson(logbook.createdBy);
     this.crate.addEntity(author);
+    this.crate.root.author = author;
     this.crate.root.hasPart.push(
       this.entityBuilder.buildLogbookEntity(logbook, author),
     );

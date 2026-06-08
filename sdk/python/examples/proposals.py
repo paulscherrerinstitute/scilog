@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+"""Demonstrates the bundled SciCat client (fetching proposals from a catalog)."""
 
 import urllib3
 

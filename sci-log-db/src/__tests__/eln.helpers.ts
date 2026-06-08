@@ -1,4 +1,9 @@
+import archiver from 'archiver';
 import crypto from 'node:crypto';
+import fs from 'node:fs';
+import os from 'node:os';
+import path from 'node:path';
+import {finished} from 'node:stream/promises';
 import {ROCrate} from 'ro-crate';
 
 // Minimal RO-Crate 1.2 + ELN graph that passes validation.
@@ -59,7 +64,7 @@ export function validElnCrate(): ROCrate {
 }
 
 // Build a Map<string, Buffer> with valid metadata and matching file content,
-// suitable for passing to ElnArchive.parse().
+// suitable for passing to ElnArchive.parseRaw().
 export function validElnEntries(): Map<string, Buffer> {
   const crate = validElnCrate();
   const fileContent = Buffer.from('hello');
@@ -74,4 +79,25 @@ export function validElnEntries(): Map<string, Buffer> {
     ],
     ['root/book/file.txt', fileContent],
   ]);
+}
+
+// Write entries to a zip file on disk and return its path. Used to exercise
+// ElnArchive.parse(filepath) end-to-end.
+export async function buildElnZip(
+  entries: Map<string, Buffer>,
+): Promise<string> {
+  const filepath = path.join(
+    os.tmpdir(),
+    `test-eln-${crypto.randomUUID()}.eln`,
+  );
+  const output = fs.createWriteStream(filepath);
+  const archive = archiver('zip');
+  archive.on('error', err => output.destroy(err));
+  archive.pipe(output);
+  for (const [name, buf] of entries) {
+    archive.append(buf, {name});
+  }
+  await archive.finalize();
+  await finished(output);
+  return filepath;
 }
