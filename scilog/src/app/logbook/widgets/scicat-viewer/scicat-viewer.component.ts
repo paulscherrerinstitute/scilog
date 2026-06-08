@@ -77,10 +77,7 @@ export class ScicatViewerComponent implements OnInit {
         switchMap((proposalDatasets: DatasetSummary[]) => {
           if (proposalDatasets?.length) {
             this.proposalLinkedPids = new Set(proposalDatasets.map((d) => d.pid));
-            // add new proposal linked datasets to selection, if not already present
-            const existingPids = new Set(this.datasetSummary().map((d) => d.pid));
-            const datasetsToAdd = proposalDatasets.filter((ds) => !existingPids.has(ds.pid));
-            this.datasetSummary.set([...datasetsToAdd, ...this.datasetSummary()]);
+            this.addUniqueToDatasetSummary(proposalDatasets);
             // select the first proposal-linked dataset by default
             this.onDatasetSelect({ value: proposalDatasets[0].pid } as MatSelectChange);
           }
@@ -91,10 +88,7 @@ export class ScicatViewerComponent implements OnInit {
         next: (userLinkedDatasets: DatasetSummary[]) => {
           if (!userLinkedDatasets?.length) return;
           this.userLinkedPids.set(new Set(userLinkedDatasets.map((d) => d.pid)));
-          // add new user linked datasets to selection, if not already present
-          const existingPids = new Set(this.datasetSummary().map((d) => d.pid));
-          const datasetsToAdd = userLinkedDatasets.filter((ds) => !existingPids.has(ds.pid));
-          this.datasetSummary.set([...datasetsToAdd, ...this.datasetSummary()]);
+          this.addUniqueToDatasetSummary(userLinkedDatasets);
           // select the first user-linked dataset by default, if no proposal-linked dataset is selected
           if (!this.selectedDataset) {
             this.onDatasetSelect({ value: userLinkedDatasets[0].pid } as MatSelectChange);
@@ -108,6 +102,13 @@ export class ScicatViewerComponent implements OnInit {
           );
         },
       });
+  }
+
+  // prepend `datasets` to this.datasetSummary that are not already present
+  private addUniqueToDatasetSummary(datasets: DatasetSummary[]): void {
+    const existingPids = new Set(this.datasetSummary().map((d) => d.pid));
+    const datasetsToAdd = datasets.filter((ds) => !existingPids.has(ds.pid));
+    this.datasetSummary.set([...datasetsToAdd, ...this.datasetSummary()]);
   }
 
   isProposalLinkedDataset(pid: string): boolean {

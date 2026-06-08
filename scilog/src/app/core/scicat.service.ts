@@ -5,6 +5,7 @@ import {
   DatasetsService,
   OutputDatasetObsoleteDto,
   ProposalsService,
+  RelationshipClass,
   ReturnedUserDto,
   UsersService,
 } from '@scicatproject/scicat-sdk-ts-angular';
@@ -26,6 +27,8 @@ export class ScicatService {
     private usersService: UsersService,
     private proposalsService: ProposalsService,
   ) {}
+  private readonly scicatFrontendBaseUrl = this.serverSettingsService.getScicatFrontendBaseUrl();
+  private readonly scilogFrontendBaseUrl = this.serverSettingsService.getScilogFrontendBaseUrl();
 
   getDatasetsSummary(): Observable<DatasetSummary[]> {
     const filter = JSON.stringify({
@@ -44,15 +47,11 @@ export class ScicatService {
   }
 
   getDatasetDetailPageUrl(pid: string): string {
-    return `${this.serverSettingsService.getScicatFrontendBaseUrl()}/datasets/${encodeURIComponent(
-      pid,
-    )}`;
+    return `${this.scicatFrontendBaseUrl}/datasets/${encodeURIComponent(pid)}`;
   }
 
   getProposalPageUrl(proposalId: string): string {
-    return `${this.serverSettingsService.getScicatFrontendBaseUrl()}/proposals/${encodeURIComponent(
-      proposalId,
-    )}`;
+    return `${this.scicatFrontendBaseUrl}/proposals/${encodeURIComponent(proposalId)}`;
   }
 
   private getProposalIdForOwnerGroup(ownerGroup: string): Observable<string[]> {
@@ -94,22 +93,16 @@ export class ScicatService {
         if (alreadyLinked) {
           return of(false);
         }
-
+        type RelationshipSchema = RelationshipClass & { _id: string };
         // the actual relationship object also contains an _id, it must be removed from the update request
-        const existingRelationships = (dataset.relationships ?? []).map(
-          ({ relationship, identifier, identifierType, entityType, externalId }) => ({
-            relationship,
-            identifier,
-            identifierType,
-            entityType,
-            externalId,
-          }),
+        const existingRelationships = ((dataset.relationships ?? []) as RelationshipSchema[]).map(
+          ({ _id, ...rest }) => rest,
         );
         const relationshipsUpdate = [
           ...existingRelationships,
           {
             relationship: 'Logbook',
-            identifier: `${this.serverSettingsService.getScilogFrontendBaseUrl()}/logbooks/${logbookId}/dashboard`,
+            identifier: `${this.scilogFrontendBaseUrl}/logbooks/${logbookId}/dashboard`,
             identifierType: 'URL',
             entityType: 'Logbook',
             externalId: logbookId,
