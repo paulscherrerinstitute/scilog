@@ -1,3 +1,10 @@
+# [2.6.0](https://github.com/paulscherrerinstitute/scilog/compare/v2.5.0...v2.6.0) (2026-06-09)
+
+
+### Features
+
+* **scicat-widget:** add functionality to link logbook to dataset ([#590](https://github.com/paulscherrerinstitute/scilog/issues/590)) ([9cf4c26](https://github.com/paulscherrerinstitute/scilog/commit/9cf4c26ed16f66276aacb4192a7cb1b8185d9389))
+
 # [2.5.0](https://github.com/paulscherrerinstitute/scilog/compare/v2.4.2...v2.5.0) (2026-06-03)
 
 
