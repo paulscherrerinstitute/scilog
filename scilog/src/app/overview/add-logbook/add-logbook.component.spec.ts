@@ -41,7 +41,7 @@ describe('AddLogbookComponent', () => {
     'uploadLogbookThumbnail',
   ]);
   logbookDataSpy.getLocations.and.returnValue(of([{}]));
-  snackBarSpy = jasmine.createSpyObj('SnackbarService', ['_showMessage']);
+  snackBarSpy = jasmine.createSpyObj('SnackbarService', ['showSnackbarMessage']);
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
@@ -147,20 +147,6 @@ describe('AddLogbookComponent', () => {
       component['setWithEditability']('location');
       expect(component['getForm']('title').disabled).toEqual(t);
       expect(component['getForm']('location').disabled).toEqual(t);
-    });
-  });
-
-  it('should test showSnackbarMessage', () => {
-    component['showSnackbarMessage']('aMessage', 'warning');
-    expect(snackBarSpy._showMessage).toHaveBeenCalledOnceWith({
-      message: 'aMessage',
-      panelClass: ['warning-snackbar'],
-      action: 'Dismiss',
-      show: true,
-      duration: 4000,
-      type: 'serverMessage',
-      horizontalPosition: 'center',
-      verticalPosition: 'top',
     });
   });
 

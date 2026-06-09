@@ -8,13 +8,14 @@ import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http'
 describe('ScicatService', () => {
   let service: ScicatService;
   const getConfig = () => ({});
+  const getScicatSettings = () => undefined;
 
   beforeEach(() => {
     TestBed.configureTestingModule({
       imports: [],
       providers: [
         ScicatService,
-        { provide: AppConfigService, useValue: { getConfig } },
+        { provide: AppConfigService, useValue: { getConfig, getScicatSettings } },
         provideHttpClient(withInterceptorsFromDi()),
         provideHttpClientTesting(),
       ],
