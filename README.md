@@ -1,9 +1,25 @@
 # SciLog
 
-Capturing both raw and metadata during an experiment is of the utmost importance, as it provides valuable context for the decisions made during the experiment and the acquisition strategy. However, logbooks often lack seamless integration with facility-specific services such as authentication and data acquisition systems and can prove to be a burden, particularly in high-pressure situations, for example, during experiments. To address these challenges SciLog has been developed at the Paul Scherrer Institut. Its primary objective is to provide a flexible and extensible environment, as well as a user-friendly interface. SciLog relies on atomic entries in a database that can be easily queried, sorted, and displayed according to the user's requirements. The integration with facility-specific authorization systems and the automatic import of new experiment proposals enable a user experience that is specifically tailored for the challenging environment of experiments conducted at large research facilities. The system is currently in use during beam time at the Paul Scherrer Institut, where it is collecting valuable feedback from scientists to enhance its capabilities.
+A collaborative electronic logbook for experiments at scientific user facilities.
 
-## Functionalities
-To get an overview of the main SciLog features and design please refer to the [official paper](https://doi.org/10.18429/JACoW-ICALEPCS2023-THPDP073). As explained [here](#docs), the GitHub-generated documentation is not yet officially supported.
+## Why SciLog?
+
+During an experiment, *what you did and why* is often as valuable as the data itself — yet that context is easily lost to paper notebooks or scattered tools. SciLog replaces the paper logbook with a real-time, searchable electronic record that integrates with facility authentication and data acquisition systems, so capturing context doesn't get in the way of running the experiment.
+
+Multiple users — wherever they are — see the same state of the logbook as it evolves, and entries can be added by hand or pushed in automatically from instruments and pipelines. The result is a richer, FAIR-aligned record of the experiment that improves reproducibility and is far easier to search, share, and reuse than a paper logbook.
+
+SciLog is developed at the Paul Scherrer Institut (PSI) and is in production use during beam time. For the design rationale, see the [ICALEPCS 2023 paper](https://doi.org/10.18429/JACoW-ICALEPCS2023-THPDP073).
+
+## Features
+
+- **Real-time collaboration** — everyone on a logbook sees new entries and edits the moment they happen.
+- **Rich entries** — formatted text, images, file attachments, and tasks, all in one timeline.
+- **Tag, filter, and sort** — organize and find entries by tag, author, time, or any metadata field.
+- **Hierarchical and virtual logbooks** — group related logbooks together, or create virtual logbooks that pull in entries from across experiments via saved queries.
+- **Fine-grained access control** — per-entry permissions, full edit history, and restore for deleted entries.
+- **REST API and Python SDK** — push entries directly from instruments, scripts, or data acquisition pipelines.
+- **Facility integrations** — pluggable authentication and automatic logbook creation from experiment proposals (used at PSI with the DUO proposal system).
+- **Responsive web UI** — works on desktop, tablet, and mobile.
 
 ## Repository structure
 

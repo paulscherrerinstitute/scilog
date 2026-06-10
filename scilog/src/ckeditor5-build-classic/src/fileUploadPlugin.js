@@ -1,7 +1,7 @@
 
 import Plugin from '@ckeditor/ckeditor5-core/src/plugin';
 import ButtonView from '@ckeditor/ckeditor5-ui/src/button/buttonview';
-import FileDialogButtonView from '@ckeditor/ckeditor5-upload/src/ui/filedialogbuttonview';
+import FileDialogButtonView from '@ckeditor/ckeditor5-ui/src/button/filedialogbuttonview';
 import imageIcon from './clip.svg'; //'@ckeditor/ckeditor5-core/theme/icons/image.svg';
 
 export default class InsertFile extends Plugin {
