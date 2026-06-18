@@ -71,7 +71,7 @@ export class ElnTranslator {
    */
   static decodeFileReferences(
     html: string,
-    fileMap: Map<string, {fileHash: string}>,
+    fileMap: ReadonlyMap<string, {fileHash: string}>,
   ): string {
     const dom = new JSDOM(html);
     const {document} = dom.window;
@@ -153,7 +153,7 @@ function paragraphFields(
   const authorEmail = author?.email?.[0] as string | undefined;
   const keywords = entity.keywords?.[0] as string | undefined;
 
-  const tags = [`eln:id:${entity['@id']}`];
+  const tags = ['eln:source:scilog', `eln:id:${entity['@id']}`];
   if (authorEmail) tags.push(`eln:author:${authorEmail}`);
   if (dateCreated) tags.push(`eln:created:${dateCreated.slice(0, 10)}`);
   if (keywords) tags.push(...keywords.split(','));
@@ -182,7 +182,7 @@ function filesnippetFromFile(file: Entity): Partial<Filesnippet> {
     contentSize: contentSize !== undefined ? Number(contentSize) : undefined,
     contentSha256: file.sha256?.[0] as string | undefined,
     fileExtension,
-    tags: [`eln:id:${file['@id']}`],
+    tags: ['eln:source:scilog', `eln:id:${file['@id']}`],
   };
 }
 

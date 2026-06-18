@@ -47,7 +47,7 @@ describe('ElnTranslator.toSciLog', () => {
           contentSize: 123,
           contentSha256: '0'.repeat(64),
           fileExtension: 'txt',
-          tags: ['eln:id:./book/file.txt'],
+          tags: ['eln:source:scilog', 'eln:id:./book/file.txt'],
         },
         hasPart: [],
         comment: [],
@@ -75,6 +75,7 @@ describe('ElnTranslator.toSciLog', () => {
           linkType: LinkType.PARAGRAPH,
           textcontent: '<p>hello</p>',
           tags: [
+            'eln:source:scilog',
             'eln:id:./book/message/',
             'eln:author:a@example.org',
             'eln:created:2026-01-19',
@@ -98,6 +99,7 @@ describe('ElnTranslator.toSciLog', () => {
           linkType: LinkType.COMMENT,
           textcontent: '<p>a comment</p>',
           tags: [
+            'eln:source:scilog',
             'eln:id:./book/comment/',
             'eln:author:a@example.org',
             'eln:created:2026-01-19',
