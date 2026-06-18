@@ -1,6 +1,7 @@
 {
   "name": "scilog",
   "version": "2.6.1",
+  "license": "GPL-3.0-or-later",
   "scripts": {
     "ng": "ng",
     "start": "ng serve",
