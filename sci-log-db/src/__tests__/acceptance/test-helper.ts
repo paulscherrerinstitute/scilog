@@ -72,7 +72,7 @@ export async function createAUser(
   const userRepo: UserRepository = await app.get('repositories.UserRepository');
   const newUser = await userRepo.create({
     ..._.omit(user, 'roles'),
-    roles: user.roles.concat(additionalRoles),
+    roles: user.roles.concat(additionalRoles, user.email),
   });
   newUser.id = newUser.id.toString();
 

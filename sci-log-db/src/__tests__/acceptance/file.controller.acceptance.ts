@@ -379,7 +379,7 @@ describe('File controller services', function (this: Suite) {
       .set('Authorization', 'Bearer ' + token)
       .field('fields', '{"description": "something"}')
       .attach('file', __filename)
-      .expect(404)
+      .expect(204)
       .then(result => result)
       .catch(err => {
         throw err;
