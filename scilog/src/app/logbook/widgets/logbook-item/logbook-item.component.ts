@@ -27,8 +27,7 @@ import { LogbookInfoService } from '@shared/logbook-info.service';
 import { Subject, Subscription, BehaviorSubject } from 'rxjs';
 import { ActivatedRoute } from '@angular/router';
 import { ViewsService } from '@shared/views.service';
-import * as ClassicEditor from '@shared/ckeditor/ckeditor5/build/ckeditor';
-import { CKEditorComponent } from '@shared/ckeditor/ckeditor5/build/ckeditor';
+import { ClassicEditor } from '@shared/ckeditor/editor';
 import { CK5ImageUploadAdapter } from '@shared/ckeditor/ck5-image-upload-adapter';
 import { extractNotificationMessage } from '@shared/add-content/add-content.component';
 import { UserPreferencesService } from '@shared/user-preferences.service';
@@ -49,7 +48,7 @@ import { SnippetComponent as SnippetComponent_1 } from '../../core/snippet/snipp
 import { MatMiniFabButton, MatFabButton } from '@angular/material/button';
 import { MatIcon } from '@angular/material/icon';
 import { MatTooltip } from '@angular/material/tooltip';
-import { CKEditorModule } from '@ckeditor/ckeditor5-angular';
+import { CKEditorModule, CKEditorComponent } from '@ckeditor/ckeditor5-angular';
 import { TagEditorComponent as TagEditorComponent_1 } from '../../core/tag-editor/tag-editor.component';
 
 @Component({
