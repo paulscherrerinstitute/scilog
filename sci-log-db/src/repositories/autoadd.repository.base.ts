@@ -28,10 +28,9 @@ export class AutoAddRepository<
   ID,
   Relations extends object = {},
 > extends DefaultCrudRepository<T, ID, Relations> {
-  // eslint-disable-next-line  @typescript-eslint/no-explicit-any
-  public readonly parent: BelongsToAccessor<Entity, any>;
+  public readonly parent: BelongsToAccessor<Basesnippet, ID>;
 
-  public readonly subsnippets: HasManyRepositoryFactory<T, string>;
+  public readonly subsnippets: HasManyRepositoryFactory<Basesnippet, string>;
 
   readonly acls = [
     'createACL',
@@ -62,14 +61,24 @@ export class AutoAddRepository<
     dataSource: juggler.DataSource,
   ) {
     super(entityClass, dataSource);
+    // Route subsnippets/parent through the unscoped BasesnippetRepository;
+    // otherwise the subclass's snippetType scope is re-applied to the
+    // relation query and silently drops children of a different kind.
+    // The cast bridges SnippetRepositoryMixin's type erasure.
+    const basesnippetRepoGetter: Getter<
+      DefaultCrudRepository<Basesnippet, string>
+    > = () =>
+      this.baseSnippetRepository() as unknown as Promise<
+        DefaultCrudRepository<Basesnippet, string>
+      >;
     this.subsnippets = this.createHasManyRepositoryFactoryFor(
       'subsnippets',
-      Getter.fromValue(this),
+      basesnippetRepoGetter,
     );
 
     this.parent = this.createBelongsToAccessorFor(
       'parent',
-      Getter.fromValue(this),
+      basesnippetRepoGetter,
     );
 
     // add these lines to register inclusion resolver.
