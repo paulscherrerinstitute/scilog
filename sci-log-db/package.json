@@ -31,7 +31,7 @@
     "type": "git"
   },
   "author": "",
-  "license": "",
+  "license": "GPL-3.0-or-later",
   "files": [
     "README.md",
     "dist",
