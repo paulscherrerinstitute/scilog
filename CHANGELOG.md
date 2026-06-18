@@ -1,3 +1,10 @@
+## [2.6.1](https://github.com/paulscherrerinstitute/scilog/compare/v2.6.0...v2.6.1) (2026-06-18)
+
+
+### Bug Fixes
+
+* **api:** route subsnippet relations via unscoped repo ([#630](https://github.com/paulscherrerinstitute/scilog/issues/630)) ([dc97d02](https://github.com/paulscherrerinstitute/scilog/commit/dc97d020f5406bdcdb01085acc4db4965d058834)), closes [#629](https://github.com/paulscherrerinstitute/scilog/issues/629)
+
 # [2.6.0](https://github.com/paulscherrerinstitute/scilog/compare/v2.5.0...v2.6.0) (2026-06-09)
 
 
