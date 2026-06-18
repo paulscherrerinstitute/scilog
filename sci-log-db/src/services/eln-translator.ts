@@ -41,7 +41,7 @@ export class ElnTranslator {
    */
   static decodeFileReferences(
     html: string,
-    fileMap: Map<string, {fileHash: string}>,
+    fileMap: ReadonlyMap<string, {fileHash: string}>,
   ): string {
     const dom = new JSDOM(html);
     const {document} = dom.window;
