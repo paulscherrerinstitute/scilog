@@ -1,8 +1,6 @@
 import {Profile} from 'passport';
 
-// kept for backward compatibility
-
-export const DEFAULT_ROLES_CLAIMS = ['roles', 'groups'];
+export const DEFAULT_ROLES_CLAIMS = ['roles'];
 
 export function roles(
   profile: Profile & {_json?: Record<string, unknown>},

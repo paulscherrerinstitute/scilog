@@ -37,12 +37,15 @@ describe('Authentication strategies roles', function (this: Suite) {
     expect(emptyRoles).to.be.eql(['g12345', 'g78910']);
   });
 
-  it('Should merge roles from the default groups claim', () => {
+  it('Should merge roles from groups claim when explicitly configured', () => {
     const profile = {} as Profile;
-    const mergedRoles = roles({
-      ...profile,
-      _json: {roles: ['g12345'], groups: ['groupA', 'groupB']},
-    });
+    const mergedRoles = roles(
+      {
+        ...profile,
+        _json: {roles: ['g12345'], groups: ['groupA', 'groupB']},
+      },
+      ['roles', 'groups'],
+    );
     expect(mergedRoles).to.be.eql(['g12345', 'groupA', 'groupB']);
   });
 
