@@ -10,7 +10,7 @@ import { AppConfigService } from 'src/app/app-config.service';
 import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http';
 import { Component } from '@angular/core';
 import { TagEditorComponent } from '@shared/tag-editor/tag-editor.component';
-import { CKEditorModule } from '@ckeditor/ckeditor5-angular';
+import { CKEditorModule, ChangeEvent } from '@ckeditor/ckeditor5-angular';
 
 class AddContentServiceMock {
   currentMessage = of({});
@@ -396,9 +396,10 @@ describe('AddContentComponent', () => {
 
   it('should test onChange', () => {
     component.message = { id: 123 };
-    const editor = { getData: () => 'edit' };
+    const editor = { getData: () => 'edit' } as ChangeEvent['editor'];
+    const event = {} as ChangeEvent['event'];
     const localStorageSpy = spyOn(localStorage, 'setItem');
-    component.onChange({ editor: editor });
+    component.onChange({ editor, event });
     expect(localStorageSpy).toHaveBeenCalledOnceWith('123_message', 'edit');
   });
 
