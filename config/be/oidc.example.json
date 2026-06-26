@@ -11,7 +11,8 @@
     "clientID": "YOURCLIENT",
     "clientSecret": "YOURSECRET",
     "callbackURL": "http://localhost:3000/auth/keycloak/callback",
-    "scope": ["email", "profile", "openid"],
+    "scope": ["email", "profile", "openid", "groups"],
+    "rolesClaims": ["roles", "groups"],
     "successRedirect": "http://localhost:4200/login",
     "skipUserProfile": false
 }

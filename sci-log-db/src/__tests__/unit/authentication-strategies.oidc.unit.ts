@@ -5,6 +5,7 @@ import {roles} from '../../authentication-strategies/roles';
 import {
   extractFirstLastName,
   findOrCreateUser,
+  verifyFunctionFactory,
 } from '../../authentication-strategies/types';
 import {UserRepository} from '../../repositories';
 import _ from 'lodash';
@@ -34,6 +35,38 @@ describe('Authentication strategies roles', function (this: Suite) {
       _json: {roles: ['g12345', 'g78910']},
     });
     expect(emptyRoles).to.be.eql(['g12345', 'g78910']);
+  });
+
+  it('Should merge roles from groups claim when explicitly configured', () => {
+    const profile = {} as Profile;
+    const mergedRoles = roles(
+      {
+        ...profile,
+        _json: {roles: ['g12345'], groups: ['groupA', 'groupB']},
+      },
+      ['roles', 'groups'],
+    );
+    expect(mergedRoles).to.be.eql(['g12345', 'groupA', 'groupB']);
+  });
+
+  it('Should read roles from a custom-named claim when configured', () => {
+    const profile = {} as Profile;
+    const customRoles = roles(
+      {
+        ...profile,
+        _json: {roles: ['ignored'], beamtimes: ['p11111', 'p22222']},
+      },
+      ['beamtimes'],
+    );
+    expect(customRoles).to.be.eql(['p11111', 'p22222']);
+  });
+
+  it('Should return an empty list when configured claim is absent', () => {
+    const profile = {} as Profile;
+    const customRoles = roles({...profile, _json: {roles: ['g12345']}}, [
+      'beamtimes',
+    ]);
+    expect(customRoles).to.be.eql([]);
   });
 
   it('Should return the list of roles without applying any regex', () => {
@@ -134,6 +167,43 @@ describe('Authentication strategies roles', function (this: Suite) {
       .true;
     // eslint-disable-next-line no-unused-expressions
     expect(updateById.notCalled).to.be.true;
+  });
+
+  it('Should build user roles from the configured claim via verifyFunctionFactory', done => {
+    const stubUserRepo = createStubInstance(UserRepository);
+    (stubUserRepo.findOne as sinon.SinonStub).resolves(null);
+    const createStub = (stubUserRepo.create as sinon.SinonStub).resolves();
+    const verify = verifyFunctionFactory(stubUserRepo, ['beamtimes']);
+    const profile = {
+      emails: [{value: 'a@user'}],
+      displayName: 'A User',
+      _json: {roles: ['ignored'], beamtimes: ['p11111']},
+    } as unknown as Profile;
+    verify(
+      'iss',
+      profile,
+      {} as never,
+      undefined,
+      'idToken',
+      'accessToken',
+      'refreshToken',
+      undefined,
+      (err: unknown) => {
+        try {
+          // eslint-disable-next-line no-unused-expressions
+          expect(err).to.be.null;
+          const created = createStub.firstCall.args[0];
+          expect(created.roles).to.be.eql([
+            'p11111',
+            'any-authenticated-user',
+            'a@user',
+          ]);
+          done();
+        } catch (e) {
+          done(e);
+        }
+      },
+    );
   });
 
   it('Should update a user', async () => {

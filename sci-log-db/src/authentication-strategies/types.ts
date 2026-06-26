@@ -35,6 +35,7 @@ export type OIDCOptions = {
   skipUserProfile: boolean;
   endSessionEndpoint: string;
   postLogoutRedirectUri: string;
+  rolesClaims?: string[];
 };
 
 export type VerifyFunction = (
@@ -62,6 +63,7 @@ export type VerifyFunction = (
 
 export const verifyFunctionFactory = function (
   userRepo: UserRepository,
+  rolesClaims?: string[],
 ): VerifyFunction {
   return function (
     claimIss: string,
@@ -88,7 +90,7 @@ export const verifyFunctionFactory = function (
       lastName: lastName,
       username: profile.username,
       roles: [
-        ...roles(profile),
+        ...roles(profile, rolesClaims),
         'any-authenticated-user',
         profile.emails[0].value,
       ],
