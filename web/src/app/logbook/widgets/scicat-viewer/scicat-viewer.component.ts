@@ -180,4 +180,27 @@ export class ScicatViewerComponent implements OnInit {
       },
     });
   }
+
+  unlinkLogbook(): void {
+    if (!this.selectedDataset) return;
+    const logbookId = this.logbookInfoService.logbookInfo.id;
+    const pid = this.selectedDataset.pid;
+    this.scicatService.unlinkLogbookFromDataset(logbookId, pid).subscribe({
+      next: () => {
+        this.userLinkedPids.update((set) => {
+          const next = new Set(set);
+          next.delete(pid);
+          return next;
+        });
+        this.snackbarService.showSnackbarMessage(
+          'Logbook unlinked from dataset successfully',
+          'resolved',
+        );
+      },
+      error: (err) => {
+        console.log('Error unlinking logbook from dataset', err);
+        this.snackbarService.showSnackbarMessage('Error unlinking logbook from dataset', 'warning');
+      },
+    });
+  }
 }

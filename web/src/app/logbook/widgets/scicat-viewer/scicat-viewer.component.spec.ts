@@ -20,6 +20,7 @@ describe('ScicatViewerComponent', () => {
       'getDatasetDetailPageUrl',
       'getProposalPageUrl',
       'getUserLinkedDatasetsSummary',
+      'unlinkLogbookFromDataset',
     ]);
 
     scicatServiceSpy.getMyself.and.returnValue(of(null));
@@ -167,6 +168,30 @@ describe('ScicatViewerComponent', () => {
 
         expect(component.filteredDatasetSummary().map((ds) => ds.pid)).toEqual(expectedPids);
       });
+    });
+  });
+  describe('unlinkLogbook', () => {
+    it('removes pid from userLinkedPids on success', () => {
+      scicatServiceSpy.getDatasetsSummary.and.returnValue(
+        of([{ pid: '5', datasetName: 'Dataset 5', creationTime: '2024-01-05' }]),
+      );
+      scicatServiceSpy.getUserLinkedDatasetsSummary.and.returnValue(
+        of([{ pid: '5', datasetName: 'Dataset 5', creationTime: '2024-01-05' }]),
+      );
+      scicatServiceSpy.getDataset.and.returnValue(
+        of({ pid: '5', datasetName: 'Dataset 5', creationTime: '2024-01-05' } as Dataset),
+      );
+      scicatServiceSpy.unlinkLogbookFromDataset.and.returnValue(of(true));
+      logbookInfoServiceSpy.logbookInfo = { ownerGroup: 'group1', id: 'lb1' } as any;
+
+      component.ngOnInit();
+      expect(component.isUserLinkedDataset('5')).toBeTrue();
+
+      component.selectedDataset = { pid: '5' } as Dataset;
+      component.unlinkLogbook();
+
+      expect(scicatServiceSpy.unlinkLogbookFromDataset).toHaveBeenCalledWith('lb1', '5');
+      expect(component.isUserLinkedDataset('5')).toBeFalse();
     });
   });
 });

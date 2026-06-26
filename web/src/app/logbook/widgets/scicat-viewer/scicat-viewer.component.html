@@ -65,14 +65,15 @@
       <a mat-button [href]="scicatDatasetUrl" target="_blank"
         >Open in SciCat <mat-icon>open_in_new</mat-icon></a
       >
-      <button
-        mat-button
-        matTooltip="Link logbook to dataset"
-        (click)="linkLogbook()"
-        [disabled]="isUserLinkedDataset(selectedDataset.pid)"
-      >
-        <mat-icon>add_link</mat-icon> Link
-      </button>
+      @if (isUserLinkedDataset(selectedDataset.pid)) {
+        <button mat-button matTooltip="Unlink logbook from dataset" (click)="unlinkLogbook()">
+          <mat-icon>link_off</mat-icon> Unlink
+        </button>
+      } @else {
+        <button mat-button matTooltip="Link logbook to dataset" (click)="linkLogbook()">
+          <mat-icon>add_link</mat-icon> Link
+        </button>
+      }
     </mat-card-actions>
   </mat-card>
 </div>
