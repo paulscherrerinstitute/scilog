@@ -1,3 +1,10 @@
+# [2.7.0](https://github.com/paulscherrerinstitute/scilog/compare/v2.6.1...v2.7.0) (2026-06-26)
+
+
+### Features
+
+* **api:** make oidc role claims configurable ([#637](https://github.com/paulscherrerinstitute/scilog/issues/637)) ([d16cb2b](https://github.com/paulscherrerinstitute/scilog/commit/d16cb2b6777e1debc2387a46d3987f169644177e)), closes [#606](https://github.com/paulscherrerinstitute/scilog/issues/606)
+
 ## [2.6.1](https://github.com/paulscherrerinstitute/scilog/compare/v2.6.0...v2.6.1) (2026-06-18)
 
 

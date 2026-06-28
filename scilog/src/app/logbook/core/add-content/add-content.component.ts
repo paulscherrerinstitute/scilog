@@ -6,8 +6,7 @@ import {
   MatDialogActions,
   MatDialogClose,
 } from '@angular/material/dialog';
-import * as ClassicEditor from '../ckeditor/ckeditor5/build/ckeditor';
-import { ChangeEvent } from '../ckeditor/ckeditor5/build/ckeditor';
+import { ClassicEditor } from '../ckeditor/editor';
 import { AddContentService } from '../add-content.service';
 import { ChangeStreamNotification } from '../changestreamnotification.model';
 import { LinkType } from '@model/paragraphs';
@@ -19,7 +18,7 @@ import { Basesnippets, Filecontainer } from '@model/basesnippets';
 import { v4 as uuid } from 'uuid';
 import { CKeditorConfig } from '../ckeditor/ckeditor-config';
 import { CdkScrollable } from '@angular/cdk/scrolling';
-import { CKEditorModule } from '@ckeditor/ckeditor5-angular';
+import { CKEditorModule, ChangeEvent } from '@ckeditor/ckeditor5-angular';
 import { TagEditorComponent } from '../tag-editor/tag-editor.component';
 import { MatTooltip } from '@angular/material/tooltip';
 import { NgIf } from '@angular/common';

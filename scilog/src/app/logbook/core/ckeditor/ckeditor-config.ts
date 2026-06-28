@@ -1,52 +1,7 @@
-// export let CKeditorConfig = {
-//     fontFamily: {
-//       options: [
-//         'default',
-//         'Ubuntu, Arial, sans-serif',
-//         'Ubuntu Mono, Courier New, Courier, monospace'
-//       ]
-//     },
-//     toolbar: {
-//       items: [
-//         "heading",
-//         "undo",
-//         "redo",
-//         "bold",
-//         "italic",
-//         // "indent",
-//         // "outdent",
-//         // "fontColor",
-//         "highlight",
-//         '|',
-//         "subscript",
-//         "superscript",
-//         '|',
-//         "insertTable",
-//         "numberedList",
-//         "bulletedList",
-//         '|',
-//         "imageUpload",
-//         "link",
-//         // '|',
-//         // "MathType",
-//         // "ChemType",
-//         "|",
-//         "tableColumn",
-//         "tableRow",
-//         // "mergeTableCells",
-//       ],
-//       shouldNotGroupWhenFull: true,
-//     },
-//     autosave: {
-//       save: ( editor ) => {
-//           return this.editorChange( editor );
-//       }
-//   },
-//     placeholder: 'Add your content here.'
-//     // extraPlugins: [ CK5ImageUploadAdapterPlugin ]
-//   };
+import { PLUGINS } from './editor';
 
 export let CKeditorConfig = {
+  plugins: PLUGINS,
   fontFamily: {
     options: [
       'default',
@@ -93,9 +48,41 @@ export let CKeditorConfig = {
     insert: {
       type: 'auto',
     },
+    toolbar: [
+      'imageStyle:inline',
+      'imageStyle:block',
+      'imageStyle:side',
+      '|',
+      'toggleImageCaption',
+      'imageTextAlternative',
+    ],
   },
-  // toolbarLocation: 'bottom',
-  // extraPlugins: [ fontFamily ]
+  table: {
+    contentToolbar: ['tableColumn', 'tableRow', 'mergeTableCells'],
+  },
+  link: {
+    decorators: {
+      detectDownloadable: {
+        mode: 'automatic',
+        callback: (url: string | null) =>
+          !!url &&
+          (url.startsWith('file:') ||
+            (/^(https?:)?\/\/.*\/download/.test(url) && url.includes(window.location.hostname))),
+        attributes: {
+          class: 'fileLink',
+          target: '_blank',
+        },
+      },
+      addTargetToExternalLinks: {
+        mode: 'automatic',
+        callback: (url: string | null) => !!url && /^(https?:)?\/\//.test(url),
+        attributes: {
+          target: '_blank',
+          rel: 'noopener noreferrer',
+        },
+      },
+    },
+  },
   codeBlock: {
     languages: [
       { language: 'python', label: 'Python' },
