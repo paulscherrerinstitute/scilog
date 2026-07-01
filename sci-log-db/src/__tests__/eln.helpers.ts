@@ -47,11 +47,7 @@ export function validElnCrate(): ROCrate {
           description: 'a book',
           dateCreated: '2026-01-19T00:00:00.000Z',
           author: {'@id': '#author'},
-          hasPart: [
-            {'@id': './book/file.txt'},
-            {'@id': './book/message/'},
-            {'@id': './book/comment/'},
-          ],
+          hasPart: [{'@id': './book/message/'}, {'@id': './book/comment/'}],
         },
         {
           '@id': './book/file.txt',
@@ -86,7 +82,7 @@ export function validElnCrate(): ROCrate {
         },
       ],
     },
-    {array: true},
+    {array: true, link: true},
   );
 }
 

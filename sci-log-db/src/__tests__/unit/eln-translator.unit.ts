@@ -4,21 +4,34 @@ import {ElnTranslator} from '../../services/eln-translator';
 import {validElnCrate} from '../eln.helpers';
 
 describe('ElnTranslator.toSciLog', () => {
+  it('assembles the tree: one paragraph with its file and nested comment', () => {
+    const draft = ElnTranslator.toSciLog(validElnCrate());
+    expect(draft.paragraphs).to.have.length(1);
+
+    const [message] = draft.paragraphs;
+    expect(message.fields.linkType).to.equal(LinkType.PARAGRAPH);
+    expect(message.files.map(file => file.elnId)).to.deepEqual([
+      './book/file.txt',
+    ]);
+
+    expect(message.paragraphs).to.have.length(1);
+    const [comment] = message.paragraphs;
+    expect(comment.fields.linkType).to.equal(LinkType.COMMENT);
+    expect(comment.files).to.be.empty();
+    expect(comment.paragraphs).to.be.empty();
+  });
+
   describe('logbook', () => {
-    it('extracts fields, hasPart, and provenance tags from the Book entity', () => {
-      expect(ElnTranslator.toSciLog(validElnCrate()).logbook).to.deepEqual({
-        fields: {
-          name: 'book',
-          description: 'a book',
-          tags: [
-            'eln:source:scilog',
-            'eln:id:./book/',
-            'eln:author:a@example.org',
-            'eln:created:2026-01-19',
-          ],
-        },
-        hasPart: ['./book/file.txt', './book/message/', './book/comment/'],
-        comment: [],
+    it('extracts fields and provenance tags from the Book entity', () => {
+      expect(ElnTranslator.toSciLog(validElnCrate()).fields).to.deepEqual({
+        name: 'book',
+        description: 'a book',
+        tags: [
+          'eln:source:scilog',
+          'eln:id:./book/',
+          'eln:author:a@example.org',
+          'eln:created:2026-01-19',
+        ],
       });
     });
 
@@ -27,7 +40,7 @@ describe('ElnTranslator.toSciLog', () => {
       crate.deleteProperty('./book/', 'description');
       crate.deleteProperty('./book/', 'dateCreated');
       crate.deleteProperty('./book/', 'author');
-      expect(ElnTranslator.toSciLog(crate).logbook.fields).to.deepEqual({
+      expect(ElnTranslator.toSciLog(crate).fields).to.deepEqual({
         name: 'book',
         description: undefined,
         tags: ['eln:source:scilog', 'eln:id:./book/'],
@@ -35,78 +48,90 @@ describe('ElnTranslator.toSciLog', () => {
     });
   });
 
-  describe('files', () => {
-    it('maps File entity fields, keyed by @id', () => {
-      expect(
-        ElnTranslator.toSciLog(validElnCrate()).files.get('./book/file.txt'),
-      ).to.deepEqual({
-        fields: {
-          name: 'file.txt',
-          filename: 'file.txt',
-          contentType: 'text/plain',
-          contentSize: 123,
-          contentSha256: '0'.repeat(64),
-          fileExtension: 'txt',
-          tags: ['eln:id:./book/file.txt'],
-        },
-        hasPart: [],
-        comment: [],
+  describe('paragraphs', () => {
+    it('maps Message entity fields, with linkType=paragraph and split keyword tags', () => {
+      const [message] = ElnTranslator.toSciLog(validElnCrate()).paragraphs;
+      expect(message.fields).to.deepEqual({
+        linkType: LinkType.PARAGRAPH,
+        textcontent: '<p>hello</p>',
+        tags: [
+          'eln:id:./book/message/',
+          'eln:author:a@example.org',
+          'eln:created:2026-01-19',
+          'atag',
+          'btag',
+        ],
+        defaultOrder: new Date('2026-01-19T00:00:00.000Z').getTime() * 1000,
       });
+    });
+  });
+
+  describe('files', () => {
+    it('embeds File entity fields on the paragraph that references them', () => {
+      const [message] = ElnTranslator.toSciLog(validElnCrate()).paragraphs;
+      expect(message.files).to.deepEqual([
+        {
+          elnId: './book/file.txt',
+          fields: {
+            name: 'file.txt',
+            filename: 'file.txt',
+            contentType: 'text/plain',
+            contentSize: 123,
+            contentSha256: '0'.repeat(64),
+            fileExtension: 'txt',
+            tags: ['eln:id:./book/file.txt'],
+          },
+        },
+      ]);
     });
 
     it('leaves fileExtension undefined when the name has no extension', () => {
       const crate = validElnCrate();
       crate.setProperty('./book/file.txt', 'name', 'README');
-      expect(
-        ElnTranslator.toSciLog(crate).files.get('./book/file.txt')?.fields
-          .fileExtension,
-      ).to.be.undefined();
+      const [message] = ElnTranslator.toSciLog(crate).paragraphs;
+      expect(message.files[0].fields.fileExtension).to.be.undefined();
     });
-  });
 
-  describe('paragraphs', () => {
-    it('maps Message entity fields, with linkType=paragraph and split keyword tags', () => {
-      expect(
-        ElnTranslator.toSciLog(validElnCrate()).paragraphs.get(
-          './book/message/',
-        ),
-      ).to.deepEqual({
-        fields: {
-          linkType: LinkType.PARAGRAPH,
-          textcontent: '<p>hello</p>',
-          tags: [
-            'eln:id:./book/message/',
-            'eln:author:a@example.org',
-            'eln:created:2026-01-19',
-            'atag',
-            'btag',
-          ],
-          defaultOrder: new Date('2026-01-19T00:00:00.000Z').getTime() * 1000,
-        },
-        hasPart: ['./book/file.txt'],
-        comment: ['./book/comment/'],
+    it('embeds files on a comment, not only on a paragraph', () => {
+      const crate = validElnCrate();
+      crate.addEntity({
+        '@id': './book/comment/img.png',
+        '@type': 'File',
+        name: 'img.png',
+        encodingFormat: 'image/png',
+        contentSize: '10',
+        sha256: '0'.repeat(64),
       });
+      crate.addValues('./book/comment/', 'hasPart', {
+        '@id': './book/comment/img.png',
+      });
+      const [message] = ElnTranslator.toSciLog(crate).paragraphs;
+      const [comment] = message.paragraphs;
+      expect(comment.files.map(file => file.elnId)).to.deepEqual([
+        './book/comment/img.png',
+      ]);
     });
   });
 
   describe('comments', () => {
+    it('nests a message comments as child paragraphs', () => {
+      const [message] = ElnTranslator.toSciLog(validElnCrate()).paragraphs;
+      expect(message.paragraphs).to.have.length(1);
+    });
+
     it('maps Comment entity fields, with linkType=comment', () => {
-      expect(
-        ElnTranslator.toSciLog(validElnCrate()).comments.get('./book/comment/'),
-      ).to.deepEqual({
-        fields: {
-          linkType: LinkType.COMMENT,
-          textcontent: '<p>a comment</p>',
-          tags: [
-            'eln:id:./book/comment/',
-            'eln:author:a@example.org',
-            'eln:created:2026-01-19',
-            'ctag',
-          ],
-          defaultOrder: new Date('2026-01-19T01:00:00.000Z').getTime() * 1000,
-        },
-        hasPart: [],
-        comment: [],
+      const [message] = ElnTranslator.toSciLog(validElnCrate()).paragraphs;
+      const [comment] = message.paragraphs;
+      expect(comment.fields).to.deepEqual({
+        linkType: LinkType.COMMENT,
+        textcontent: '<p>a comment</p>',
+        tags: [
+          'eln:id:./book/comment/',
+          'eln:author:a@example.org',
+          'eln:created:2026-01-19',
+          'ctag',
+        ],
+        defaultOrder: new Date('2026-01-19T01:00:00.000Z').getTime() * 1000,
       });
     });
   });
