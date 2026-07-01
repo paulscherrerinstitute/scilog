@@ -82,7 +82,7 @@ export function validElnCrate(): ROCrate {
         },
       ],
     },
-    {array: true},
+    {array: true, link: true},
   );
 }
 

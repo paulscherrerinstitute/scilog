@@ -15,46 +15,16 @@ import {LinkType} from '../models/paragraph.model';
 
 export class ElnTranslator {
   /**
-   * Extract SciLog-shaped fields from ELN metadata. Returns drafts grouped
-   * by kind, each carrying the spec's relationship fields (`hasPart`,
-   * `comment`) as plain `@id` strings. The orchestrator drives creation in
-   * declaration order (logbook → files → paragraphs → comments), resolving
-   * references via the kind-specific Maps.
+   * Translate ELN metadata into a SciLog logbook draft: a tree whose nodes
+   * carry their embedded files and their nested paragraphs (a comment is a
+   * paragraph with `linkType=comment`). Files keep their `@id` so the
+   * orchestrator can fetch their bytes; the orchestrator assigns SciLog
+   * identity (id, hashes) when it creates them.
    */
-  static toSciLog(crate: ROCrate): ImportDraft {
-    let logbook: LogbookDraft | undefined;
-    const files = new Map<string, FileDraft>();
-    const paragraphs = new Map<string, ParagraphDraft>();
-    const comments = new Map<string, CommentDraft>();
-
-    for (const entity of crate.entities()) {
-      const types = entity['@type'] as string[];
-      const id = entity['@id'] as string;
-      const author = resolveAuthor(crate, entity);
-      const hasPart = extractRefs(entity.hasPart);
-      const comment = extractRefs(entity.comment);
-
-      if (types.includes('Book')) {
-        logbook = {fields: logbookFromBook(entity, author), hasPart, comment};
-      } else if (types.includes('Message')) {
-        paragraphs.set(id, {
-          fields: paragraphFromMessage(entity, author),
-          hasPart,
-          comment,
-        });
-      } else if (types.includes('Comment')) {
-        comments.set(id, {
-          fields: paragraphFromComment(entity, author),
-          hasPart,
-          comment,
-        });
-      } else if (types.includes('File')) {
-        files.set(id, {fields: filesnippetFromFile(entity), hasPart, comment});
-      }
-    }
-
-    if (!logbook) throw new Error('ElnTranslator: no Book entity in crate');
-    return {logbook, files, paragraphs, comments};
+  static toSciLog(crate: ROCrate): LogbookDraft {
+    const book = findBook(crate);
+    if (!book) throw new Error('ElnTranslator: no Book entity in crate');
+    return buildLogbook(book);
   }
 
   /**
@@ -102,60 +72,54 @@ export class ElnTranslator {
   }
 }
 
-function extractRefs(refs: unknown): string[] {
-  if (!Array.isArray(refs)) return [];
-  return refs.map(ref => (ref as Entity)['@id'] as string);
+// --- crate navigation (the crate is parsed in `link` mode, so reference
+// fields like `author`, `hasPart`, and `comment` yield linked entities) ---
+
+function findBook(crate: ROCrate): Entity | undefined {
+  return [...crate.entities()].find(entity => entity.$$hasType('Book'));
 }
 
-function resolveAuthor(crate: ROCrate, entity: Entity): Entity | undefined {
-  const authorId = entity.author?.[0]?.['@id'] as string | undefined;
-  return authorId ? crate.getEntity(authorId) : undefined;
+/** Linked entities of a given `@type` in `entity`'s `hasPart`. */
+function partsOfType(entity: Entity, type: string): Entity[] {
+  return (entity.hasPart ?? []).filter((part: Entity) => part.$$hasType(type));
 }
 
-function logbookFromBook(
-  book: Entity,
-  author: Entity | undefined,
-): Partial<Logbook> {
-  const dateCreated = book.dateCreated?.[0] as string | undefined;
-  const authorEmail = author?.email?.[0] as string | undefined;
+// --- field mappers: ELN entity → SciLog model fields ---
 
-  const tags = ['eln:source:scilog', `eln:id:${book['@id']}`];
+/** Provenance tags carried by every entity: ELN id, author, date created. */
+function provenanceTags(entity: Entity): string[] {
+  const tags = [`eln:id:${entity['@id']}`];
+  const authorEmail = entity.author?.[0]?.email?.[0] as string | undefined;
   if (authorEmail) tags.push(`eln:author:${authorEmail}`);
+  const dateCreated = entity.dateCreated?.[0] as string | undefined;
   if (dateCreated) tags.push(`eln:created:${dateCreated.slice(0, 10)}`);
+  return tags;
+}
 
+function logbookFromBook(book: Entity): Partial<Logbook> {
   return {
     name: book.name?.[0],
     description: book.description?.[0],
-    tags,
+    tags: ['eln:source:scilog', ...provenanceTags(book)],
   };
 }
 
-function paragraphFromMessage(
-  message: Entity,
-  author: Entity | undefined,
-): Partial<Paragraph> {
-  return paragraphFields(message, author, LinkType.PARAGRAPH);
+function paragraphFromMessage(message: Entity): Partial<Paragraph> {
+  return paragraphFromEntity(message, LinkType.PARAGRAPH);
 }
 
-function paragraphFromComment(
-  comment: Entity,
-  author: Entity | undefined,
-): Partial<Paragraph> {
-  return paragraphFields(comment, author, LinkType.COMMENT);
+function paragraphFromComment(comment: Entity): Partial<Paragraph> {
+  return paragraphFromEntity(comment, LinkType.COMMENT);
 }
 
-function paragraphFields(
+function paragraphFromEntity(
   entity: Entity,
-  author: Entity | undefined,
   linkType: LinkType,
 ): Partial<Paragraph> {
   const dateCreated = entity.dateCreated?.[0] as string | undefined;
-  const authorEmail = author?.email?.[0] as string | undefined;
   const keywords = entity.keywords?.[0] as string | undefined;
 
-  const tags = [`eln:id:${entity['@id']}`];
-  if (authorEmail) tags.push(`eln:author:${authorEmail}`);
-  if (dateCreated) tags.push(`eln:created:${dateCreated.slice(0, 10)}`);
+  const tags = provenanceTags(entity);
   if (keywords) tags.push(...keywords.split(','));
 
   return {
@@ -186,45 +150,50 @@ function filesnippetFromFile(file: Entity): Partial<Filesnippet> {
   };
 }
 
+// --- draft builders: ELN entity → draft node ---
+
+function buildLogbook(book: Entity): LogbookDraft {
+  return {
+    fields: logbookFromBook(book),
+    // Comments also appear in a Book's hasPart, but are built under their
+    // message via the `comment` field, so only messages are taken here.
+    paragraphs: partsOfType(book, 'Message').map(buildParagraph),
+  };
+}
+
+function buildParagraph(entity: Entity): ParagraphDraft {
+  return {
+    fields: entity.$$hasType('Comment')
+      ? paragraphFromComment(entity)
+      : paragraphFromMessage(entity),
+    files: partsOfType(entity, 'File').map(buildFile),
+    paragraphs: (entity.comment ?? []).map(buildParagraph),
+  };
+}
+
+function buildFile(file: Entity): FileDraft {
+  return {
+    elnId: file['@id'] as string,
+    fields: filesnippetFromFile(file),
+  };
+}
+
 // --- types ---
 
-/**
- * Drafts of entities to create from an .eln archive, grouped by SciLog kind.
- *
- * The orchestrator drives creation in declaration order: logbook first, then
- * files (all parented to the logbook), then paragraphs (which embed file
- * references via `hasPart` and recurse into `comment` for sub-comments).
- *
- * `hasPart` and `comment` carry the spec's relationship fields as plain
- * `@id` strings — references are resolved via the kind-specific Maps below.
- */
-export type ImportDraft = {
-  logbook: LogbookDraft;
-  files: Map<string, FileDraft>;
-  paragraphs: Map<string, ParagraphDraft>;
-  comments: Map<string, CommentDraft>;
-};
-
-/** Fields common to every draft. */
-type DraftBase = {
-  /** Child `@id`s from the entity's `hasPart` field. */
-  hasPart: string[];
-  /** Child `@id`s from the entity's schema.org `comment` field. */
-  comment: string[];
-};
-
-export type LogbookDraft = DraftBase & {
+export type LogbookDraft = {
   fields: Partial<Logbook>;
+  paragraphs: ParagraphDraft[];
 };
 
-export type ParagraphDraft = DraftBase & {
+export type ParagraphDraft = {
   fields: Partial<Paragraph>;
+  files: FileDraft[];
+  /** Paragraphs nested under this one; comments are the common case. */
+  paragraphs: ParagraphDraft[];
 };
 
-export type FileDraft = DraftBase & {
+export type FileDraft = {
+  /** Archive-relative `@id`; locates the file's bytes for upload. */
+  elnId: string;
   fields: Partial<Filesnippet>;
-};
-
-export type CommentDraft = DraftBase & {
-  fields: Partial<Paragraph>;
 };
