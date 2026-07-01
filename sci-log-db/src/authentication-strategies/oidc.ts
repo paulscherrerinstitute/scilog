@@ -29,7 +29,7 @@ export class OIDCAuthentication implements AuthenticationStrategy {
   ) {
     const strategy: Strategy = new oidcStrategy(
       this.oidcOptions,
-      verifyFunctionFactory(this.userRepository),
+      verifyFunctionFactory(this.userRepository, this.oidcOptions.rolesClaims),
     );
     this.strategy = new StrategyAdapter(
       strategy,
