@@ -1,15 +1,40 @@
 import {authenticate} from '@loopback/authentication';
 import {authorize} from '@loopback/authorization';
-import {inject} from '@loopback/core';
+import {inject, service} from '@loopback/core';
 import {repository} from '@loopback/repository';
-import {HttpErrors, Request, param, post, requestBody} from '@loopback/rest';
+import {
+  HttpErrors,
+  Request,
+  Response,
+  RestBindings,
+  param,
+  post,
+  requestBody,
+} from '@loopback/rest';
 import {SecurityBindings, UserProfile} from '@loopback/security';
 import {errors as formidableErrors, formidable} from 'formidable';
+import {Logbook} from '../models';
 import {LocationRepository} from '../repositories';
 import {basicAuthorization} from '../services/basic.authorizor';
+import {ElnError} from '../services/eln-archive';
+import {ElnImportError, ElnImportService} from '../services/eln-import.service';
 import {OPERATION_SECURITY_SPEC} from '../utils/security-spec';
+import {MAX_FILE_SIZE} from './eln-import.config';
+import {
+  ELN_IMPORT_REQUEST_BODY,
+  ELN_IMPORT_RESPONSES,
+} from './specs/eln-import.specs';
 
-const MAX_FILE_SIZE = 100 * 1024 * 1024;
+/**
+ * 422 envelope for archive-validation failures. `details` carries the list
+ * of `ElnError`s; strong-error-handler serializes it as `error.details`
+ * (one of its default-passthrough fields for 4xx responses).
+ */
+class ElnImportHttpError extends HttpErrors.UnprocessableEntity {
+  constructor(public readonly details: ElnError[]) {
+    super('Archive validation failed');
+  }
+}
 
 const FORMIDABLE_422_ERRORS = new Set([
   formidableErrors.maxFilesExceeded,
@@ -30,37 +55,12 @@ export class ElnImportController {
     @inject(SecurityBindings.USER) private user: UserProfile,
     @repository(LocationRepository)
     private locationRepository: LocationRepository,
+    @service(ElnImportService) private importService: ElnImportService,
   ) {}
 
   @post('/logbooks/import/eln', {
     security: OPERATION_SECURITY_SPEC,
-    responses: {
-      '501': {
-        description: 'Not implemented',
-        content: {
-          'application/json': {
-            schema: {
-              type: 'object',
-              properties: {
-                error: {
-                  type: 'object',
-                  properties: {
-                    statusCode: {type: 'number'},
-                    message: {type: 'string'},
-                  },
-                },
-              },
-            },
-            example: {
-              error: {
-                statusCode: 501,
-                message: 'Not Implemented',
-              },
-            },
-          },
-        },
-      },
-    },
+    responses: ELN_IMPORT_RESPONSES,
   })
   async import(
     @param.query.string('location-id', {
@@ -68,37 +68,28 @@ export class ElnImportController {
       required: true,
     })
     locationId: string,
-    @requestBody({
-      required: true,
-      content: {
-        'multipart/form-data': {
-          schema: {
-            type: 'object',
-            properties: {
-              file: {
-                type: 'string',
-                format: 'binary',
-                description: 'The .eln file to import (max 100 MB)',
-              },
-            },
-          },
-          'x-parser': 'stream',
-        },
-      },
-    })
+    @requestBody(ELN_IMPORT_REQUEST_BODY)
     request: Request,
-  ): Promise<void> {
-    await this.getUploadedFilePath(request);
+    @inject(RestBindings.Http.RESPONSE) response: Response,
+  ): Promise<Logbook> {
+    const filepath = await this.getUploadedFilePath(request);
 
-    await this.locationRepository.findById(
+    const location = await this.locationRepository.findById(
       locationId,
       {},
-      {
-        currentUser: this.user,
-      },
+      {currentUser: this.user},
     );
 
-    throw new HttpErrors.NotImplemented();
+    try {
+      const logbook = await this.importService.import(filepath, location);
+      response.status(201);
+      return logbook;
+    } catch (err) {
+      if (err instanceof ElnImportError) {
+        throw new ElnImportHttpError(err.errors);
+      }
+      throw err;
+    }
   }
 
   private async getUploadedFilePath(request: Request): Promise<string> {
