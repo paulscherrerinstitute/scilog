@@ -167,6 +167,14 @@ describe('ElnArchive.validateMetadata', () => {
     ]);
   });
 
+  it('rejects when comment references a non-existent entity', () => {
+    const crate = validElnCrate();
+    crate.addValues('./book/message/', 'comment', {'@id': './does-not-exist/'});
+    expect(ElnArchive.validateMetadata(crate)).to.containDeep([
+      {code: ElnErrorCode.INVALID_COMMENT},
+    ]);
+  });
+
   it('accepts numeric contentSize', () => {
     const crate = validElnCrate();
     crate.setProperty('./book/file.txt', 'contentSize', 123);
