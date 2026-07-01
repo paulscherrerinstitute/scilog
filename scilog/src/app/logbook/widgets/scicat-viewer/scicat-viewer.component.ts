@@ -54,6 +54,26 @@ export class ScicatViewerComponent implements OnInit {
   private proposalLinkedPids = new Set<string>();
   private userLinkedPids = signal<Set<string>>(new Set());
 
+  showProposalLinked = signal(false);
+  showUserLinked = signal(false);
+
+  filteredDatasetSummary = computed(() => {
+    const showProposalLinked = this.showProposalLinked();
+    const showUserLinked = this.showUserLinked();
+    if (!showProposalLinked && !showUserLinked) {
+      return this.datasetSummary();
+    }
+    return this.datasetSummary().filter((ds) => {
+      if (showProposalLinked && this.proposalLinkedPids.has(ds.pid)) {
+        return true;
+      }
+      if (showUserLinked && this.userLinkedPids().has(ds.pid)) {
+        return true;
+      }
+      return false;
+    });
+  });
+
   ngOnInit(): void {
     this.scicatService.getMyself().subscribe({
       next: (data: ScicatUser) => {

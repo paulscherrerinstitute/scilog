@@ -117,4 +117,56 @@ describe('ScicatViewerComponent', () => {
 
     expect(component.selectedDataset?.pid).toBe('4');
   });
+
+  describe('filteredDatasetSummary', () => {
+    // Test all four cases for when signals (showProposalLinked, showUserLinked) = (true x false)
+    const ds1 = { pid: '1', datasetName: 'Proposal-only', creationTime: '2024-01-01' };
+    const ds2 = { pid: '2', datasetName: 'User-only', creationTime: '2024-01-02' };
+    const ds3 = { pid: '3', datasetName: 'Both-linked', creationTime: '2024-01-03' };
+    const ds4 = { pid: '4', datasetName: 'Unlinked', creationTime: '2024-01-04' };
+
+    beforeEach(() => {
+      scicatServiceSpy.getDatasetsSummary.and.returnValue(of([ds1, ds2, ds3, ds4]));
+      scicatServiceSpy.getProposalLinkedDatasets.and.returnValue(of([ds1, ds3]));
+      scicatServiceSpy.getUserLinkedDatasetsSummary.and.returnValue(of([ds2, ds3]));
+      scicatServiceSpy.getDataset.and.returnValue(of({ pid: '1' } as Dataset));
+      component.ngOnInit();
+    });
+
+    const cases: {
+      showProposalLinked: boolean;
+      showUserLinked: boolean;
+      expectedPids: string[];
+    }[] = [
+      {
+        showProposalLinked: false,
+        showUserLinked: false,
+        expectedPids: ['1', '2', '3', '4'],
+      },
+      {
+        showProposalLinked: true,
+        showUserLinked: false,
+        expectedPids: ['1', '3'],
+      },
+      {
+        showProposalLinked: false,
+        showUserLinked: true,
+        expectedPids: ['2', '3'],
+      },
+      {
+        showProposalLinked: true,
+        showUserLinked: true,
+        expectedPids: ['1', '2', '3'],
+      },
+    ];
+
+    cases.forEach(({ showProposalLinked, showUserLinked, expectedPids }) => {
+      it(`populates expected pids=[${expectedPids}] when showProposalLinked=${showProposalLinked}, showUserLinked=${showUserLinked}`, () => {
+        component.showProposalLinked.set(showProposalLinked);
+        component.showUserLinked.set(showUserLinked);
+
+        expect(component.filteredDatasetSummary().map((ds) => ds.pid)).toEqual(expectedPids);
+      });
+    });
+  });
 });
