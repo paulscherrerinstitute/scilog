@@ -27,7 +27,7 @@ type CreatedFile = Required<
   Pick<Filecontainer, 'fileId' | 'fileHash' | 'accessHash' | 'fileExtension'>
 >;
 
-@injectable({scope: BindingScope.TRANSIENT})
+@injectable({scope: BindingScope.REQUEST})
 export class ElnImportService {
   constructor(
     @inject(SecurityBindings.USER) private user: UserProfile,
