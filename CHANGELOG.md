@@ -1,3 +1,17 @@
+## [2.8.1](https://github.com/paulscherrerinstitute/scilog/compare/v2.8.0...v2.8.1) (2026-07-03)
+
+
+### Bug Fixes
+
+* **api:** validate ELN comment references ([#646](https://github.com/paulscherrerinstitute/scilog/issues/646)) ([5992150](https://github.com/paulscherrerinstitute/scilog/commit/5992150a18742c75a174eae0fc23050fc5ec9906))
+
+# [2.8.0](https://github.com/paulscherrerinstitute/scilog/compare/v2.7.0...v2.8.0) (2026-07-02)
+
+
+### Features
+
+* add functionality to filter proposal / user linked datasets ([#602](https://github.com/paulscherrerinstitute/scilog/issues/602)) ([11ef3d3](https://github.com/paulscherrerinstitute/scilog/commit/11ef3d3e40576d171a32dc7c0d0f02977b142e02))
+
 # [2.7.0](https://github.com/paulscherrerinstitute/scilog/compare/v2.6.1...v2.7.0) (2026-06-26)
 
 

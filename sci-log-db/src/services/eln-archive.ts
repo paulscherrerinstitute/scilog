@@ -20,6 +20,7 @@ export const ElnErrorCode = {
   MISSING_DATASET_FIELD: 'MISSING_DATASET_FIELD',
   INVALID_AUTHOR: 'INVALID_AUTHOR',
   INVALID_HAS_PART: 'INVALID_HAS_PART',
+  INVALID_COMMENT: 'INVALID_COMMENT',
   INVALID_CONTENT_SIZE: 'INVALID_CONTENT_SIZE',
   INVALID_ELN_ARCHIVE: 'INVALID_ELN_ARCHIVE',
   INVALID_ELN_STRUCTURE: 'INVALID_ELN_STRUCTURE',
@@ -195,6 +196,7 @@ export class ElnArchive {
       ...validateAuthors(crate),
       ...validateFiles(crate),
       ...validateHasPartReferences(crate),
+      ...validateCommentReferences(crate),
     ];
   }
 
@@ -472,6 +474,25 @@ function validateHasPartReferences(crate: ROCrate): ElnError[] {
         errors.push({
           code: ElnErrorCode.INVALID_HAS_PART,
           message: `Entity ${entity['@id']}: hasPart ${id} not found`,
+        });
+      }
+    }
+  }
+  return errors;
+}
+
+function validateCommentReferences(crate: ROCrate): ElnError[] {
+  const errors: ElnError[] = [];
+  for (const entity of crate.entities()) {
+    const comment = entity.comment;
+    if (!comment?.length) continue;
+
+    for (const ref of comment) {
+      const id = ref['@id'];
+      if (!crate.getEntity(id)) {
+        errors.push({
+          code: ElnErrorCode.INVALID_COMMENT,
+          message: `Entity ${entity['@id']}: comment ${id} not found`,
         });
       }
     }
