@@ -167,7 +167,7 @@ export class ElnArchive {
     let crate: ROCrate;
     try {
       const raw = JSON.parse(entries.get(metadataPath)!.toString());
-      crate = new ROCrate(raw, {array: true});
+      crate = new ROCrate(raw, {array: true, link: true});
     } catch {
       return {
         ok: false,
