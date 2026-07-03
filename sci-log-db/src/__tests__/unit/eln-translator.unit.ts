@@ -17,7 +17,7 @@ describe('ElnTranslator.toSciLog', () => {
             'eln:created:2026-01-19',
           ],
         },
-        hasPart: ['./book/file.txt', './book/message/', './book/comment/'],
+        hasPart: ['./book/message/', './book/comment/'],
         comment: [],
       });
     });
