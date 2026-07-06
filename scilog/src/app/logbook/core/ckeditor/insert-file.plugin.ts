@@ -1,5 +1,6 @@
 import { Plugin, FileDialogButtonView, icons } from 'ckeditor5';
 import { v4 as uuid } from 'uuid';
+import type { FileAttachment } from './editor';
 
 export class InsertFile extends Plugin {
   init() {
@@ -26,12 +27,12 @@ export class InsertFile extends Plugin {
             editor.model.insertContent(link, editor.model.document.selection);
           });
           const fnameParts = file.name.split('.');
-          const fileStorage = {
+          const fileAttachment: FileAttachment = {
             file,
             fileHash: fnameHash,
             fileExtension: 'file/' + fnameParts[fnameParts.length - 1],
           };
-          editor.prel_filestorage = [fileStorage];
+          editor.fileAttachments = [...(editor.fileAttachments ?? []), fileAttachment];
         }
       });
 

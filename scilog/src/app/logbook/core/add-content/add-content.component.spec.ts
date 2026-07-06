@@ -301,6 +301,15 @@ describe('AddContentComponent', () => {
     expect(message.files[0].fileHash).toEqual('myHash');
   });
 
+  it('should include every attached file, not just the most recent, when preparing a message', () => {
+    let linkMock =
+      '<p><a class="fileLink" href="file:hashA">fileA.pdf</a> <a class="fileLink" href="file:hashB">fileB.pdf</a></p>';
+    component.fileStorage = [{ fileHash: 'hashA' } as any, { fileHash: 'hashB' } as any];
+    component.prepareMessage(linkMock);
+    let fileHashes = component.notification.files.map((file) => file.fileHash);
+    expect(fileHashes).toEqual(['hashA', 'hashB']);
+  });
+
   it('should prepare subsnippets container for quotes', () => {
     component.notification = notificationMock;
     component.prepareSubsnippetsQuoteContainer();

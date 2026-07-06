@@ -189,7 +189,6 @@ export class LogbookItemComponent implements OnInit, AfterViewInit, OnDestroy {
   @ViewChild('snippetContainer') snippetContainerRef: ElementRef;
   @ViewChild('editor') editorRef: ElementRef;
   @ViewChild('contentEditor') editorContentRef: CKEditorComponent;
-  @ViewChild('contentEditor') editorContentComponentRef: QueryList<CKEditorComponent>;
   @ViewChild('tagEditor') tagEditorRef: TagEditorComponent;
   @ViewChild('searchSnippets') searchSnippetsRef: ElementRef;
 
@@ -922,16 +921,14 @@ export class LogbookItemComponent implements OnInit, AfterViewInit, OnDestroy {
 
   addContent(isMessage = false) {
     this.forceScrollToEnd = true;
-    console.log(this.editorContentRef.editorInstance.prel_filestorage);
     let notification: ChangeStreamNotification = extractNotificationMessage(
       this.editorContentRef.editorInstance.getData(),
-      this.editorContentRef.editorInstance.prel_filestorage,
+      this.editorContentRef.editorInstance.fileAttachments,
     );
 
     if (notification != null) {
       notification.parentId = this.targetId;
       notification.isMessage = isMessage;
-      // notification.files = this.editorContentRef.editorInstance.prel_filestorage;
       if (
         !this.modifiedMetadata &&
         this.childSnippets.last &&
