@@ -1,3 +1,10 @@
+## [2.8.2](https://github.com/paulscherrerinstitute/scilog/compare/v2.8.1...v2.8.2) (2026-07-07)
+
+
+### Bug Fixes
+
+* include all attached files from ckeditor ([#648](https://github.com/paulscherrerinstitute/scilog/issues/648)) ([b71ef0c](https://github.com/paulscherrerinstitute/scilog/commit/b71ef0cb19a2232dbd04d6c2a42405776d099f78)), closes [#208](https://github.com/paulscherrerinstitute/scilog/issues/208) [#643](https://github.com/paulscherrerinstitute/scilog/issues/643)
+
 ## [2.8.1](https://github.com/paulscherrerinstitute/scilog/compare/v2.8.0...v2.8.1) (2026-07-03)
 
 
