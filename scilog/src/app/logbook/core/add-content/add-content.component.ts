@@ -6,7 +6,7 @@ import {
   MatDialogActions,
   MatDialogClose,
 } from '@angular/material/dialog';
-import { ClassicEditor } from '../ckeditor/editor';
+import { ClassicEditor, FileAttachment } from '../ckeditor/editor';
 import { AddContentService } from '../add-content.service';
 import { ChangeStreamNotification } from '../changestreamnotification.model';
 import { LinkType } from '@model/paragraphs';
@@ -67,7 +67,7 @@ export class AddContentComponent implements OnInit, OnDestroy {
   subscriptions: Subscription[] = [];
   contentChanged: boolean = false;
   initialized: boolean = false;
-  prel_fileStorage: any[] = [];
+  fileStorage: FileAttachment[] = [];
   config: any = [];
   editor: any;
   lastEdit: { message?: string; tags?: string } = {};
@@ -204,15 +204,16 @@ export class AddContentComponent implements OnInit, OnDestroy {
   }
 
   onChange({ editor }: ChangeEvent) {
+    if (!editor) return;
     localStorage.setItem(`${this.message.id}_message`, editor.getData());
     this.contentChanged = true;
+    this.fileStorage = editor.fileAttachments ?? this.fileStorage;
   }
 
   editorChange(editor: any): any {
     if (this.initialized) {
       if (typeof editor != 'undefined') {
         const data = editor.getData();
-        this.prel_fileStorage = editor['prel_fileStorage'];
         this.changeChain(data);
       }
     }
@@ -239,10 +240,10 @@ export class AddContentComponent implements OnInit, OnDestroy {
   }
 
   prepareMessage(data: string) {
-    let notification = extractNotificationMessage(
-      data,
-      this.message?.files ? this.message.files : [],
-    );
+    let notification = extractNotificationMessage(data, [
+      ...(this.message?.files ?? []),
+      ...this.fileStorage,
+    ]);
     if (notification != null) {
       this.notification.textcontent = notification.textcontent;
       this.notification.files = notification.files;

@@ -50,9 +50,15 @@ import {
 
 import { InsertFile } from './insert-file.plugin';
 
+export interface FileAttachment {
+  file: File;
+  fileHash: string;
+  fileExtension: string;
+}
+
 declare module 'ckeditor5' {
   interface Editor {
-    prel_filestorage?: { file: File; fileHash: string; fileExtension: string }[];
+    fileAttachments?: FileAttachment[];
   }
 }
 
