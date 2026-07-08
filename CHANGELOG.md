@@ -1,3 +1,10 @@
+## [2.8.3](https://github.com/paulscherrerinstitute/scilog/compare/v2.8.2...v2.8.3) (2026-07-08)
+
+
+### Bug Fixes
+
+* **api:** pin chromium to bookworm/main 147 ([#649](https://github.com/paulscherrerinstitute/scilog/issues/649)) ([3f4b254](https://github.com/paulscherrerinstitute/scilog/commit/3f4b2547e5da292060265b834ef349a1d7d6b129)), closes [#1141488](https://github.com/paulscherrerinstitute/scilog/issues/1141488)
+
 ## [2.8.2](https://github.com/paulscherrerinstitute/scilog/compare/v2.8.1...v2.8.2) (2026-07-07)
 
 
