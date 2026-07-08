@@ -6,7 +6,13 @@ Thank you for considering contributing to SciLog! By contributing, you agree to 
 
 Please adhere to the [Code of Conduct](./CODE_OF_CONDUCT.md) in all interactions with the project.
 
-## 2. How to Contribute
+## 2. Licensing of contributions
+
+By contributing, you agree that your contributions will be licensed under
+the project's license. See the [License section of the README](../README.md#license)
+for which license applies to which package.
+
+## 3. How to Contribute
 
 You can contribute by:
 
@@ -14,7 +20,7 @@ You can contribute by:
 - Suggesting improvements or new features
 - Submitting Pull Requests
 
-## 3. Pull Requests
+## 4. Pull Requests
 
 - All contributions must be made via **pull requests (PRs)**.
 - PRs can come either from a **fork** of the repository or from a **branch** within this repository.
@@ -31,13 +37,13 @@ This provides essential context for future maintenance and helps others understa
 - By default, the PR title serves as the commit’s subject line, while the PR description populates
 the commit body.
 
-## 4. Additional Guidelines
+## 5. Additional Guidelines
 
 - Ensure your changes include **documentation updates** when relevant.
 - Follow **existing code style and patterns** in the project.
 - Keep PRs **focused and concise** to make reviewing easier.
 
-## 5. Reporting Issues or Security Concerns
+## 6. Reporting Issues or Security Concerns
 
 - For **security issues**, please follow the instructions in [SECURITY.md](./SECURITY.md).
 - For other issues or feature requests, use the

@@ -66,3 +66,9 @@ To change configuration options or check the default ones, have a look at the fi
 For backend development, see the [backend README](./sci-log-db/README.md).
 
 For questions or support, email us at: [scilog-help@lists.psi.ch](mailto:scilog-help@lists.psi.ch)
+
+## License
+
+SciLog is distributed under the [GNU General Public License v3.0 or later](./LICENSE), with one exception: the [Python SDK](./sdk/python/) is distributed under the [BSD 3-Clause License](./sdk/python/LICENSE) so it can be embedded in instrument scripts and data acquisition pipelines without inheriting copyleft obligations.
+
+The GPLv3 choice for the web client and the REST API is driven by their incorporation of copyleft third-party components — notably CKEditor 5 (GPL-2.0-or-later) in the web client and the `ro-crate` / `ro-crate-html` packages (GPL-3.0-or-later) in the API. For an authoritative, up-to-date inventory of bundled dependencies and their licenses, run `npx license-checker --production` from the corresponding Node package root.
