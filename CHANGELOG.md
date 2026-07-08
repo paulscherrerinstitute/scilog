@@ -1,3 +1,10 @@
+# [2.9.0](https://github.com/paulscherrerinstitute/scilog/compare/v2.8.3...v2.9.0) (2026-07-08)
+
+
+### Features
+
+* **api:** add ELN import endpoint ([#635](https://github.com/paulscherrerinstitute/scilog/issues/635)) ([cb466fc](https://github.com/paulscherrerinstitute/scilog/commit/cb466fc19ab3bac2128539aece3dfc16467b456a)), closes [#604](https://github.com/paulscherrerinstitute/scilog/issues/604)
+
 ## [2.8.3](https://github.com/paulscherrerinstitute/scilog/compare/v2.8.2...v2.8.3) (2026-07-08)
 
 
