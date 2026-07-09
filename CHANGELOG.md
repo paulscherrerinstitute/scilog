@@ -1,3 +1,10 @@
+## [2.10.1](https://github.com/paulscherrerinstitute/scilog/compare/v2.10.0...v2.10.1) (2026-07-09)
+
+
+### Bug Fixes
+
+* **web:** explain .eln files in import dialog ([#658](https://github.com/paulscherrerinstitute/scilog/issues/658)) ([2e33596](https://github.com/paulscherrerinstitute/scilog/commit/2e3359610db1a46e77a37ba14872c1d3837abd29))
+
 # [2.10.0](https://github.com/paulscherrerinstitute/scilog/compare/v2.9.2...v2.10.0) (2026-07-09)
 
 
