@@ -1,3 +1,10 @@
+## [2.9.2](https://github.com/paulscherrerinstitute/scilog/compare/v2.9.1...v2.9.2) (2026-07-09)
+
+
+### Bug Fixes
+
+* move yauzl to runtime dependencies ([#652](https://github.com/paulscherrerinstitute/scilog/issues/652)) ([33dc0cc](https://github.com/paulscherrerinstitute/scilog/commit/33dc0ccd8e7874970b57d2a291b3017fd656eab8))
+
 ## [2.9.1](https://github.com/paulscherrerinstitute/scilog/compare/v2.9.0...v2.9.1) (2026-07-09)
 
 

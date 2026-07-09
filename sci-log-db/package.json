@@ -1,6 +1,6 @@
 {
   "name": "sci-log-db",
-  "version": "2.9.1",
+  "version": "2.9.2",
   "description": "SciLogDB",
   "keywords": [
     "loopback-application",
