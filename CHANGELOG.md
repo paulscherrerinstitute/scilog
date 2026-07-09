@@ -1,3 +1,10 @@
+# [2.10.0](https://github.com/paulscherrerinstitute/scilog/compare/v2.9.2...v2.10.0) (2026-07-09)
+
+
+### Features
+
+* **web:** add ELN archive import to overview ([#654](https://github.com/paulscherrerinstitute/scilog/issues/654)) ([a6727f1](https://github.com/paulscherrerinstitute/scilog/commit/a6727f1222e2e782eafbcde413dc81bc13f8e7ae)), closes [#635](https://github.com/paulscherrerinstitute/scilog/issues/635) [#650](https://github.com/paulscherrerinstitute/scilog/issues/650)
+
 ## [2.9.2](https://github.com/paulscherrerinstitute/scilog/compare/v2.9.1...v2.9.2) (2026-07-09)
 
 
