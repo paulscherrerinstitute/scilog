@@ -11,6 +11,7 @@ import { MatSelect, MatOption } from '@angular/material/select';
 import { MatButton } from '@angular/material/button';
 import { MatProgressBar } from '@angular/material/progress-bar';
 import { MatIcon } from '@angular/material/icon';
+import { MatTooltip } from '@angular/material/tooltip';
 import { Router } from '@angular/router';
 import { Basesnippets } from '@model/basesnippets';
 import { LogbookDataService } from '@shared/remote-data.service';
@@ -36,6 +37,7 @@ const MAX_FILE_SIZE = MAX_FILE_SIZE_MB * 1024 * 1024;
     MatDialogClose,
     MatProgressBar,
     MatIcon,
+    MatTooltip,
     MatFormField,
     MatLabel,
     MatSelect,
