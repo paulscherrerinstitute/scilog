@@ -49,7 +49,8 @@
     <mat-icon>keyboard_double_arrow_up</mat-icon>
   </button>
   <div
-    *ngIf="!mobile && !isReadOnly"
+    *ngIf="!isReadOnly"
+    [style.display]="mobile ? 'none' : null"
     [ngClass]="isLightMode ? 'editor-container' : 'editor-container-no-border'"
   >
     <div
