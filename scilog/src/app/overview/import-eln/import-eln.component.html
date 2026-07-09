@@ -1,0 +1,52 @@
+<h2 mat-dialog-title>Import logbook from .eln</h2>
+
+<mat-dialog-content>
+  @if (inProgress) {
+    <mat-progress-bar mode="query" color="accent"></mat-progress-bar>
+  }
+
+  <label class="field-label">
+    ELN file <span class="required-marker" aria-hidden="true">*</span>
+  </label>
+  <div
+    class="drop-zone"
+    [class.drag-over]="isDragging"
+    (click)="fileInput.click()"
+    (dragover)="onDragOver($event)"
+    (dragleave)="onDragLeave($event)"
+    (drop)="onDrop($event)"
+  >
+    <mat-icon>upload_file</mat-icon>
+    @if (file) {
+      <span>{{ file.name }}</span>
+    } @else {
+      <span>Drag a .eln file here, or click to browse (max {{ maxFileSizeMb }} MB)</span>
+    }
+  </div>
+  <input hidden type="file" accept=".eln" (change)="onFileSelected($event)" #fileInput />
+
+  <mat-form-field>
+    <mat-label>Location (Beamline or Instrument)</mat-label>
+    <mat-select [(value)]="locationId" required>
+      @for (location of availLocations; track location.id) {
+        <mat-option [value]="location.id">{{ location.location }}</mat-option>
+      }
+    </mat-select>
+  </mat-form-field>
+
+  @if (errors.length) {
+    <div class="import-errors">
+      <p>The archive could not be imported:</p>
+      <ul>
+        @for (error of errors; track error.code + error.message) {
+          <li>{{ error.message }}</li>
+        }
+      </ul>
+    </div>
+  }
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+  <button mat-button mat-dialog-close>Cancel</button>
+  <button mat-button (click)="importEln()" [disabled]="!canImport">Import</button>
+</mat-dialog-actions>

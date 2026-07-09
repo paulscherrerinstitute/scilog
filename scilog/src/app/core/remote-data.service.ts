@@ -14,6 +14,7 @@ import { Views } from '@model/views';
 import { Images } from '@model/images';
 import _ from 'lodash';
 import { TagsStat } from '@model/tags';
+import { firstValueFrom } from 'rxjs';
 
 interface Count {
   count: number;
@@ -404,6 +405,18 @@ export class LogbookDataService extends RemoteDataService {
   postLogbook(payload: any): Promise<Logbooks> {
     const headers = new HttpHeaders().set('Content-Type', 'application/json');
     return this.postSnippet<Logbooks>('logbooks', JSON.stringify(payload), headers).toPromise();
+  }
+
+  importELN(file: File, locationId: string): Promise<Logbooks> {
+    const formData = new FormData();
+    formData.append('file', file);
+    return firstValueFrom(
+      this.httpClient.post<Logbooks>(
+        `${this.serverSettings.getServerAddress()}logbooks/import/eln`,
+        formData,
+        { params: { 'location-id': locationId } },
+      ),
+    );
   }
 
   uploadLogbookThumbnail(formData: any, header: HttpHeaders = null): Promise<any> {
