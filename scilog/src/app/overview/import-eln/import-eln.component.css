@@ -32,6 +32,19 @@ mat-form-field {
   color: var(--warn-color);
 }
 
+.field-label .hint-link {
+  color: inherit;
+  vertical-align: middle;
+  text-decoration: none;
+}
+
+.field-label .hint-icon {
+  font-size: 16px;
+  width: 16px;
+  height: 16px;
+  line-height: 16px;
+}
+
 .import-errors {
   margin-top: 12px;
   color: var(--warn-color);
