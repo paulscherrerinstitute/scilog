@@ -83,6 +83,9 @@ $default-text-color-dark: mat.m2-get-color-from-palette($scilog-colors-dark, A40
 $accent-color: #ff0000;
 $accent-color-dark: mat.m2-get-color-from-palette($scilog-colors-dark, 500);
 
+$warn-color: mat.m2-get-color-from-palette($scilog-colors-light, A700);
+$warn-color-dark: mat.m2-get-color-from-palette($scilog-colors-dark, A700);
+
 $button-accent: mat.m2-get-color-from-palette($scilog-colors-light, 500);
 $button-accent-dark: mat.m2-get-color-from-palette($scilog-colors-dark, 500);
 
@@ -170,6 +173,10 @@ $colors: (
   --accent-color: (
     $accent-color,
     $accent-color-dark,
+  ),
+  --warn-color: (
+    $warn-color,
+    $warn-color-dark,
   ),
   --button-accent: (
     $button-accent,

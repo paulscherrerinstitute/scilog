@@ -6,6 +6,7 @@ import { CollectionConfig, WidgetItemConfig } from '@model/config';
 import { MatDialog, MatDialogConfig } from '@angular/material/dialog';
 import { AddCollectionComponent } from './add-collection/add-collection.component';
 import { AddLogbookComponent } from './add-logbook/add-logbook.component';
+import { ImportElnComponent } from './import-eln/import-eln.component';
 import { LogbookInfoService } from '@shared/logbook-info.service';
 import { CookiesService } from '@shared/cookies.service';
 import { animate, style, transition, trigger } from '@angular/animations';
@@ -13,6 +14,8 @@ import { OverviewTableComponent } from './overview-table/overview-table.componen
 import { OverviewScrollComponent } from './overview-scroll/overview-scroll.component';
 import { ToolbarComponent } from '../core/toolbar/toolbar.component';
 import { MatButtonToggleGroup, MatButtonToggle } from '@angular/material/button-toggle';
+import { MatMenu, MatMenuItem, MatMenuTrigger } from '@angular/material/menu';
+import { MatButton } from '@angular/material/button';
 import { FormsModule } from '@angular/forms';
 import { MatIcon } from '@angular/material/icon';
 import { NgIf } from '@angular/common';
@@ -40,6 +43,10 @@ export type MatCardType = 'logbook-module' | 'logbook-headline';
   imports: [
     ToolbarComponent,
     MatButtonToggleGroup,
+    MatMenu,
+    MatMenuItem,
+    MatMenuTrigger,
+    MatButton,
     FormsModule,
     MatButtonToggle,
     MatIcon,
@@ -151,6 +158,14 @@ export class OverviewComponent implements OnInit, OnDestroy {
         await this.reloadData(result, 'add');
       }),
     );
+  }
+
+  importEln() {
+    const dialogConfig = new MatDialogConfig();
+    dialogConfig.autoFocus = true;
+    dialogConfig.disableClose = true;
+    // The dialog navigates to the imported logbook itself, so no afterClosed handling here.
+    this.dialog.open(ImportElnComponent, dialogConfig);
   }
 
   private _prepareConfig() {

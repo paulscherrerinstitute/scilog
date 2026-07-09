@@ -1,7 +1,7 @@
 import { TestBed } from '@angular/core/testing';
 
 import { RemoteDataService } from '@shared/remote-data.service';
-import { provideHttpClientTesting } from '@angular/common/http/testing';
+import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
 import { AppConfigService } from '../app-config.service';
 import {
   LogbookDataService,
@@ -355,6 +355,23 @@ describe('LogbookDataService', () => {
       limit: 20,
       skip: 10,
     });
+  });
+
+  it('should POST importELN as multipart with the location-id param', () => {
+    const httpTestingController = TestBed.inject(HttpTestingController);
+    const file = new File(['x'], 'archive.eln');
+
+    service.importELN(file, 'loc1');
+
+    const req = httpTestingController.expectOne(
+      (r) => r.url === 'http://[::1]:3000/logbooks/import/eln',
+    );
+    expect(req.request.method).toEqual('POST');
+    expect(req.request.params.get('location-id')).toEqual('loc1');
+    expect(req.request.body instanceof FormData).toBeTrue();
+    expect((req.request.body as FormData).get('file')).toBe(file);
+    req.flush({ id: 'lb1' });
+    httpTestingController.verify();
   });
 });
 
