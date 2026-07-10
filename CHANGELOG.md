@@ -1,3 +1,10 @@
+## [2.10.5](https://github.com/paulscherrerinstitute/scilog/compare/v2.10.4...v2.10.5) (2026-07-10)
+
+
+### Bug Fixes
+
+* **deps:** update dependency ro-crate to v3.7.2 ([#660](https://github.com/paulscherrerinstitute/scilog/issues/660)) ([ffe00e4](https://github.com/paulscherrerinstitute/scilog/commit/ffe00e4a587f89fa5b3bfea1a78aaca162b77d0b))
+
 ## [2.10.4](https://github.com/paulscherrerinstitute/scilog/compare/v2.10.3...v2.10.4) (2026-07-10)
 
 
