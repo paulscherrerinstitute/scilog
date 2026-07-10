@@ -12,7 +12,7 @@ For the subsequent sections it will be useful to have a "helicopter" overview of
 
 ### Backend
 
-At the heart of the SciLog architecture is the [REST API server](https://github.com/paulscherrerinstitute/scilog/tree/main/sci-log-db). This is a  NodeJS application that uses the Loopback 4 framework to generate RESTful APIs. 
+At the heart of the SciLog architecture is the [REST API server](https://github.com/paulscherrerinstitute/scilog/tree/main/api). This is a  NodeJS application that uses the Loopback 4 framework to generate RESTful APIs. 
 
 The persistence layer behind this API server is a [MongoDB](https://www.mongodb.com/) instance, i.e an open source, NoSQL, document-based database solution. The API server handles alll the bi-directional communication from the REST interface to the Database.
 
@@ -21,7 +21,7 @@ These two components together comprise the "backend" of the architecture.
 
 ### Frontend
 
-To the REST server an arbitrary number of "clients" (frontends) can be connected. One of the most important clients is the [web based GUI frontend](https://github.com/paulscherrerinstitute/scilog/tree/main/scilog). The functionality of the GUI is described in the [User manual](../Users.html). This allows to communicate with the SciLog backend in a user friendly way. It is based on the Angular (9+) technology.
+To the REST server an arbitrary number of "clients" (frontends) can be connected. One of the most important clients is the [web based GUI frontend](https://github.com/paulscherrerinstitute/scilog/tree/main/web). The functionality of the GUI is described in the [User manual](../Users.html). This allows to communicate with the SciLog backend in a user friendly way. It is based on the Angular (9+) technology.
 
 In addition to the GUI other clients exist, such as command line (CLI) clients (example exist written in Python)  The CLI tools are especially useful for automated workflows, e.g. to get the data into the electronic logbook from external processes. This process is termed "ingestion" of the data. 
 

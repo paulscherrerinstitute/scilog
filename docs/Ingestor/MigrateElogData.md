@@ -60,7 +60,7 @@ export SCILOG_URL=http://localhost:3000
 export SCILOG_LOGIN=users/login
 export SCILOG_USERNAME=scilog-admin@psi.ch
 export SCILOG_PWD=....
-export SCILOG_DEFAULT_LOGBOOK_ICON=../sci-log-db/src/scilog_config_PSI/default_logbook_icon.jpg
+export SCILOG_DEFAULT_LOGBOOK_ICON=../api/src/scilog_config_PSI/default_logbook_icon.jpg
 
 ```
 

@@ -1,7 +1,7 @@
 {
-  "name": "sci-log-db",
+  "name": "api",
   "version": "2.10.1",
-  "description": "SciLogDB",
+  "description": "SciLog REST API backend",
   "keywords": [
     "loopback-application",
     "loopback"

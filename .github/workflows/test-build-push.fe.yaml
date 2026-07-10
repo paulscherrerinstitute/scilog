@@ -4,12 +4,12 @@ on:
   pull_request:
     branches: [main]
     paths:
-      - scilog/**
+      - web/**
       - .github/workflows/test-build-push.fe.yaml
   push:
     branches: [main]
     paths:
-      - scilog/**
+      - web/**
       - .github/workflows/test-build-push.fe.yaml
   release:
     types: [published]
@@ -17,7 +17,7 @@ on:
 env:
   CONTAINER_REGISTRY: ghcr.io
   IMAGE_NAME: ${{ github.repository }}/fe
-  CONTEXT: scilog
+  CONTEXT: web
 
 jobs:
   test:

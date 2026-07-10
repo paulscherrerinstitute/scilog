@@ -1,6 +1,7 @@
 {
-  "name": "scilog",
+  "name": "web",
   "version": "2.10.1",
+  "description": "SciLog web frontend",
   "license": "GPL-3.0-or-later",
   "scripts": {
     "ng": "ng",
