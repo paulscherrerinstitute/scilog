@@ -501,17 +501,17 @@ cd scilog
 git checkout main
 </code></pre><h4 id="start-backend">Start Backend</h4>
 <pre><code># adjust configuration if needed (functionalAccounts.json), see section below
-cd sci-log-db
+cd api
 npm install
 npm run test
 npm run start
 </code></pre><p>After that the API server is running on <a href="http://localhost:3000" target="_blank">http://localhost:3000</a> . You can check that it is working by navigating to the <a href="http://localhost:3000/explorer" target="_blank">API explorer</a></p>
 <h4 id="add-mongo-indices">Add Mongo indices</h4>
-<p>Just execute the commands in file sci-log-db/createIndexCommands.txt in a Mongo shell connected to your scilog repository.</p>
+<p>Just execute the commands in file api/createIndexCommands.txt in a Mongo shell connected to your scilog repository.</p>
 <h4 id="start-frontend">Start Frontend</h4>
 <p>In a separate terminal type the following commands</p>
-<pre><code># you may want to adjust the configuration before (scilog/src/assets/config.json), see below
-cd scilog
+<pre><code># you may want to adjust the configuration before (web/src/assets/config.json), see below
+cd web
 npm install
 npm run test
 npm run start
@@ -520,8 +520,8 @@ npm run start
 <p>There are the following configuration files that need to be adjusted to your situation.</p>
 <h4 id="backend">Backend</h4>
 <ol>
-<li><code>sci-log-db/functionalAccounts.json</code> : defines the functional accounts, such as admin, beamline accounts etc</li>
-<li><code>sci-log-db/datasource.json</code> : defines the connection to the Mongo DB , default settings are in the code</li>
+<li><code>api/functionalAccounts.json</code> : defines the functional accounts, such as admin, beamline accounts etc</li>
+<li><code>api/datasource.json</code> : defines the connection to the Mongo DB , default settings are in the code</li>
 <li><code>oidc.json</code> : TODO</li>
 </ol>
 <pre><code># Example functionalAccounts.json with admin and one beamline account
@@ -587,7 +587,7 @@ npm run start
 }
 </code></pre><h4 id="frontend">Frontend</h4>
 <ol>
-<li><code>scilog/src/assets/config.json</code> : defines the API server endpoint and OIDC connection details</li>
+<li><code>web/src/assets/config.json</code> : defines the API server endpoint and OIDC connection details</li>
 </ol>
 <pre><code># Example config.json file
 {
@@ -640,7 +640,7 @@ npm run start
     <script>
         var gitbook = gitbook || [];
         gitbook.push(function() {
-            gitbook.page.hasChanged({"page":{"title":"Step by Step instruction","level":"1.4.2","depth":2,"next":{"title":"Deploy with Docker Compose","level":"1.4.3","depth":2,"path":"Operator/Step_by_Step_Setup_Docker.md","ref":"Operator/Step_by_Step_Setup_Docker.md","articles":[]},"previous":{"title":"Login and Accounts","level":"1.4.1","depth":2,"path":"Operator/Login.md","ref":"Operator/Login.md","articles":[]},"dir":"ltr"},"config":{"gitbook":"*","theme":"default","variables":{},"plugins":[],"pluginsConfig":{"highlight":{},"search":{},"lunr":{"maxIndexSize":1000000,"ignoreSpecialCharacters":false},"fontsettings":{"theme":"white","family":"sans","size":2},"theme-default":{"styles":{"website":"styles/website.css","pdf":"styles/pdf.css","epub":"styles/epub.css","mobi":"styles/mobi.css","ebook":"styles/ebook.css","print":"styles/print.css"},"showLevel":false}},"structure":{"langs":"LANGS.md","readme":"README.md","glossary":"GLOSSARY.md","summary":"SUMMARY.md"},"pdf":{"pageNumbers":true,"fontSize":12,"fontFamily":"Arial","paperSize":"a4","chapterMark":"pagebreak","pageBreaksBefore":"/","margin":{"right":62,"left":62,"top":56,"bottom":56},"embedFonts":false},"styles":{"website":"styles/website.css","pdf":"styles/pdf.css","epub":"styles/epub.css","mobi":"styles/mobi.css","ebook":"styles/ebook.css","print":"styles/print.css"}},"file":{"path":"Operator/Step_by_Step_Setup.md","mtime":"2026-07-10T08:04:44.816Z","type":"markdown"},"gitbook":{"version":"4.0.8","time":"2026-07-10T08:04:55.454Z"},"basePath":"..","book":{"language":""}});
+            gitbook.page.hasChanged({"page":{"title":"Step by Step instruction","level":"1.4.2","depth":2,"next":{"title":"Deploy with Docker Compose","level":"1.4.3","depth":2,"path":"Operator/Step_by_Step_Setup_Docker.md","ref":"Operator/Step_by_Step_Setup_Docker.md","articles":[]},"previous":{"title":"Login and Accounts","level":"1.4.1","depth":2,"path":"Operator/Login.md","ref":"Operator/Login.md","articles":[]},"dir":"ltr"},"config":{"gitbook":"*","theme":"default","variables":{},"plugins":[],"pluginsConfig":{"highlight":{},"search":{},"lunr":{"maxIndexSize":1000000,"ignoreSpecialCharacters":false},"fontsettings":{"theme":"white","family":"sans","size":2},"theme-default":{"styles":{"website":"styles/website.css","pdf":"styles/pdf.css","epub":"styles/epub.css","mobi":"styles/mobi.css","ebook":"styles/ebook.css","print":"styles/print.css"},"showLevel":false}},"structure":{"langs":"LANGS.md","readme":"README.md","glossary":"GLOSSARY.md","summary":"SUMMARY.md"},"pdf":{"pageNumbers":true,"fontSize":12,"fontFamily":"Arial","paperSize":"a4","chapterMark":"pagebreak","pageBreaksBefore":"/","margin":{"right":62,"left":62,"top":56,"bottom":56},"embedFonts":false},"styles":{"website":"styles/website.css","pdf":"styles/pdf.css","epub":"styles/epub.css","mobi":"styles/mobi.css","ebook":"styles/ebook.css","print":"styles/print.css"}},"file":{"path":"Operator/Step_by_Step_Setup.md","mtime":"2026-07-10T08:52:28.581Z","type":"markdown"},"gitbook":{"version":"4.0.8","time":"2026-07-10T08:52:34.435Z"},"basePath":"..","book":{"language":""}});
         });
     </script>
 </div>
