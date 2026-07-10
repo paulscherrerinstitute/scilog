@@ -341,7 +341,20 @@
             
         </li>
     
-        <li class="chapter " data-level="1.5.2" data-path="../Development/LocalDevelopment.html">
+        <li class="chapter " data-level="1.5.2" data-path="../Development/eln-conventions.html">
+            
+                <a href="../Development/eln-conventions.html">
+            
+                    
+                    ELN Conventions
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.5.3" data-path="../Development/LocalDevelopment.html">
             
                 <a href="../Development/LocalDevelopment.html">
             
@@ -354,7 +367,7 @@
             
         </li>
     
-        <li class="chapter " data-level="1.5.3" data-path="../Development/RunningTests.html">
+        <li class="chapter " data-level="1.5.4" data-path="../Development/RunningTests.html">
             
                 <a href="../Development/RunningTests.html">
             
@@ -367,7 +380,7 @@
             
         </li>
     
-        <li class="chapter " data-level="1.5.4" data-path="../Development/Contributing.html">
+        <li class="chapter " data-level="1.5.5" data-path="../Development/Contributing.html">
             
                 <a href="../Development/Contributing.html">
             
@@ -380,7 +393,7 @@
             
         </li>
     
-        <li class="chapter " data-level="1.5.5" data-path="../Development/Documentation.html">
+        <li class="chapter " data-level="1.5.6" data-path="../Development/Documentation.html">
             
                 <a href="../Development/Documentation.html">
             
@@ -393,7 +406,7 @@
             
         </li>
     
-        <li class="chapter " data-level="1.5.6" data-path="../Development/GitHubFlow.html">
+        <li class="chapter " data-level="1.5.7" data-path="../Development/GitHubFlow.html">
             
                 <a href="../Development/GitHubFlow.html">
             
@@ -411,20 +424,7 @@
             
         </li>
     
-        <li class="chapter " data-level="1.6" data-path="../ELN_Export.html">
-            
-                <a href="../ELN_Export.html">
-            
-                    
-                    ELN Export
-            
-                </a>
-            
-
-            
-        </li>
-    
-        <li class="chapter " data-level="1.7" >
+        <li class="chapter " data-level="1.6" >
             
                 <a target="_blank" href="https://scilog.psi.ch/api/v1/explorer">
             
@@ -489,6 +489,20 @@
 <p>You can search among the logbooks based on the ownerGroup or the text content of the abstracts</p>
 <h2 id="view-details">View Details</h2>
 <p>To navigate to a specific logbook just click on the image or the open button of the corresponding logbook card.</p>
+<h2 id="adding-a-logbook">Adding a logbook</h2>
+<p>Use the <strong>Add logbook</strong> control at the top of the dashboard:</p>
+<ul>
+<li><strong>New logbook</strong> creates an empty logbook, where you enter the title, location, owner group, and so on.</li>
+<li><strong>Import from .eln</strong> creates a logbook from a previously exported <code>.eln</code> archive.</li>
+</ul>
+<h3 id="importing-from-an-eln-archive">Importing from an <code>.eln</code> archive</h3>
+<p>Select <strong>Add logbook ▾ → Import from .eln</strong>, then in the dialog:</p>
+<ol>
+<li>Choose the <code>.eln</code> file — drag it onto the drop area, or click to browse.</li>
+<li>Select the target <strong>location</strong> (beamline or instrument).</li>
+<li>Click <strong>Import</strong>.</li>
+</ol>
+<p>On success you are taken straight to the newly created logbook. Only <code>.eln</code> archives previously exported by SciLog are accepted (up to 100 MB); if an archive cannot be imported, the dialog lists the reasons so you can correct it.</p>
 
                                 
                                 </section>
@@ -532,7 +546,7 @@
     <script>
         var gitbook = gitbook || [];
         gitbook.push(function() {
-            gitbook.page.hasChanged({"page":{"title":"Overview Dashboard","level":"1.2.2","depth":2,"next":{"title":"Logbook","level":"1.2.3","depth":2,"path":"Users/Logbook.md","ref":"Users/Logbook.md","articles":[]},"previous":{"title":"Login","level":"1.2.1","depth":2,"path":"Users/Login.md","ref":"Users/Login.md","articles":[]},"dir":"ltr"},"config":{"gitbook":"*","theme":"default","variables":{},"plugins":[],"pluginsConfig":{"highlight":{},"search":{},"lunr":{"maxIndexSize":1000000,"ignoreSpecialCharacters":false},"fontsettings":{"theme":"white","family":"sans","size":2},"theme-default":{"styles":{"website":"styles/website.css","pdf":"styles/pdf.css","epub":"styles/epub.css","mobi":"styles/mobi.css","ebook":"styles/ebook.css","print":"styles/print.css"},"showLevel":false}},"structure":{"langs":"LANGS.md","readme":"README.md","glossary":"GLOSSARY.md","summary":"SUMMARY.md"},"pdf":{"pageNumbers":true,"fontSize":12,"fontFamily":"Arial","paperSize":"a4","chapterMark":"pagebreak","pageBreaksBefore":"/","margin":{"right":62,"left":62,"top":56,"bottom":56},"embedFonts":false},"styles":{"website":"styles/website.css","pdf":"styles/pdf.css","epub":"styles/epub.css","mobi":"styles/mobi.css","ebook":"styles/ebook.css","print":"styles/print.css"}},"file":{"path":"Users/Dashboard.md","mtime":"2026-06-02T14:31:24.697Z","type":"markdown"},"gitbook":{"version":"4.0.8","time":"2026-06-02T14:31:32.475Z"},"basePath":"..","book":{"language":""}});
+            gitbook.page.hasChanged({"page":{"title":"Overview Dashboard","level":"1.2.2","depth":2,"next":{"title":"Logbook","level":"1.2.3","depth":2,"path":"Users/Logbook.md","ref":"Users/Logbook.md","articles":[]},"previous":{"title":"Login","level":"1.2.1","depth":2,"path":"Users/Login.md","ref":"Users/Login.md","articles":[]},"dir":"ltr"},"config":{"gitbook":"*","theme":"default","variables":{},"plugins":[],"pluginsConfig":{"highlight":{},"search":{},"lunr":{"maxIndexSize":1000000,"ignoreSpecialCharacters":false},"fontsettings":{"theme":"white","family":"sans","size":2},"theme-default":{"styles":{"website":"styles/website.css","pdf":"styles/pdf.css","epub":"styles/epub.css","mobi":"styles/mobi.css","ebook":"styles/ebook.css","print":"styles/print.css"},"showLevel":false}},"structure":{"langs":"LANGS.md","readme":"README.md","glossary":"GLOSSARY.md","summary":"SUMMARY.md"},"pdf":{"pageNumbers":true,"fontSize":12,"fontFamily":"Arial","paperSize":"a4","chapterMark":"pagebreak","pageBreaksBefore":"/","margin":{"right":62,"left":62,"top":56,"bottom":56},"embedFonts":false},"styles":{"website":"styles/website.css","pdf":"styles/pdf.css","epub":"styles/epub.css","mobi":"styles/mobi.css","ebook":"styles/ebook.css","print":"styles/print.css"}},"file":{"path":"Users/Dashboard.md","mtime":"2026-07-10T08:04:44.816Z","type":"markdown"},"gitbook":{"version":"4.0.8","time":"2026-07-10T08:04:55.454Z"},"basePath":"..","book":{"language":""}});
         });
     </script>
 </div>
