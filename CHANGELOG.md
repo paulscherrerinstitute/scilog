@@ -1,3 +1,10 @@
+## [2.10.2](https://github.com/paulscherrerinstitute/scilog/compare/v2.10.1...v2.10.2) (2026-07-10)
+
+
+### Bug Fixes
+
+* **api:** load pdf export css from compiled dist ([#663](https://github.com/paulscherrerinstitute/scilog/issues/663)) ([6163d3d](https://github.com/paulscherrerinstitute/scilog/commit/6163d3dd73cde54a1ca4bb7213a5d232407a5552))
+
 ## [2.10.1](https://github.com/paulscherrerinstitute/scilog/compare/v2.10.0...v2.10.1) (2026-07-09)
 
 
