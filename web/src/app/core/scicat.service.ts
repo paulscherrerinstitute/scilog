@@ -14,6 +14,7 @@ import { HttpContext, HttpContextToken } from '@angular/common/http';
 export type Dataset = OutputDatasetObsoleteDto;
 export type DatasetSummary = Pick<Dataset, 'pid' | 'datasetName' | 'creationTime'>;
 export type ScicatUser = ReturnedUserDto;
+type RelationshipSchema = RelationshipClass & { _id: string };
 
 export const IF_UNMODIFIED_SINCE = new HttpContextToken<string>(() => undefined);
 
@@ -93,7 +94,6 @@ export class ScicatService {
         if (alreadyLinked) {
           return of(false);
         }
-        type RelationshipSchema = RelationshipClass & { _id: string };
         // the actual relationship object also contains an _id, it must be removed from the update request
         const existingRelationships = ((dataset.relationships ?? []) as RelationshipSchema[]).map(
           ({ _id, ...rest }) => rest,
@@ -118,6 +118,31 @@ export class ScicatService {
             {
               context: new HttpContext().set(IF_UNMODIFIED_SINCE, dataset.updatedAt),
             },
+          )
+          .pipe(map(() => true));
+      }),
+    );
+  }
+
+  unlinkLogbookFromDataset(logbookId: string, pid: string): Observable<boolean> {
+    return this.getDataset(pid).pipe(
+      switchMap((dataset) => {
+        const existing = ((dataset.relationships ?? []) as RelationshipSchema[]).map(
+          ({ _id, ...rest }) => rest,
+        );
+        const filtered = existing.filter(
+          (rel) => !(rel.relationship === 'Logbook' && rel.externalId === logbookId),
+        );
+        if (filtered.length === existing.length) {
+          return of(false);
+        }
+        return this.datasetsService
+          .datasetsControllerFindByIdAndUpdateV3(
+            pid,
+            { relationships: filtered },
+            undefined,
+            undefined,
+            { context: new HttpContext().set(IF_UNMODIFIED_SINCE, dataset.updatedAt) },
           )
           .pipe(map(() => true));
       }),
