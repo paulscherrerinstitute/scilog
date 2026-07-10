@@ -7,8 +7,10 @@ import {LinkType, Paragraph} from '../../models';
 import {Server} from '@loopback/rest';
 import PDFMerger from 'pdf-merger-js';
 import puppeteer from 'puppeteer';
+import type {Browser, Page} from 'puppeteer';
 import fspromise from 'fs/promises';
 import fs from 'fs';
+import {isAbsolute} from 'path';
 
 describe('Export service unit', function (this: Suite) {
   let tests: string[] | string[][];
@@ -249,6 +251,30 @@ describe('Export service unit', function (this: Suite) {
       expect(htmlToPDF.callCount).to.be.eql(o);
       expect(exportFile).to.be.eql('dir/file.pdf');
     });
+  });
+
+  it('htmlToPDF loads pdf.css anchored at the module, not the cwd', async () => {
+    const addStyleTag = sandbox.stub().resolves();
+    const page: Partial<Page> = {
+      setDefaultNavigationTimeout: sandbox.stub(),
+      setContent: sandbox.stub().resolves(),
+      addStyleTag,
+      emulateMediaType: sandbox.stub().resolves(),
+      pdf: sandbox.stub().resolves(),
+    };
+    const browser = {
+      newPage: sandbox.stub().resolves(page),
+    } as unknown as Browser;
+
+    await exportService['htmlToPDF'](browser, 'file.pdf', '<html></html>');
+
+    const cssPath = addStyleTag.args
+      .map(([opts]) => opts.path)
+      .find(p => p?.endsWith('pdf.css'));
+
+    expect(cssPath).to.not.be.undefined();
+    expect(isAbsolute(cssPath)).to.be.true();
+    expect(fs.existsSync(cssPath)).to.be.true();
   });
 
   const countTest = [
