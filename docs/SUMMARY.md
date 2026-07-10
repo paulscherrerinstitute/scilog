@@ -18,11 +18,11 @@
     * [Deploy with Kubernetes](Operator/Step_by_Step_Setup_Kubernetes.md)
 * [Developers Guide](Development/README.md)
     * [An Introduction to the Data Model](Development/Data_Model.md)
+    * [ELN Conventions](Development/eln-conventions.md)
     * [Local Development](Development/LocalDevelopment.md)
     * [Testing](Development/RunningTests.md)
     * [Contributing](Development/Contributing.md)
     * [Adding Documentation](Development/Documentation.md)
     * [GitHub Flow](Development/GitHubFlow.md)
-* [ELN Export](ELN_Export.md)
 * [Example of API Documentation](https://scilog.psi.ch/api/v1/explorer)
 
