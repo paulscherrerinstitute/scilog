@@ -11,7 +11,7 @@ import {omit} from 'lodash';
 import {writeFile} from 'fs/promises';
 import {create as tarCreate} from 'tar';
 import {mkdirSync, existsSync} from 'fs';
-import {basename} from 'path';
+import {basename, join} from 'path';
 
 @bind({
   scope: BindingScope.TRANSIENT,
@@ -363,7 +363,7 @@ export class ExportService {
     const page = await browser.newPage();
     page.setDefaultNavigationTimeout(0);
     await page.setContent(htmlString);
-    await page.addStyleTag({path: 'src/services/pdf.css'});
+    await page.addStyleTag({path: join(__dirname, 'pdf.css')});
     await page.addStyleTag({
       path: `${
         process.env.NODE_PATH ?? 'node_modules'

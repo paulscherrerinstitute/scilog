@@ -12,7 +12,7 @@
     "node": ">=10.16"
   },
   "scripts": {
-    "build": "lb-tsc",
+    "build": "lb-tsc --copy-resources",
     "lint": "npm run prettier:check && npm run eslint",
     "lint:fix": "npm run eslint:fix && npm run prettier:fix",
     "prettier:cli": "lb-prettier \"**/*.ts\" \"**/*.js\"",
@@ -25,7 +25,7 @@
     "migrate": "node ./dist/migrate",
     "openapi-spec": "node ./dist/openapi-spec",
     "clean": "lb-clean dist *.tsbuildinfo .eslintcache",
-    "dev": "tsc && (tsc --watch & node --watch --enable-source-maps .)"
+    "dev": "npm run build && (tsc --watch & node --watch --enable-source-maps .)"
   },
   "repository": {
     "type": "git"
