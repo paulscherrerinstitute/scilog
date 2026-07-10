@@ -24,10 +24,10 @@ SciLog is developed at the Paul Scherrer Institut (PSI) and is in production use
 ## Repository structure
 
 ### Frontend (angular)
-The [scilog](./scilog) folder contains the [angular](https://angular.dev/) components and the Dockerfile that implement the SciLog UI.
+The [web](./web) folder contains the [angular](https://angular.dev/) components and the Dockerfile that implement the SciLog UI.
 
 ### Backend (loopback4)
-The [sci-log-db](./sci-log-db) folder contains the REST API backend implementation. It is implemented using [loopback4](https://loopback.io/doc/en/lb4/index.html), a [node.js](https://nodejs.org/en) framework developed by IBM. See the [backend README](./sci-log-db/README.md) for development instructions.
+The [api](./api) folder contains the REST API backend implementation. It is implemented using [loopback4](https://loopback.io/doc/en/lb4/index.html), a [node.js](https://nodejs.org/en) framework developed by IBM. See the [backend README](./api/README.md) for development instructions.
 
 ### SDK (python)
 The [sdk/python](./sdk/python) folder contains a wrapper of the backend REST APIs in python. It is currently limited to the core endpoints and doesn't yet cover all HTTP endpoints.
@@ -63,7 +63,7 @@ After that, you can start creating logbooks (`Add logbook`) and play around.
 To change configuration options or check the default ones, have a look at the files referenced by the [docker compose file](./config/docker-compose.yaml) and their content inside the [config](./config) folder.
 
 ### Backend only
-For backend development, see the [backend README](./sci-log-db/README.md).
+For backend development, see the [backend README](./api/README.md).
 
 For questions or support, email us at: [scilog-help@lists.psi.ch](mailto:scilog-help@lists.psi.ch)
 

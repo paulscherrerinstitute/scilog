@@ -1,4 +1,4 @@
-# sci-log-db
+# api
 
 REST API backend for SciLog, built with [LoopBack 4](https://loopback.io/doc/en/lb4/index.html).
 

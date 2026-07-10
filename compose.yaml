@@ -1,16 +1,16 @@
 include:
-  - sci-log-db/compose.yaml
+  - api/compose.yaml
 
 services:
   frontend:
     build:
-      context: ./scilog/.
+      context: ./web/.
       target: builder
     environment:
       CHROME_BIN: /usr/bin/chromium-browser
       CHROME_PATH: /usr/lib/chromium/
     volumes:
-      - ./scilog:/frontend
+      - ./web:/frontend
       - ./config/fe/config.dev.json:/frontend/src/assets/config.json
       - /frontend/node_modules
       - /frontend/dist

@@ -4,23 +4,23 @@ on:
   pull_request:
     branches: [main]
     paths: 
-      - sci-log-db/**
+      - api/**
       - .github/workflows/test-build-push.be.yaml
   push:
     branches: [main]
     paths: 
-      - sci-log-db/**
+      - api/**
       - .github/workflows/test-build-push.be.yaml
   release:
     types: [published]
     paths: 
-      - sci-log-db/**
+      - api/**
       - .github/workflows/test-build-push.be.yaml
 
 env:
   CONTAINER_REGISTRY: ghcr.io
   IMAGE_NAME: ${{ github.repository }}/be
-  CONTEXT: sci-log-db
+  CONTEXT: api
 
 jobs:
   test:

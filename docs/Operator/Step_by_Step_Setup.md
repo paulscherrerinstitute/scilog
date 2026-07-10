@@ -35,7 +35,7 @@ git checkout main
 #### Start Backend
 ```
 # adjust configuration if needed (functionalAccounts.json), see section below
-cd sci-log-db
+cd api
 npm install
 npm run test
 npm run start
@@ -45,13 +45,13 @@ After that the API server is running on http://localhost:3000 . You can check th
 
 #### Add Mongo indices
 
-Just execute the commands in file sci-log-db/createIndexCommands.txt in a Mongo shell connected to your scilog repository.
+Just execute the commands in file api/createIndexCommands.txt in a Mongo shell connected to your scilog repository.
 
 #### Start Frontend
 In a separate terminal type the following commands
 ```
-# you may want to adjust the configuration before (scilog/src/assets/config.json), see below
-cd scilog
+# you may want to adjust the configuration before (web/src/assets/config.json), see below
+cd web
 npm install
 npm run test
 npm run start
@@ -65,8 +65,8 @@ There are the following configuration files that need to be adjusted to your sit
 
 #### Backend
 
-1. `sci-log-db/functionalAccounts.json` : defines the functional accounts, such as admin, beamline accounts etc
-2. `sci-log-db/datasource.json` : defines the connection to the Mongo DB , default settings are in the code
+1. `api/functionalAccounts.json` : defines the functional accounts, such as admin, beamline accounts etc
+2. `api/datasource.json` : defines the connection to the Mongo DB , default settings are in the code
 3. `oidc.json` : TODO
 
 ```
@@ -134,7 +134,7 @@ There are the following configuration files that need to be adjusted to your sit
 ```
 #### Frontend
 
-1. `scilog/src/assets/config.json` : defines the API server endpoint and OIDC connection details
+1. `web/src/assets/config.json` : defines the API server endpoint and OIDC connection details
 
 ```
 # Example config.json file
