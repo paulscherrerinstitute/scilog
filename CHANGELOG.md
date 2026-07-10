@@ -1,3 +1,10 @@
+# [2.11.0](https://github.com/paulscherrerinstitute/scilog/compare/v2.10.5...v2.11.0) (2026-07-10)
+
+
+### Features
+
+* add unlink logbook functionality ([#644](https://github.com/paulscherrerinstitute/scilog/issues/644)) ([481b25a](https://github.com/paulscherrerinstitute/scilog/commit/481b25a68f6a1bb13b660dc92ae003d05e3a5064))
+
 ## [2.10.5](https://github.com/paulscherrerinstitute/scilog/compare/v2.10.4...v2.10.5) (2026-07-10)
 
 
