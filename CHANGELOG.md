@@ -1,3 +1,10 @@
+## [2.10.3](https://github.com/paulscherrerinstitute/scilog/compare/v2.10.2...v2.10.3) (2026-07-10)
+
+
+### Bug Fixes
+
+* **deps:** update dependency ws to v8.21.0 [security] ([#662](https://github.com/paulscherrerinstitute/scilog/issues/662)) ([a9bec0d](https://github.com/paulscherrerinstitute/scilog/commit/a9bec0d04bc463f3faa17ef9ef752b460746b058))
+
 ## [2.10.2](https://github.com/paulscherrerinstitute/scilog/compare/v2.10.1...v2.10.2) (2026-07-10)
 
 
