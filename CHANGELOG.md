@@ -1,3 +1,10 @@
+## [2.11.1](https://github.com/paulscherrerinstitute/scilog/compare/v2.11.0...v2.11.1) (2026-07-21)
+
+
+### Bug Fixes
+
+* **web:** drop legacy acl from paragraph patch ([#667](https://github.com/paulscherrerinstitute/scilog/issues/667)) ([9d3c278](https://github.com/paulscherrerinstitute/scilog/commit/9d3c27802a70356db7af190ef118d665c1689471)), closes [#666](https://github.com/paulscherrerinstitute/scilog/issues/666)
+
 # [2.11.0](https://github.com/paulscherrerinstitute/scilog/compare/v2.10.5...v2.11.0) (2026-07-10)
 
 
