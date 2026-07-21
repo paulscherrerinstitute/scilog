@@ -8,12 +8,9 @@ WORKDIR /home/node/app
 
 RUN chown -R node:node .
 
-# Pinned: chromium 150 in bookworm-security crashes on startup
-# (Debian bug #1141488); 147 from bookworm/main predates the regression.
 RUN apt-get update && \
     apt-get install -y --no-install-recommends \
-        chromium=147.0.7727.137-1~deb12u1 \
-        chromium-common=147.0.7727.137-1~deb12u1 && \
+        chromium && \
     rm -rf /var/lib/apt/lists/*
 
 ENV CHROME_BIN=/usr/bin/chromium
