@@ -1,3 +1,10 @@
+## [2.11.2](https://github.com/paulscherrerinstitute/scilog/compare/v2.11.1...v2.11.2) (2026-07-21)
+
+
+### Bug Fixes
+
+* **api:** unpin chromium in Dockerfile ([#668](https://github.com/paulscherrerinstitute/scilog/issues/668)) ([b7ff13b](https://github.com/paulscherrerinstitute/scilog/commit/b7ff13bea19c849bf3536375b267b82861a74573)), closes [#665](https://github.com/paulscherrerinstitute/scilog/issues/665)
+
 ## [2.11.1](https://github.com/paulscherrerinstitute/scilog/compare/v2.11.0...v2.11.1) (2026-07-21)
 
 
