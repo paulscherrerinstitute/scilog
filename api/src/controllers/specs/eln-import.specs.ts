@@ -1,6 +1,6 @@
 import {getModelSchemaRef, RequestBodyObject} from '@loopback/rest';
 import {Logbook} from '../../models';
-import {ElnErrorCode} from '../../services/eln-archive';
+import {ElnErrorCode} from '../../services/eln/archive';
 import {MAX_FILE_SIZE, MAX_FILE_SIZE_MB} from '../eln-import.config';
 
 const ERROR_SCHEMA = {

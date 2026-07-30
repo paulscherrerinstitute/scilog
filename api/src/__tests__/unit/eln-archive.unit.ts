@@ -7,7 +7,7 @@ import {
   ElnErrorCode,
   ElnParseFailure,
   ElnArchive,
-} from '../../services/eln-archive';
+} from '../../services/eln/archive';
 import {buildElnZip, validElnCrate, validElnEntries} from '../eln.helpers';
 
 describe('ElnArchive.validateMetadata', () => {

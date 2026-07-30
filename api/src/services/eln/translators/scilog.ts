@@ -9,11 +9,11 @@
 import {JSDOM} from 'jsdom';
 import path from 'node:path';
 import {Entity, ROCrate} from 'ro-crate';
-import {Logbook, Paragraph} from '../models';
-import {Filesnippet} from '../models/file.model';
-import {LinkType} from '../models/paragraph.model';
+import {Logbook, Paragraph} from '../../../models';
+import {Filesnippet} from '../../../models/file.model';
+import {LinkType} from '../../../models/paragraph.model';
 
-export class ElnTranslator {
+export class ScilogTranslator {
   /**
    * Translate ELN metadata into a SciLog logbook draft: a tree whose nodes
    * carry their embedded files and their nested paragraphs (a comment is a
@@ -23,7 +23,7 @@ export class ElnTranslator {
    */
   static toSciLog(crate: ROCrate): LogbookDraft {
     const book = findBook(crate);
-    if (!book) throw new Error('ElnTranslator: no Book entity in crate');
+    if (!book) throw new Error('ScilogTranslator: no Book entity in crate');
     return buildLogbook(book);
   }
 
@@ -57,7 +57,7 @@ export class ElnTranslator {
       const entry = fileMap.get(ref);
       if (!entry) {
         throw new Error(
-          `ElnTranslator.decodeFileReferences: no file map entry for ${readAttr} ${ref}`,
+          `ScilogTranslator.decodeFileReferences: no file map entry for ${readAttr} ${ref}`,
         );
       }
       el.setAttribute(writeAttr, format(entry.fileHash));

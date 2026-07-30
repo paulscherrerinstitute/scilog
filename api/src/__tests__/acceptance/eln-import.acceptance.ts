@@ -6,7 +6,7 @@ import path from 'path';
 import {SciLogDbApplication} from '../..';
 import {Logbook, Paragraph} from '../../models';
 import {Filesnippet} from '../../models/file.model';
-import {ElnError, ElnErrorCode} from '../../services/eln-archive';
+import {ElnError, ElnErrorCode} from '../../services/eln/archive';
 import {buildElnZip, validElnCrate} from '../eln.helpers';
 import {
   clearDatabase,

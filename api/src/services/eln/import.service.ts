@@ -4,21 +4,21 @@ import {SecurityBindings, UserProfile} from '@loopback/security';
 import crypto from 'node:crypto';
 import {unlink} from 'node:fs/promises';
 import {Readable} from 'node:stream';
-import {Logbook} from '../models';
-import {Filecontainer, Location} from '../models/location.model';
+import {Logbook} from '../../models';
+import {Filecontainer, Location} from '../../models/location.model';
 import {
   FileRepository,
   LogbookRepository,
   ParagraphRepository,
-} from '../repositories';
-import {ElnArchive, ElnError} from './eln-archive';
+} from '../../repositories';
+import {ElnArchive, ElnError} from './archive';
 import {
-  ElnTranslator,
+  ScilogTranslator,
   FileDraft,
   LogbookDraft,
   ParagraphDraft,
-} from './eln-translator';
-import {FileStorageService} from './file-storage.service';
+} from './translators/scilog';
+import {FileStorageService} from '../file-storage.service';
 
 export class ElnImportError extends Error {
   constructor(readonly errors: ElnError[]) {
@@ -62,7 +62,7 @@ export class ElnImportService {
     }
     if (!parsed.ok) throw new ElnImportError(parsed.errors);
 
-    const draft = ElnTranslator.toSciLog(parsed.elnArchive.crate);
+    const draft = ScilogTranslator.toSciLog(parsed.elnArchive.crate);
     const logbookId = await this.createLogbook(
       draft,
       location,
@@ -104,7 +104,7 @@ export class ElnImportService {
     const files = await this.createFiles(draft.files, archive);
     const html = draft.fields.textcontent;
     const textcontent = html
-      ? ElnTranslator.decodeFileReferences(html, files)
+      ? ScilogTranslator.decodeFileReferences(html, files)
       : html;
     const created = await this.paragraphRepository.create(
       {...draft.fields, textcontent, files: [...files.values()], parentId},
