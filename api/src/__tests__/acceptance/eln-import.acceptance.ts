@@ -7,7 +7,7 @@ import {SciLogDbApplication} from '../..';
 import {Logbook, Paragraph} from '../../models';
 import {Filesnippet} from '../../models/file.model';
 import {ElnError, ElnErrorCode} from '../../services/eln/archive';
-import {buildElnZip, validElnCrate} from '../eln.helpers';
+import {buildElnZip, validScilogCrate} from '../eln.helpers';
 import {
   clearDatabase,
   createUserToken,
@@ -178,7 +178,7 @@ describe('Logbook .eln import', function (this: Suite) {
         new Map([
           [
             'ro-crate-metadata.json',
-            Buffer.from(JSON.stringify(validElnCrate().toJSON())),
+            Buffer.from(JSON.stringify(validScilogCrate().toJSON())),
           ],
         ]),
       );
@@ -213,7 +213,7 @@ describe('Logbook .eln import', function (this: Suite) {
     });
 
     it('returns 422 when a referenced file is missing from the zip', async () => {
-      const crate = validElnCrate();
+      const crate = validScilogCrate();
       crate.addEntity({
         '@id': './book/missing.jpg',
         '@type': 'File',
@@ -238,7 +238,7 @@ describe('Logbook .eln import', function (this: Suite) {
         .set('Authorization', 'Bearer ' + token)
         .attach('file', eln, 'missing-file.eln')
         .expect(422);
-      // Two errors: the default ./book/file.txt from validElnCrate is also
+      // Two errors: the default ./book/file.txt from validScilogCrate is also
       // absent from our entries map, plus our intended ./book/missing.jpg.
       expectArchiveValidationError(r.body.error, [
         {
@@ -255,7 +255,7 @@ describe('Logbook .eln import', function (this: Suite) {
     it('returns 422 when a file sha256 does not match the metadata', async () => {
       const content = Buffer.from('the actual bytes');
       const wrongSha = '0'.repeat(64);
-      const crate = validElnCrate();
+      const crate = validScilogCrate();
       crate.addEntity({
         '@id': './book/data.txt',
         '@type': 'File',
@@ -280,7 +280,7 @@ describe('Logbook .eln import', function (this: Suite) {
         .set('Authorization', 'Bearer ' + token)
         .attach('file', eln, 'bad-sha.eln')
         .expect(422);
-      // Two errors: the default ./book/file.txt from validElnCrate is also
+      // Two errors: the default ./book/file.txt from validScilogCrate is also
       // absent, plus the intended checksum mismatch on ./book/data.txt.
       expectArchiveValidationError(r.body.error, [
         {
