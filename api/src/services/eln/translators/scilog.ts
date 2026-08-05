@@ -12,6 +12,7 @@ import {Entity, ROCrate} from 'ro-crate';
 import {Logbook, Paragraph} from '../../../models';
 import {Filesnippet} from '../../../models/file.model';
 import {LinkType} from '../../../models/paragraph.model';
+import {provenanceTags, sourceTag} from './provenance';
 import type {
   FileDraft,
   LogbookDraft,
@@ -19,6 +20,7 @@ import type {
   Translator,
 } from './translator';
 
+const SOURCE = 'scilog';
 const PUBLISHER = 'https://github.com/paulscherrerinstitute/scilog';
 
 export class ScilogTranslator implements Translator {
@@ -98,21 +100,21 @@ function partsOfType(entity: Entity, type: string): Entity[] {
 
 // --- field mappers: ELN entity → SciLog model fields ---
 
-/** Provenance tags carried by every entity: ELN id, author, date created. */
-function provenanceTags(entity: Entity): string[] {
-  const tags = [`eln:id:${entity['@id']}`];
-  const authorEmail = entity.author?.[0]?.email?.[0] as string | undefined;
-  if (authorEmail) tags.push(`eln:author:${authorEmail}`);
-  const dateCreated = entity.dateCreated?.[0] as string | undefined;
-  if (dateCreated) tags.push(`eln:created:${dateCreated.slice(0, 10)}`);
-  return tags;
+/** Extract SciLog's provenance values from an entity and format them. */
+function entityProvenance(entity: Entity): string[] {
+  const created = entity.dateCreated?.[0] as string | undefined;
+  return provenanceTags({
+    id: entity['@id'] as string,
+    author: entity.author?.[0]?.email?.[0] as string | undefined,
+    created: created ? new Date(created) : undefined,
+  });
 }
 
 function logbookFromBook(book: Entity): Partial<Logbook> {
   return {
     name: book.name?.[0],
     description: book.description?.[0],
-    tags: ['eln:source:scilog', ...provenanceTags(book)],
+    tags: [sourceTag(SOURCE), ...entityProvenance(book)],
   };
 }
 
@@ -131,7 +133,7 @@ function paragraphFromEntity(
   const dateCreated = entity.dateCreated?.[0] as string | undefined;
   const keywords = entity.keywords?.[0] as string | undefined;
 
-  const tags = provenanceTags(entity);
+  const tags = entityProvenance(entity);
   if (keywords) tags.push(...keywords.split(','));
 
   return {
@@ -158,7 +160,7 @@ function filesnippetFromFile(file: Entity): Partial<Filesnippet> {
     contentSize: contentSize !== undefined ? Number(contentSize) : undefined,
     contentSha256: file.sha256?.[0] as string | undefined,
     fileExtension,
-    tags: [`eln:id:${file['@id']}`],
+    tags: provenanceTags({id: file['@id'] as string}),
   };
 }
 
