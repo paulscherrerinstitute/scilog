@@ -1,11 +1,11 @@
 import {expect} from '@loopback/testlab';
-import {LinkType} from '../../models/paragraph.model';
-import {ScilogTranslator} from '../../services/eln/translators/scilog';
-import {validElnCrate} from '../eln.helpers';
+import {LinkType} from '../../../../models/paragraph.model';
+import {ScilogTranslator} from '../../../../services/eln/translators/scilog';
+import {validScilogCrate} from '../../../eln.helpers';
 
 describe('ScilogTranslator.toSciLog', () => {
   it('assembles the tree: one paragraph with its file and nested comment', () => {
-    const draft = ScilogTranslator.toSciLog(validElnCrate());
+    const draft = ScilogTranslator.toSciLog(validScilogCrate());
     expect(draft.paragraphs).to.have.length(1);
 
     const [message] = draft.paragraphs;
@@ -23,20 +23,22 @@ describe('ScilogTranslator.toSciLog', () => {
 
   describe('logbook', () => {
     it('extracts fields and provenance tags from the Book entity', () => {
-      expect(ScilogTranslator.toSciLog(validElnCrate()).fields).to.deepEqual({
-        name: 'book',
-        description: 'a book',
-        tags: [
-          'eln:source:scilog',
-          'eln:id:./book/',
-          'eln:author:a@example.org',
-          'eln:created:2026-01-19',
-        ],
-      });
+      expect(ScilogTranslator.toSciLog(validScilogCrate()).fields).to.deepEqual(
+        {
+          name: 'book',
+          description: 'a book',
+          tags: [
+            'eln:source:scilog',
+            'eln:id:./book/',
+            'eln:author:a@example.org',
+            'eln:created:2026-01-19',
+          ],
+        },
+      );
     });
 
     it('omits optional fields and conditional tags when missing', () => {
-      const crate = validElnCrate();
+      const crate = validScilogCrate();
       crate.deleteProperty('./book/', 'description');
       crate.deleteProperty('./book/', 'dateCreated');
       crate.deleteProperty('./book/', 'author');
@@ -50,7 +52,8 @@ describe('ScilogTranslator.toSciLog', () => {
 
   describe('paragraphs', () => {
     it('maps Message entity fields, with linkType=paragraph and split keyword tags', () => {
-      const [message] = ScilogTranslator.toSciLog(validElnCrate()).paragraphs;
+      const [message] =
+        ScilogTranslator.toSciLog(validScilogCrate()).paragraphs;
       expect(message.fields).to.deepEqual({
         linkType: LinkType.PARAGRAPH,
         textcontent: '<p>hello</p>',
@@ -68,7 +71,8 @@ describe('ScilogTranslator.toSciLog', () => {
 
   describe('files', () => {
     it('embeds File entity fields on the paragraph that references them', () => {
-      const [message] = ScilogTranslator.toSciLog(validElnCrate()).paragraphs;
+      const [message] =
+        ScilogTranslator.toSciLog(validScilogCrate()).paragraphs;
       expect(message.files).to.deepEqual([
         {
           elnId: './book/file.txt',
@@ -86,14 +90,14 @@ describe('ScilogTranslator.toSciLog', () => {
     });
 
     it('leaves fileExtension undefined when the name has no extension', () => {
-      const crate = validElnCrate();
+      const crate = validScilogCrate();
       crate.setProperty('./book/file.txt', 'name', 'README');
       const [message] = ScilogTranslator.toSciLog(crate).paragraphs;
       expect(message.files[0].fields.fileExtension).to.be.undefined();
     });
 
     it('embeds files on a comment, not only on a paragraph', () => {
-      const crate = validElnCrate();
+      const crate = validScilogCrate();
       crate.addEntity({
         '@id': './book/comment/img.png',
         '@type': 'File',
@@ -115,12 +119,14 @@ describe('ScilogTranslator.toSciLog', () => {
 
   describe('comments', () => {
     it('nests a message comments as child paragraphs', () => {
-      const [message] = ScilogTranslator.toSciLog(validElnCrate()).paragraphs;
+      const [message] =
+        ScilogTranslator.toSciLog(validScilogCrate()).paragraphs;
       expect(message.paragraphs).to.have.length(1);
     });
 
     it('maps Comment entity fields, with linkType=comment', () => {
-      const [message] = ScilogTranslator.toSciLog(validElnCrate()).paragraphs;
+      const [message] =
+        ScilogTranslator.toSciLog(validScilogCrate()).paragraphs;
       const [comment] = message.paragraphs;
       expect(comment.fields).to.deepEqual({
         linkType: LinkType.COMMENT,

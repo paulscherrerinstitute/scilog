@@ -7,7 +7,7 @@ import {finished} from 'node:stream/promises';
 import {ROCrate} from 'ro-crate';
 
 // Minimal RO-Crate 1.2 + ELN graph that passes validation.
-export function validElnCrate(): ROCrate {
+export function validScilogCrate(): ROCrate {
   return new ROCrate(
     {
       '@context': 'https://w3id.org/ro/crate/1.2/context',
@@ -88,8 +88,8 @@ export function validElnCrate(): ROCrate {
 
 // Build a Map<string, Buffer> with valid metadata and matching file content,
 // suitable for passing to ElnArchive.parseRaw().
-export function validElnEntries(): Map<string, Buffer> {
-  const crate = validElnCrate();
+export function validScilogEntries(): Map<string, Buffer> {
+  const crate = validScilogCrate();
   const fileContent = Buffer.from('hello');
   const sha = crypto.createHash('sha256').update(fileContent).digest('hex');
   crate.setProperty('./book/file.txt', 'sha256', sha);
