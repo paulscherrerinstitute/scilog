@@ -11,7 +11,8 @@ import {
   LogbookRepository,
   ParagraphRepository,
 } from '../../repositories';
-import {ElnArchive, ElnError} from './archive';
+import {ElnArchive} from './archive';
+import {ElnImportError} from './errors';
 import {
   ScilogTranslator,
   FileDraft,
@@ -19,13 +20,6 @@ import {
   ParagraphDraft,
 } from './translators/scilog';
 import {FileStorageService} from '../file-storage.service';
-
-export class ElnImportError extends Error {
-  constructor(readonly errors: ElnError[]) {
-    super(`ELN import failed with ${errors.length} error(s)`);
-    this.name = 'ElnImportError';
-  }
-}
 
 /** Per-file identity captured after creating the Filesnippet. */
 type CreatedFile = Required<

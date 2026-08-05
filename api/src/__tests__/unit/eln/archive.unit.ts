@@ -3,11 +3,8 @@ import crypto from 'node:crypto';
 import fs from 'node:fs/promises';
 import os from 'node:os';
 import path from 'node:path';
-import {
-  ElnErrorCode,
-  ElnParseFailure,
-  ElnArchive,
-} from '../../../services/eln/archive';
+import {ElnArchive, ElnParseFailure} from '../../../services/eln/archive';
+import {ElnErrorCode} from '../../../services/eln/errors';
 import {
   buildElnZip,
   validScilogCrate,
