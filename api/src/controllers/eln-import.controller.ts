@@ -16,8 +16,8 @@ import {errors as formidableErrors, formidable} from 'formidable';
 import {Logbook} from '../models';
 import {LocationRepository} from '../repositories';
 import {basicAuthorization} from '../services/basic.authorizor';
-import {ElnError} from '../services/eln/archive';
-import {ElnImportError, ElnImportService} from '../services/eln/import.service';
+import {ElnError, ElnImportError} from '../services/eln/errors';
+import {ElnImportService} from '../services/eln/import.service';
 import {OPERATION_SECURITY_SPEC} from '../utils/security-spec';
 import {MAX_FILE_SIZE} from './eln-import.config';
 import {
