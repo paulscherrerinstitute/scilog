@@ -29,10 +29,6 @@ export type ElnParseResult = ElnParseSuccess | ElnParseFailure;
 
 const METADATA_FILENAME = 'ro-crate-metadata.json';
 
-const SUPPORTED_PUBLISHERS = [
-  'https://github.com/paulscherrerinstitute/scilog',
-];
-
 const SUPPORTED_RO_CRATE_VERSIONS = [
   'https://w3id.org/ro/crate/1.1',
   'https://w3id.org/ro/crate/1.2',
@@ -290,15 +286,6 @@ function validateSdPublisher(crate: ROCrate): ElnError[] {
   }
 
   const id = sdPublisher[0]?.['@id'];
-  if (!SUPPORTED_PUBLISHERS.includes(id)) {
-    return [
-      {
-        code: ElnErrorCode.INVALID_PUBLISHER,
-        message: `Unsupported sdPublisher: ${id}`,
-      },
-    ];
-  }
-
   const publisher = crate.getEntity(id);
   if (!publisher) {
     return [

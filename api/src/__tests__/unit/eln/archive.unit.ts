@@ -16,16 +16,6 @@ describe('ElnArchive.validateMetadata', () => {
     expect(ElnArchive.validateMetadata(validScilogCrate())).to.be.empty();
   });
 
-  it('rejects when sdPublisher is not a supported publisher', () => {
-    const crate = validScilogCrate();
-    crate.setProperty('ro-crate-metadata.json', 'sdPublisher', {
-      '@id': 'https://example.org/unknown-eln',
-    });
-    expect(ElnArchive.validateMetadata(crate)).to.containDeep([
-      {code: ElnErrorCode.INVALID_PUBLISHER},
-    ]);
-  });
-
   it('rejects when sdPublisher is missing', () => {
     const crate = validScilogCrate();
     crate.deleteProperty('ro-crate-metadata.json', 'sdPublisher');

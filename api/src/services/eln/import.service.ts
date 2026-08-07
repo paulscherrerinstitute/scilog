@@ -14,11 +14,12 @@ import {
 import {ElnArchive} from './archive';
 import {ElnImportError} from './errors';
 import {
-  ScilogTranslator,
   FileDraft,
   LogbookDraft,
   ParagraphDraft,
-} from './translators/scilog';
+  Translator,
+  translatorRegistry,
+} from './translators';
 import {FileStorageService} from '../file-storage.service';
 
 /** Per-file identity captured after creating the Filesnippet. */
@@ -56,11 +57,13 @@ export class ElnImportService {
     }
     if (!parsed.ok) throw new ElnImportError(parsed.errors);
 
-    const draft = ScilogTranslator.toSciLog(parsed.elnArchive.crate);
+    const translator = translatorRegistry.select(parsed.elnArchive.crate);
+    const draft = translator.toSciLog(parsed.elnArchive.crate);
     const logbookId = await this.createLogbook(
       draft,
       location,
       parsed.elnArchive,
+      translator,
     );
 
     return this.logbookRepository.findById(
@@ -74,6 +77,7 @@ export class ElnImportService {
     draft: LogbookDraft,
     location: Location,
     archive: ElnArchive,
+    translator: Translator,
   ): Promise<string> {
     const logbook = await this.logbookRepository.create(
       {
@@ -85,7 +89,7 @@ export class ElnImportService {
       {currentUser: this.user},
     );
     for (const paragraph of draft.paragraphs) {
-      await this.createParagraph(paragraph, logbook.id, archive);
+      await this.createParagraph(paragraph, logbook.id, archive, translator);
     }
     return logbook.id;
   }
@@ -94,18 +98,19 @@ export class ElnImportService {
     draft: ParagraphDraft,
     parentId: string,
     archive: ElnArchive,
+    translator: Translator,
   ): Promise<void> {
     const files = await this.createFiles(draft.files, archive);
     const html = draft.fields.textcontent;
     const textcontent = html
-      ? ScilogTranslator.decodeFileReferences(html, files)
+      ? translator.decodeFileReferences(html, files)
       : html;
     const created = await this.paragraphRepository.create(
       {...draft.fields, textcontent, files: [...files.values()], parentId},
       {currentUser: this.user},
     );
     for (const child of draft.paragraphs) {
-      await this.createParagraph(child, created.id, archive);
+      await this.createParagraph(child, created.id, archive, translator);
     }
   }
 

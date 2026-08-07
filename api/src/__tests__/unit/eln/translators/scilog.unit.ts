@@ -3,9 +3,11 @@ import {LinkType} from '../../../../models/paragraph.model';
 import {ScilogTranslator} from '../../../../services/eln/translators/scilog';
 import {validScilogCrate} from '../../../eln.helpers';
 
+const translator = new ScilogTranslator();
+
 describe('ScilogTranslator.toSciLog', () => {
   it('assembles the tree: one paragraph with its file and nested comment', () => {
-    const draft = ScilogTranslator.toSciLog(validScilogCrate());
+    const draft = translator.toSciLog(validScilogCrate());
     expect(draft.paragraphs).to.have.length(1);
 
     const [message] = draft.paragraphs;
@@ -23,18 +25,16 @@ describe('ScilogTranslator.toSciLog', () => {
 
   describe('logbook', () => {
     it('extracts fields and provenance tags from the Book entity', () => {
-      expect(ScilogTranslator.toSciLog(validScilogCrate()).fields).to.deepEqual(
-        {
-          name: 'book',
-          description: 'a book',
-          tags: [
-            'eln:source:scilog',
-            'eln:id:./book/',
-            'eln:author:a@example.org',
-            'eln:created:2026-01-19',
-          ],
-        },
-      );
+      expect(translator.toSciLog(validScilogCrate()).fields).to.deepEqual({
+        name: 'book',
+        description: 'a book',
+        tags: [
+          'eln:source:scilog',
+          'eln:id:./book/',
+          'eln:author:a@example.org',
+          'eln:created:2026-01-19',
+        ],
+      });
     });
 
     it('omits optional fields and conditional tags when missing', () => {
@@ -42,7 +42,7 @@ describe('ScilogTranslator.toSciLog', () => {
       crate.deleteProperty('./book/', 'description');
       crate.deleteProperty('./book/', 'dateCreated');
       crate.deleteProperty('./book/', 'author');
-      expect(ScilogTranslator.toSciLog(crate).fields).to.deepEqual({
+      expect(translator.toSciLog(crate).fields).to.deepEqual({
         name: 'book',
         description: undefined,
         tags: ['eln:source:scilog', 'eln:id:./book/'],
@@ -52,8 +52,7 @@ describe('ScilogTranslator.toSciLog', () => {
 
   describe('paragraphs', () => {
     it('maps Message entity fields, with linkType=paragraph and split keyword tags', () => {
-      const [message] =
-        ScilogTranslator.toSciLog(validScilogCrate()).paragraphs;
+      const [message] = translator.toSciLog(validScilogCrate()).paragraphs;
       expect(message.fields).to.deepEqual({
         linkType: LinkType.PARAGRAPH,
         textcontent: '<p>hello</p>',
@@ -71,8 +70,7 @@ describe('ScilogTranslator.toSciLog', () => {
 
   describe('files', () => {
     it('embeds File entity fields on the paragraph that references them', () => {
-      const [message] =
-        ScilogTranslator.toSciLog(validScilogCrate()).paragraphs;
+      const [message] = translator.toSciLog(validScilogCrate()).paragraphs;
       expect(message.files).to.deepEqual([
         {
           elnId: './book/file.txt',
@@ -92,7 +90,7 @@ describe('ScilogTranslator.toSciLog', () => {
     it('leaves fileExtension undefined when the name has no extension', () => {
       const crate = validScilogCrate();
       crate.setProperty('./book/file.txt', 'name', 'README');
-      const [message] = ScilogTranslator.toSciLog(crate).paragraphs;
+      const [message] = translator.toSciLog(crate).paragraphs;
       expect(message.files[0].fields.fileExtension).to.be.undefined();
     });
 
@@ -109,7 +107,7 @@ describe('ScilogTranslator.toSciLog', () => {
       crate.addValues('./book/comment/', 'hasPart', {
         '@id': './book/comment/img.png',
       });
-      const [message] = ScilogTranslator.toSciLog(crate).paragraphs;
+      const [message] = translator.toSciLog(crate).paragraphs;
       const [comment] = message.paragraphs;
       expect(comment.files.map(file => file.elnId)).to.deepEqual([
         './book/comment/img.png',
@@ -119,14 +117,12 @@ describe('ScilogTranslator.toSciLog', () => {
 
   describe('comments', () => {
     it('nests a message comments as child paragraphs', () => {
-      const [message] =
-        ScilogTranslator.toSciLog(validScilogCrate()).paragraphs;
+      const [message] = translator.toSciLog(validScilogCrate()).paragraphs;
       expect(message.paragraphs).to.have.length(1);
     });
 
     it('maps Comment entity fields, with linkType=comment', () => {
-      const [message] =
-        ScilogTranslator.toSciLog(validScilogCrate()).paragraphs;
+      const [message] = translator.toSciLog(validScilogCrate()).paragraphs;
       const [comment] = message.paragraphs;
       expect(comment.fields).to.deepEqual({
         linkType: LinkType.COMMENT,
@@ -151,14 +147,14 @@ describe('ScilogTranslator.decodeFileReferences', () => {
 
   it('rewrites anchor href to file:<newFileHash>', () => {
     const html = '<p>see <a href="./book/message/file.txt">doc</a></p>';
-    expect(ScilogTranslator.decodeFileReferences(html, fileMap)).to.equal(
+    expect(translator.decodeFileReferences(html, fileMap)).to.equal(
       '<p>see <a href="file:newhash-1">doc</a></p>',
     );
   });
 
   it('rewrites img title to the new fileHash and leaves src as-is', () => {
     const html = '<p><img src="./book/message/img.png" title="oldhash"></p>';
-    expect(ScilogTranslator.decodeFileReferences(html, fileMap)).to.equal(
+    expect(translator.decodeFileReferences(html, fileMap)).to.equal(
       '<p><img src="./book/message/img.png" title="newhash-2"></p>',
     );
   });
@@ -167,7 +163,7 @@ describe('ScilogTranslator.decodeFileReferences', () => {
     const html =
       '<a href="./book/message/file.txt">f</a>' +
       '<img src="./book/message/img.png" title="x">';
-    expect(ScilogTranslator.decodeFileReferences(html, fileMap)).to.equal(
+    expect(translator.decodeFileReferences(html, fileMap)).to.equal(
       '<a href="file:newhash-1">f</a>' +
         '<img src="./book/message/img.png" title="newhash-2">',
     );
@@ -177,12 +173,12 @@ describe('ScilogTranslator.decodeFileReferences', () => {
     const html =
       '<a href="https://example.org">ext</a>' +
       '<img src="data:image/png;base64,abc" title="keep">';
-    expect(ScilogTranslator.decodeFileReferences(html, fileMap)).to.equal(html);
+    expect(translator.decodeFileReferences(html, fileMap)).to.equal(html);
   });
 
   it('throws when an ELN ref is missing from the map', () => {
     const html = '<a href="./book/message/missing.txt">x</a>';
-    expect(() => ScilogTranslator.decodeFileReferences(html, fileMap)).to.throw(
+    expect(() => translator.decodeFileReferences(html, fileMap)).to.throw(
       /no file map entry for href \.\/book\/message\/missing\.txt/,
     );
   });

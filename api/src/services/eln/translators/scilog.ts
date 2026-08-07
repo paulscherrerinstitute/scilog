@@ -12,8 +12,20 @@ import {Entity, ROCrate} from 'ro-crate';
 import {Logbook, Paragraph} from '../../../models';
 import {Filesnippet} from '../../../models/file.model';
 import {LinkType} from '../../../models/paragraph.model';
+import type {
+  FileDraft,
+  LogbookDraft,
+  ParagraphDraft,
+  Translator,
+} from './translator';
 
-export class ScilogTranslator {
+const PUBLISHER = 'https://github.com/paulscherrerinstitute/scilog';
+
+export class ScilogTranslator implements Translator {
+  matches(crate: ROCrate): boolean {
+    return crate.descriptor.sdPublisher?.[0]?.['@id'] === PUBLISHER;
+  }
+
   /**
    * Translate ELN metadata into a SciLog logbook draft: a tree whose nodes
    * carry their embedded files and their nested paragraphs (a comment is a
@@ -21,7 +33,7 @@ export class ScilogTranslator {
    * orchestrator can fetch their bytes; the orchestrator assigns SciLog
    * identity (id, hashes) when it creates them.
    */
-  static toSciLog(crate: ROCrate): LogbookDraft {
+  toSciLog(crate: ROCrate): LogbookDraft {
     const book = findBook(crate);
     if (!book) throw new Error('ScilogTranslator: no Book entity in crate');
     return buildLogbook(book);
@@ -39,7 +51,7 @@ export class ScilogTranslator {
    * Throws if an `href`/`src` references a path absent from `fileMap` —
    * the orchestrator is contractually required to supply a complete map.
    */
-  static decodeFileReferences(
+  decodeFileReferences(
     html: string,
     fileMap: ReadonlyMap<string, {fileHash: string}>,
   ): string {
@@ -177,23 +189,3 @@ function buildFile(file: Entity): FileDraft {
     fields: filesnippetFromFile(file),
   };
 }
-
-// --- types ---
-
-export type LogbookDraft = {
-  fields: Partial<Logbook>;
-  paragraphs: ParagraphDraft[];
-};
-
-export type ParagraphDraft = {
-  fields: Partial<Paragraph>;
-  files: FileDraft[];
-  /** Paragraphs nested under this one; comments are the common case. */
-  paragraphs: ParagraphDraft[];
-};
-
-export type FileDraft = {
-  /** Archive-relative `@id`; locates the file's bytes for upload. */
-  elnId: string;
-  fields: Partial<Filesnippet>;
-};
