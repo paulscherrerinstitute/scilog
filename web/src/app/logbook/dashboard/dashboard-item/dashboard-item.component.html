@@ -6,6 +6,14 @@
   <span>
     <button
       mat-icon-button
+      *ngIf="config?.general.type === 'tasks'"
+      matTooltip="Export Tasks"
+      (click)="exportTasksFromHeader()"
+    >
+      <mat-icon>arrow_forward</mat-icon>
+    </button>
+    <button
+      mat-icon-button
       aria-label="Export"
       (click)="exportLogbook()"
       *ngIf="config?.general.type === 'logbook'"
