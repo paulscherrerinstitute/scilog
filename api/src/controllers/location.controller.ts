@@ -241,6 +241,6 @@ export class LocationController {
     },
   })
   async restoreDeletedId(@param.path.string('id') id: string): Promise<void> {
-    this.locationRepository.restoreDeletedId(id, this.user);
+    await this.locationRepository.restoreDeletedId(id, this.user);
   }
 }

@@ -255,6 +255,6 @@ export class LogbookController {
     },
   })
   async restoreDeletedId(@param.path.string('id') id: string): Promise<void> {
-    this.logbookRepository.restoreDeletedId(id, this.user);
+    await this.logbookRepository.restoreDeletedId(id, this.user);
   }
 }
