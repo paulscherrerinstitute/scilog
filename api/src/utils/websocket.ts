@@ -31,7 +31,13 @@ export async function startWebsocket(app: SciLogDbApplication) {
   wss.on('connection', function connection(ws: any) {
     // eslint-disable-next-line  @typescript-eslint/no-explicit-any
     ws.on('message', async (message: any) => {
-      const msgContainer = JSON.parse(message);
+      let msgContainer;
+      try {
+        msgContainer = JSON.parse(message);
+      } catch (error) {
+        console.log('Cannot parse websocket message:', error);
+        return;
+      }
       // eslint-disable-next-line  no-prototype-builtins
       if (msgContainer.hasOwnProperty('message')) {
         // eslint-disable-next-line  no-prototype-builtins
@@ -52,7 +58,9 @@ export async function startWebsocket(app: SciLogDbApplication) {
             if (userProfileFromToken != null) {
               const logbookID: string = msgContainer['message']['join'];
               // eslint-disable-next-line  @typescript-eslint/no-explicit-any
-              const config: any = msgContainer['message']['config'];
+              const config: any = msgContainer['message']['config'] ?? {
+                filter: {},
+              };
               // eslint-disable-next-line  no-prototype-builtins
               if (websocketMap.hasOwnProperty(logbookID)) {
                 websocketMap[logbookID].push({
