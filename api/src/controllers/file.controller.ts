@@ -294,7 +294,14 @@ export class FileController {
     if (typeof data._fileId == 'undefined') {
       throw new HttpErrors.BadRequest(`Retrieving sandbox data is deprecated.`);
     }
-    response.set('Content-Type', data.contentType);
+    response.set(
+      'Content-Type',
+      data.contentType?.startsWith('image/')
+        ? data.contentType
+        : 'application/octet-stream',
+    );
+    response.set('X-Content-Type-Options', 'nosniff');
+    response.set('Content-Disposition', 'attachment');
     this.fileStorage.downloadStream(data._fileId).pipe(response);
     return response;
   }
