@@ -3,7 +3,7 @@ import {EXPORT_SERVICE} from '../keys';
 import {Filecontainer, LinkType, Paragraph} from '../models';
 import {Browser, launch as puppeteerLaunc} from 'puppeteer';
 import {JSDOM} from 'jsdom';
-import {RestBindings, Server} from '@loopback/rest';
+import {HttpErrors, RestBindings, Server} from '@loopback/rest';
 import PDFMerger from 'pdf-merger-js';
 import Prism from 'prismjs';
 import LoadLanguages from 'prismjs/components/';
@@ -11,7 +11,7 @@ import {omit} from 'lodash';
 import {writeFile} from 'fs/promises';
 import {create as tarCreate} from 'tar';
 import {mkdirSync, existsSync} from 'fs';
-import {basename, join} from 'path';
+import {basename, join, resolve, sep} from 'path';
 
 @bind({
   scope: BindingScope.TRANSIENT,
@@ -351,7 +351,10 @@ export class ExportService {
       headers: this.authorizationHeader,
     });
     const buffer = Buffer.from(await response.arrayBuffer());
-    const destinationFile = `${attachmentDir}/${attachment[0]}`;
+    const destinationFile = resolve(attachmentDir, basename(attachment[0]));
+    if (!destinationFile.startsWith(resolve(attachmentDir) + sep)) {
+      throw new HttpErrors.BadRequest('Invalid attachment path.');
+    }
     await writeFile(destinationFile, buffer);
   }
 
