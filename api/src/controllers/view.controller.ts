@@ -18,13 +18,27 @@ import {
 import {View} from '../models';
 import {ViewRepository} from '../repositories';
 
+import {authenticate} from '@loopback/authentication';
+import {authorize} from '@loopback/authorization';
+import {basicAuthorization} from '../services/basic.authorizor';
+import {OPERATION_SECURITY_SPEC} from '../utils/security-spec';
+import {SecurityBindings, UserProfile} from '@loopback/security';
+import {inject} from '@loopback/core';
+
+@authenticate('jwt')
+@authorize({
+  allowedRoles: ['any-authenticated-user'],
+  voters: [basicAuthorization],
+})
 export class ViewController {
   constructor(
+    @inject(SecurityBindings.USER) private user: UserProfile,
     @repository(ViewRepository)
     public viewRepository: ViewRepository,
   ) {}
 
   @post('/views', {
+    security: OPERATION_SECURITY_SPEC,
     responses: {
       '200': {
         description: 'View model instance',
@@ -45,10 +59,11 @@ export class ViewController {
     })
     view: Omit<View, 'id'>,
   ): Promise<View> {
-    return this.viewRepository.create(view);
+    return this.viewRepository.create(view, {currentUser: this.user});
   }
 
   @get('/views/count', {
+    security: OPERATION_SECURITY_SPEC,
     responses: {
       '200': {
         description: 'View model count',
@@ -57,10 +72,11 @@ export class ViewController {
     },
   })
   async count(@param.where(View) where?: Where<View>): Promise<Count> {
-    return this.viewRepository.count(where);
+    return this.viewRepository.count(where, {currentUser: this.user});
   }
 
   @get('/views', {
+    security: OPERATION_SECURITY_SPEC,
     responses: {
       '200': {
         description: 'Array of View model instances',
@@ -76,10 +92,11 @@ export class ViewController {
     },
   })
   async find(@param.filter(View) filter?: Filter<View>): Promise<View[]> {
-    return this.viewRepository.find(filter);
+    return this.viewRepository.find(filter, {currentUser: this.user});
   }
 
   @patch('/views', {
+    security: OPERATION_SECURITY_SPEC,
     responses: {
       '200': {
         description: 'View PATCH success count',
@@ -98,10 +115,11 @@ export class ViewController {
     view: View,
     @param.where(View) where?: Where<View>,
   ): Promise<Count> {
-    return this.viewRepository.updateAll(view, where);
+    return this.viewRepository.updateAll(view, where, {currentUser: this.user});
   }
 
   @get('/views/{id}', {
+    security: OPERATION_SECURITY_SPEC,
     responses: {
       '200': {
         description: 'View model instance',
@@ -117,10 +135,11 @@ export class ViewController {
     @param.path.string('id') id: string,
     @param.filter(View, {exclude: 'where'}) filter?: FilterExcludingWhere<View>,
   ): Promise<View> {
-    return this.viewRepository.findById(id, filter);
+    return this.viewRepository.findById(id, filter, {currentUser: this.user});
   }
 
   @patch('/views/{id}', {
+    security: OPERATION_SECURITY_SPEC,
     responses: {
       '204': {
         description: 'View PATCH success',
@@ -138,10 +157,11 @@ export class ViewController {
     })
     view: View,
   ): Promise<void> {
-    await this.viewRepository.updateById(id, view);
+    await this.viewRepository.updateById(id, view, {currentUser: this.user});
   }
 
   @del('/views/{id}', {
+    security: OPERATION_SECURITY_SPEC,
     responses: {
       '204': {
         description: 'View DELETE success',
@@ -149,6 +169,6 @@ export class ViewController {
     },
   })
   async deleteById(@param.path.string('id') id: string): Promise<void> {
-    await this.viewRepository.deleteById(id);
+    await this.viewRepository.deleteById(id, {currentUser: this.user});
   }
 }
