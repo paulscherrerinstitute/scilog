@@ -63,6 +63,9 @@ function UpdateAndDeleteRepositoryMixin<
       options?: Options,
       checkExpiration = true,
     ): Promise<void> {
+      if (Object.keys(basesnippet).some(key => key.startsWith('$'))) {
+        throw new HttpErrors.BadRequest('Invalid operator in request body.');
+      }
       const baseSnippetRepository = await this.baseSnippetRepository();
       const snippet = await baseSnippetRepository.findById(id, {}, options);
       const patches = await this.applyFromOwnerAccessAndGetChanged(
