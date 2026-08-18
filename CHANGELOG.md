@@ -1,3 +1,10 @@
+## [2.11.3](https://github.com/paulscherrerinstitute/scilog/compare/v2.11.2...v2.11.3) (2026-08-18)
+
+
+### Bug Fixes
+
+* only show link/unlink button when user belongs to ds's ownerGroup ([#677](https://github.com/paulscherrerinstitute/scilog/issues/677)) ([a930ba7](https://github.com/paulscherrerinstitute/scilog/commit/a930ba7eb4c46d13be41c8245d50d51e7b8bbf68))
+
 ## [2.11.2](https://github.com/paulscherrerinstitute/scilog/compare/v2.11.1...v2.11.2) (2026-07-21)
 
 
