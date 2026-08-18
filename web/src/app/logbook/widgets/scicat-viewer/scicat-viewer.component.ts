@@ -139,6 +139,11 @@ export class ScicatViewerComponent implements OnInit {
     return this.userLinkedPids().has(pid);
   }
 
+  hasWriteAccess(dataset: Dataset): boolean {
+    if (!this.scicatUser) return false;
+    return this.scicatUser.profile.accessGroups.includes(dataset.ownerGroup);
+  }
+
   get scicatDatasetUrl(): string {
     return this.scicatService.getDatasetDetailPageUrl(this.selectedDataset?.pid);
   }

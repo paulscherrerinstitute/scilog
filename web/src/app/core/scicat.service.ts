@@ -6,14 +6,14 @@ import {
   OutputDatasetObsoleteDto,
   ProposalsService,
   RelationshipClass,
-  ReturnedUserDto,
+  UserIdentity,
   UsersService,
 } from '@scicatproject/scicat-sdk-ts-angular';
 import { HttpContext, HttpContextToken } from '@angular/common/http';
 
 export type Dataset = OutputDatasetObsoleteDto;
 export type DatasetSummary = Pick<Dataset, 'pid' | 'datasetName' | 'creationTime'>;
-export type ScicatUser = ReturnedUserDto;
+export type ScicatUser = UserIdentity;
 type RelationshipSchema = RelationshipClass & { _id: string };
 
 export const IF_UNMODIFIED_SINCE = new HttpContextToken<string>(() => undefined);
@@ -44,7 +44,7 @@ export class ScicatService {
   }
 
   getMyself(): Observable<ScicatUser> {
-    return this.usersService.usersControllerGetMyUserV3() as Observable<ScicatUser>;
+    return this.usersService.usersControllerGetMyUserIdentityV3() as Observable<ScicatUser>;
   }
 
   getDatasetDetailPageUrl(pid: string): string {

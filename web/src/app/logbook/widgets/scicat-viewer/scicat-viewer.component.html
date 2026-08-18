@@ -1,5 +1,5 @@
 <div *ngIf="scicatUser; else unauthenticated">
-  <p>Hello, {{ scicatUser.username }}!</p>
+  <p>Hello, {{ scicatUser.profile.displayName || scicatUser.profile.username }}!</p>
 </div>
 <ng-template #unauthenticated>
   <p>Not authenticated with SciCat, showing only public datasets:</p>
@@ -65,14 +65,16 @@
       <a mat-button [href]="scicatDatasetUrl" target="_blank"
         >Open in SciCat <mat-icon>open_in_new</mat-icon></a
       >
-      @if (isUserLinkedDataset(selectedDataset.pid)) {
-        <button mat-button matTooltip="Unlink logbook from dataset" (click)="unlinkLogbook()">
-          <mat-icon>link_off</mat-icon> Unlink
-        </button>
-      } @else {
-        <button mat-button matTooltip="Link logbook to dataset" (click)="linkLogbook()">
-          <mat-icon>add_link</mat-icon> Link
-        </button>
+      @if (hasWriteAccess(selectedDataset)) {
+        @if (isUserLinkedDataset(selectedDataset.pid)) {
+          <button mat-button matTooltip="Unlink logbook from dataset" (click)="unlinkLogbook()">
+            <mat-icon>link_off</mat-icon> Unlink
+          </button>
+        } @else {
+          <button mat-button matTooltip="Link logbook to dataset" (click)="linkLogbook()">
+            <mat-icon>add_link</mat-icon> Link
+          </button>
+        }
       }
     </mat-card-actions>
   </mat-card>

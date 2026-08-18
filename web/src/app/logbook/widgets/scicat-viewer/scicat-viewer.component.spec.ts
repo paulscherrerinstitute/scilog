@@ -1,6 +1,6 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { ScicatViewerComponent } from './scicat-viewer.component';
-import { Dataset, ScicatService } from '@shared/scicat.service';
+import { Dataset, ScicatService, ScicatUser } from '@shared/scicat.service';
 import { of } from 'rxjs';
 import { LogbookInfoService } from '@shared/logbook-info.service';
 import { Logbooks } from '@model/logbooks';
@@ -170,6 +170,38 @@ describe('ScicatViewerComponent', () => {
       });
     });
   });
+  describe('hasWriteAccess', () => {
+    const dataset = { pid: '1', ownerGroup: 'group1' } as Dataset;
+
+    it('returns false when the scicat user is not available i.e. not logged in', () => {
+      scicatServiceSpy.getMyself.and.returnValue(of(null));
+
+      component.ngOnInit();
+
+      expect(component.hasWriteAccess(dataset)).toBeFalse();
+    });
+
+    it('returns true when the user access groups include the dataset owner group', () => {
+      scicatServiceSpy.getMyself.and.returnValue(
+        of({ profile: { accessGroups: ['group2', 'group1'] } } as ScicatUser),
+      );
+
+      component.ngOnInit();
+
+      expect(component.hasWriteAccess(dataset)).toBeTrue();
+    });
+
+    it('returns false when the user access groups do not include the dataset owner group', () => {
+      scicatServiceSpy.getMyself.and.returnValue(
+        of({ profile: { accessGroups: ['group2'] } } as ScicatUser),
+      );
+
+      component.ngOnInit();
+
+      expect(component.hasWriteAccess(dataset)).toBeFalse();
+    });
+  });
+
   describe('unlinkLogbook', () => {
     it('removes pid from userLinkedPids on success', () => {
       scicatServiceSpy.getDatasetsSummary.and.returnValue(
