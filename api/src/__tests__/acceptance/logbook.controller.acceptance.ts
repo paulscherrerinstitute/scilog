@@ -459,6 +459,14 @@ describe('Logbook', function (this: Suite) {
       });
   });
 
+  it('restore a non-existent snippet id should return 404', async () => {
+    await client
+      .patch('/logbooks/000000000000000000000000/restore')
+      .set('Authorization', 'Bearer ' + token)
+      .set('Content-Type', 'application/json')
+      .expect(404);
+  });
+
   it('post a logbook with authentication and should create default ACLS from parent', async () => {
     const unxUser = {
       email: 'unx@loopback.io',
