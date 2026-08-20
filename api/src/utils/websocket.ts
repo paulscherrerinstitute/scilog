@@ -1,5 +1,7 @@
+import {TokenService} from '@loopback/authentication';
 import {TokenServiceBindings} from '@loopback/authentication-jwt';
 import {AnyObject} from '@loopback/repository';
+import {UserProfile} from '@loopback/security';
 import {SciLogDbApplication} from '../application';
 import {MongoDataSource} from '../datasources';
 import {Basesnippet} from '../models';
@@ -31,44 +33,7 @@ export async function startWebsocket(app: SciLogDbApplication) {
   wss.on('connection', function connection(ws: any) {
     // eslint-disable-next-line  @typescript-eslint/no-explicit-any
     ws.on('message', async (message: any) => {
-      const msgContainer = JSON.parse(message);
-      // eslint-disable-next-line  no-prototype-builtins
-      if (msgContainer.hasOwnProperty('message')) {
-        // eslint-disable-next-line  no-prototype-builtins
-        if (msgContainer['message'].hasOwnProperty('join')) {
-          // eslint-disable-next-line  no-prototype-builtins
-          if (msgContainer['message'].hasOwnProperty('token')) {
-            // msgContainer['message']['token']
-            // console.log("retrieving data")
-            // eslint-disable-next-line  @typescript-eslint/no-explicit-any
-            let userProfileFromToken: any = null;
-            try {
-              userProfileFromToken = await jwtService.verifyToken(
-                msgContainer['message']['token'],
-              );
-            } catch (error) {
-              ws.send(JSON.stringify({error: 'Token invalid'}));
-            }
-            if (userProfileFromToken != null) {
-              const logbookID: string = msgContainer['message']['join'];
-              // eslint-disable-next-line  @typescript-eslint/no-explicit-any
-              const config: any = msgContainer['message']['config'];
-              // eslint-disable-next-line  no-prototype-builtins
-              if (websocketMap.hasOwnProperty(logbookID)) {
-                websocketMap[logbookID].push({
-                  ws: ws,
-                  user: userProfileFromToken,
-                  config: config,
-                });
-              } else {
-                websocketMap[logbookID] = [
-                  {ws: ws, user: userProfileFromToken, config: config},
-                ]; //push({ws: ws, user: userProfileFromToken});
-              }
-            }
-          }
-        }
-      }
+      await handleWebsocketMessage(ws, message, jwtService, websocketMap);
     });
 
     ws.isAlive = true;
@@ -249,6 +214,50 @@ export async function startWebsocket(app: SciLogDbApplication) {
       console.log('Error in ChangeStream:');
       console.log(err);
     });
+  });
+}
+
+function isObject(value: unknown): value is AnyObject {
+  return typeof value === 'object' && value !== null && !Array.isArray(value);
+}
+
+export async function handleWebsocketMessage(
+  // eslint-disable-next-line  @typescript-eslint/no-explicit-any
+  ws: any,
+  // eslint-disable-next-line  @typescript-eslint/no-explicit-any
+  message: any,
+  jwtService: TokenService,
+  websocketMap: WebsocketContainer,
+): Promise<void> {
+  let msgContainer: unknown = null;
+  try {
+    msgContainer = JSON.parse(message);
+  } catch {
+    // an unparsable frame is reported below, together with a parsed non object
+  }
+  if (!isObject(msgContainer)) {
+    ws.send(JSON.stringify({error: 'Message invalid'}));
+    return;
+  }
+  const request = msgContainer['message'];
+  if (!isObject(request)) return;
+  if (!('join' in request) || !('token' in request)) return;
+
+  let userProfileFromToken: UserProfile | null = null;
+  try {
+    userProfileFromToken = await jwtService.verifyToken(request['token']);
+  } catch {
+    ws.send(JSON.stringify({error: 'Token invalid'}));
+  }
+  if (userProfileFromToken == null) return;
+
+  const logbookID: string = request['join'];
+  const config = request['config'] ?? {filter: {}};
+  websocketMap[logbookID] ??= [];
+  websocketMap[logbookID].push({
+    ws: ws,
+    user: userProfileFromToken,
+    config: config,
   });
 }
 
