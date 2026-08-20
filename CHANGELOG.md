@@ -1,3 +1,10 @@
+## [2.11.4](https://github.com/paulscherrerinstitute/scilog/compare/v2.11.3...v2.11.4) (2026-08-20)
+
+
+### Bug Fixes
+
+* **api:** await restoreDeletedId in snippet controllers ([#678](https://github.com/paulscherrerinstitute/scilog/issues/678)) ([02d74c8](https://github.com/paulscherrerinstitute/scilog/commit/02d74c8962f5a28f0de456f46da641cba139d648))
+
 ## [2.11.3](https://github.com/paulscherrerinstitute/scilog/compare/v2.11.2...v2.11.3) (2026-08-18)
 
 
