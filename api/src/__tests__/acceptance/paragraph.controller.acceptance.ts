@@ -281,4 +281,12 @@ describe('Paragraph', function (this: Suite) {
       .set('Content-Type', 'application/json')
       .expect(204);
   });
+
+  it('restore a non-existent snippet id should return 404', async () => {
+    await client
+      .patch('/paragraphs/000000000000000000000000/restore')
+      .set('Authorization', 'Bearer ' + token)
+      .set('Content-Type', 'application/json')
+      .expect(404);
+  });
 });

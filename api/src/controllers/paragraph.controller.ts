@@ -243,6 +243,6 @@ export class ParagraphController {
     },
   })
   async restoreDeletedId(@param.path.string('id') id: string): Promise<void> {
-    this.paragraphRepository.restoreDeletedId(id, this.user);
+    await this.paragraphRepository.restoreDeletedId(id, this.user);
   }
 }

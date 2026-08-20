@@ -280,6 +280,6 @@ export class BasesnippetController {
     },
   })
   async restoreDeletedId(@param.path.string('id') id: string): Promise<void> {
-    this.basesnippetRepository.restoreDeletedId(id, this.user);
+    await this.basesnippetRepository.restoreDeletedId(id, this.user);
   }
 }

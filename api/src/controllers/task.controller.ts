@@ -242,6 +242,6 @@ export class TaskController {
     },
   })
   async restoreDeletedId(@param.path.string('id') id: string): Promise<void> {
-    this.taskRepository.restoreDeletedId(id, this.user);
+    await this.taskRepository.restoreDeletedId(id, this.user);
   }
 }

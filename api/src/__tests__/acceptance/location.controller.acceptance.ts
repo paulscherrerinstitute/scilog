@@ -283,6 +283,14 @@ describe('Location', function (this: Suite) {
       .expect(204);
   });
 
+  it('restore a non-existent snippet id should return 404', async () => {
+    await client
+      .patch('/locations/000000000000000000000000/restore')
+      .set('Authorization', 'Bearer ' + token)
+      .set('Content-Type', 'application/json')
+      .expect(404);
+  });
+
   it('post a location with authentication should return 200 and contain readACL from functional accounts', async () => {
     await client
       .post('/locations')
