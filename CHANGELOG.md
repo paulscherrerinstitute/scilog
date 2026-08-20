@@ -1,3 +1,10 @@
+## [2.11.5](https://github.com/paulscherrerinstitute/scilog/compare/v2.11.4...v2.11.5) (2026-08-20)
+
+
+### Bug Fixes
+
+* **api:** guard websocket message parsing and default config ([#680](https://github.com/paulscherrerinstitute/scilog/issues/680)) ([e7fb9c7](https://github.com/paulscherrerinstitute/scilog/commit/e7fb9c79c6abbb0f287542860eb3deda9a96a6b0))
+
 ## [2.11.4](https://github.com/paulscherrerinstitute/scilog/compare/v2.11.3...v2.11.4) (2026-08-20)
 
 
