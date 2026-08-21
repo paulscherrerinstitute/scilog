@@ -1,3 +1,10 @@
+## [2.11.6](https://github.com/paulscherrerinstitute/scilog/compare/v2.11.5...v2.11.6) (2026-08-21)
+
+
+### Bug Fixes
+
+* **api:** reject mongo operator keys in request bodies ([#690](https://github.com/paulscherrerinstitute/scilog/issues/690)) ([882aad6](https://github.com/paulscherrerinstitute/scilog/commit/882aad6aaa9da1243492b96fc8da43497f87bbef))
+
 ## [2.11.5](https://github.com/paulscherrerinstitute/scilog/compare/v2.11.4...v2.11.5) (2026-08-20)
 
 
