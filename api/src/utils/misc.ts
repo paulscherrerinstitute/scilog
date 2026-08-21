@@ -124,6 +124,14 @@ export function sanitizeTextContent(textcontent: string) {
   return div.textContent ?? undefined;
 }
 
+export function rejectOperatorKeys(key: string, value: unknown) {
+  if (key.startsWith('$'))
+    throw new HttpErrors.BadRequest(
+      `Request body cannot contain "${key}" key.`,
+    );
+  return value;
+}
+
 export function sanitizeTextContentInPlace(data?: {
   textcontent?: string;
   htmlTextcontent?: string;
