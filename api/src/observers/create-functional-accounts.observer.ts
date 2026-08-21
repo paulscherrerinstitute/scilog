@@ -108,11 +108,9 @@ export class CreateFunctionalAccountsObserver implements LifeCycleObserver {
       batchIds.push(descendant!._id);
       const isLast = !(await descendants.hasNext());
       if (batchIds.length === this.batchSize || isLast) {
-        await this.basesnippetRepository.updateAll(
-          addToSetAclsQuery,
-          {_id: {inq: batchIds}},
-          {currentUser: {roles: ['admin']}},
-        );
+        await this.basesnippetRepository.dataSource.connector
+          .collection('Basesnippet')
+          .updateMany({_id: {$in: batchIds}}, addToSetAclsQuery);
         batchIds = [];
       }
       if (isLast) break;
@@ -134,11 +132,12 @@ export class CreateFunctionalAccountsObserver implements LifeCycleObserver {
 
   private async addAclsToLocation(location: Location, unxGroup: string) {
     if (location.updateACL?.includes(unxGroup)) return;
-    await this.basesnippetRepository.updateById(
-      location.id,
-      {$addToSet: {updateACL: unxGroup}},
-      {currentUser: {roles: ['admin']}},
-    );
+    await this.basesnippetRepository.dataSource.connector
+      .collection('Basesnippet')
+      .updateOne(
+        {_id: new ObjectId(location.id)},
+        {$addToSet: {updateACL: unxGroup}},
+      );
   }
 
   private async addAclsToExistingSnippetsFromAccount(account: User) {
@@ -153,9 +152,11 @@ export class CreateFunctionalAccountsObserver implements LifeCycleObserver {
   }
 
   async migrateUnxGroup() {
-    const accounts = await this.userRepository.find({
-      where: {location: {exists: true}, unxGroup: {exists: true}},
-    });
+    const accounts =
+      (await this.userRepository.dataSource.connector
+        ?.collection('User')
+        .find({location: {$exists: true}, unxGroup: {$exists: true}})
+        .toArray()) ?? [];
     for await (const account of accounts)
       await this.addAclsToExistingSnippetsFromAccount(account);
   }
