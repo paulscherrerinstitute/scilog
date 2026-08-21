@@ -26,7 +26,11 @@ import {
   RepositoryMixin,
   SchemaMigrationOptions,
 } from '@loopback/repository';
-import {ExpressRequestHandler, RestApplication} from '@loopback/rest';
+import {
+  ExpressRequestHandler,
+  RestApplication,
+  RestBindings,
+} from '@loopback/rest';
 import {
   RestExplorerBindings,
   RestExplorerComponent,
@@ -42,6 +46,7 @@ import {JWTService} from './services/jwt-service';
 import {DeprecatedSpecEnhancer} from './services/deprecated-spec.enhancer';
 import {SecuritySpecEnhancer} from './services/jwt-spec.enhancer';
 import {MyUserService} from './services/user-service';
+import {rejectOperatorKeys} from './utils/misc';
 import {startWebsocket} from './utils/websocket';
 import * as crypto from 'crypto';
 
@@ -140,6 +145,10 @@ export class SciLogDbApplication extends BootMixin(
       '../datasource.json',
       'datasources.config.mongo',
     );
+    this.bind(RestBindings.REQUEST_BODY_PARSER_OPTIONS).to({
+      json: {reviver: rejectOperatorKeys},
+    });
+
     this.bind('middleware.sequence')
       .toProvider(ExpressRequestHandlersProvider)
       .inScope(BindingScope.SINGLETON);

@@ -7,6 +7,5 @@
     "password": "",
     "database": "scilog",
     "useNewUrlParser": true,
-    "useUnifiedTopology": true,
-    "allowExtendedOperators": true
+    "useUnifiedTopology": true
 }
