@@ -11,5 +11,4 @@ export const testdb: juggler.DataSource = new juggler.DataSource({
   database: 'testdb',
   useNewUrlParser: true,
   useUnifiedTopology: true,
-  allowExtendedOperators: true,
 });

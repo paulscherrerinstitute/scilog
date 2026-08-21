@@ -15,7 +15,9 @@ const config = {
 };
 
 function updateConfig(dsConfig: AnyObject) {
-  return dsConfig;
+  // Extended operators would let a request body reach the database as update
+  // instructions instead of data.
+  return {...dsConfig, allowExtendedOperators: false};
 }
 
 @lifeCycleObserver('datasource')
