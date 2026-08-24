@@ -64,7 +64,7 @@
     "ro-crate-html": "0.1.6",
     "tar": "7.5.22",
     "tslib": "2.0.0",
-    "ws": "8.21.0",
+    "ws": "8.21.3",
     "yauzl": "3.2.1"
   },
   "devDependencies": {
