@@ -12,8 +12,8 @@ services:
     volumes:
       - ./web:/frontend
       - ./config/fe/config.dev.json:/frontend/src/assets/config.json
-      - /frontend/node_modules
-      - /frontend/dist
+      - web_node_modules:/frontend/node_modules
+      - web_dist:/frontend/dist
     command: ["npm", "run", "dev"]
     profiles:
       - fe
@@ -30,3 +30,7 @@ services:
     command: /bin/sh -c "while sleep 1000; do :; done"
     profiles:
       - py
+
+volumes:
+  web_node_modules:
+  web_dist:
