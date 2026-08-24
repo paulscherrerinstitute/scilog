@@ -1,3 +1,10 @@
+## [2.11.7](https://github.com/paulscherrerinstitute/scilog/compare/v2.11.6...v2.11.7) (2026-08-24)
+
+
+### Bug Fixes
+
+* **deps:** update dependency tar to v7.5.19 [security] ([#701](https://github.com/paulscherrerinstitute/scilog/issues/701)) ([0f96bcf](https://github.com/paulscherrerinstitute/scilog/commit/0f96bcf705f55dd82d7679802b65c098d2683b4c))
+
 ## [2.11.6](https://github.com/paulscherrerinstitute/scilog/compare/v2.11.5...v2.11.6) (2026-08-21)
 
 
