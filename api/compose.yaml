@@ -4,7 +4,7 @@ services:
     container_name: mongo
     command: ["--replSet", "rs0"]
     volumes:
-      - mongo_data:/data/db
+      - api_mongo_data:/data/db
     healthcheck:
       test: ["CMD", "mongosh", "--eval", "try { rs.status() } catch(e) { rs.initiate({_id:'rs0', members:[{_id:0, host:'mongo:27017'}]}) }"]
 
@@ -31,7 +31,7 @@ services:
       - 3000:3000
     volumes:
       - .:/home/node/app
-      - node_modules:/home/node/app/node_modules
+      - api_node_modules:/home/node/app/node_modules
     tty: true
     init: true
     healthcheck:
@@ -69,5 +69,5 @@ services:
     profiles: [production]
 
 volumes:
-  mongo_data:
-  node_modules:
+  api_mongo_data:
+  api_node_modules:
