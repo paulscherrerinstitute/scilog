@@ -28,7 +28,7 @@
     "@ckeditor/ckeditor5-angular": "9.1.0",
     "angular-gridster2": "19.0.0",
     "chart.js": "4.4.9",
-    "ckeditor5": "42.0.2",
+    "ckeditor5": "47.6.0",
     "jdenticon": "3.3.0",
     "ng2-charts": "4.1.1",
     "ngx-cookie-service": "19.1.2",
