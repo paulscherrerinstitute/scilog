@@ -2,6 +2,7 @@ import { PLUGINS } from './editor';
 
 export let CKeditorConfig = {
   plugins: PLUGINS,
+  licenseKey: 'GPL',
   fontFamily: {
     options: [
       'default',
