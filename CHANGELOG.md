@@ -1,3 +1,10 @@
+## [2.11.11](https://github.com/paulscherrerinstitute/scilog/compare/v2.11.10...v2.11.11) (2026-08-25)
+
+
+### Bug Fixes
+
+* **deps:** update loopback monorepo ([#706](https://github.com/paulscherrerinstitute/scilog/issues/706)) ([0b65fd0](https://github.com/paulscherrerinstitute/scilog/commit/0b65fd0a96a9d88b34a913400574730baa4a6463))
+
 ## [2.11.10](https://github.com/paulscherrerinstitute/scilog/compare/v2.11.9...v2.11.10) (2026-08-25)
 
 
