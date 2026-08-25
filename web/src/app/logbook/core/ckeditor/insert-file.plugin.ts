@@ -1,4 +1,4 @@
-import { Plugin, FileDialogButtonView, icons } from 'ckeditor5';
+import { Plugin, FileDialogButtonView, IconBrowseFiles } from 'ckeditor5';
 import { v4 as uuid } from 'uuid';
 import type { FileAttachment } from './editor';
 
@@ -11,11 +11,8 @@ export class InsertFile extends Plugin {
       view.set({
         acceptedType: '*',
         allowMultipleFiles: true,
-      });
-
-      view.buttonView.set({
         label: 'Insert file',
-        icon: icons.browseFiles,
+        icon: IconBrowseFiles,
         tooltip: true,
       });
 
