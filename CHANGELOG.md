@@ -1,3 +1,10 @@
+## [2.11.10](https://github.com/paulscherrerinstitute/scilog/compare/v2.11.9...v2.11.10) (2026-08-25)
+
+
+### Bug Fixes
+
+* **web:** upgrade ckeditor 5 to v48 ([#705](https://github.com/paulscherrerinstitute/scilog/issues/705)) ([21adaf9](https://github.com/paulscherrerinstitute/scilog/commit/21adaf9ce47754881d2e64ad1ac63e84f5ebfd45)), closes [#619](https://github.com/paulscherrerinstitute/scilog/issues/619)
+
 ## [2.11.9](https://github.com/paulscherrerinstitute/scilog/compare/v2.11.8...v2.11.9) (2026-08-24)
 
 
