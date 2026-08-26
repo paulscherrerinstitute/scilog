@@ -17,9 +17,9 @@ import {
   FileDraft,
   LogbookDraft,
   ParagraphDraft,
-  Translator,
   translatorRegistry,
 } from './translators';
+import {resolveFileReferences} from './file-references';
 import {FileStorageService} from '../file-storage.service';
 
 /** Per-file identity captured after creating the Filesnippet. */
@@ -63,7 +63,6 @@ export class ElnImportService {
       draft,
       location,
       parsed.elnArchive,
-      translator,
     );
 
     return this.logbookRepository.findById(
@@ -77,7 +76,6 @@ export class ElnImportService {
     draft: LogbookDraft,
     location: Location,
     archive: ElnArchive,
-    translator: Translator,
   ): Promise<string> {
     const logbook = await this.logbookRepository.create(
       {
@@ -89,7 +87,7 @@ export class ElnImportService {
       {currentUser: this.user},
     );
     for (const paragraph of draft.paragraphs) {
-      await this.createParagraph(paragraph, logbook.id, archive, translator);
+      await this.createParagraph(paragraph, logbook.id, archive);
     }
     return logbook.id;
   }
@@ -98,19 +96,16 @@ export class ElnImportService {
     draft: ParagraphDraft,
     parentId: string,
     archive: ElnArchive,
-    translator: Translator,
   ): Promise<void> {
     const files = await this.createFiles(draft.files, archive);
     const html = draft.fields.textcontent;
-    const textcontent = html
-      ? translator.decodeFileReferences(html, files)
-      : html;
+    const textcontent = html ? resolveFileReferences(html, files) : html;
     const created = await this.paragraphRepository.create(
       {...draft.fields, textcontent, files: [...files.values()], parentId},
       {currentUser: this.user},
     );
     for (const child of draft.paragraphs) {
-      await this.createParagraph(child, created.id, archive, translator);
+      await this.createParagraph(child, created.id, archive);
     }
   }
 
