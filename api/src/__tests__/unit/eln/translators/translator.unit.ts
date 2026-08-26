@@ -10,7 +10,6 @@ function fake(source: string, matches: boolean): Translator {
   return {
     matches: () => matches,
     toSciLog: () => ({fields: {name: source}, paragraphs: []}),
-    decodeFileReferences: () => '',
   };
 }
 

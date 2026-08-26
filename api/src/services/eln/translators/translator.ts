@@ -43,11 +43,6 @@ export interface Translator {
   matches(crate: ROCrate): boolean;
   /** Translate the crate into the canonical draft. */
   toSciLog(crate: ROCrate): LogbookDraft;
-  /** Rewrite in-HTML file references to the newly created file hashes. */
-  decodeFileReferences(
-    html: string,
-    fileMap: ReadonlyMap<string, {fileHash: string}>,
-  ): string;
 }
 
 /** Holds the supported translators and selects the one for a given crate. */
