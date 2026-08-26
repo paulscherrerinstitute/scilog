@@ -1,5 +1,5 @@
 {
-  "name": "honkitdocu",
+  "name": "scilog-docs",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
@@ -9,10 +9,10 @@
   "keywords": [],
   "author": "",
   "license": "ISC",
-  "devDependencies": {
-    "honkit": "^4.0.4"
-  },
   "dependencies": {
     "gitbook-plugin-chapter-fold": "0.0.4"
+  },
+  "devDependencies": {
+    "honkit": "6.2.2"
   }
 }
