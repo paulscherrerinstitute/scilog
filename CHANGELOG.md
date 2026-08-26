@@ -1,3 +1,10 @@
+## [2.11.12](https://github.com/paulscherrerinstitute/scilog/compare/v2.11.11...v2.11.12) (2026-08-26)
+
+
+### Bug Fixes
+
+* **deps:** run npm audit fix in api ([#711](https://github.com/paulscherrerinstitute/scilog/issues/711)) ([618b0fe](https://github.com/paulscherrerinstitute/scilog/commit/618b0fef68089cc24c69971be75d864ef743b59b))
+
 ## [2.11.11](https://github.com/paulscherrerinstitute/scilog/compare/v2.11.10...v2.11.11) (2026-08-25)
 
 
