@@ -836,9 +836,9 @@ describe('LogbookItemComponent', () => {
   });
 
   [
-    { position: 'end', scrollPosition: 'notEmpty' },
+    { position: 'end', scrollPosition: true },
     { position: 'end', scrollPosition: undefined },
-    { position: 'start', scrollPosition: 'notEmpty' },
+    { position: 'start', scrollPosition: true },
     { position: 'start', scrollPosition: undefined },
   ].forEach((t, i) => {
     it(`should test scrollOnClickTo ${t.position}:${i}`, () => {
