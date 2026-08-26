@@ -6,7 +6,6 @@
  * rationale and open questions.
  */
 
-import {JSDOM} from 'jsdom';
 import path from 'node:path';
 import {Entity, ROCrate} from 'ro-crate';
 import {Logbook, Paragraph} from '../../../models';
@@ -39,50 +38,6 @@ export class ScilogTranslator implements Translator {
     const book = findBook(crate);
     if (!book) throw new Error('ScilogTranslator: no Book entity in crate');
     return buildLogbook(book);
-  }
-
-  /**
-   * Rewrite ELN-format file references in a paragraph's HTML back to the
-   * SciLog convention. Inverse of `EntityBuilderService.replaceFileReferences`.
-   *
-   * - `<a href="./<elnPath>">`           → `<a href="file:<newFileHash>">`
-   * - `<img src="./<elnPath>" title=...>` → `<img title="<newFileHash>" ...>`
-   *   (src is left as-is; SciLog's frontend re-renders it from the file's
-   *   accessHash at view time, using `title` as the discriminator.)
-   *
-   * Throws if an `href`/`src` references a path absent from `fileMap` —
-   * the orchestrator is contractually required to supply a complete map.
-   */
-  decodeFileReferences(
-    html: string,
-    fileMap: ReadonlyMap<string, {fileHash: string}>,
-  ): string {
-    const dom = new JSDOM(html);
-    const {document} = dom.window;
-
-    const rewriteRef = (
-      el: Element,
-      readAttr: string,
-      writeAttr: string,
-      format: (hash: string) => string,
-    ) => {
-      const ref = el.getAttribute(readAttr) ?? '';
-      if (!ref.startsWith('./')) return;
-      const entry = fileMap.get(ref);
-      if (!entry) {
-        throw new Error(
-          `ScilogTranslator.decodeFileReferences: no file map entry for ${readAttr} ${ref}`,
-        );
-      }
-      el.setAttribute(writeAttr, format(entry.fileHash));
-    };
-
-    for (const link of document.querySelectorAll('a[href]'))
-      rewriteRef(link, 'href', 'href', hash => `file:${hash}`);
-    for (const img of document.querySelectorAll('img[src]'))
-      rewriteRef(img, 'src', 'title', hash => hash);
-
-    return document.body.innerHTML;
   }
 }
 
