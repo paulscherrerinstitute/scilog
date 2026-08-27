@@ -72,7 +72,7 @@
     "@loopback/eslint-config": "16.0.1",
     "@loopback/testlab": "8.0.15",
     "@types/archiver": "6.0.4",
-    "@types/express-session": "1.18.2",
+    "@types/express-session": "1.19.0",
     "@types/formidable": "3.5.1",
     "@types/jsdom": "21.1.7",
     "@types/node": "16.18.126",
