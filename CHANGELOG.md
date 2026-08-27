@@ -1,3 +1,10 @@
+## [2.11.13](https://github.com/paulscherrerinstitute/scilog/compare/v2.11.12...v2.11.13) (2026-08-27)
+
+
+### Bug Fixes
+
+* **deps:** update dependency jsdom to v29.1.1 ([#725](https://github.com/paulscherrerinstitute/scilog/issues/725)) ([c163bc1](https://github.com/paulscherrerinstitute/scilog/commit/c163bc1662c14a1c0c280604d91fa90e886b384c))
+
 ## [2.11.12](https://github.com/paulscherrerinstitute/scilog/compare/v2.11.11...v2.11.12) (2026-08-26)
 
 
