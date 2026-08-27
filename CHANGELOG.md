@@ -1,3 +1,10 @@
+## [2.11.14](https://github.com/paulscherrerinstitute/scilog/compare/v2.11.13...v2.11.14) (2026-08-27)
+
+
+### Bug Fixes
+
+* **deps:** update dependency yauzl to v3.4.0 ([#726](https://github.com/paulscherrerinstitute/scilog/issues/726)) ([ec82c97](https://github.com/paulscherrerinstitute/scilog/commit/ec82c97e6c4be4d3cfad71c89824d8e8e695ce45))
+
 ## [2.11.13](https://github.com/paulscherrerinstitute/scilog/compare/v2.11.12...v2.11.13) (2026-08-27)
 
 
