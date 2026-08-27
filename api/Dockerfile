@@ -2,7 +2,7 @@
 
 # Shared foundation for every stage: OS, workdir, and chromium
 # (required for PDF export, even in production).
-FROM node:22.22.2-slim AS base
+FROM node:22.23.2-slim AS base
 
 WORKDIR /home/node/app
 
