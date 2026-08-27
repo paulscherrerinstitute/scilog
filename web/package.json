@@ -61,7 +61,7 @@
     "karma-coverage-istanbul-reporter": "3.0.3",
     "karma-jasmine": "5.1.0",
     "karma-jasmine-html-reporter": "2.3.0",
-    "prettier": "3.7.4",
+    "prettier": "3.9.6",
     "typescript": "5.8.3"
   }
 }
