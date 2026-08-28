@@ -1,37 +1,25 @@
 import {BindingScope, injectable} from '@loopback/core';
 import {ZipArchive} from 'archiver';
-import {pipeline, Readable, Writable} from 'node:stream';
+import {finished, Readable} from 'node:stream';
 
 export interface AssetDescriptor {
   stream: Readable;
   archivePath: string;
 }
 
-@injectable({scope: BindingScope.TRANSIENT})
+@injectable({scope: BindingScope.SINGLETON})
 export class ArchiveService {
-  constructor() {}
+  // Zip the given assets and return the archive as a readable stream.
+  zipStream(assets: AssetDescriptor[]): Readable {
+    const archive = new ZipArchive();
+    for (const {stream, archivePath} of assets) {
+      stream.on('error', err => archive.destroy(err));
+      archive.append(stream, {name: archivePath});
+    }
 
-  async streamZipToResponse(
-    assets: AssetDescriptor[],
-    res: Writable,
-  ): Promise<void> {
-    return new Promise((resolve, reject) => {
-      const archive = new ZipArchive();
+    finished(archive, () => assets.forEach(({stream}) => stream.destroy()));
 
-      for (const asset of assets) {
-        archive.append(asset.stream, {name: asset.archivePath});
-      }
-
-      pipeline(archive, res, err => {
-        if (err) {
-          console.error('Error in archive/response pipeline', err);
-          reject(err);
-        } else {
-          resolve();
-        }
-      });
-      // eslint-disable-next-line no-void
-      void archive.finalize();
-    });
+    archive.finalize().catch(err => archive.destroy(err));
+    return archive;
   }
 }
