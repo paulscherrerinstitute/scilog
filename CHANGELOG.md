@@ -1,3 +1,10 @@
+## [2.11.15](https://github.com/paulscherrerinstitute/scilog/compare/v2.11.14...v2.11.15) (2026-08-31)
+
+
+### Bug Fixes
+
+* **deps:** update dependency chart.js to v4.5.1 ([#732](https://github.com/paulscherrerinstitute/scilog/issues/732)) ([d2325ec](https://github.com/paulscherrerinstitute/scilog/commit/d2325ec602b21e9c104355a733965c63eb7e52ab))
+
 ## [2.11.14](https://github.com/paulscherrerinstitute/scilog/compare/v2.11.13...v2.11.14) (2026-08-27)
 
 
