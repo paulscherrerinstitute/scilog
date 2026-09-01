@@ -9,6 +9,7 @@ const crate = {} as ROCrate;
 function fake(source: string, matches: boolean): Translator {
   return {
     matches: () => matches,
+    validate: () => [],
     toSciLog: () => ({fields: {name: source}, paragraphs: []}),
   };
 }

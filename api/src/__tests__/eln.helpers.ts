@@ -88,8 +88,9 @@ export function validScilogCrate(): ROCrate {
 
 // Build a Map<string, Buffer> with valid metadata and matching file content,
 // suitable for passing to ElnArchive.parseRaw().
-export function validScilogEntries(): Map<string, Buffer> {
-  const crate = validScilogCrate();
+export function validScilogEntries(
+  crate: ROCrate = validScilogCrate(),
+): Map<string, Buffer> {
   const fileContent = Buffer.from('hello');
   const sha = crypto.createHash('sha256').update(fileContent).digest('hex');
   crate.setProperty('./book/file.txt', 'sha256', sha);
