@@ -14,7 +14,7 @@
 import type {ROCrate} from 'ro-crate';
 import type {Logbook, Paragraph} from '../../../models';
 import type {Filesnippet} from '../../../models/file.model';
-import {ElnErrorCode, ElnImportError} from '../errors';
+import {ElnError, ElnErrorCode, ElnImportError} from '../errors';
 
 // --- canonical model (what every publisher's crate is translated into) ---
 
@@ -41,6 +41,8 @@ export type FileDraft = {
 export interface Translator {
   /** Cheap, side-effect-free check of whether this crate is our publisher's. */
   matches(crate: ROCrate): boolean;
+  /** Validate the crate against this publisher's profile; `[]` means valid. */
+  validate(crate: ROCrate): ElnError[];
   /** Translate the crate into the canonical draft. */
   toSciLog(crate: ROCrate): LogbookDraft;
 }
