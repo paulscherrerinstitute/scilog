@@ -58,6 +58,8 @@ export class ElnImportService {
     if (!parsed.ok) throw new ElnImportError(parsed.errors);
 
     const translator = translatorRegistry.select(parsed.elnArchive.crate);
+    const errors = translator.validate(parsed.elnArchive.crate);
+    if (errors.length) throw new ElnImportError(errors);
     const draft = translator.toSciLog(parsed.elnArchive.crate);
     const logbookId = await this.createLogbook(
       draft,

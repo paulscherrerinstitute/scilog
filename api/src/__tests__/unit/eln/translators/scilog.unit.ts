@@ -1,5 +1,6 @@
 import {expect} from '@loopback/testlab';
 import {LinkType} from '../../../../models/paragraph.model';
+import {ElnErrorCode} from '../../../../services/eln/errors';
 import {ScilogTranslator} from '../../../../services/eln/translators/scilog';
 import {validScilogCrate} from '../../../eln.helpers';
 
@@ -136,5 +137,165 @@ describe('ScilogTranslator.toSciLog', () => {
         defaultOrder: new Date('2026-01-19T01:00:00.000Z').getTime() * 1000,
       });
     });
+  });
+});
+
+describe('ScilogTranslator.validate', () => {
+  it('accepts a valid crate', () => {
+    expect(translator.validate(validScilogCrate())).to.be.empty();
+  });
+
+  it('rejects when author entity is not found', () => {
+    const crate = validScilogCrate();
+    crate.setProperty('./book/', 'author', {'@id': '#nonexistent'});
+    expect(translator.validate(crate)).to.containDeep([
+      {code: ElnErrorCode.INVALID_AUTHOR},
+    ]);
+  });
+
+  it('rejects when author entity is not a Person', () => {
+    const crate = validScilogCrate();
+    crate.setProperty('#author', '@type', 'Organization');
+    expect(translator.validate(crate)).to.containDeep([
+      {code: ElnErrorCode.INVALID_AUTHOR},
+    ]);
+  });
+
+  it('rejects when author entity is missing email', () => {
+    const crate = validScilogCrate();
+    crate.deleteProperty('#author', 'email');
+    expect(translator.validate(crate)).to.containDeep([
+      {code: ElnErrorCode.INVALID_AUTHOR},
+    ]);
+  });
+
+  it('rejects when a File entity is missing name', () => {
+    const crate = validScilogCrate();
+    crate.deleteProperty('./book/file.txt', 'name');
+    expect(translator.validate(crate)).to.containDeep([
+      {code: ElnErrorCode.MISSING_FILE_FIELD},
+    ]);
+  });
+
+  it('rejects when a File entity is missing encodingFormat', () => {
+    const crate = validScilogCrate();
+    crate.deleteProperty('./book/file.txt', 'encodingFormat');
+    expect(translator.validate(crate)).to.containDeep([
+      {code: ElnErrorCode.MISSING_FILE_FIELD},
+    ]);
+  });
+
+  it('rejects when a File entity is missing sha256', () => {
+    const crate = validScilogCrate();
+    crate.deleteProperty('./book/file.txt', 'sha256');
+    expect(translator.validate(crate)).to.containDeep([
+      {code: ElnErrorCode.MISSING_FILE_FIELD},
+    ]);
+  });
+
+  it('rejects when a File entity is missing contentSize', () => {
+    const crate = validScilogCrate();
+    crate.deleteProperty('./book/file.txt', 'contentSize');
+    expect(translator.validate(crate)).to.containDeep([
+      {code: ElnErrorCode.MISSING_FILE_FIELD},
+    ]);
+  });
+
+  it('accepts numeric contentSize', () => {
+    const crate = validScilogCrate();
+    crate.setProperty('./book/file.txt', 'contentSize', 123);
+    expect(translator.validate(crate)).to.be.empty();
+  });
+
+  it('rejects contentSize with unit suffixes', () => {
+    const crate = validScilogCrate();
+    crate.setProperty('./book/file.txt', 'contentSize', '2.5MB');
+    expect(translator.validate(crate)).to.containDeep([
+      {code: ElnErrorCode.INVALID_CONTENT_SIZE},
+    ]);
+  });
+
+  it('rejects contentSize that is non-numeric', () => {
+    const crate = validScilogCrate();
+    crate.setProperty('./book/file.txt', 'contentSize', 'abc');
+    expect(translator.validate(crate)).to.containDeep([
+      {code: ElnErrorCode.INVALID_CONTENT_SIZE},
+    ]);
+  });
+
+  it('rejects contentSize that is negative', () => {
+    const crate = validScilogCrate();
+    crate.setProperty('./book/file.txt', 'contentSize', '-5');
+    expect(translator.validate(crate)).to.containDeep([
+      {code: ElnErrorCode.INVALID_CONTENT_SIZE},
+    ]);
+  });
+
+  it('rejects contentSize that is empty', () => {
+    const crate = validScilogCrate();
+    crate.setProperty('./book/file.txt', 'contentSize', '');
+    expect(translator.validate(crate)).to.containDeep([
+      {code: ElnErrorCode.INVALID_CONTENT_SIZE},
+    ]);
+  });
+
+  it('rejects when sdPublisher is missing', () => {
+    const crate = validScilogCrate();
+    crate.deleteProperty('ro-crate-metadata.json', 'sdPublisher');
+    expect(translator.validate(crate)).to.containDeep([
+      {code: ElnErrorCode.MISSING_ELN_FIELD},
+    ]);
+  });
+
+  it('rejects when sdPublisher entity is not found in crate', () => {
+    const crate = validScilogCrate();
+    const id = 'https://github.com/paulscherrerinstitute/scilog';
+    crate.deleteEntity(id);
+    expect(translator.validate(crate)).to.containDeep([
+      {code: ElnErrorCode.INVALID_PUBLISHER},
+    ]);
+  });
+
+  it('rejects when sdPublisher entity is not an Organization', () => {
+    const crate = validScilogCrate();
+    const id = 'https://github.com/paulscherrerinstitute/scilog';
+    crate.setProperty(id, '@type', 'Person');
+    expect(translator.validate(crate)).to.containDeep([
+      {code: ElnErrorCode.INVALID_PUBLISHER},
+    ]);
+  });
+
+  it('rejects when sdPublisher entity is missing name', () => {
+    const crate = validScilogCrate();
+    const id = 'https://github.com/paulscherrerinstitute/scilog';
+    crate.deleteProperty(id, 'name');
+    expect(translator.validate(crate)).to.containDeep([
+      {code: ElnErrorCode.INVALID_PUBLISHER},
+    ]);
+  });
+
+  it('rejects when sdPublisher entity is missing url', () => {
+    const crate = validScilogCrate();
+    const id = 'https://github.com/paulscherrerinstitute/scilog';
+    crate.deleteProperty(id, 'url');
+    expect(translator.validate(crate)).to.containDeep([
+      {code: ElnErrorCode.INVALID_PUBLISHER},
+    ]);
+  });
+
+  it('rejects when a Dataset entity is missing author', () => {
+    const crate = validScilogCrate();
+    crate.deleteProperty('./book/', 'author');
+    expect(translator.validate(crate)).to.containDeep([
+      {code: ElnErrorCode.MISSING_DATASET_FIELD},
+    ]);
+  });
+
+  it('rejects when a Dataset entity is missing name', () => {
+    const crate = validScilogCrate();
+    crate.deleteProperty('./book/', 'name');
+    expect(translator.validate(crate)).to.containDeep([
+      {code: ElnErrorCode.MISSING_DATASET_FIELD},
+    ]);
   });
 });

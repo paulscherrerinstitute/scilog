@@ -11,6 +11,7 @@ import {Entity, ROCrate} from 'ro-crate';
 import {Logbook, Paragraph} from '../../../models';
 import {Filesnippet} from '../../../models/file.model';
 import {LinkType} from '../../../models/paragraph.model';
+import {ElnError, ElnErrorCode} from '../errors';
 import {provenanceTags, sourceTag} from './provenance';
 import type {
   FileDraft,
@@ -25,6 +26,16 @@ const PUBLISHER = 'https://github.com/paulscherrerinstitute/scilog';
 export class ScilogTranslator implements Translator {
   matches(crate: ROCrate): boolean {
     return crate.descriptor.sdPublisher?.[0]?.['@id'] === PUBLISHER;
+  }
+
+  /** Validate the crate against SciLog's ELN profile; `[]` means valid. */
+  validate(crate: ROCrate): ElnError[] {
+    return [
+      ...validateSdPublisher(crate),
+      ...validateDatasets(crate),
+      ...validateAuthors(crate),
+      ...validateFiles(crate),
+    ];
   }
 
   /**
@@ -145,4 +156,159 @@ function buildFile(file: Entity): FileDraft {
     elnId: file['@id'] as string,
     fields: filesnippetFromFile(file),
   };
+}
+
+// --- validation: SciLog's ELN profile (crate-level). Generic RO-Crate
+// well-formedness (conformsTo, referential integrity, file integrity) stays
+// in `../archive`. ---
+
+function validateAuthors(crate: ROCrate): ElnError[] {
+  const errors: ElnError[] = [];
+  for (const entity of crate.entities()) {
+    const author = entity.author;
+    if (!author?.length) continue;
+
+    for (const ref of author) {
+      const id = ref['@id'];
+      const person = crate.getEntity(id);
+      if (!person) {
+        errors.push({
+          code: ElnErrorCode.INVALID_AUTHOR,
+          message: `author: entity ${id} not found`,
+        });
+        continue;
+      }
+
+      const types = person['@type'] as string[];
+      if (!types.includes('Person')) {
+        errors.push({
+          code: ElnErrorCode.INVALID_AUTHOR,
+          message: `author ${id}: must be a Person`,
+        });
+      }
+      if (!person.email?.length) {
+        errors.push({
+          code: ElnErrorCode.INVALID_AUTHOR,
+          message: `author ${id}: missing email`,
+        });
+      }
+    }
+  }
+  return errors;
+}
+
+function validateFiles(crate: ROCrate): ElnError[] {
+  const errors: ElnError[] = [];
+  for (const entity of crate.entities()) {
+    const types = entity['@type'] as string[];
+    if (!types.includes('File')) continue;
+
+    if (!entity.name?.length) {
+      errors.push({
+        code: ElnErrorCode.MISSING_FILE_FIELD,
+        message: `File ${entity['@id']}: missing name`,
+      });
+    }
+    if (!entity.encodingFormat?.length) {
+      errors.push({
+        code: ElnErrorCode.MISSING_FILE_FIELD,
+        message: `File ${entity['@id']}: missing encodingFormat`,
+      });
+    }
+    if (!entity.sha256?.length) {
+      errors.push({
+        code: ElnErrorCode.MISSING_FILE_FIELD,
+        message: `File ${entity['@id']}: missing sha256`,
+      });
+    }
+
+    if (!entity.contentSize?.length) {
+      errors.push({
+        code: ElnErrorCode.MISSING_FILE_FIELD,
+        message: `File ${entity['@id']}: missing contentSize`,
+      });
+      continue;
+    }
+    const contentSize = entity.contentSize[0];
+    if (!isValidContentSize(contentSize)) {
+      errors.push({
+        code: ElnErrorCode.INVALID_CONTENT_SIZE,
+        message: `File ${entity['@id']}: invalid contentSize "${contentSize}"`,
+      });
+    }
+  }
+  return errors;
+}
+
+function isValidContentSize(value: string | number): boolean {
+  if (value === '') return false;
+  const num = Number(value);
+  return Number.isInteger(num) && num >= 0;
+}
+
+function validateSdPublisher(crate: ROCrate): ElnError[] {
+  const sdPublisher = crate.descriptor.sdPublisher;
+  if (!sdPublisher?.length) {
+    return [
+      {
+        code: ElnErrorCode.MISSING_ELN_FIELD,
+        message: 'Missing sdPublisher',
+      },
+    ];
+  }
+
+  const id = sdPublisher[0]?.['@id'];
+  const publisher = crate.getEntity(id);
+  if (!publisher) {
+    return [
+      {
+        code: ElnErrorCode.INVALID_PUBLISHER,
+        message: `sdPublisher: entity ${id} not found`,
+      },
+    ];
+  }
+
+  const errors: ElnError[] = [];
+  const types = publisher['@type'] as string[];
+  if (!types.includes('Organization')) {
+    errors.push({
+      code: ElnErrorCode.INVALID_PUBLISHER,
+      message: `sdPublisher ${id}: must be an Organization`,
+    });
+  }
+  if (!publisher.name?.length) {
+    errors.push({
+      code: ElnErrorCode.INVALID_PUBLISHER,
+      message: `sdPublisher ${id}: missing name`,
+    });
+  }
+  if (!publisher.url?.length) {
+    errors.push({
+      code: ElnErrorCode.INVALID_PUBLISHER,
+      message: `sdPublisher ${id}: missing url`,
+    });
+  }
+  return errors;
+}
+
+function validateDatasets(crate: ROCrate): ElnError[] {
+  const errors: ElnError[] = [];
+  for (const entity of crate.entities()) {
+    const types = entity['@type'] as string[];
+    if (!types.includes('Dataset')) continue;
+
+    if (!entity.name?.length) {
+      errors.push({
+        code: ElnErrorCode.MISSING_DATASET_FIELD,
+        message: `Dataset ${entity['@id']}: missing name`,
+      });
+    }
+    if (!entity.author?.length) {
+      errors.push({
+        code: ElnErrorCode.MISSING_DATASET_FIELD,
+        message: `Dataset ${entity['@id']}: missing author`,
+      });
+    }
+  }
+  return errors;
 }
