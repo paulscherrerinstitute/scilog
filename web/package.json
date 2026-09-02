@@ -38,7 +38,7 @@
     "prismjs-components-importer": "0.2.0",
     "rxjs": "7.8.2",
     "vscroll": "1.6.3",
-    "zone.js": "0.15.1"
+    "zone.js": "0.16.3"
   },
   "devDependencies": {
     "@angular-devkit/build-angular": "19.2.27",
