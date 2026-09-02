@@ -1,3 +1,24 @@
+## [2.11.15](https://github.com/paulscherrerinstitute/scilog/compare/v2.11.14...v2.11.15) (2026-08-31)
+
+
+### Bug Fixes
+
+* **deps:** update dependency chart.js to v4.5.1 ([#732](https://github.com/paulscherrerinstitute/scilog/issues/732)) ([d2325ec](https://github.com/paulscherrerinstitute/scilog/commit/d2325ec602b21e9c104355a733965c63eb7e52ab))
+
+## [2.11.14](https://github.com/paulscherrerinstitute/scilog/compare/v2.11.13...v2.11.14) (2026-08-27)
+
+
+### Bug Fixes
+
+* **deps:** update dependency yauzl to v3.4.0 ([#726](https://github.com/paulscherrerinstitute/scilog/issues/726)) ([ec82c97](https://github.com/paulscherrerinstitute/scilog/commit/ec82c97e6c4be4d3cfad71c89824d8e8e695ce45))
+
+## [2.11.13](https://github.com/paulscherrerinstitute/scilog/compare/v2.11.12...v2.11.13) (2026-08-27)
+
+
+### Bug Fixes
+
+* **deps:** update dependency jsdom to v29.1.1 ([#725](https://github.com/paulscherrerinstitute/scilog/issues/725)) ([c163bc1](https://github.com/paulscherrerinstitute/scilog/commit/c163bc1662c14a1c0c280604d91fa90e886b384c))
+
 ## [2.11.12](https://github.com/paulscherrerinstitute/scilog/compare/v2.11.11...v2.11.12) (2026-08-26)
 
 

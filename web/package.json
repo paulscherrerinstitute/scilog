@@ -1,6 +1,6 @@
 {
   "name": "web",
-  "version": "2.11.12",
+  "version": "2.11.15",
   "description": "SciLog web frontend",
   "license": "GPL-3.0-or-later",
   "scripts": {
@@ -27,7 +27,7 @@
     "@angular/router": "19.2.25",
     "@ckeditor/ckeditor5-angular": "11.2.0",
     "angular-gridster2": "19.0.0",
-    "chart.js": "4.4.9",
+    "chart.js": "4.5.1",
     "ckeditor5": "48.2.0",
     "jdenticon": "3.3.0",
     "ng2-charts": "4.1.1",
@@ -51,17 +51,17 @@
     "@angular/compiler-cli": "19.2.25",
     "@scicatproject/scicat-sdk-ts-angular": "5.2.1",
     "@types/jasmine": "5.1.15",
-    "@typescript-eslint/eslint-plugin": "8.33.0",
-    "@typescript-eslint/parser": "8.33.0",
+    "@typescript-eslint/eslint-plugin": "8.68.0",
+    "@typescript-eslint/parser": "8.68.0",
     "eslint": "9.39.5",
     "eslint-config-prettier": "10.1.8",
     "jasmine-core": "5.13.0",
     "karma": "6.4.4",
-    "karma-chrome-launcher": "3.1.1",
+    "karma-chrome-launcher": "3.2.0",
     "karma-coverage-istanbul-reporter": "3.0.3",
     "karma-jasmine": "5.1.0",
-    "karma-jasmine-html-reporter": "2.1.0",
-    "prettier": "3.7.4",
+    "karma-jasmine-html-reporter": "2.3.0",
+    "prettier": "3.9.6",
     "typescript": "5.8.3"
   }
 }

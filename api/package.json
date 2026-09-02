@@ -1,6 +1,6 @@
 {
   "name": "api",
-  "version": "2.11.12",
+  "version": "2.11.15",
   "description": "SciLog REST API backend",
   "keywords": [
     "loopback-application",
@@ -54,7 +54,7 @@
     "express-session": "1.19.0",
     "formidable": "3.5.4",
     "isemail": "3.2.0",
-    "jsdom": "29.0.2",
+    "jsdom": "29.1.1",
     "loopback-connector-mongodb": "5.6.0",
     "passport-openidconnect": "0.1.2",
     "pdf-merger-js": "4.3.1",
@@ -65,21 +65,21 @@
     "tar": "7.5.22",
     "tslib": "2.0.0",
     "ws": "8.21.3",
-    "yauzl": "3.2.1"
+    "yauzl": "3.4.0"
   },
   "devDependencies": {
     "@loopback/build": "12.0.15",
     "@loopback/eslint-config": "16.0.1",
     "@loopback/testlab": "8.0.15",
     "@types/archiver": "6.0.4",
-    "@types/express-session": "1.18.2",
+    "@types/express-session": "1.19.0",
     "@types/formidable": "3.5.1",
     "@types/jsdom": "21.1.7",
     "@types/node": "16.18.126",
     "@types/passport": "1.0.17",
     "@types/prismjs": "1.26.6",
     "@types/ws": "8.18.1",
-    "@types/yauzl": "2.10.3",
+    "@types/yauzl": "3.4.0",
     "eslint": "8.57.1",
     "typescript": "5.2.2"
   }
