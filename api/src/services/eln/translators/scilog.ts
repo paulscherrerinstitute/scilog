@@ -31,6 +31,7 @@ export class ScilogTranslator implements Translator {
   /** Validate the crate against SciLog's ELN profile; `[]` means valid. */
   validate(crate: ROCrate): ElnError[] {
     return [
+      ...validateBook(crate),
       ...validateSdPublisher(crate),
       ...validateDatasets(crate),
       ...validateAuthors(crate),
@@ -47,6 +48,7 @@ export class ScilogTranslator implements Translator {
    */
   toSciLog(crate: ROCrate): LogbookDraft {
     const book = findBook(crate);
+    // validate() rejects crates with no Book, so this should never happen.
     if (!book) throw new Error('ScilogTranslator: no Book entity in crate');
     return buildLogbook(book);
   }
@@ -161,6 +163,13 @@ function buildFile(file: Entity): FileDraft {
 // --- validation: SciLog's ELN profile (crate-level). Generic RO-Crate
 // well-formedness (conformsTo, referential integrity, file integrity) stays
 // in `../archive`. ---
+
+/** A SciLog crate must have a Book — toSciLog builds the logbook from it. */
+function validateBook(crate: ROCrate): ElnError[] {
+  return findBook(crate)
+    ? []
+    : [{code: ElnErrorCode.MISSING_ELN_ENTITY, message: 'Missing Book'}];
+}
 
 function validateAuthors(crate: ROCrate): ElnError[] {
   const errors: ElnError[] = [];
