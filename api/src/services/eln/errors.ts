@@ -7,6 +7,8 @@
 export const ElnErrorCode = {
   /** A required field on the RO-Crate metadata descriptor is absent. */
   MISSING_ELN_FIELD: 'MISSING_ELN_FIELD',
+  /** A required entity is absent from the crate graph. */
+  MISSING_ELN_ENTITY: 'MISSING_ELN_ENTITY',
   /** conformsTo names an unsupported RO-Crate version. */
   INVALID_CONFORMS_TO: 'INVALID_CONFORMS_TO',
   /** No translator matches the crate, or its publisher is malformed. */
