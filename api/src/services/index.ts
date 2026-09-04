@@ -6,5 +6,6 @@
 export * from './ro-crate-export.service';
 export * from './entity-builder.service';
 export * from './archive.service';
+export * from './logbook-pdf.service';
 export * from './eln/import.service';
 export * from './file-storage.service';
