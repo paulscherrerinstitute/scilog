@@ -10,7 +10,8 @@ import {FileRepository} from '../repositories/file.repository';
 import {RoCrateExportService} from '../services';
 import {EntityBuilderService} from '../services';
 import {ArchiveService, AssetDescriptor} from '../services/archive.service';
-import {Readable} from 'stream';
+import {Readable} from 'node:stream';
+import {pipeline} from 'node:stream/promises';
 
 import {ObjectId} from 'mongodb';
 import * as mongodb from 'mongodb';
@@ -26,6 +27,7 @@ import path from 'path';
 })
 export class RoCrateController {
   static readonly ARCHIVE_ROOT = 'scilog-eln-export';
+  static readonly ELN_MEDIA_TYPE = 'application/vnd.eln+zip';
   constructor(
     @repository(FileRepository) private fileRepository: FileRepository,
     @service(RoCrateExportService)
@@ -55,7 +57,9 @@ export class RoCrateController {
     responses: {
       '200': {
         description: 'Rocrate model instance',
-        content: {'application/zip': {schema: {type: 'object'}}},
+        content: {
+          [RoCrateController.ELN_MEDIA_TYPE]: {schema: {type: 'object'}},
+        },
       },
     },
   })
@@ -104,6 +108,12 @@ export class RoCrateController {
       ),
     });
 
-    await this.archiveService.streamZipToResponse(assets, response);
+    const zip = this.archiveService.zipStream(assets);
+    response.set('Content-Type', RoCrateController.ELN_MEDIA_TYPE);
+    response.set(
+      'Content-Disposition',
+      `attachment; filename="${RoCrateController.ARCHIVE_ROOT}-${id}.eln"`,
+    );
+    await pipeline(zip, response);
   }
 }
