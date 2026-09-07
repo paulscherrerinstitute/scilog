@@ -9,6 +9,8 @@ import {basicAuthorization} from '../services/basic.authorizor';
 import {FileRepository} from '../repositories/file.repository';
 import {RoCrateExportService} from '../services';
 import {EntityBuilderService} from '../services';
+import {DATA_DIR, ScicatCrateService} from '../services/scicat-crate.service';
+import {LogbookPdfService} from '../services/logbook-pdf.service';
 import {ArchiveService, AssetDescriptor} from '../services/archive.service';
 import {Readable} from 'node:stream';
 import {pipeline} from 'node:stream/promises';
@@ -34,6 +36,8 @@ export class RoCrateController {
     private rocrateExportService: RoCrateExportService,
     @service(ArchiveService) private archiveService: ArchiveService,
     @service(EntityBuilderService) private entityBuilder: EntityBuilderService,
+    @service(ScicatCrateService) private scicatCrateService: ScicatCrateService,
+    @service(LogbookPdfService) private logbookPdfService: LogbookPdfService,
   ) {}
 
   // GET /rocrates/{id}
@@ -67,6 +71,17 @@ export class RoCrateController {
     @param.path.string('id') id: string,
     @inject(RestBindings.Http.RESPONSE) response: Response,
   ) {
+    const zip = await this.buildElnStream(id);
+    response.set('Content-Type', RoCrateController.ELN_MEDIA_TYPE);
+    response.set(
+      'Content-Disposition',
+      `attachment; filename="${RoCrateController.ARCHIVE_ROOT}-${id}.eln"`,
+    );
+    await pipeline(zip, response);
+  }
+
+  // Build the ELN archive for a logbook and return it as a readable stream.
+  private async buildElnStream(id: string): Promise<Readable> {
     const {rocrate, fileMetadata} =
       await this.rocrateExportService.getRoCrateMetadata(id);
 
@@ -108,12 +123,65 @@ export class RoCrateController {
       ),
     });
 
-    const zip = this.archiveService.zipStream(assets);
-    response.set('Content-Type', RoCrateController.ELN_MEDIA_TYPE);
-    response.set(
-      'Content-Disposition',
-      `attachment; filename="${RoCrateController.ARCHIVE_ROOT}-${id}.eln"`,
-    );
-    await pipeline(zip, response);
+    return this.archiveService.zipStream(assets);
+  }
+
+  // GET /scicat-rocrates/{id}/download
+  @get('/scicat-rocrates/{id}/download', {
+    security: OPERATION_SECURITY_SPEC,
+    responses: {
+      '200': {
+        description: 'Rocrate model instance',
+        content: {'application/zip': {schema: {type: 'object'}}},
+      },
+    },
+  })
+  async downloadScicatRoCrateById(
+    @param.path.string('id') id: string,
+    @inject(RestBindings.Http.RESPONSE) response: Response,
+  ) {
+    const metadataJson = await this.scicatCrateService.getMetadataJson(id);
+
+    const {stream: pdfStream, pdfName} =
+      await this.logbookPdfService.exportPdf(id);
+
+    try {
+      const elnStream = await this.buildElnStream(id);
+
+      const assets: Array<AssetDescriptor> = [
+        {
+          // Explicitly create a directory entry as validation fails in scicat-rocrate
+          // service otherwise
+          // TO-DO: Remove this once the fix (v2.6.6) is deployed:
+          // https://github.com/paulscherrerinstitute/scicat-rocrate/issues/338
+          stream: null,
+          archivePath: `${DATA_DIR}/`,
+        },
+        {
+          stream: pdfStream,
+          archivePath: `${DATA_DIR}/${pdfName}`,
+        },
+        {
+          stream: elnStream,
+          archivePath: `${DATA_DIR}/${id}.eln`,
+        },
+        {
+          stream: Readable.from([metadataJson]),
+          archivePath: 'ro-crate-metadata.json',
+        },
+      ];
+
+      const zip = this.archiveService.zipStream(assets);
+
+      response.set('Content-Type', 'application/zip');
+      response.set(
+        'Content-Disposition',
+        `attachment; filename="logbook-${id}-as-dataset.zip"`,
+      );
+
+      await pipeline(zip, response);
+    } finally {
+      pdfStream.destroy();
+    }
   }
 }
