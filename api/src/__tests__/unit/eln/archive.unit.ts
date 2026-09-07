@@ -57,8 +57,18 @@ describe('ElnArchive.parseRaw', () => {
     expect(result.ok).to.be.true();
   });
 
-  it('rejects when an entry has no folder prefix', () => {
-    const entries = new Map([['ro-crate-metadata.json', Buffer.from('{}')]]);
+  it('accepts a flat archive with ro-crate-metadata.json at the root', () => {
+    const entries = new Map([
+      [
+        'ro-crate-metadata.json',
+        Buffer.from(JSON.stringify(validScilogCrate().toJSON())),
+      ],
+    ]);
+    expect(ElnArchive.parseRaw(entries).ok).to.be.true();
+  });
+
+  it('rejects a root-level file when no crate sits at the root', () => {
+    const entries = new Map([['stray.txt', Buffer.from('x')]]);
     const result = ElnArchive.parseRaw(entries);
     expect(result.ok).to.be.false();
     expect((result as ElnParseFailure).errors).to.containDeep([
@@ -111,6 +121,20 @@ describe('ElnArchive.parseRaw', () => {
     const buf = elnArchive.getFile('./book/file.txt');
     expect(buf).to.not.be.undefined();
     expect(buf!.toString()).to.equal('hello');
+  });
+
+  it('resolves a bare file path against a flat archive via getFile()', () => {
+    const entries = new Map([
+      [
+        'ro-crate-metadata.json',
+        Buffer.from(JSON.stringify(validScilogCrate().toJSON())),
+      ],
+      ['book/file.txt', Buffer.from('hello')],
+    ]);
+    const result = ElnArchive.parseRaw(entries);
+    expect(result.ok).to.be.true();
+    const archive = (result as {ok: true; elnArchive: ElnArchive}).elnArchive;
+    expect(archive.getFile('book/file.txt')!.toString()).to.equal('hello');
   });
 
   it('returns undefined from getFile() for missing files', () => {
