@@ -89,39 +89,24 @@ export class ElnArchive {
   /**
    * @internal Test seam — consumers should call `ElnArchive.parse(filepath)`.
    * Parses raw zip entries into an `ElnArchive` without running metadata or
-   * integrity validation. Checks archive structure and parses
+   * integrity validation. Accepts either a flat archive with
+   * ro-crate-metadata.json at its root or a single root folder containing it,
+   * derives the root prefix used to resolve file @ids, and parses
    * ro-crate-metadata.json only.
    */
   static parseRaw(entries: Map<string, Buffer>): ElnParseResult {
-    const prefixes = new Set<string>();
-    for (const name of entries.keys()) {
-      const slash = name.indexOf('/');
-      if (slash === -1) {
-        return {
-          ok: false,
-          errors: [
-            {
-              code: ElnErrorCode.INVALID_ELN_STRUCTURE,
-              message: 'Archive must contain a single root folder',
-            },
-          ],
-        };
-      }
-      prefixes.add(name.slice(0, slash + 1));
-    }
-    if (prefixes.size !== 1) {
+    const rootFolder = resolveRootFolder(entries);
+    if (rootFolder === undefined) {
       return {
         ok: false,
         errors: [
           {
             code: ElnErrorCode.INVALID_ELN_STRUCTURE,
-            message: 'Archive must contain a single root folder',
+            message: `Archive must have ${METADATA_FILENAME} at its root or in a single root folder`,
           },
         ],
       };
     }
-
-    const rootFolder = [...prefixes][0];
 
     const metadataPath = `${rootFolder}${METADATA_FILENAME}`;
     if (!entries.has(metadataPath)) {
@@ -208,6 +193,24 @@ export class ElnArchive {
 }
 
 // --- private helpers ---
+
+/**
+ * Derive the prefix that file @ids resolve against, from the one accepted
+ * layout the crate sits in: flat (ro-crate-metadata.json at the archive root,
+ * prefix `''`) or a single root folder holding it (prefix `'<folder>/'`).
+ * Returns undefined when the archive is neither — no locatable crate root.
+ */
+function resolveRootFolder(entries: Map<string, Buffer>): string | undefined {
+  if (entries.has(METADATA_FILENAME)) return '';
+
+  const prefixes = new Set<string>();
+  for (const name of entries.keys()) {
+    const slash = name.indexOf('/');
+    if (slash === -1) return undefined;
+    prefixes.add(name.slice(0, slash + 1));
+  }
+  return prefixes.size === 1 ? [...prefixes][0] : undefined;
+}
 
 function unzip(filepath: string): Promise<Map<string, Buffer>> {
   return new Promise((resolve, reject) => {
