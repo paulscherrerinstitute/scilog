@@ -137,6 +137,34 @@ describe('ElnArchive.parseRaw', () => {
     expect(archive.getFile('book/file.txt')!.toString()).to.equal('hello');
   });
 
+  it('decodes a percent-encoded file id to its literal entry', () => {
+    const entries = new Map([
+      [
+        'ro-crate-metadata.json',
+        Buffer.from(JSON.stringify(validScilogCrate().toJSON())),
+      ],
+      ['data/a b.txt', Buffer.from('spaced')],
+    ]);
+    const result = ElnArchive.parseRaw(entries);
+    expect(result.ok).to.be.true();
+    const archive = (result as {ok: true; elnArchive: ElnArchive}).elnArchive;
+    expect(archive.getFile('data/a%20b.txt')!.toString()).to.equal('spaced');
+  });
+
+  it('leaves a malformed percent-encoded file id unchanged', () => {
+    const entries = new Map([
+      [
+        'ro-crate-metadata.json',
+        Buffer.from(JSON.stringify(validScilogCrate().toJSON())),
+      ],
+      ['data/50%.txt', Buffer.from('literal')],
+    ]);
+    const result = ElnArchive.parseRaw(entries);
+    expect(result.ok).to.be.true();
+    const archive = (result as {ok: true; elnArchive: ElnArchive}).elnArchive;
+    expect(archive.getFile('data/50%.txt')!.toString()).to.equal('literal');
+  });
+
   it('returns undefined from getFile() for missing files', () => {
     const result = ElnArchive.parseRaw(validScilogEntries());
     expect(result.ok).to.be.true();

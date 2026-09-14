@@ -43,9 +43,13 @@ export class ElnArchive {
     private readonly rootFolder: string,
   ) {}
 
-  /** Look up a file by its RO-Crate @id (e.g. "./book/file.txt"). */
+  /**
+   * Look up a file by its RO-Crate @id (e.g. "./book/file.txt"). @ids are URI
+   * references, so a percent-encoded id (openBIS's "…/a%20b.txt") is decoded
+   * to match the archive's literal entry path — a no-op for unencoded ids.
+   */
   getFile(fileId: string): Buffer | undefined {
-    const path = this.rootFolder + fileId.replace(/^\.\//, '');
+    const path = this.rootFolder + safeDecode(fileId.replace(/^\.\//, ''));
     return this.entries.get(path);
   }
 
@@ -210,6 +214,15 @@ function resolveRootFolder(entries: Map<string, Buffer>): string | undefined {
     prefixes.add(name.slice(0, slash + 1));
   }
   return prefixes.size === 1 ? [...prefixes][0] : undefined;
+}
+
+/** Percent-decode a URI reference, leaving a malformed value unchanged. */
+function safeDecode(value: string): string {
+  try {
+    return decodeURIComponent(value);
+  } catch {
+    return value;
+  }
 }
 
 function unzip(filepath: string): Promise<Map<string, Buffer>> {
