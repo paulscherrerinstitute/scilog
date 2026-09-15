@@ -128,18 +128,24 @@ export class FileController {
     request: Request,
   ): Promise<Filesnippet> {
     const formData = await this.parseFormData(request);
-    formData.fields._fileId = await this.fileStorage.upload(
+    const {fileId, contentSize, contentSha256} = await this.fileStorage.upload(
       createReadStream(formData.file.filepath),
       formData.file.originalFilename ?? formData.file.filepath,
     );
-    formData.fields.accessHash = crypto.randomBytes(64).toString('hex');
-    const file = await this.fileRepository.create(
-      _.omit(formData.fields, ['id']),
+    const fields = {
+      ...formData.fields,
+      _fileId: fileId,
+      contentSize,
+      contentSha256,
+      accessHash: crypto.randomBytes(64).toString('hex'),
+    };
+    const filesnippet = await this.fileRepository.create(
+      _.omit(fields, ['id']),
       {
         currentUser: this.user,
       },
     );
-    return file;
+    return filesnippet;
   }
 
   @get('/filesnippet/count', {
@@ -328,11 +334,17 @@ export class FileController {
     request: Request,
   ): Promise<void> {
     const formData = await this.parseFormData(request);
-    formData.fields._fileId = await this.fileStorage.upload(
+    const {fileId, contentSize, contentSha256} = await this.fileStorage.upload(
       createReadStream(formData.file.filepath),
       formData.file.originalFilename ?? formData.file.filepath,
     );
-    await this.fileRepository.updateById(id, _.omit(formData.fields, ['id']), {
+    const fields = {
+      ...formData.fields,
+      _fileId: fileId,
+      contentSize,
+      contentSha256,
+    };
+    await this.fileRepository.updateById(id, _.omit(fields, ['id']), {
       currentUser: this.user,
     });
   }
@@ -391,21 +403,19 @@ export class FileController {
     parsedFields: Partial<Filesnippet>,
     file: File,
   ): Partial<Filesnippet> {
-    if (!file.mimetype || !file.originalFilename || !file.hash) {
+    if (!file.mimetype || !file.originalFilename) {
       throw new Error('missing file metadata from formidable');
     }
     const fileSnippet = {
       ...parsedFields,
       contentType: file.mimetype,
       filename: file.originalFilename,
-      contentSize: file.size,
-      contentSha256: file.hash,
     };
     return fileSnippet;
   }
 
   async parseFormData(request: Request): Promise<FormData> {
-    const form = formidable({hashAlgorithm: 'sha256'});
+    const form = formidable();
     const [fields, files] = await form.parse(request);
     if (!files.file?.[0]) {
       throw new MissingFileError();
