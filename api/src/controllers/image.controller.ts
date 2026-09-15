@@ -38,7 +38,14 @@ export class ImageController {
     const bucket = new Mongo.GridFSBucket(
       this.fileRepository.dataSource.connector?.db,
     );
-    response.set('Content-Type', data.contentType);
+    response.set(
+      'Content-Type',
+      data.contentType?.startsWith('image/')
+        ? data.contentType
+        : 'application/octet-stream',
+    );
+    response.set('X-Content-Type-Options', 'nosniff');
+    response.set('Content-Disposition', 'attachment');
     bucket.openDownloadStream(data._fileId).pipe(response);
     return response;
   }
