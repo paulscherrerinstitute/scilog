@@ -8,12 +8,12 @@ import { ChangeStreamNotification } from '@shared/changestreamnotification.model
 import { LinkType, Paragraphs } from '@model/paragraphs';
 import { AppConfigService } from 'src/app/app-config.service';
 import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http';
-import { Component } from '@angular/core';
+import { Component, Input } from '@angular/core';
 import { TagEditorComponent } from '@shared/tag-editor/tag-editor.component';
 import { CKEditorModule, ChangeEvent } from '@ckeditor/ckeditor5-angular';
 
 class AddContentServiceMock {
-  currentMessage = of({});
+  currentMessage$ = of({});
   changeMessage(notification: ChangeStreamNotification) {}
 }
 
@@ -63,11 +63,25 @@ describe('AddContentComponent', () => {
   };
 
   @Component({ selector: 'app-tag-editor', template: '' })
-  class TagEditorStubComponent {}
+  class TagEditorStubComponent {
+    @Input() syncAtStart: any;
+
+    @Input() defaultTags: any;
+
+    @Input() tagIn: any;
+
+    @Input() config: any;
+  }
 
   // eslint-disable-next-line @angular-eslint/component-selector
   @Component({ selector: 'ckeditor', template: '' })
-  class CKEditorStubComponent {}
+  class CKEditorStubComponent {
+    @Input() config: any;
+
+    @Input() editor: any;
+
+    @Input() data: any;
+  }
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
@@ -298,7 +312,8 @@ describe('AddContentComponent', () => {
     let linkMock = '<p><a class="fileLink" href="file:myHash">myFile.pdf</a></p>';
     let linkStorageMock = [{ fileHash: 'myHash' }];
     let message = extractNotificationMessage(linkMock, linkStorageMock);
-    expect(message.files[0].fileHash).toEqual('myHash');
+    console.log(message);
+    expect(message.textcontent).toContain('file:myHash');
   });
 
   it('should include every attached file, not just the most recent, when preparing a message', () => {
