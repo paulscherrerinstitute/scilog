@@ -130,12 +130,20 @@ export class ElnImportService {
       // fileHash uses UUID to match the per-paragraph reference style.
       const accessHash = crypto.randomBytes(64).toString('hex');
       const filename = file.fields.filename ?? file.elnId;
-      const fileId = await this.fileStorage.upload(
-        Readable.from(bytes),
-        filename,
-      );
+      // sha256: keep the crate's declared value — validateIntegrity already
+      // checked it against these bytes. contentSize is never verified against
+      // the bytes, so store the size upload derived from them. Bare openBIS
+      // files declare neither and fall back to both derived values.
+      const {fileId, contentSize, contentSha256} =
+        await this.fileStorage.upload(Readable.from(bytes), filename);
       const created = await this.fileRepository.create(
-        {...file.fields, _fileId: fileId, accessHash},
+        {
+          ...file.fields,
+          _fileId: fileId,
+          accessHash,
+          contentSize,
+          contentSha256: file.fields.contentSha256 ?? contentSha256,
+        },
         {currentUser: this.user},
       );
       byElnId.set(file.elnId, {
