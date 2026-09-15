@@ -17,6 +17,7 @@ export class CK5ImageUploadAdapter {
     this.loader = loader;
     // this.url = this.serverSettings.getServerAddress()+"files/";
     console.log('Upload Adapter Constructor', this.loader, this.url);
+   
   }
 
   upload() {
@@ -56,16 +57,96 @@ export class CK5ImageUploadAdapter {
     console.log('UploadAdapter abort');
   }
 
-  createImageFromBlob(image: Blob) {
+  createImageFromBlob(image: File): Promise<string> {
     return new Promise((resolve, reject) => {
-      let reader = new FileReader();
-      reader.onload = () => {
-        resolve(reader.result)
-        console.log(reader)
-      };
-      reader.readAsDataURL(image);
-    })
+      const reader = new FileReader();
 
+      reader.onload = (event: ProgressEvent<FileReader>) => {
+        const result = event.target?.result;
+
+        if (!result) {
+          console.error("FileReader result is empty");
+          reject("FileReader failed");
+          return;
+        }
+
+        console.log("Reader loaded successfully");
+
+        const img = new Image();
+
+        
+        img.onload = () => {
+          console.log("Image loaded successfully");
+
+          
+          console.log("Original Width:", img.width);
+          console.log("Original Height:", img.height);
+          console.log("Original Size (KB):", (image.size / 1024).toFixed(2));
+
+          const canvas = document.createElement('canvas');
+          const ctx = canvas.getContext('2d');
+
+          if (!ctx) {
+            console.error("Canvas context not available");
+            reject("Canvas error");
+            return;
+          }
+
+          
+          const MAX_WIDTH = 800;
+          const MAX_HEIGHT = 800;
+
+          let width = img.width;
+          let height = img.height;
+
+          
+          if (width > MAX_WIDTH || height > MAX_HEIGHT) {
+            if (width > height) {
+              height = Math.round(height * (MAX_WIDTH / width));
+              width = MAX_WIDTH;
+            } else {
+              width = Math.round(width * (MAX_HEIGHT / height));
+              height = MAX_HEIGHT;
+            }
+          }
+
+          canvas.width = width;
+          canvas.height = height;
+
+          ctx.drawImage(img, 0, 0, width, height);
+
+          
+          const quality = 0.7;
+          const compressedBase64 = canvas.toDataURL('image/jpeg', quality);
+
+          
+          const newSizeKB = Math.round((compressedBase64.length * 3) / 4 / 1024);
+
+          console.log("Compressed Width:", width);
+          console.log("Compressed Height:", height);
+          console.log("Compressed Size (KB):", newSizeKB);
+
+          resolve(compressedBase64);
+        };
+
+        
+        img.onerror = (err) => {
+          console.error("Image failed to load", err);
+          reject("Image load error");
+        };
+
+        
+        img.src = result as string;
+      };
+
+      
+      reader.onerror = (err) => {
+        console.error("FileReader error", err);
+        reject("FileReader error");
+      };
+
+      reader.readAsDataURL(image);
+    });
   }
 
 }
