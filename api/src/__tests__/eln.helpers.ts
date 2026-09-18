@@ -1,4 +1,4 @@
-import archiver from 'archiver';
+import {ZipArchive} from 'archiver';
 import crypto from 'node:crypto';
 import fs from 'node:fs';
 import os from 'node:os';
@@ -114,7 +114,7 @@ export async function buildElnZip(
     `test-eln-${crypto.randomUUID()}.eln`,
   );
   const output = fs.createWriteStream(filepath);
-  const archive = archiver('zip');
+  const archive = new ZipArchive();
   archive.on('error', err => output.destroy(err));
   archive.pipe(output);
   for (const [name, buf] of entries) {
