@@ -56,12 +56,7 @@ export class MyUserService implements UserService<User, Credentials> {
   convertToUserProfile(user: User): UserProfile {
     //console.error("Inside convertToUserProfile:"+JSON.stringify(user,null,4))
     // since first name and lastName are optional, no error is thrown if not provided
-    let userName = '';
-    if (user.firstName) userName = `${user.firstName}`;
-    if (user.lastName)
-      userName = user.firstName
-        ? `${userName} ${user.lastName}`
-        : `${user.lastName}`;
+    const userName = computeUserName(user);
     const userProfile = {
       [securityId]: user.id,
       name: userName,
@@ -72,4 +67,14 @@ export class MyUserService implements UserService<User, Credentials> {
     // console.error("convertToUserProfile:",user,userProfile)
     return userProfile;
   }
+}
+
+export function computeUserName(user: User) {
+  let userName = '';
+  if (user.firstName) userName = `${user.firstName}`;
+  if (user.lastName)
+    userName = user.firstName
+      ? `${userName} ${user.lastName}`
+      : `${user.lastName}`;
+  return userName;
 }
