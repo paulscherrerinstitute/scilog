@@ -3,6 +3,7 @@ import {once} from 'node:events';
 import {Readable} from 'node:stream';
 import {ArchiveService} from '../../services/archive.service';
 import {listZipEntries} from '../zip.helpers';
+import {finished} from 'node:stream/promises';
 
 describe('ArchiveService (unit)', () => {
   let service: ArchiveService;
@@ -46,11 +47,10 @@ describe('ArchiveService (unit)', () => {
       {stream: failing, archivePath: 'a.bin'},
       {stream: pending, archivePath: 'b.bin'},
     ]);
-    zip.on('error', () => {});
 
     failing.destroy(new Error('the source went away'));
-    await new Promise(resolve => zip.once('close', resolve));
 
+    await expect(finished(zip)).to.be.rejectedWith('the source went away');
     expect(pending.destroyed).to.be.true();
   });
 
