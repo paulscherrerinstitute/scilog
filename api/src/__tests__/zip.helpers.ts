@@ -1,18 +1,8 @@
 import yauzl from 'yauzl';
 
-export function listZipEntries(zip: Buffer): Promise<string[]> {
-  return new Promise((resolve, reject) => {
-    yauzl.fromBuffer(zip, {lazyEntries: true}, (err, zipfile) => {
-      if (err) return reject(err);
-
-      const entries: string[] = [];
-      zipfile.readEntry();
-      zipfile.on('entry', entry => {
-        entries.push(entry.fileName);
-        zipfile.readEntry();
-      });
-      zipfile.on('end', () => resolve(entries));
-      zipfile.on('error', reject);
-    });
-  });
+export async function listZipEntries(zip: Buffer): Promise<string[]> {
+  const zipfile = await yauzl.fromBufferPromise(zip, {lazyEntries: true});
+  const entries: string[] = [];
+  for await (const entry of zipfile.eachEntry()) entries.push(entry.fileName);
+  return entries;
 }

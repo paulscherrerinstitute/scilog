@@ -225,42 +225,17 @@ function safeDecode(value: string): string {
   }
 }
 
-function unzip(filepath: string): Promise<Map<string, Buffer>> {
-  return new Promise((resolve, reject) => {
-    yauzl.open(filepath, {lazyEntries: true}, (err, zipfile) => {
-      if (err) {
-        reject(err);
-        return;
-      }
+async function unzip(filepath: string): Promise<Map<string, Buffer>> {
+  const entries = new Map<string, Buffer>();
+  const zipfile = await yauzl.openPromise(filepath, {lazyEntries: true});
 
-      const entries = new Map<string, Buffer>();
+  for await (const entry of zipfile.eachEntry()) {
+    if (entry.fileName.endsWith('/')) continue;
+    const readStream = await zipfile.openReadStreamPromise(entry);
+    entries.set(entry.fileName, await buffer(readStream));
+  }
 
-      zipfile.on('error', reject);
-
-      zipfile.on('entry', entry => {
-        if (entry.fileName.endsWith('/')) {
-          zipfile.readEntry();
-          return;
-        }
-
-        zipfile.openReadStream(entry, (streamErr, readStream) => {
-          if (streamErr) {
-            reject(streamErr);
-            return;
-          }
-
-          // eslint-disable-next-line no-void
-          void (async () => {
-            entries.set(entry.fileName, await buffer(readStream));
-            zipfile.readEntry();
-          })().catch(reject);
-        });
-      });
-
-      zipfile.on('end', () => resolve(entries));
-      zipfile.readEntry();
-    });
-  });
+  return entries;
 }
 
 function validateConformsTo(crate: ROCrate): ElnError[] {
