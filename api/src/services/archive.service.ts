@@ -1,7 +1,7 @@
-import {injectable, BindingScope} from '@loopback/core';
-import archiver from 'archiver';
+import {BindingScope, injectable} from '@loopback/core';
 import {Response} from '@loopback/rest';
-import {pipeline, Readable} from 'stream';
+import {ZipArchive} from 'archiver';
+import {pipeline, Readable} from 'node:stream';
 
 export interface AssetDescriptor {
   stream: Readable;
@@ -17,7 +17,7 @@ export class ArchiveService {
     res: Response,
   ): Promise<void> {
     return new Promise((resolve, reject) => {
-      const archive = archiver('zip');
+      const archive = new ZipArchive();
 
       for (const asset of assets) {
         archive.append(asset.stream, {name: asset.archivePath});
