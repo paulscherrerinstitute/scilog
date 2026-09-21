@@ -4,6 +4,7 @@ import {Readable} from 'node:stream';
 import {ArchiveService} from '../../services/archive.service';
 import {listZipEntries} from '../zip.helpers';
 import {finished} from 'node:stream/promises';
+import {buffer} from 'node:stream/consumers';
 
 describe('ArchiveService (unit)', () => {
   let service: ArchiveService;
@@ -18,14 +19,17 @@ describe('ArchiveService (unit)', () => {
       {stream: Readable.from(['world']), archivePath: 'nested/b.txt'},
     ]);
 
-    expect(await zipEntries(zip)).to.eql(['a.txt', 'nested/b.txt']);
+    expect(await listZipEntries(await buffer(zip))).to.eql([
+      'a.txt',
+      'nested/b.txt',
+    ]);
   });
 
   it('destroys the source streams once the archive completes', async () => {
     const source = Readable.from(['hello']);
     const zip = service.zipStream([{stream: source, archivePath: 'a.txt'}]);
 
-    await zipEntries(zip);
+    await listZipEntries(await buffer(zip));
 
     expect(source.destroyed).to.be.true();
   });
@@ -53,10 +57,4 @@ describe('ArchiveService (unit)', () => {
     await expect(finished(zip)).to.be.rejectedWith('the source went away');
     expect(pending.destroyed).to.be.true();
   });
-
-  async function zipEntries(zip: Readable) {
-    const chunks: Buffer[] = [];
-    for await (const chunk of zip) chunks.push(chunk as Buffer);
-    return listZipEntries(Buffer.concat(chunks));
-  }
 });
