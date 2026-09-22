@@ -86,6 +86,73 @@ export function validScilogCrate(): ROCrate {
   );
 }
 
+// Minimal openBIS RO-Crate 1.1 graph: openBIS-namespaced @context, a BOOK with
+// two messages (one carrying a comment and a file), authored by a person.
+export function validOpenbisCrate(): ROCrate {
+  return new ROCrate(
+    {
+      '@context': [
+        'https://w3id.org/ro/crate/1.1/context',
+        {openBIS: 'www.openbis.ch'},
+      ],
+      '@graph': [
+        {
+          '@id': 'ro-crate-metadata.json',
+          '@type': 'CreativeWork',
+          about: {'@id': './'},
+          conformsTo: {'@id': 'https://w3id.org/ro/crate/1.1'},
+        },
+        {'@id': './', '@type': 'Dataset', name: 'name'},
+        {
+          '@id': '/DEMO/BOOK1',
+          '@type': 'BOOK',
+          'openBIS:hasNAME': 'Demo Logbook',
+          'openBIS:hasBOOK.CREATED_AT': '2026-08-24T09:12:15Z',
+          'openBIS:hasBOOK.AUTHOR': {'@id': '/PERSON1'},
+          'openBIS:hasBOOK.HASMESSAGE': [
+            {'@id': '/DEMO/MESSAGE1'},
+            {'@id': '/DEMO/MESSAGE2'},
+          ],
+        },
+        {
+          '@id': '/PERSON1',
+          '@type': 'PERSON',
+          'openBIS:hasNAME': 'John Doe',
+          'openBIS:hasPERSON.EMAIL': 'john.doe@example.org',
+        },
+        {
+          '@id': '/DEMO/MESSAGE1',
+          '@type': 'MESSAGE',
+          'openBIS:hasMESSAGE.TEXT':
+            '<html><head></head><body><p>hello</p>' +
+            '<figure class="image"><img src="data/a%20b.png"></figure></body></html>',
+          'openBIS:hasMESSAGE.CREATED_AT': '2026-08-24T09:18:42Z',
+          'openBIS:hasMESSAGE.AUTHOR': {'@id': '/PERSON1'},
+          'schema:hasPart': [{'@id': 'data/a%20b.png'}],
+          'openBIS:hasMESSAGE.HASCOMMENT': {'@id': '/DEMO/COMMENT1'},
+        },
+        {
+          '@id': '/DEMO/MESSAGE2',
+          '@type': 'MESSAGE',
+          'openBIS:hasMESSAGE.TEXT':
+            '<html><head></head><body><p>second</p></body></html>',
+          'openBIS:hasMESSAGE.CREATED_AT': '2026-08-24T09:19:38Z',
+          'openBIS:hasMESSAGE.AUTHOR': {'@id': '/PERSON1'},
+        },
+        {
+          '@id': '/DEMO/COMMENT1',
+          '@type': 'COMMENT',
+          'openBIS:hasCOMMENT.TEXT': 'a comment',
+          'openBIS:hasCOMMENT.CREATED_AT': '2026-08-24T09:15:02Z',
+          'openBIS:hasCOMMENT.AUTHOR': {'@id': '/PERSON1'},
+        },
+        {'@id': 'data/a%20b.png', '@type': 'File'},
+      ],
+    },
+    {array: true, link: true},
+  );
+}
+
 // Build a Map<string, Buffer> with valid metadata and matching file content,
 // suitable for passing to ElnArchive.parseRaw().
 export function validScilogEntries(
