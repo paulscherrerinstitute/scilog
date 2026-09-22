@@ -143,6 +143,7 @@ export class ElnImportService {
           accessHash,
           contentSize,
           contentSha256: file.fields.contentSha256 ?? contentSha256,
+          contentType: file.fields.contentType ?? 'application/octet-stream',
         },
         {currentUser: this.user},
       );
