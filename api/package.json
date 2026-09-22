@@ -1,6 +1,6 @@
 {
   "name": "api",
-  "version": "2.11.16",
+  "version": "2.11.17",
   "description": "SciLog REST API backend",
   "keywords": [
     "loopback-application",

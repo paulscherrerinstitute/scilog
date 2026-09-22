@@ -1,3 +1,10 @@
+## [2.11.17](https://github.com/paulscherrerinstitute/scilog/compare/v2.11.16...v2.11.17) (2026-09-22)
+
+
+### Bug Fixes
+
+* **deps:** update dependency tslib to v2.8.1 ([#756](https://github.com/paulscherrerinstitute/scilog/issues/756)) ([8be6078](https://github.com/paulscherrerinstitute/scilog/commit/8be6078ada44de60360626576e773f59cc0019c8))
+
 ## [2.11.16](https://github.com/paulscherrerinstitute/scilog/compare/v2.11.15...v2.11.16) (2026-09-22)
 
 
