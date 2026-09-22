@@ -1,3 +1,11 @@
+## [2.11.16](https://github.com/paulscherrerinstitute/scilog/compare/v2.11.15...v2.11.16) (2026-09-22)
+
+
+### Bug Fixes
+
+* **deps:** update dependency ckeditor5 to v48.5.2 ([#745](https://github.com/paulscherrerinstitute/scilog/issues/745)) ([cb50a8f](https://github.com/paulscherrerinstitute/scilog/commit/cb50a8fa7f52d0ca2b78d8e099815cf0e247a8f5))
+* **deps:** update dependency puppeteer to v24.43.1 ([#754](https://github.com/paulscherrerinstitute/scilog/issues/754)) ([7284022](https://github.com/paulscherrerinstitute/scilog/commit/7284022f40d9c757877629151aa0d971674a0229))
+
 ## [2.11.15](https://github.com/paulscherrerinstitute/scilog/compare/v2.11.14...v2.11.15) (2026-08-31)
 
 
