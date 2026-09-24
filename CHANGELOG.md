@@ -1,3 +1,10 @@
+## [2.11.19](https://github.com/paulscherrerinstitute/scilog/compare/v2.11.18...v2.11.19) (2026-09-24)
+
+
+### Bug Fixes
+
+* improve error handling in archive service. add content-type header to eln export response ([#741](https://github.com/paulscherrerinstitute/scilog/issues/741)) ([047fe96](https://github.com/paulscherrerinstitute/scilog/commit/047fe960aafa5ef6fff288fc003808f947ad1725))
+
 ## [2.11.18](https://github.com/paulscherrerinstitute/scilog/compare/v2.11.17...v2.11.18) (2026-09-24)
 
 
