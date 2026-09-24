@@ -7,7 +7,11 @@ import {SciLogDbApplication} from '../..';
 import {Logbook, Paragraph} from '../../models';
 import {Filesnippet} from '../../models/file.model';
 import {ElnError, ElnErrorCode} from '../../services/eln/errors';
-import {buildElnZip, validScilogCrate} from '../eln.helpers';
+import {
+  buildElnZip,
+  validScilogCrate,
+  validScilogEntries,
+} from '../eln.helpers';
 import {
   clearDatabase,
   createUserToken,
@@ -298,9 +302,10 @@ describe('Logbook .eln import', function (this: Suite) {
     });
   });
 
-  describe('metadata validation', () => {
-    it('returns 422 with validation errors for a malformed ro-crate', async () => {
-      // well-formed zip, ill-formed RO-Crate (no root Dataset)
+  describe('unsupported ELN source', () => {
+    it('rejects an archive that matches no translator', async () => {
+      // Well-formed zip + RO-Crate, but no sdPublisher: it matches no
+      // translator, so routing fails before any profile validation runs.
       const eln = await buildElnZip(
         new Map([
           [
@@ -321,16 +326,30 @@ describe('Logbook .eln import', function (this: Suite) {
         .expect(422);
       expectArchiveValidationError(r.body.error, [
         {
-          code: ElnErrorCode.MISSING_ELN_FIELD,
-          message: 'Missing sdPublisher',
+          code: ElnErrorCode.INVALID_PUBLISHER,
+          message: 'unsupported ELN source: no matching translator',
         },
+      ]);
+    });
+  });
+
+  describe('translator profile validation', () => {
+    it('rejects a matching crate that fails its publisher profile', async () => {
+      // A valid, routable SciLog crate (so it reaches the translator), but a
+      // File is missing encodingFormat — a profile error caught by validate,
+      // not by parse.
+      const crate = validScilogCrate();
+      crate.deleteProperty('./book/file.txt', 'encodingFormat');
+      const eln = await buildElnZip(validScilogEntries(crate));
+      const r = await client
+        .post(`/logbooks/import/eln?location-id=${locationId}`)
+        .set('Authorization', 'Bearer ' + token)
+        .attach('file', eln, 'invalid-profile.eln')
+        .expect(422);
+      expectArchiveValidationError(r.body.error, [
         {
-          code: ElnErrorCode.MISSING_DATASET_FIELD,
-          message: 'Dataset ./: missing name',
-        },
-        {
-          code: ElnErrorCode.MISSING_DATASET_FIELD,
-          message: 'Dataset ./: missing author',
+          code: ElnErrorCode.MISSING_FILE_FIELD,
+          message: 'File ./book/file.txt: missing encodingFormat',
         },
       ]);
     });
