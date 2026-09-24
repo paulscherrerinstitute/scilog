@@ -3,10 +3,8 @@ import {Suite} from 'mocha';
 import {SciLogDbApplication} from '../..';
 import {clearDatabase, createUserToken, setupApplication} from './test-helper';
 import {DatabaseHelper} from '../database.helpers';
-import fs from 'fs';
-import yauzl from 'yauzl';
+import {listZipEntries} from '../zip.helpers';
 import {ROCrate} from 'ro-crate';
-import {pipeline, Readable} from 'stream';
 import {RoCrateController} from '../../controllers';
 
 describe('RocrateController', function (this: Suite) {
@@ -17,7 +15,6 @@ describe('RocrateController', function (this: Suite) {
   let databaseHelper: DatabaseHelper;
 
   const LOGBOOK_OWNER_GROUP = 'roCrateAcceptance';
-  const ZIP_FILE_PATH = 'roCrateAcceptanceTest.zip';
 
   const user = {
     email: 'test@loopback.io',
@@ -85,28 +82,19 @@ describe('RocrateController', function (this: Suite) {
       .set('Authorization', 'Bearer ' + token)
       .responseType('blob')
       .expect(200)
+      .expect('Content-Type', RoCrateController.ELN_MEDIA_TYPE)
+      .expect(
+        'Content-Disposition',
+        `attachment; filename="${RoCrateController.ARCHIVE_ROOT}-${logbook.id}.eln"`,
+      )
       .then(async response => {
-        const outputStream = fs.createWriteStream(ZIP_FILE_PATH);
-        const inputStream = Readable.from(response.body);
-        return new Promise<void>((resolve, reject) => {
-          pipeline(inputStream, outputStream, err => {
-            if (err) {
-              reject(err);
-            } else {
-              resolve();
-            }
-          });
-        });
-      })
-      .then(async () => {
-        const files = await listZipEntries(ZIP_FILE_PATH);
+        const files = await listZipEntries(response.body);
         expect(files).to.containEql(
           `${RoCrateController.ARCHIVE_ROOT}/ro-crate-metadata.json`,
         );
         expect(files).to.containEql(
           `${RoCrateController.ARCHIVE_ROOT}/ro-crate-preview.html`,
         );
-        fs.unlinkSync(ZIP_FILE_PATH);
       })
       .catch(error => {
         throw error;
@@ -129,21 +117,3 @@ describe('RocrateController', function (this: Suite) {
       .expect(404);
   });
 });
-
-function listZipEntries(zipPath: string): Promise<string[]> {
-  return new Promise((resolve, reject) => {
-    const entries: string[] = [];
-
-    yauzl.open(zipPath, {lazyEntries: true}, (err, zipfile) => {
-      if (err) return reject(err);
-
-      zipfile.readEntry();
-      zipfile.on('entry', entry => {
-        entries.push(entry.fileName);
-        zipfile.readEntry();
-      });
-
-      zipfile.on('end', () => resolve(entries));
-    });
-  });
-}
