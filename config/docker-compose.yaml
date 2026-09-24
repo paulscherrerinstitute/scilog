@@ -8,7 +8,7 @@ services:
       - /var/run/docker.sock:/var/run/docker.sock
 
   mongo:
-    image: mongo:4.2
+    image: mongo:4.4
     volumes:
       - mongo_data:/data/db
       - ./mongo/rs-init.sh:/rs-init.sh:ro
@@ -20,7 +20,7 @@ services:
       - be
 
   mongo-seed:
-    image: mongo:4.2
+    image: mongo:4.4
     volumes:
       - ./seed_db/seed:/seed
       - ./seed_db/mongo_import.sh:/mnt/mongo_import.sh
