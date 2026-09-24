@@ -6,7 +6,7 @@ RUN npm install
 COPY . /frontend/
 RUN npx ng build --output-path=dist
 
-FROM nginx:1.28-alpine
+FROM nginx:1.31-alpine
 RUN rm -rf /usr/share/nginx/html*
 COPY --from=builder /frontend/dist/ /usr/share/nginx/html/
 COPY nginx.conf /etc/nginx/nginx.conf
