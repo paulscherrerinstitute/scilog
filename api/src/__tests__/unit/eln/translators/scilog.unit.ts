@@ -298,4 +298,12 @@ describe('ScilogTranslator.validate', () => {
       {code: ElnErrorCode.MISSING_DATASET_FIELD},
     ]);
   });
+
+  it('rejects a crate with no Book entity', () => {
+    const crate = validScilogCrate();
+    crate.setProperty('./book/', '@type', 'Dataset');
+    expect(translator.validate(crate)).to.containDeep([
+      {code: ElnErrorCode.MISSING_ELN_ENTITY, message: 'Missing Book'},
+    ]);
+  });
 });
