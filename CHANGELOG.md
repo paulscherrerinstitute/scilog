@@ -1,3 +1,10 @@
+## [2.11.18](https://github.com/paulscherrerinstitute/scilog/compare/v2.11.17...v2.11.18) (2026-09-24)
+
+
+### Bug Fixes
+
+* **api:** reject eln crate with no book ([#740](https://github.com/paulscherrerinstitute/scilog/issues/740)) ([858d3fa](https://github.com/paulscherrerinstitute/scilog/commit/858d3faeabfb57b4718dcf4dee52e3e51da7156d))
+
 ## [2.11.17](https://github.com/paulscherrerinstitute/scilog/compare/v2.11.16...v2.11.17) (2026-09-22)
 
 
