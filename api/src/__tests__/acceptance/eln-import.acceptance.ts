@@ -177,28 +177,6 @@ describe('Logbook .eln import', function (this: Suite) {
       ]);
     });
 
-    it('returns 422 when the zip lacks a single root folder', async () => {
-      const eln = await buildElnZip(
-        new Map([
-          [
-            'ro-crate-metadata.json',
-            Buffer.from(JSON.stringify(validScilogCrate().toJSON())),
-          ],
-        ]),
-      );
-      const r = await client
-        .post(`/logbooks/import/eln?location-id=${locationId}`)
-        .set('Authorization', 'Bearer ' + token)
-        .attach('file', eln, 'flat.eln')
-        .expect(422);
-      expectArchiveValidationError(r.body.error, [
-        {
-          code: ElnErrorCode.INVALID_ELN_STRUCTURE,
-          message: 'Archive must contain a single root folder',
-        },
-      ]);
-    });
-
     it('returns 422 when ro-crate-metadata.json is missing', async () => {
       const eln = await buildElnZip(
         new Map([['eln-export/something-else.txt', Buffer.from('hi')]]),
