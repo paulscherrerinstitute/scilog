@@ -34,7 +34,7 @@
     "ngx-cookie-service": "19.1.2",
     "ngx-jdenticon": "2.0.0",
     "ngx-ui-scroll": "3.2.2",
-    "prismjs": "1.28.0",
+    "prismjs": "1.30.0",
     "prismjs-components-importer": "0.2.0",
     "rxjs": "7.8.2",
     "vscroll": "1.6.3",
