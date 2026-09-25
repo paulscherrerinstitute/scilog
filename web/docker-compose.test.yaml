@@ -1,5 +1,0 @@
-services:
-  scilog:
-    build:
-      context: .
-      target: test
