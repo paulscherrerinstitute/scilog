@@ -1,13 +1,12 @@
 {
-  "lbBaseURL": "http://localhost:3000/",
-  "frontendBaseURL": "http://scilog.local",
+  "lbBaseURL": "http://localhost:3000/api/v1/",
   "oAuth2Endpoint": {
     "authURL": "auth/keycloak",
     "displayText": "keycloak",
-    "toolTipText": "text to display on top of OIDC login button"
+    "tooltipText": "text to display on top of OIDC login button"
   },
   "scicat": {
-    "scicatWidgetEnabled": true,
+    "scicatWidgetEnabled": false,
     "lbBaseURL": "http://backend.localhost",
     "frontendBaseURL": "http://localhost"
   }

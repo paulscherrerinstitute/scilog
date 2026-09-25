@@ -1,0 +1,34 @@
+services:
+  web-development:
+    build:
+      context: .
+      target: deps
+    container_name: web-development
+    command: ['npm', 'run', 'dev']
+    ports:
+      - 4200:4200
+    volumes:
+      - .:/frontend
+      - ./config.json:/frontend/src/assets/config.json
+      - web_node_modules:/frontend/node_modules
+
+  web-test:
+    build:
+      context: .
+      target: test
+    container_name: web-test
+    profiles: [test]
+
+  web-production:
+    build:
+      context: .
+      target: production
+    container_name: web-production
+    ports:
+      - 8080:80
+    volumes:
+      - ./config.json:/usr/share/nginx/html/assets/config.json:ro
+    profiles: [production]
+
+volumes:
+  web_node_modules:

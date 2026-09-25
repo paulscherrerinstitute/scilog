@@ -19,3 +19,8 @@ coverage/
 
 # Documentation
 *.md
+
+# Runtime config (bind-mounted by compose, never baked into the image)
+config.json
+config.example.json
+src/assets/config.json
