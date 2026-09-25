@@ -5,9 +5,9 @@ import {clearDatabase, createUserToken, setupApplication} from './test-helper';
 import {DatabaseHelper} from '../database.helpers';
 import {listZipEntries} from '../zip.helpers';
 import {ROCrate} from 'ro-crate';
-import {RoCrateController} from '../../controllers';
+import {ElnExportController} from '../../controllers';
 
-describe('RocrateController', function (this: Suite) {
+describe('ElnExportController', function (this: Suite) {
   this.timeout(5000);
   let app: SciLogDbApplication;
   let client: Client;
@@ -49,14 +49,14 @@ describe('RocrateController', function (this: Suite) {
       currentUser: user,
     });
     await client
-      .get(`/rocrates/${logbook.id}`)
+      .get(`/logbooks/${logbook.id}/export/eln/metadata`)
       .set('Authorization', 'Bearer ' + token)
       .set('Content-Type', 'application/json')
       .expect(200)
       .then(result => {
         // sanity checks that it's a valid ro-crate
         const crate = new ROCrate(result.body);
-        expect(crate.rootDataset.name).to.equal(logbookSnippet.name);
+        expect(crate.root.name).to.equal(logbookSnippet.name);
 
         // check properties of logbook entity
         const logbookEntity = crate.getEntity(`./${logbook.id}/`);
@@ -78,22 +78,22 @@ describe('RocrateController', function (this: Suite) {
       currentUser: user,
     });
     await client
-      .get(`/rocrates/${logbook.id}/download`)
+      .get(`/logbooks/${logbook.id}/export/eln`)
       .set('Authorization', 'Bearer ' + token)
       .responseType('blob')
       .expect(200)
-      .expect('Content-Type', RoCrateController.ELN_MEDIA_TYPE)
+      .expect('Content-Type', ElnExportController.ELN_MEDIA_TYPE)
       .expect(
         'Content-Disposition',
-        `attachment; filename="${RoCrateController.ARCHIVE_ROOT}-${logbook.id}.eln"`,
+        `attachment; filename="${ElnExportController.ARCHIVE_ROOT}-${logbook.id}.eln"`,
       )
       .then(async response => {
         const files = await listZipEntries(response.body);
         expect(files).to.containEql(
-          `${RoCrateController.ARCHIVE_ROOT}/ro-crate-metadata.json`,
+          `${ElnExportController.ARCHIVE_ROOT}/ro-crate-metadata.json`,
         );
         expect(files).to.containEql(
-          `${RoCrateController.ARCHIVE_ROOT}/ro-crate-preview.html`,
+          `${ElnExportController.ARCHIVE_ROOT}/ro-crate-preview.html`,
         );
       })
       .catch(error => {
@@ -103,7 +103,7 @@ describe('RocrateController', function (this: Suite) {
 
   it('throws 404 for non-existing logbook', async () => {
     await client
-      .get('/rocrates/nosuchlogbook')
+      .get('/logbooks/nosuchlogbook/export/eln/metadata')
       .set('Authorization', 'Bearer ' + token)
       .set('Content-Type', 'application/json')
       .expect(404);
@@ -111,7 +111,7 @@ describe('RocrateController', function (this: Suite) {
 
   it('throws 404 for non-existing logbook (download)', async () => {
     await client
-      .get('/rocrates/nosuchlogbook/download')
+      .get('/logbooks/nosuchlogbook/export/eln')
       .set('Authorization', 'Bearer ' + token)
       .set('Content-Type', 'application/json')
       .expect(404);

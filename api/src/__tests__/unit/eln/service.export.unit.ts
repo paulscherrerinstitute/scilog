@@ -3,24 +3,25 @@ import {
   expect,
   StubbedInstanceWithSinonAccessor,
 } from '@loopback/testlab';
-import {RoCrateExportService} from '../../services/ro-crate-export.service';
+import {ElnExportService} from '../../../services/eln/export.service';
 import {
   BasesnippetRepository,
   FileRepository,
   LogbookRepository,
-} from '../../repositories';
-import {EntityBuilderService} from '../../services';
+} from '../../../repositories';
+import {ArchiveService, EntityBuilderService} from '../../../services';
 import {UserProfile} from '@loopback/security';
-import {LinkType, Logbook, Paragraph} from '../../models';
-import {Filesnippet} from '../../models/file.model';
+import {LinkType, Logbook, Paragraph} from '../../../models';
+import {Filesnippet} from '../../../models/file.model';
 
-// these are more like integration tests for RoCrateExportService + EntityBuilderService
+// these are more like integration tests for ElnExportService + EntityBuilderService
 // as EntityBuilderService only contains pure functions, we use the real service instead of mocking their outputs
-describe('RoCrateExportService (unit)', () => {
+describe('ElnExportService (unit)', () => {
   let basesnippetRepository: StubbedInstanceWithSinonAccessor<BasesnippetRepository>;
   let logbookRepository: StubbedInstanceWithSinonAccessor<LogbookRepository>;
   let fileRepository: StubbedInstanceWithSinonAccessor<FileRepository>;
   let entityBuilder: EntityBuilderService;
+  const archiveService: ArchiveService = new ArchiveService();
   const user: UserProfile = {
     email: 'test@example.com',
     name: 'Test user',
@@ -54,16 +55,16 @@ describe('RoCrateExportService (unit)', () => {
       }),
     ]);
 
-    const roCrateExportService = new RoCrateExportService(
+    const elnExportService = new ElnExportService(
       user,
       basesnippetRepository,
       logbookRepository,
       fileRepository,
       entityBuilder,
+      archiveService,
     );
 
-    const {rocrate} =
-      await roCrateExportService.getRoCrateMetadata('logbook-id');
+    const {rocrate} = await elnExportService.getRoCrateMetadata('logbook-id');
 
     console.log(JSON.stringify(rocrate, null, 2));
     // assert the structure of the ro-crate: root data entity has a logbook,
@@ -126,16 +127,17 @@ describe('RoCrateExportService (unit)', () => {
       .withArgs('file-2')
       .resolves(givenFilesnippet({_fileId: 'file-2'}));
 
-    const roCrateExportService = new RoCrateExportService(
+    const elnExportService = new ElnExportService(
       user,
       basesnippetRepository,
       logbookRepository,
       fileRepository,
       entityBuilder,
+      archiveService,
     );
 
     const {rocrate, fileMetadata} =
-      await roCrateExportService.getRoCrateMetadata('logbook-id');
+      await elnExportService.getRoCrateMetadata('logbook-id');
 
     expect(fileMetadata).to.containEql({
       snippetId: 'snippet-1',

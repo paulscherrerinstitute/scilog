@@ -1,17 +1,28 @@
 import {injectable, BindingScope, service, inject} from '@loopback/core';
-import {Basesnippet, Paragraph, Logbook, LinkType} from '../models';
-import {EntityBuilderService} from './entity-builder.service';
+import {Basesnippet, Paragraph, Logbook, LinkType} from '../../models';
+import {EntityBuilderService} from '../entity-builder.service';
 import {Filter, repository} from '@loopback/repository';
 import {
   BasesnippetRepository,
   FileRepository,
   LogbookRepository,
-} from '../repositories';
-import {Filesnippet} from '../models/file.model';
+} from '../../repositories';
+import {Filesnippet} from '../../models/file.model';
 import {SecurityBindings, UserProfile} from '@loopback/security';
 
 import {RawEntity} from 'ro-crate/lib/types';
 import {ROCrate} from 'ro-crate';
+import {ObjectId} from 'mongodb';
+import path from 'path';
+import {Readable} from 'stream';
+import {ArchiveService, AssetDescriptor} from '../archive.service';
+import * as mongodb from 'mongodb';
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// @ts-ignore
+import {Preview, Defaults, HtmlFile} from 'ro-crate-html/index-node.js';
+
+// Root directory inside the ELN archive that all exported files are nested under.
+export const ELN_ARCHIVE_ROOT = 'scilog-eln-export';
 
 export interface FileMetadata {
   snippetId: string;
@@ -20,7 +31,7 @@ export interface FileMetadata {
 }
 
 @injectable({scope: BindingScope.TRANSIENT})
-export class RoCrateExportService {
+export class ElnExportService {
   private crate: ROCrate;
   private fileMetadata: FileMetadata[];
   private logbookEntity: RawEntity;
@@ -31,6 +42,7 @@ export class RoCrateExportService {
     @repository(LogbookRepository) private logbookRepository: LogbookRepository,
     @repository(FileRepository) private fileRepository: FileRepository,
     @service(EntityBuilderService) private entityBuilder: EntityBuilderService,
+    @service(ArchiveService) private archiveService: ArchiveService,
   ) {
     this.crate = new ROCrate({});
     this.fileMetadata = [];
@@ -50,6 +62,45 @@ export class RoCrateExportService {
     );
     await this.prepareRoCrate(logbook, basesnippets);
     return {rocrate: this.crate, fileMetadata: this.fileMetadata};
+  }
+
+  // Build the ELN archive for a logbook and return it as a readable stream.
+  public async buildElnStream(id: string): Promise<Readable> {
+    const {rocrate, fileMetadata} = await this.getRoCrateMetadata(id);
+
+    // Build asset descriptors from GridFS streams for files referenced in snippets
+    const bucket = new mongodb.GridFSBucket(
+      this.fileRepository.dataSource.connector?.db,
+    );
+    const assets: Array<AssetDescriptor> = fileMetadata.map(
+      ({snippetId, fileId, fileExt}) => {
+        return {
+          stream: bucket.openDownloadStream(fileId as unknown as ObjectId),
+          archivePath: path.join(
+            ELN_ARCHIVE_ROOT,
+            this.entityBuilder.getFilePath(snippetId, fileId, fileExt),
+          ),
+        };
+      },
+    );
+
+    // add metadata json as a stream asset
+    const metadataJson = JSON.stringify(rocrate, null, 2);
+    assets.push({
+      stream: Readable.from([metadataJson]),
+      archivePath: path.join(ELN_ARCHIVE_ROOT, 'ro-crate-metadata.json'),
+    });
+
+    // generate preview html and add as stream asset
+    const previewHtml: string = await new HtmlFile(new Preview(rocrate)).render(
+      Defaults.render_script,
+    );
+    assets.push({
+      stream: Readable.from([previewHtml]),
+      archivePath: path.join(ELN_ARCHIVE_ROOT, 'ro-crate-preview.html'),
+    });
+
+    return this.archiveService.zipStream(assets);
   }
 
   private async prepareRoCrate(
