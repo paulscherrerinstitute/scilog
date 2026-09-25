@@ -11,9 +11,9 @@ export function sourceTag(source: string): string {
 
 /**
  * Per-entity provenance tags from already-extracted values. `author` is
- * whatever identifies the author in the source (an email for SciLog, a name
- * for openBIS) — publishers don't all carry an email. `created` is a `Date`
- * (a valid one); it is tagged as its UTC calendar date.
+ * whatever identifies the author in the source (an email) — it is optional,
+ * since not every source carries one. `created` is a `Date` (a valid one); it
+ * is tagged as its UTC calendar date.
  */
 export function provenanceTags(values: {
   id: string;
