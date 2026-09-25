@@ -25,7 +25,7 @@ services:
       target: production
     container_name: web-production
     ports:
-      - 8080:80
+      - 8080:8080
     volumes:
       - ./config.json:/usr/share/nginx/html/assets/config.json:ro
     profiles: [production]
