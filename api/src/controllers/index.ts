@@ -7,4 +7,5 @@ export * from './user.controller';
 export * from './user-preference.controller';
 export * from './oidc.controller';
 export * from './eln-export.controller';
+export * from './scicat-rocrate.controller';
 export * from './eln-import.controller';
