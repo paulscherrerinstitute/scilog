@@ -4,4 +4,4 @@ idna==3.15
 python-dotenv==0.20.0
 requests==2.34.2
 scilog~=2.0
-urllib3==1.26.19
+urllib3==2.7.0
