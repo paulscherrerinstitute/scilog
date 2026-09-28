@@ -5,7 +5,7 @@ services:
   frontend:
     build:
       context: ./web/.
-      target: builder
+      target: deps
     environment:
       CHROME_BIN: /usr/bin/chromium-browser
       CHROME_PATH: /usr/lib/chromium/
