@@ -1,0 +1,21 @@
+# Docker
+.dockerignore
+compose.yaml
+Dockerfile
+
+# Dependencies and build output
+node_modules/
+dist/
+coverage/
+.angular/
+
+# Editor
+.vscode/
+
+# Logs and caches
+*.log
+.eslintcache
+*.tsbuildinfo
+
+# Documentation
+*.md
