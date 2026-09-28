@@ -35,7 +35,7 @@ COPY . .
 CMD ["npm", "run", "test:CI"]
 
 # Static file server for the compiled bundle.
-FROM nginx:1.28-alpine AS production
+FROM nginx:1.31-alpine AS production
 
 RUN rm -rf /usr/share/nginx/html*
 COPY --from=build /frontend/dist/ /usr/share/nginx/html/
