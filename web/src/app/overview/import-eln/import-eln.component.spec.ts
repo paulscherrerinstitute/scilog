@@ -69,7 +69,13 @@ describe('ImportElnComponent', () => {
     expect(snackBarSpy.showSnackbarMessage).not.toHaveBeenCalled();
   });
 
-  it('rejects a non-.eln file with a warning', () => {
+  it('accepts an openBIS .zip export', () => {
+    selectFile(component, elnFile('openbis.zip'));
+    expect(component.file?.name).toBe('openbis.zip');
+    expect(snackBarSpy.showSnackbarMessage).not.toHaveBeenCalled();
+  });
+
+  it('rejects a file that is neither .eln nor .zip with a warning', () => {
     selectFile(component, elnFile('notes.txt'));
     expect(component.file).toBeNull();
     expect(snackBarSpy.showSnackbarMessage).toHaveBeenCalledWith(jasmine.any(String), 'warning');

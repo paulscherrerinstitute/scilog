@@ -1,4 +1,4 @@
-<h2 mat-dialog-title>Import logbook from .eln</h2>
+<h2 mat-dialog-title>Import logbook from ELN</h2>
 
 <mat-dialog-content>
   @if (inProgress) {
@@ -12,8 +12,8 @@
       href="https://the.elnconsortium.org"
       target="_blank"
       rel="noopener"
-      matTooltip="An .eln archive is a logbook exported from SciLog (Export → ELN), based on the ELN file format. Only SciLog exports can be imported."
-      aria-label="About .eln files"
+      matTooltip="An ELN archive is a logbook exported in the ELN file format. SciLog (Export → ELN, .eln) and openBIS (.zip) exports can be imported."
+      aria-label="About ELN archives"
     >
       <mat-icon class="hint-icon">help_outline</mat-icon>
     </a>
@@ -30,10 +30,10 @@
     @if (file) {
       <span>{{ file.name }}</span>
     } @else {
-      <span>Drag a .eln file here, or click to browse (max {{ maxFileSizeMb }} MB)</span>
+      <span>Drag a .eln or .zip file here, or click to browse (max {{ maxFileSizeMb }} MB)</span>
     }
   </div>
-  <input hidden type="file" accept=".eln" (change)="onFileSelected($event)" #fileInput />
+  <input hidden type="file" [accept]="accept" (change)="onFileSelected($event)" #fileInput />
 
   <mat-form-field>
     <mat-label>Location (Beamline or Instrument)</mat-label>
