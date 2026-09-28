@@ -8,6 +8,7 @@
  * if a test ever needs them).
  */
 
+import {OpenbisTranslator} from './openbis';
 import {ScilogTranslator} from './scilog';
 import {TranslatorRegistry} from './translator';
 
@@ -21,4 +22,5 @@ export type {
 /** The publishers SciLog can import, most specific first. */
 export const translatorRegistry = new TranslatorRegistry([
   new ScilogTranslator(),
+  new OpenbisTranslator(),
 ]);
