@@ -1,3 +1,10 @@
+# [2.12.0](https://github.com/paulscherrerinstitute/scilog/compare/v2.11.19...v2.12.0) (2026-09-28)
+
+
+### Features
+
+* **api:** add openbis eln import ([#757](https://github.com/paulscherrerinstitute/scilog/issues/757)) ([0c84c7b](https://github.com/paulscherrerinstitute/scilog/commit/0c84c7baab813297d15054dc396c4c1106cd7fc3))
+
 ## [2.11.19](https://github.com/paulscherrerinstitute/scilog/compare/v2.11.18...v2.11.19) (2026-09-24)
 
 
