@@ -9,6 +9,7 @@ import {JSDOM} from 'jsdom';
 import _ from 'lodash';
 import {Entity, ROCrate} from 'ro-crate';
 import {LinkType} from '../../../models/paragraph.model';
+import {decodeCrateId} from '../crate-id';
 import {ElnError, ElnErrorCode} from '../errors';
 import {provenanceTags, sourceTag} from './provenance';
 import type {
@@ -221,9 +222,9 @@ function buildComment(comment: Entity): ParagraphDraft {
 
 function buildFile(file: Entity): FileDraft {
   // Keep the raw (percent-encoded) @id as elnId: it matches the file's inline
-  // `src`/`href` for reference rewriting, and getFile decodes it to find bytes.
+  // `src`/`href` for reference rewriting; decodeCrateId resolves it to a path.
   const id = file['@id'];
-  const name = path.basename(safeDecode(id));
+  const name = path.basename(decodeCrateId(id));
   const ext = path.extname(name);
   return {
     elnId: id,
@@ -260,13 +261,4 @@ function extractBody(html: string | undefined): string | undefined {
   return html === undefined
     ? undefined
     : new JSDOM(html).window.document.body.innerHTML;
-}
-
-/** Percent-decode a URI reference, leaving a malformed value unchanged. */
-function safeDecode(value: string): string {
-  try {
-    return decodeURIComponent(value);
-  } catch {
-    return value;
-  }
 }
