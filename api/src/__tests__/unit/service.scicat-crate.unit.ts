@@ -36,7 +36,7 @@ describe('ScicatCrateService (unit)', () => {
     userRepository.stubs.findOne.resolves(givenUser());
   });
 
-  it('describes the data directory rather than the individual files', async () => {
+  it('creates ro-crate with basic metadata and data directory', async () => {
     const crate = new ROCrate(
       JSON.parse(await service.getMetadataJson('logbook-1')),
     );
@@ -44,6 +44,7 @@ describe('ScicatCrateService (unit)', () => {
     expect(crate.root.description).to.equal('A description');
     expect(crate.root.datePublished).to.not.be.undefined();
 
+    // the crate describes the data directory rather than the individual files
     const partIds = crate.root.hasPart.map(
       (part: {[key: string]: string}) => part['@id'],
     );
@@ -57,21 +58,11 @@ describe('ScicatCrateService (unit)', () => {
   it('rejects a logbook whose creator has no name on record', async () => {
     userRepository.stubs.findOne.resolves({} as User);
 
-    const error = await caught(() => service.getMetadataJson('logbook-1'));
-    expect(error.statusCode).to.equal(422);
-    expect(error.message).to.match(/first and last name/);
+    const error = await expect(
+      service.getMetadataJson('logbook-1'),
+    ).to.be.rejectedWith(/first and last name/);
+    expect((error as {statusCode?: number}).statusCode).to.equal(422);
   });
-
-  async function caught(
-    run: () => Promise<unknown>,
-  ): Promise<{statusCode?: number; message?: string}> {
-    try {
-      await run();
-    } catch (err) {
-      return err;
-    }
-    throw new Error('expected the call to reject');
-  }
 
   function givenLogbook(): Logbook {
     return {
