@@ -32,10 +32,29 @@ You can contribute by:
 - PRs will be **squashed and merged**.
 - The squashed commit should follow **Conventional Commit style**. See here the
   [specification](https://www.conventionalcommits.org/en/v1.0.0/).
-- Include a 'why' in the commit body to document the rationale behind the change. 
+- Include 'what' and 'why' in the commit body to document the rationale behind the change. 
 This provides essential context for future maintenance and helps others understand the project's growth.
-- By default, the PR title serves as the commit’s subject line, while the PR description populates
+- By default, the PR title serves as the commit’s title, while the PR description populates
 the commit body.
+- PR title and description are checked by [commitlint](https://commitlint.js.org/)
+  (rules in [`.commitlintrc.yaml`](../.commitlintrc.yaml)): the title aims for
+  50 characters (hard limit 72, including the `type(scope): ` prefix and the
+  ` (#123)` GitHub appends on merge), the description is required and its lines
+  wrap at 72 (lines with URLs are exempt).
+  The scope is the package you changed: `api`, `web` or `sdk`. Omit it when a
+  change spans several packages or touches none (e.g. CI, docs site, root config).
+  Renovate PRs are exempt.
+- To check a message locally (see commitlint's
+  [CLI primitives](https://commitlint.js.org/guides/ai-agents.html#cli-primitives-for-agents-and-automation)):
+
+  ```sh
+  npx commitlint --last                              # your last commit
+  printf '%s' "feat(api): add x" | npx commitlint    # a draft message
+  npx commitlint --print-config json                 # the resolved rules
+  ```
+
+  The PR check also counts the ` (#123)` suffix, so a title that passes
+  locally at 66–72 characters fails on the PR.
 
 ## 5. Additional Guidelines
 

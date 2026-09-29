@@ -1,28 +1,52 @@
-name: Semantic Commit Validator
+name: Commitlint
 
+# PRs are squash-merged with the PR title as subject and the description as
+# body, so that text is what gets linted. `edited` re-runs the check when the
+# title or description changes; it lives in its own workflow so such edits
+# don't re-trigger CI.
 on:
+  pull_request:
+    types: [opened, edited, synchronize, reopened]
   merge_group:
-    types:
-      - checks_requested
+
+permissions: {}
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
   commitlint:
-    name: Lint Squashed Commit
-    runs-on: ubuntu-latest
+    name: Lint commit message
+    # Renovate's generated titles and release-note bodies are not linted.
+    # A skipped job still satisfies the required check.
+    if: >-
+      github.event.pull_request.user.login != 'renovate[bot]' &&
+      github.event.merge_group.head_commit.author.name != 'renovate[bot]'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    permissions:
+      contents: read # checkout for .commitlintrc.yaml
     steps:
-      - uses: actions/checkout@v6
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
-          fetch-depth: 0
+          persist-credentials: false
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v6
+      - name: Set up Node.js
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
         with:
           node-version: 24
-          cache: npm
 
-      - name: Install Commitlint
-        run: |
-          npm install --save-dev @commitlint/config-conventional @commitlint/cli
+      - name: Lint PR title and description
+        if: github.event_name == 'pull_request'
+        env:
+          PR_TITLE: ${{ github.event.pull_request.title }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+          PR_BODY: ${{ github.event.pull_request.body }}
+        # Same text as the squash commit, which gets " (#<number>)" appended.
+        run: printf '%s (#%s)\n\n%s' "$PR_TITLE" "$PR_NUMBER" "$PR_BODY" | npx --yes commitlint@21.2.3 --verbose
 
-      - name: Validate Last Commit Message
-        run: npx commitlint --last --verbose
+      - name: Lint merge queue commit
+        if: github.event_name == 'merge_group'
+        run: npx --yes commitlint@21.2.3 --last --verbose
