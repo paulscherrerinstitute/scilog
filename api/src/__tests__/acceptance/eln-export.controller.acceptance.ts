@@ -49,7 +49,7 @@ describe('ElnExportController', function (this: Suite) {
       currentUser: user,
     });
     await client
-      .get(`/logbooks/${logbook.id}/export/eln/metadata`)
+      .get(`/logbooks/export/${logbook.id}/eln/metadata`)
       .set('Authorization', 'Bearer ' + token)
       .set('Content-Type', 'application/json')
       .expect(200)
@@ -78,7 +78,7 @@ describe('ElnExportController', function (this: Suite) {
       currentUser: user,
     });
     await client
-      .get(`/logbooks/${logbook.id}/export/eln`)
+      .get(`/logbooks/export/${logbook.id}/eln`)
       .set('Authorization', 'Bearer ' + token)
       .responseType('blob')
       .expect(200)
@@ -103,7 +103,7 @@ describe('ElnExportController', function (this: Suite) {
 
   it('throws 404 for non-existing logbook', async () => {
     await client
-      .get('/logbooks/nosuchlogbook/export/eln/metadata')
+      .get('/logbooks/export/nosuchlogbook/eln/metadata')
       .set('Authorization', 'Bearer ' + token)
       .set('Content-Type', 'application/json')
       .expect(404);
@@ -111,7 +111,7 @@ describe('ElnExportController', function (this: Suite) {
 
   it('throws 404 for non-existing logbook (download)', async () => {
     await client
-      .get('/logbooks/nosuchlogbook/export/eln')
+      .get('/logbooks/export/nosuchlogbook/eln')
       .set('Authorization', 'Bearer ' + token)
       .set('Content-Type', 'application/json')
       .expect(404);

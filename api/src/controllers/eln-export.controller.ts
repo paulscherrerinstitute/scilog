@@ -20,8 +20,8 @@ export class ElnExportController {
     @service(ElnExportService) private elnExportService: ElnExportService,
   ) {}
 
-  // GET /logbooks/{id}/export/eln/metadata
-  @get('/logbooks/{id}/export/eln/metadata', {
+  // GET /logbooks/export/{id}/eln/metadata
+  @get('/logbooks/export/{id}/eln/metadata', {
     security: OPERATION_SECURITY_SPEC,
     responses: {
       '200': {
@@ -37,8 +37,8 @@ export class ElnExportController {
     return rocrate;
   }
 
-  // GET /logbooks/{id}/export/eln
-  @get('/logbooks/{id}/export/eln', {
+  // GET /logbooks/export/{id}/eln
+  @get('/logbooks/export/{id}/eln', {
     security: OPERATION_SECURITY_SPEC,
     responses: {
       '200': {
