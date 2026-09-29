@@ -1,3 +1,10 @@
+## [2.12.1](https://github.com/paulscherrerinstitute/scilog/compare/v2.12.0...v2.12.1) (2026-09-29)
+
+
+### Bug Fixes
+
+* **web:** accept openbis zip in eln import ([#767](https://github.com/paulscherrerinstitute/scilog/issues/767)) ([1d8a3f0](https://github.com/paulscherrerinstitute/scilog/commit/1d8a3f06da71a01ab22f874a8ad707742cc282c3))
+
 # [2.12.0](https://github.com/paulscherrerinstitute/scilog/compare/v2.11.19...v2.12.0) (2026-09-28)
 
 
