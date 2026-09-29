@@ -12,11 +12,10 @@ import {SecurityBindings, UserProfile} from '@loopback/security';
 
 import {RawEntity} from 'ro-crate/lib/types';
 import {ROCrate} from 'ro-crate';
-import {ObjectId} from 'mongodb';
 import path from 'path';
 import {Readable} from 'stream';
 import {ArchiveService, AssetDescriptor} from '../archive.service';
-import * as mongodb from 'mongodb';
+import {FileStorageService} from '../file-storage.service';
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore
 import {Preview, Defaults, HtmlFile} from 'ro-crate-html/index-node.js';
@@ -43,6 +42,7 @@ export class ElnExportService {
     @repository(FileRepository) private fileRepository: FileRepository,
     @service(EntityBuilderService) private entityBuilder: EntityBuilderService,
     @service(ArchiveService) private archiveService: ArchiveService,
+    @service(FileStorageService) private fileStorage: FileStorageService,
   ) {
     this.crate = new ROCrate({});
     this.fileMetadata = [];
@@ -69,13 +69,10 @@ export class ElnExportService {
     const {rocrate, fileMetadata} = await this.getRoCrateMetadata(id);
 
     // Build asset descriptors from GridFS streams for files referenced in snippets
-    const bucket = new mongodb.GridFSBucket(
-      this.fileRepository.dataSource.connector?.db,
-    );
     const assets: Array<AssetDescriptor> = fileMetadata.map(
       ({snippetId, fileId, fileExt}) => {
         return {
-          stream: bucket.openDownloadStream(fileId as unknown as ObjectId),
+          stream: this.fileStorage.downloadStream(fileId),
           archivePath: path.join(
             ELN_ARCHIVE_ROOT,
             this.entityBuilder.getFilePath(snippetId, fileId, fileExt),
