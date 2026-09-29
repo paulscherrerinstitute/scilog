@@ -16,7 +16,7 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  commitlint:
+  lint-commit-message:
     name: Lint commit message
     # Renovate's generated titles and release-note bodies are not linted.
     # A skipped job still satisfies the required check.
