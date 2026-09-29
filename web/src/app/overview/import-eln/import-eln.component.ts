@@ -26,6 +26,9 @@ interface ElnError {
 const MAX_FILE_SIZE_MB = 100;
 const MAX_FILE_SIZE = MAX_FILE_SIZE_MB * 1024 * 1024;
 
+// SciLog exports .eln; openBIS exports the same RO-Crate layout as .zip.
+const ACCEPTED_EXTENSIONS = ['.eln', '.zip'];
+
 @Component({
   selector: 'app-import-eln',
   templateUrl: './import-eln.component.html',
@@ -59,6 +62,7 @@ export class ImportElnComponent implements OnInit {
   errors: ElnError[] = [];
 
   readonly maxFileSizeMb = MAX_FILE_SIZE_MB;
+  readonly accept = ACCEPTED_EXTENSIONS.join(',');
 
   async ngOnInit(): Promise<void> {
     const locations = await this.logbookDataService.getLocations();
@@ -92,8 +96,9 @@ export class ImportElnComponent implements OnInit {
 
   private setFile(file: File | null): void {
     if (!file) return;
-    if (!file.name.toLowerCase().endsWith('.eln')) {
-      this.snackBar.showSnackbarMessage('Please choose a .eln file.', 'warning');
+    const name = file.name.toLowerCase();
+    if (!ACCEPTED_EXTENSIONS.some((ext) => name.endsWith(ext))) {
+      this.snackBar.showSnackbarMessage('Please choose a .eln or .zip file.', 'warning');
       return;
     }
     if (file.size > MAX_FILE_SIZE) {
@@ -122,7 +127,7 @@ export class ImportElnComponent implements OnInit {
         ?.details;
       if (details?.length) {
         this.errors = details;
-        this.snackBar.showSnackbarMessage('The .eln archive could not be imported.', 'warning');
+        this.snackBar.showSnackbarMessage('The archive could not be imported.', 'warning');
       } else {
         this.snackBar.showSnackbarMessage(
           'Error while importing the logbook. If the error persists contact an administrator',

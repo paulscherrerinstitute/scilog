@@ -14,7 +14,7 @@
     </button>
     <mat-menu #addMenu>
       <button mat-menu-item (click)="addCollectionLogbook('logbook')">New logbook</button>
-      <button mat-menu-item (click)="importEln()">Import from .eln</button>
+      <button mat-menu-item (click)="importEln()">Import from ELN</button>
     </mat-menu>
     <br />
     <mat-spinner *ngIf="!overviewComponent?.isLoaded" [@spinner] class="spinner"></mat-spinner>
