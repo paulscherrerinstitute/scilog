@@ -1,3 +1,10 @@
+# [2.13.0](https://github.com/paulscherrerinstitute/scilog/compare/v2.12.1...v2.13.0) (2026-09-30)
+
+
+### Features
+
+* **web:** serve frontend with unprivileged nginx ([#765](https://github.com/paulscherrerinstitute/scilog/issues/765)) ([a99f4de](https://github.com/paulscherrerinstitute/scilog/commit/a99f4de49e37af9806da208e303182184e3d0b0b)), closes [#737](https://github.com/paulscherrerinstitute/scilog/issues/737)
+
 ## [2.12.1](https://github.com/paulscherrerinstitute/scilog/compare/v2.12.0...v2.12.1) (2026-09-29)
 
 
