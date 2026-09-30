@@ -1,14 +1,17 @@
 # Conventional Commits. The title (commitlint's "header", i.e. the whole
 # first line incl. type and scope) has a hard limit of 72; 50 remains the
 # target, see .github/CONTRIBUTING.md. Line-length rules skip lines
-# containing a URL. Imperative mood and "explain why" can't be linted;
-# left to review. subject-full-stop can't see a trailing period before the
-# " (#123)" GitHub appends, so in practice that's left to review too.
+# containing a URL. Body lines have no length limit: descriptions are
+# written in the GitHub editor, which reflows prose, and often contain
+# commands or logs that shouldn't be wrapped (see #770). Imperative mood
+# and "explain why" can't be linted; left to review. subject-full-stop
+# can't see a trailing period before the " (#123)" GitHub appends, so in
+# practice that's left to review too.
 extends:
   - "@commitlint/config-conventional"
 rules:
   header-max-length: [2, always, 72]
-  body-max-line-length: [2, always, 72]
+  body-max-line-length: [0]
   footer-max-line-length: [2, always, 72]
   # Every commit explains what and why in its body.
   body-empty: [2, never]

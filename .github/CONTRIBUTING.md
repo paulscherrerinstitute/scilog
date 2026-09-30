@@ -39,8 +39,8 @@ the commit body.
 - PR title and description are checked by [commitlint](https://commitlint.js.org/)
   (rules in [`.commitlintrc.yaml`](../.commitlintrc.yaml)): the title aims for
   50 characters (hard limit 72, including the `type(scope): ` prefix and the
-  ` (#123)` GitHub appends on merge), the description is required and its lines
-  wrap at 72 (lines with URLs are exempt).
+  ` (#123)` GitHub appends on merge) and the description is required. Wrapping
+  description lines at 72 keeps `git log` readable, but it isn't checked.
   The scope is the package you changed: `api`, `web` or `sdk`. Omit it when a
   change spans several packages or touches none (e.g. CI, docs site, root config).
   Renovate PRs are exempt.
