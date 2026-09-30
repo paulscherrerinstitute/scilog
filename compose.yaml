@@ -1,25 +1,8 @@
 include:
   - api/compose.yaml
+  - web/compose.yaml
 
 services:
-  frontend:
-    build:
-      context: ./web/.
-      target: deps
-    environment:
-      CHROME_BIN: /usr/bin/chromium-browser
-      CHROME_PATH: /usr/lib/chromium/
-    volumes:
-      - ./web:/frontend
-      - ./config/fe/config.dev.json:/frontend/src/assets/config.json
-      - web_node_modules:/frontend/node_modules
-      - web_dist:/frontend/dist
-    command: ["npm", "run", "dev"]
-    profiles:
-      - fe
-    ports:
-      - 4200:4200
-
   python:
     build:
       context: ./importTools
@@ -30,7 +13,3 @@ services:
     command: /bin/sh -c "while sleep 1000; do :; done"
     profiles:
       - py
-
-volumes:
-  web_node_modules:
-  web_dist:
