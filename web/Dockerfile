@@ -36,7 +36,7 @@ CMD ["npm", "run", "test:CI"]
 
 # Static file server for the compiled bundle. The unprivileged image runs
 # as uid 101 and listens on 8080 instead of 80.
-FROM nginxinc/nginx-unprivileged:1.30-alpine AS production
+FROM nginxinc/nginx-unprivileged:1.31-alpine AS production
 
 COPY --from=build /frontend/dist/ /usr/share/nginx/html/
 COPY nginx/default.conf /etc/nginx/conf.d/default.conf
