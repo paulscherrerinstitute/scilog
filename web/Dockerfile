@@ -19,7 +19,7 @@ COPY . .
 
 RUN npm run build -- --configuration production --output-path=dist
 
-# Lint and unit tests. Chromium is only needed by karma, so it lives in
+# Unit tests. Chromium is only needed by karma, so it lives in
 # this leaf stage instead of slowing down every production build.
 FROM deps AS test
 
@@ -32,7 +32,7 @@ ENV CHROME_BIN=/usr/bin/chromium
 
 COPY . .
 
-CMD ["npm", "run", "test:CI"]
+CMD ["npm", "run", "test"]
 
 # Static file server for the compiled bundle. The unprivileged image runs
 # as uid 101 and listens on 8080 instead of 80.
