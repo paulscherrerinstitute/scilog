@@ -8,10 +8,13 @@
     "start": "ng serve",
     "dev": "ng serve --host 0.0.0.0",
     "build": "ng build",
-    "test": "ng test",
-    "test:CI": "npx prettier -c . && ng lint && ng test --watch=false",
+    "test": "ng test --watch=false",
+    "test:watch": "ng test",
     "lint": "ng lint",
-    "lint:fix": "ng lint --fix"
+    "lint:fix": "ng lint --fix",
+    "format": "prettier . --check",
+    "format:fix": "prettier . --write",
+    "typecheck": "tsc --noEmit -p tsconfig.app.json && tsc --noEmit -p tsconfig.spec.json"
   },
   "private": true,
   "dependencies": {

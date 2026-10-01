@@ -30,6 +30,13 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
 
+      - name: Lint
+        if: github.event_name != 'push'
+        working-directory: ${{ env.CONTEXT }}
+        run: |
+          docker compose run --rm --no-deps api-test npm run format
+          docker compose run --rm --no-deps api-test npm run lint
+
       - name: Test
         if: github.event_name != 'push'
         working-directory: ${{ env.CONTEXT }}
