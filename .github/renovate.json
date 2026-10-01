@@ -1,0 +1,36 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "extends": [
+    "config:best-practices",
+    ":pinDependencies",
+    "security:minimumReleaseAgePypi",
+    "helpers:pinGitHubActionDigestsToSemver",
+    "security:openssf-scorecard",
+    ":semanticCommits"
+  ],
+  "ignorePaths": [
+    "**/node_modules/**",
+    "**/bower_components/**",
+    "**/vendor/**",
+    "**/examples/**",
+    "**/__tests__/**",
+    "**/test/**",
+    "**/tests/**",
+    "**/__fixtures__/**",
+    "config/**",
+    "importTools/**"
+  ],
+  "packageRules": [
+    {
+      "description": "The sdk is a library: widen ranges instead of raising the minimum",
+      "matchFileNames": ["sdk/**"],
+      "rangeStrategy": "widen"
+    },
+    {
+      "description": "Update GitHub Actions together",
+      "matchManagers": ["github-actions"],
+      "matchDepTypes": ["action", "workflow"],
+      "groupName": "GitHub Actions"
+    }
+  ]
+}
