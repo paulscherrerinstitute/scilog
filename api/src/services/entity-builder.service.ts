@@ -8,11 +8,19 @@ import path from 'path';
 export class EntityBuilderService {
   constructor() {}
 
-  buildPerson(createdBy: string) {
+  buildPerson(
+    email: string,
+    name?: string,
+    givenName?: string,
+    familyName?: string,
+  ) {
     return {
-      '@id': `person://${createdBy}`,
+      '@id': `person://${email}`,
       '@type': 'Person',
-      email: createdBy,
+      email,
+      name,
+      givenName,
+      familyName,
     };
   }
 
@@ -88,12 +96,27 @@ export class EntityBuilderService {
     return result;
   }
 
-  buildLicenseEntity() {
+  buildLicenseEntity(container = '.eln') {
     return {
       '@id': '#license',
       '@type': 'CreativeWork',
       name: 'No license',
-      description: 'This .eln does not contain a license',
+      description: `This ${container} does not contain a license`,
+    };
+  }
+
+  buildDirectoryEntity(
+    archivePath: string,
+    name: string,
+    dateCreated: string,
+    description?: string,
+  ) {
+    return {
+      '@id': archivePath,
+      '@type': 'Dataset',
+      name,
+      dateCreated,
+      description,
     };
   }
 
