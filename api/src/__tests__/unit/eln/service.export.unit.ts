@@ -3,24 +3,38 @@ import {
   expect,
   StubbedInstanceWithSinonAccessor,
 } from '@loopback/testlab';
-import {RoCrateExportService} from '../../services/ro-crate-export.service';
+import {
+  ELN_ARCHIVE_ROOT,
+  ElnExportService,
+} from '../../../services/eln/export.service';
 import {
   BasesnippetRepository,
   FileRepository,
   LogbookRepository,
-} from '../../repositories';
-import {EntityBuilderService} from '../../services';
+} from '../../../repositories';
+import {
+  ArchiveService,
+  EntityBuilderService,
+  FileStorageService,
+} from '../../../services';
 import {UserProfile} from '@loopback/security';
-import {LinkType, Logbook, Paragraph} from '../../models';
-import {Filesnippet} from '../../models/file.model';
+import {Readable} from 'node:stream';
+import {LinkType, Logbook, Paragraph} from '../../../models';
+import {Filesnippet} from '../../../models/file.model';
+import {buffer} from 'node:stream/consumers';
+import path from 'node:path';
+import {listZipEntries} from '../../zip.helpers';
+import {GridFSBucketReadStream} from 'mongodb';
 
-// these are more like integration tests for RoCrateExportService + EntityBuilderService
+// these are more like integration tests for ElnExportService + EntityBuilderService
 // as EntityBuilderService only contains pure functions, we use the real service instead of mocking their outputs
-describe('RoCrateExportService (unit)', () => {
+describe('ElnExportService (unit)', () => {
   let basesnippetRepository: StubbedInstanceWithSinonAccessor<BasesnippetRepository>;
   let logbookRepository: StubbedInstanceWithSinonAccessor<LogbookRepository>;
   let fileRepository: StubbedInstanceWithSinonAccessor<FileRepository>;
+  let fileStorage: StubbedInstanceWithSinonAccessor<FileStorageService>;
   let entityBuilder: EntityBuilderService;
+  const archiveService: ArchiveService = new ArchiveService();
   const user: UserProfile = {
     email: 'test@example.com',
     name: 'Test user',
@@ -30,6 +44,7 @@ describe('RoCrateExportService (unit)', () => {
     basesnippetRepository = createStubInstance(BasesnippetRepository);
     logbookRepository = createStubInstance(LogbookRepository);
     fileRepository = createStubInstance(FileRepository);
+    fileStorage = createStubInstance(FileStorageService);
     entityBuilder = new EntityBuilderService();
   });
 
@@ -54,16 +69,17 @@ describe('RoCrateExportService (unit)', () => {
       }),
     ]);
 
-    const roCrateExportService = new RoCrateExportService(
+    const elnExportService = new ElnExportService(
       user,
       basesnippetRepository,
       logbookRepository,
       fileRepository,
       entityBuilder,
+      archiveService,
+      fileStorage,
     );
 
-    const {rocrate} =
-      await roCrateExportService.getRoCrateMetadata('logbook-id');
+    const {rocrate} = await elnExportService.getRoCrateMetadata('logbook-id');
 
     console.log(JSON.stringify(rocrate, null, 2));
     // assert the structure of the ro-crate: root data entity has a logbook,
@@ -126,16 +142,18 @@ describe('RoCrateExportService (unit)', () => {
       .withArgs('file-2')
       .resolves(givenFilesnippet({_fileId: 'file-2'}));
 
-    const roCrateExportService = new RoCrateExportService(
+    const elnExportService = new ElnExportService(
       user,
       basesnippetRepository,
       logbookRepository,
       fileRepository,
       entityBuilder,
+      archiveService,
+      fileStorage,
     );
 
     const {rocrate, fileMetadata} =
-      await roCrateExportService.getRoCrateMetadata('logbook-id');
+      await elnExportService.getRoCrateMetadata('logbook-id');
 
     expect(fileMetadata).to.containEql({
       snippetId: 'snippet-1',
@@ -164,6 +182,45 @@ describe('RoCrateExportService (unit)', () => {
     expect(snippet2Entity.hasPart).to.containEql({
       '@id': entityBuilder.getFilePath('snippet-2', 'file-2', 'txt'),
     });
+  });
+
+  it('builds an eln archive stream with metadata, preview and file bytes', async () => {
+    logbookRepository.stubs.findById.resolves(givenLogbook());
+    basesnippetRepository.stubs.find.resolves([
+      givenParagraph({
+        id: 'snippet-1',
+        textcontent: 'Paragraph 1',
+        files: [{fileId: 'file-1'}],
+      }),
+    ]);
+    fileRepository.stubs.findById
+      .withArgs('file-1')
+      .resolves(givenFilesnippet({_fileId: 'file-1'}));
+    fileStorage.stubs.downloadStream.returns(
+      Readable.from(['file bytes']) as GridFSBucketReadStream,
+    );
+
+    const elnExportService = new ElnExportService(
+      user,
+      basesnippetRepository,
+      logbookRepository,
+      fileRepository,
+      entityBuilder,
+      archiveService,
+      fileStorage,
+    );
+
+    const zip = await elnExportService.buildElnStream('logbook-id');
+
+    const entries = await listZipEntries(await buffer(zip));
+    expect(entries).to.containEql(`${ELN_ARCHIVE_ROOT}/ro-crate-metadata.json`);
+    expect(entries).to.containEql(`${ELN_ARCHIVE_ROOT}/ro-crate-preview.html`);
+    expect(entries).to.containEql(
+      path.join(
+        ELN_ARCHIVE_ROOT,
+        entityBuilder.getFilePath('snippet-1', 'file-1', 'txt'),
+      ),
+    );
   });
 });
 
