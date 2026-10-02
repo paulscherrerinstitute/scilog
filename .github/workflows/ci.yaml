@@ -151,7 +151,7 @@ jobs:
 
   test-api:
     name: Test api
-    needs: detect-changes
+    needs: [detect-changes, lint-api]
     if: needs.detect-changes.outputs.api == 'true'
     runs-on: ubuntu-24.04
     timeout-minutes: 20
@@ -171,7 +171,7 @@ jobs:
 
   test-web:
     name: Test web
-    needs: detect-changes
+    needs: [detect-changes, lint-web]
     if: needs.detect-changes.outputs.web == 'true'
     runs-on: ubuntu-24.04
     timeout-minutes: 20
@@ -191,7 +191,7 @@ jobs:
 
   test-sdk:
     name: Test sdk
-    needs: detect-changes
+    needs: [detect-changes, lint-sdk]
     if: needs.detect-changes.outputs.sdk == 'true'
     runs-on: ubuntu-24.04
     timeout-minutes: 15
