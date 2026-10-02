@@ -43,4 +43,9 @@ COPY nginx/default.conf /etc/nginx/conf.d/default.conf
 
 USER nginx
 
+# Checks that nginx serves the app's start page.
+HEALTHCHECK --start-period=30s --start-interval=2s \
+    CMD ["curl", "--fail", "--silent", "--show-error", \
+         "--output", "/dev/null", "http://localhost:8080/"]
+
 EXPOSE 8080
