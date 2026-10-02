@@ -81,4 +81,7 @@ USER node
 
 EXPOSE 3000
 
+HEALTHCHECK --start-period=60s --start-interval=2s \
+    CMD ["node", "dist/healthcheck.js"]
+
 CMD ["node", "--enable-source-maps", "dist/index.js"]
