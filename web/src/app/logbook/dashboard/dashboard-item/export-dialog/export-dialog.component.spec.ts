@@ -1,7 +1,8 @@
 import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 
 import { ExportDialogComponent } from './export-dialog.component';
-import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
+import { MatDialogModule, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
+import { NoopAnimationsModule } from '@angular/platform-browser/animations';
 import { LogbookItemDataService } from '@shared/remote-data.service';
 import { HttpErrorResponse } from '@angular/common/http';
 import { of } from 'rxjs';
@@ -17,7 +18,12 @@ class NativeElementMock {
   click() {}
 }
 
-const getConfig = () => ({});
+const enabledScicatSettings = {
+  scicatWidgetEnabled: true,
+  lbBaseURL: '',
+  frontendBaseURL: '',
+  rocrateBaseURL: 'https://scicat-rocrate.example',
+};
 
 describe('ExportDialogComponent', () => {
   let component: ExportDialogComponent;
@@ -31,20 +37,29 @@ describe('ExportDialogComponent', () => {
     of(new Blob(['data:image/png;base64,iVBORw0KGgoAAAANSUhE'], { type: 'image/png' })).toPromise();
   logbookItemDataSpy.exportLogbook.and.callFake(resolveExport);
   logbookItemDataSpy.exportELN.and.callFake(resolveExport);
+  logbookItemDataSpy.exportLogbook.and.returnValue(
+    of(new Blob(['data:image/png;base64,iVBORw0KGgoAAAANSUhE'], { type: 'image/png' })).toPromise(),
+  );
+  const appConfigServiceSpy = jasmine.createSpyObj('AppConfigService', [
+    'getConfig',
+    'getScicatSettings',
+  ]);
+  appConfigServiceSpy.getConfig.and.returnValue({});
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      imports: [ExportDialogComponent],
+      imports: [MatDialogModule, NoopAnimationsModule, ExportDialogComponent],
       providers: [
         { provide: MatDialogRef, useValue: mockDialogRef },
-        { provide: MAT_DIALOG_DATA, useValue: {} },
+        { provide: MAT_DIALOG_DATA, useValue: { filter: { targetId: 'test-logbook-id' } } },
         { provide: LogbookItemDataService, useValue: logbookItemDataSpy },
-        { provide: AppConfigService, useValue: { getConfig } },
+        { provide: AppConfigService, useValue: appConfigServiceSpy },
       ],
     }).compileComponents();
   }));
 
   beforeEach(() => {
+    appConfigServiceSpy.getScicatSettings.and.returnValue(enabledScicatSettings);
     fixture = TestBed.createComponent(ExportDialogComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
@@ -143,5 +158,24 @@ describe('ExportDialogComponent', () => {
     );
     expect(component.inProgress).toBe(false);
     expect(mockDialogRef.close).not.toHaveBeenCalled();
+  });
+
+  it('should enable SciCat export when scicat is configured with a rocrate URL', () => {
+    expect(component.scicatEnabled).toBeTrue();
+  });
+
+  it('should not enable SciCat export when scicat is not configured', () => {
+    appConfigServiceSpy.getScicatSettings.and.returnValue(undefined);
+    expect(component.scicatEnabled).toBeFalse();
+  });
+
+  it('should not enable SciCat export when the rocrate URL is missing', () => {
+    appConfigServiceSpy.getScicatSettings.and.returnValue({
+      scicatWidgetEnabled: true,
+      lbBaseURL: '',
+      frontendBaseURL: '',
+      rocrateBaseURL: '',
+    });
+    expect(component.scicatEnabled).toBeFalse();
   });
 });
