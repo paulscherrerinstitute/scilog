@@ -8,6 +8,7 @@
   "scicat": {
     "scicatWidgetEnabled": false,
     "lbBaseURL": "http://backend.localhost",
-    "frontendBaseURL": "http://localhost"
+    "frontendBaseURL": "http://localhost",
+    "rocrateBaseURL": "http://scicat-rocrate.localhost"
   }
 }
