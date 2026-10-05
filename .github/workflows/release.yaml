@@ -1,50 +1,56 @@
 name: Release
 
 on:
-    push:
-        branches:
-            - main
-    workflow_dispatch:
+  push:
+    branches: [main]
+  workflow_dispatch:
 
-permissions:
-    contents: write
-    issues: write
-    pull-requests: write
+permissions: {}
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: false
 
 jobs:
-    release:
-        runs-on: ubuntu-latest
+  create-release:
+    name: Create release
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    permissions:
+      contents: write # push the release commit and tag, create the GitHub release
+      issues: write # comment on released issues
+      pull-requests: write # comment on released pull requests
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          # The deploy key pushes the release commit and tag past branch protection.
+          ssh-key: ${{ secrets.SEMANTIC_RELEASE_BOT }}
+          fetch-depth: 0 # semantic-release reads all tags and commits
 
-        steps:
-            - name: Checkout
-              uses: actions/checkout@v4
-              with:
-                  ssh-key: ${{ secrets.SEMANTIC_RELEASE_BOT }}
-                  fetch-depth: 0
+      - name: Set up Node.js
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: 24
 
-            - name: Set up Node
-              uses: actions/setup-node@v4
-              with:
-                  node-version: 20
+      - name: Set up Python
+        uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
+        with:
+          python-version: "3.11"
 
-            - name: Set up Python
-              uses: actions/setup-python@v5
-              with:
-                  python-version: "3.11"
+      - name: Install Python build tools
+        run: python -m pip install build==1.6.1 twine==7.0.0
 
-            - name: Install semantic-release
-              run: >-
-                  npm install -g semantic-release @semantic-release/commit-analyzer 
-                  @semantic-release/release-notes-generator @semantic-release/changelog 
-                  @semantic-release/git @semantic-release/github @semantic-release/exec 
-                  conventional-changelog-conventionalcommits
-
-            - name: Install Python build tools
-              run: python -m pip install --upgrade pip build twine
-
-            - name: Run semantic-release
-              env:
-                  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-                  TWINE_USERNAME: __token__
-                  TWINE_PASSWORD: ${{ secrets.PYPI_API_TOKEN }}
-              run: semantic-release
+      - name: Run semantic-release
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          TWINE_USERNAME: __token__
+          TWINE_PASSWORD: ${{ secrets.PYPI_API_TOKEN }}
+        run: >-
+          npx --yes
+          --package semantic-release@25.0.9
+          --package @semantic-release/changelog@7.0.0
+          --package @semantic-release/exec@7.1.0
+          --package @semantic-release/git@11.0.1
+          --package conventional-changelog-conventionalcommits@10.4.0
+          semantic-release
