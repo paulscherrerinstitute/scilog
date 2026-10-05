@@ -3,6 +3,7 @@ name: Release
 on:
   push:
     branches: [main]
+    tags: ["v*"]
 
 permissions: {}
 
@@ -13,6 +14,11 @@ concurrency:
 jobs:
   create-release:
     name: Create release
+    # Only on main (pushes and manual runs), and not again for the
+    # release commit it pushed itself.
+    if: >-
+      github.ref == 'refs/heads/main' &&
+      !startsWith(github.event.head_commit.message, 'chore(release):')
     runs-on: ubuntu-24.04
     timeout-minutes: 15
     permissions:
@@ -32,19 +38,9 @@ jobs:
         with:
           node-version: 24
 
-      - name: Set up Python
-        uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
-        with:
-          python-version: "3.11"
-
-      - name: Install Python build tools
-        run: python -m pip install build==1.6.1 twine==7.0.0
-
       - name: Run semantic-release
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          TWINE_USERNAME: __token__
-          TWINE_PASSWORD: ${{ secrets.PYPI_API_TOKEN }}
         run: >-
           npx --yes
           --package semantic-release@25.0.9
@@ -53,3 +49,55 @@ jobs:
           --package @semantic-release/git@11.0.1
           --package conventional-changelog-conventionalcommits@10.4.0
           semantic-release
+
+  build-sdk:
+    name: Build sdk
+    if: github.ref_type == 'tag'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    permissions:
+      contents: read # checkout
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Set up Python
+        uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
+        with:
+          python-version: "3.13"
+
+      - name: Install build
+        run: python -m pip install build==1.6.1
+
+      - name: Build distributions
+        run: python -m build sdk/python
+
+      - name: Upload distributions
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: sdk-distributions
+          path: sdk/python/dist/
+          overwrite: true # a re-run of this job replaces its earlier upload
+
+  publish-sdk:
+    name: Publish sdk
+    needs: build-sdk
+    if: github.ref_type == 'tag'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    environment:
+      name: pypi
+      url: https://pypi.org/p/scilog
+    permissions:
+      id-token: write # PyPI Trusted Publishing
+    steps:
+      - name: Download distributions
+        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+        with:
+          name: sdk-distributions
+          path: dist/
+
+      - name: Publish to PyPI
+        uses: pypa/gh-action-pypi-publish@dc37677b2e1c63e2034f94d8a5b11f265b73ba33 # v1.14.2

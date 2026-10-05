@@ -12,19 +12,19 @@ plugins:
   - "@semantic-release/release-notes-generator"
   # Adds the release notes to CHANGELOG.md.
   - "@semantic-release/changelog"
-  # Writes the new version into api, web and the sdk, and uploads the sdk.
+  # Writes the new version into api, web and the sdk.
   - - "@semantic-release/exec"
     - prepareCmd: >-
         echo Releasing ${nextRelease.version}
         && npm version ${nextRelease.version} --no-git-tag-version --prefix api
         && npm version ${nextRelease.version} --no-git-tag-version --prefix web
         && sed -i -E '/^[[]project[]]$/,/^[[]/{s/^version = ".*"/version = "'${nextRelease.version}'"/}' sdk/python/pyproject.toml
-      publishCmd: >-
-        python -m build sdk/python --outdir sdk/python/dist
-        && python -m twine upload sdk/python/dist/*
-  # Commits the changed files as the release commit.
+  # Commits the changed files as the release commit. The message leaves
+  # out the plugin's default [skip ci], so that pushing the release tag
+  # starts the release workflow.
   - - "@semantic-release/git"
-    - assets:
+    - message: "chore(release): ${nextRelease.version}\n\n${nextRelease.notes}"
+      assets:
         - CHANGELOG.md
         - api/package.json
         - api/package-lock.json
