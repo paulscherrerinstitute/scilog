@@ -8,8 +8,10 @@ import { of, throwError } from 'rxjs';
 
 describe('AuthInterceptor', () => {
   const serverSettingsService = jasmine.createSpyObj('ServerSettingsService', [
+    'getServerAddress',
     'getSciCatServerAddress',
   ]);
+  serverSettingsService.getServerAddress.and.returnValue('https://scilog-backend.psi.ch/api/v1/');
   serverSettingsService.getSciCatServerAddress.and.returnValue('https://scicat-backend.psi.ch');
   beforeEach(() =>
     TestBed.configureTestingModule({
@@ -42,7 +44,7 @@ describe('AuthInterceptor', () => {
     });
   });
 
-  it('should append scilog token if request is not to scicat backend', (done: DoneFn) => {
+  it('should append scilog token if request is to scilog backend', (done: DoneFn) => {
     localStorage.setItem('id_token', 'test_scilog_token');
     const interceptor: AuthInterceptor = TestBed.inject(AuthInterceptor);
     const req = new HttpRequest('GET', 'https://scilog-backend.psi.ch/api/v1');
@@ -99,6 +101,24 @@ describe('AuthInterceptor', () => {
       location = { pathname: '/auth-callback', search: '?access-token=x', hash: '', href };
       failWith401();
       expect(location.href).toEqual(href);
+    });
+  });
+
+  it('should append no token if request is to any other backend', (done: DoneFn) => {
+    localStorage.setItem('id_token', 'test_scilog_token');
+    localStorage.setItem('scicat_token', 'test_scicat_token');
+    const interceptor: AuthInterceptor = TestBed.inject(AuthInterceptor);
+    const req = new HttpRequest('GET', 'https://other-backend.psi.ch/api/v1');
+    const next = jasmine.createSpyObj<HttpHandler>('HttpHandler', ['handle']);
+    next.handle.and.returnValue(of({} as HttpEvent<any>));
+    interceptor.intercept(req, next).subscribe({
+      next: (_httpEvent: HttpEvent<any>) => {
+        const reqArg = next.handle.calls.mostRecent().args[0];
+        expect(reqArg.headers.get('Authorization')).toBeNull();
+        localStorage.clear();
+        done();
+      },
+      error: done.fail,
     });
   });
 });
