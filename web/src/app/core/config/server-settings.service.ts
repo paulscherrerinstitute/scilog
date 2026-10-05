@@ -23,6 +23,10 @@ export class ServerSettingsService {
     return this.appConfigService.getScicatSettings()?.frontendBaseURL;
   }
 
+  getScicatRocrateBaseUrl(): string | undefined {
+    return this.appConfigService.getScicatSettings()?.rocrateBaseURL;
+  }
+
   getScilogFrontendBaseUrl(): string {
     return this.appConfigService.getConfig().frontendBaseURL ?? window.location.origin;
   }
