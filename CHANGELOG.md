@@ -1,3 +1,10 @@
+## [2.14.1](https://github.com/paulscherrerinstitute/scilog/compare/v2.14.0...v2.14.1) (2026-10-06)
+
+
+### Bug Fixes
+
+* **deps:** update dependency ws to v8.22.0 ([#776](https://github.com/paulscherrerinstitute/scilog/issues/776)) ([1b3bd9e](https://github.com/paulscherrerinstitute/scilog/commit/1b3bd9e49147d13601fef684f6388fa2d2d89974))
+
 # [2.14.0](https://github.com/paulscherrerinstitute/scilog/compare/v2.13.0...v2.14.0) (2026-10-06)
 
 
