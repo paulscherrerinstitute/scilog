@@ -7,7 +7,7 @@ The documentation consists of two main parts.
 
 * The documentation of the REST API of the backend. This is auto-generated from the source and can be viewed at the respective *api/v1/explorer* URL, e.g. at this [example explorer](https://scilog.qa.psi.ch/api/v1/explorer)
 
-The live documentation is kept in sync with the source of the documentation via [Github deploy-docu workflow ](https://github.com/paulscherrerinstitute/scilog/blob/feature/addDocumentation/.github/workflows/deploy-docu.yaml)
+The live documentation is kept in sync with the source of the documentation via [Docs workflow](https://github.com/paulscherrerinstitute/scilog/blob/main/.github/workflows/docs.yaml)
 
 The live web site is then visible at the [following URL](https://paulscherrerinstitute.github.io/scilog/)
 
