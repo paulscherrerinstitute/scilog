@@ -101,3 +101,40 @@ jobs:
 
       - name: Publish to PyPI
         uses: pypa/gh-action-pypi-publish@dc37677b2e1c63e2034f94d8a5b11f265b73ba33 # v1.14.2
+
+  publish-image:
+    name: Publish image
+    # Main builds :edge, a release tag builds the release; never other branches.
+    if: github.ref == 'refs/heads/main' || github.ref_type == 'tag'
+    strategy:
+      matrix:
+        component: [api, web]
+    uses: docker/github-builder/.github/workflows/build.yml@58cb9f5b71b1836d6f690c1e95effdeb9b98cb8a # v1.17.0
+    permissions:
+      contents: read # build from the repository
+      id-token: write # sign attestations and cache entries
+      packages: write # push to GHCR
+    with:
+      output: image
+      push: true
+      context: ${{ matrix.component }}
+      target: production
+      platforms: linux/amd64,linux/arm64
+      sbom: true
+      # Cache entries are signed, so only this workflow's own entries are reused.
+      cache: true
+      cache-scope: ${{ matrix.component }}
+      set-meta-labels: true
+      set-meta-annotations: true
+      meta-images: ghcr.io/${{ github.repository }}/${{ matrix.component }}
+      meta-tags: |
+        type=semver,pattern={{version}}
+        type=semver,pattern={{major}}.{{minor}}
+        type=semver,pattern={{major}}
+        type=edge
+        type=sha,enable=${{ github.ref_type == 'branch' }}
+    secrets:
+      registry-auths: |
+        - registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
