@@ -1,3 +1,10 @@
+# [2.14.0](https://github.com/paulscherrerinstitute/scilog/compare/v2.13.0...v2.14.0) (2026-10-06)
+
+
+### Features
+
+* **api:** add health endpoints ([#780](https://github.com/paulscherrerinstitute/scilog/issues/780)) ([16761b2](https://github.com/paulscherrerinstitute/scilog/commit/16761b24ef6ed8a16a2faf6b2f0e9d326786e6ef)), closes [#621](https://github.com/paulscherrerinstitute/scilog/issues/621) [#642](https://github.com/paulscherrerinstitute/scilog/issues/642)
+
 # [2.13.0](https://github.com/paulscherrerinstitute/scilog/compare/v2.12.1...v2.13.0) (2026-09-30)
 
 
