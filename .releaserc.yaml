@@ -1,0 +1,35 @@
+# https://semantic-release.gitbook.io/semantic-release/usage/configuration
+# Within each release step, plugins run in the order listed here:
+# changelog and exec must come before git, so the release commit
+# includes the files they change.
+branches:
+  - main
+plugins:
+  # Picks the next version from the commits since the last release.
+  - - "@semantic-release/commit-analyzer"
+    - preset: conventionalcommits
+  # Writes the release notes.
+  - "@semantic-release/release-notes-generator"
+  # Adds the release notes to CHANGELOG.md.
+  - "@semantic-release/changelog"
+  # Writes the new version into api, web and the sdk, and uploads the sdk.
+  - - "@semantic-release/exec"
+    - prepareCmd: >-
+        echo Releasing ${nextRelease.version}
+        && npm version ${nextRelease.version} --no-git-tag-version --prefix api
+        && npm version ${nextRelease.version} --no-git-tag-version --prefix web
+        && sed -i -E '/^[[]project[]]$/,/^[[]/{s/^version = ".*"/version = "'${nextRelease.version}'"/}' sdk/python/pyproject.toml
+      publishCmd: >-
+        python -m build sdk/python --outdir sdk/python/dist
+        && python -m twine upload sdk/python/dist/*
+  # Commits the changed files as the release commit.
+  - - "@semantic-release/git"
+    - assets:
+        - CHANGELOG.md
+        - api/package.json
+        - api/package-lock.json
+        - web/package.json
+        - web/package-lock.json
+        - sdk/python/pyproject.toml
+  # Creates the GitHub release and comments on released PRs and issues.
+  - "@semantic-release/github"
