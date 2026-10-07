@@ -1,3 +1,10 @@
+## [2.14.3](https://github.com/paulscherrerinstitute/scilog/compare/v2.14.2...v2.14.3) (2026-10-07)
+
+
+### Bug Fixes
+
+* **deps:** update dependency pdf-merger-js to v5 ([#813](https://github.com/paulscherrerinstitute/scilog/issues/813)) ([b7b8e12](https://github.com/paulscherrerinstitute/scilog/commit/b7b8e12b799bd5ff0f08d8b6dde5f926b4841b7e))
+
 ## [2.14.2](https://github.com/paulscherrerinstitute/scilog/compare/v2.14.1...v2.14.2) (2026-10-07)
 
 
