@@ -41,6 +41,11 @@
         "conventional-changelog-conventionalcommits"
       ],
       "groupName": "semantic-release"
+    },
+    {
+      "description": "Update jasmine and its type definitions together",
+      "matchPackageNames": ["jasmine-core", "@types/jasmine"],
+      "groupName": "jasmine"
     }
   ]
 }
