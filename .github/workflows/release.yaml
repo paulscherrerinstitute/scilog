@@ -43,13 +43,23 @@ jobs:
       - name: Run semantic-release
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          # renovate: datasource=npm depName=semantic-release
+          SEMANTIC_RELEASE_VERSION: 25.0.9
+          # renovate: datasource=npm depName=@semantic-release/changelog
+          CHANGELOG_PLUGIN_VERSION: 7.0.0
+          # renovate: datasource=npm depName=@semantic-release/exec
+          EXEC_PLUGIN_VERSION: 7.1.0
+          # renovate: datasource=npm depName=@semantic-release/git
+          GIT_PLUGIN_VERSION: 11.0.1
+          # renovate: datasource=npm depName=conventional-changelog-conventionalcommits
+          CONVENTIONALCOMMITS_VERSION: 10.4.0
         run: >-
           npx --yes
-          --package semantic-release@25.0.9
-          --package @semantic-release/changelog@7.0.0
-          --package @semantic-release/exec@7.1.0
-          --package @semantic-release/git@11.0.1
-          --package conventional-changelog-conventionalcommits@10.4.0
+          --package "semantic-release@$SEMANTIC_RELEASE_VERSION"
+          --package "@semantic-release/changelog@$CHANGELOG_PLUGIN_VERSION"
+          --package "@semantic-release/exec@$EXEC_PLUGIN_VERSION"
+          --package "@semantic-release/git@$GIT_PLUGIN_VERSION"
+          --package "conventional-changelog-conventionalcommits@$CONVENTIONALCOMMITS_VERSION"
           semantic-release
 
   build-sdk:
