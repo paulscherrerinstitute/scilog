@@ -1,3 +1,10 @@
+## [2.14.2](https://github.com/paulscherrerinstitute/scilog/compare/v2.14.1...v2.14.2) (2026-10-07)
+
+
+### Bug Fixes
+
+* **deps:** update dependency puppeteer to v25 ([#814](https://github.com/paulscherrerinstitute/scilog/issues/814)) ([0300ffd](https://github.com/paulscherrerinstitute/scilog/commit/0300ffd4a67b315f83f0b81f3f019750afab325e))
+
 ## [2.14.1](https://github.com/paulscherrerinstitute/scilog/compare/v2.14.0...v2.14.1) (2026-10-06)
 
 
