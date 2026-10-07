@@ -6,7 +6,8 @@
     "security:minimumReleaseAgePypi",
     "helpers:pinGitHubActionDigestsToSemver",
     "security:openssf-scorecard",
-    ":semanticCommits"
+    ":semanticCommits",
+    "customManagers:githubActionsVersions"
   ],
   "ignorePaths": [
     "**/node_modules/**",
@@ -31,6 +32,15 @@
       "matchManagers": ["github-actions"],
       "matchDepTypes": ["action", "workflow"],
       "groupName": "GitHub Actions"
+    },
+    {
+      "description": "Update semantic-release and its plugins together",
+      "matchPackageNames": [
+        "semantic-release",
+        "@semantic-release/**",
+        "conventional-changelog-conventionalcommits"
+      ],
+      "groupName": "semantic-release"
     }
   ]
 }

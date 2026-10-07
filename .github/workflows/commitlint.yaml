@@ -27,6 +27,9 @@ jobs:
     timeout-minutes: 5
     permissions:
       contents: read # checkout for .commitlintrc.yaml
+    env:
+      # renovate: datasource=npm depName=commitlint
+      COMMITLINT_VERSION: 21.2.3
     steps:
       - name: Checkout
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
@@ -45,8 +48,8 @@ jobs:
           PR_NUMBER: ${{ github.event.pull_request.number }}
           PR_BODY: ${{ github.event.pull_request.body }}
         # Same text as the squash commit, which gets " (#<number>)" appended.
-        run: printf '%s (#%s)\n\n%s' "$PR_TITLE" "$PR_NUMBER" "$PR_BODY" | npx --yes commitlint@21.2.3 --verbose
+        run: printf '%s (#%s)\n\n%s' "$PR_TITLE" "$PR_NUMBER" "$PR_BODY" | npx --yes "commitlint@$COMMITLINT_VERSION" --verbose
 
       - name: Lint merge queue commit
         if: github.event_name == 'merge_group'
-        run: npx --yes commitlint@21.2.3 --last --verbose
+        run: npx --yes "commitlint@$COMMITLINT_VERSION" --last --verbose
