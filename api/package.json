@@ -47,7 +47,7 @@
     "@loopback/rest-explorer": "8.0.16",
     "@loopback/service-proxy": "8.0.15",
     "archiver": "8.0.0",
-    "connect-mongo": "4.6.0",
+    "connect-mongo": "6.0.0",
     "express-session": "1.19.0",
     "formidable": "3.5.4",
     "isemail": "3.2.0",
