@@ -253,6 +253,89 @@ jobs:
       - name: Run tests
         run: pytest
 
+  test-api-image:
+    name: Test api image (${{ matrix.arch }})
+    needs: [detect-changes, test-api]
+    if: needs.detect-changes.outputs.api == 'true'
+    runs-on: ${{ matrix.runner }}
+    timeout-minutes: 20
+    permissions:
+      contents: read
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - arch: amd64
+            runner: ubuntu-24.04
+          - arch: arm64
+            runner: ubuntu-24.04-arm
+    defaults:
+      run:
+        working-directory: api
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      # The production service mounts these; they aren't in git.
+      - name: Use example config
+        run: |
+          cp datasource.example.json datasource.json
+          cp oidc.example.json oidc.json
+
+      - name: Start production image
+        run: docker compose up --wait api-production
+
+      - name: Check the database connection
+        run: curl --fail-with-body --silent --show-error http://localhost:3000/api/v1/health
+
+      - name: Show logs
+        if: failure()
+        run: docker compose logs api-production
+
+  test-web-image:
+    name: Test web image (${{ matrix.arch }})
+    needs: [detect-changes, test-web]
+    if: needs.detect-changes.outputs.web == 'true'
+    runs-on: ${{ matrix.runner }}
+    timeout-minutes: 20
+    permissions:
+      contents: read
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - arch: amd64
+            runner: ubuntu-24.04
+          - arch: arm64
+            runner: ubuntu-24.04-arm
+    defaults:
+      run:
+        working-directory: web
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      # The production service mounts this; it isn't in git.
+      - name: Use example config
+        run: cp config.example.json config.json
+
+      - name: Start production image
+        run: docker compose up --wait web-production
+
+      - name: Check that deep links load the app
+        run: curl --fail --silent --show-error --output /dev/null http://localhost:8080/overview
+
+      - name: Check that the config is served
+        run: curl --fail --silent --show-error --output /dev/null http://localhost:8080/assets/config.json
+
+      - name: Show logs
+        if: failure()
+        run: docker compose logs web-production
+
   # The one required check. Skipped jobs count as passed, so PRs that
   # don't touch a package still merge.
   ci:
@@ -267,6 +350,8 @@ jobs:
       - test-api
       - test-web
       - test-sdk
+      - test-api-image
+      - test-web-image
     runs-on: ubuntu-24.04
     timeout-minutes: 2
     permissions: {}
@@ -274,5 +359,7 @@ jobs:
       - name: Check job results
         uses: re-actors/alls-green@b5b5b37504aa4183270bd3d855c52a67f212be35 # v1.3.0
         with:
-          allowed-skips: lint-api, lint-web, lint-sdk, lint-workflows, test-api, test-web, test-sdk
+          allowed-skips: >-
+            lint-api, lint-web, lint-sdk, lint-workflows, test-api, test-web,
+            test-sdk, test-api-image, test-web-image
           jobs: ${{ toJSON(needs) }}
