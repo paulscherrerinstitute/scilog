@@ -1,3 +1,10 @@
+## [2.14.4](https://github.com/paulscherrerinstitute/scilog/compare/v2.14.3...v2.14.4) (2026-10-07)
+
+
+### Bug Fixes
+
+* **api:** override outdated undici in loopback deps ([#830](https://github.com/paulscherrerinstitute/scilog/issues/830)) ([dabe330](https://github.com/paulscherrerinstitute/scilog/commit/dabe3309149dca08360542e54d1de71226b0e4b6))
+
 ## [2.14.3](https://github.com/paulscherrerinstitute/scilog/compare/v2.14.2...v2.14.3) (2026-10-07)
 
 
