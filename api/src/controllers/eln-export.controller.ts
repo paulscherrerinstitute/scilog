@@ -1,4 +1,3 @@
-import {repository} from '@loopback/repository';
 import {get, param, RestBindings, Response} from '@loopback/rest';
 
 import {inject, service} from '@loopback/core';
@@ -6,19 +5,8 @@ import {OPERATION_SECURITY_SPEC} from '../utils/security-spec';
 import {authenticate} from '@loopback/authentication';
 import {authorize} from '@loopback/authorization';
 import {basicAuthorization} from '../services/basic.authorizor';
-import {FileRepository} from '../repositories/file.repository';
-import {ElnExportService} from '../services';
-import {EntityBuilderService} from '../services';
-import {ArchiveService, AssetDescriptor} from '../services/archive.service';
-import {Readable} from 'node:stream';
+import {ElnExportService, ELN_ARCHIVE_ROOT} from '../services';
 import {pipeline} from 'node:stream/promises';
-
-import {ObjectId} from 'mongodb';
-import * as mongodb from 'mongodb';
-// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-// @ts-ignore
-import {Preview, Defaults, HtmlFile} from 'ro-crate-html/index-node.js';
-import path from 'path';
 
 @authenticate('jwt')
 @authorize({
@@ -26,14 +14,9 @@ import path from 'path';
   voters: [basicAuthorization],
 })
 export class ElnExportController {
-  static readonly ARCHIVE_ROOT = 'scilog-eln-export';
   static readonly ELN_MEDIA_TYPE = 'application/vnd.eln+zip';
   constructor(
-    @repository(FileRepository) private fileRepository: FileRepository,
-    @service(ElnExportService)
-    private elnExportService: ElnExportService,
-    @service(ArchiveService) private archiveService: ArchiveService,
-    @service(EntityBuilderService) private entityBuilder: EntityBuilderService,
+    @service(ElnExportService) private elnExportService: ElnExportService,
   ) {}
 
   // GET /logbooks/export/{id}/eln/metadata
@@ -69,52 +52,11 @@ export class ElnExportController {
     @param.path.string('id') id: string,
     @inject(RestBindings.Http.RESPONSE) response: Response,
   ) {
-    const {rocrate, fileMetadata} =
-      await this.elnExportService.getRoCrateMetadata(id);
-
-    // Build asset descriptors from GridFS streams for files referenced in snippets
-    const bucket = new mongodb.GridFSBucket(
-      this.fileRepository.dataSource.connector?.db,
-    );
-    const assets: Array<AssetDescriptor> = fileMetadata.map(
-      ({snippetId, fileId, fileExt}) => {
-        return {
-          stream: bucket.openDownloadStream(fileId as unknown as ObjectId),
-          archivePath: path.join(
-            ElnExportController.ARCHIVE_ROOT,
-            this.entityBuilder.getFilePath(snippetId, fileId, fileExt),
-          ),
-        };
-      },
-    );
-
-    // add metadata json as a stream asset
-    const metadataJson = JSON.stringify(rocrate, null, 2);
-    assets.push({
-      stream: Readable.from([metadataJson]),
-      archivePath: path.join(
-        ElnExportController.ARCHIVE_ROOT,
-        'ro-crate-metadata.json',
-      ),
-    });
-
-    // generate preview html and add as stream asset
-    const previewHtml: string = await new HtmlFile(new Preview(rocrate)).render(
-      Defaults.render_script,
-    );
-    assets.push({
-      stream: Readable.from([previewHtml]),
-      archivePath: path.join(
-        ElnExportController.ARCHIVE_ROOT,
-        'ro-crate-preview.html',
-      ),
-    });
-
-    const zip = this.archiveService.zipStream(assets);
+    const zip = await this.elnExportService.buildElnStream(id);
     response.set('Content-Type', ElnExportController.ELN_MEDIA_TYPE);
     response.set(
       'Content-Disposition',
-      `attachment; filename="${ElnExportController.ARCHIVE_ROOT}-${id}.eln"`,
+      `attachment; filename="${ELN_ARCHIVE_ROOT}-${id}.eln"`,
     );
     await pipeline(zip, response);
   }

@@ -6,6 +6,7 @@ import {DatabaseHelper} from '../database.helpers';
 import {listZipEntries} from '../zip.helpers';
 import {ROCrate} from 'ro-crate';
 import {ElnExportController} from '../../controllers';
+import {ELN_ARCHIVE_ROOT} from '../../services';
 
 describe('ElnExportController', function (this: Suite) {
   this.timeout(5000);
@@ -85,15 +86,15 @@ describe('ElnExportController', function (this: Suite) {
       .expect('Content-Type', ElnExportController.ELN_MEDIA_TYPE)
       .expect(
         'Content-Disposition',
-        `attachment; filename="${ElnExportController.ARCHIVE_ROOT}-${logbook.id}.eln"`,
+        `attachment; filename="${ELN_ARCHIVE_ROOT}-${logbook.id}.eln"`,
       )
       .then(async response => {
         const files = await listZipEntries(response.body);
         expect(files).to.containEql(
-          `${ElnExportController.ARCHIVE_ROOT}/ro-crate-metadata.json`,
+          `${ELN_ARCHIVE_ROOT}/ro-crate-metadata.json`,
         );
         expect(files).to.containEql(
-          `${ElnExportController.ARCHIVE_ROOT}/ro-crate-preview.html`,
+          `${ELN_ARCHIVE_ROOT}/ro-crate-preview.html`,
         );
       })
       .catch(error => {
