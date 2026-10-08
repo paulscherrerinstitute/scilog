@@ -196,9 +196,9 @@ describe('ElnExportService (unit)', () => {
     fileRepository.stubs.findById
       .withArgs('file-1')
       .resolves(givenFilesnippet({_fileId: 'file-1'}));
-    fileStorage.stubs.downloadStream.returns(
-      Readable.from(['file bytes']) as GridFSBucketReadStream,
-    );
+    fileStorage.stubs.downloadStream
+      .withArgs('file-1')
+      .returns(Readable.from(['file bytes']) as GridFSBucketReadStream);
 
     const elnExportService = new ElnExportService(
       user,
