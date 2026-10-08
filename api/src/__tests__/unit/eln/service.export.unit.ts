@@ -23,7 +23,7 @@ import {LinkType, Logbook, Paragraph} from '../../../models';
 import {Filesnippet} from '../../../models/file.model';
 import {buffer} from 'node:stream/consumers';
 import path from 'node:path';
-import {listZipEntries} from '../../zip.helpers';
+import {listZipEntries, readZipEntries} from '../../zip.helpers';
 import {GridFSBucketReadStream} from 'mongodb';
 
 // these are more like integration tests for ElnExportService + EntityBuilderService
@@ -212,15 +212,23 @@ describe('ElnExportService (unit)', () => {
 
     const zip = await elnExportService.buildElnStream('logbook-id');
 
-    const entries = await listZipEntries(await buffer(zip));
-    expect(entries).to.containEql(`${ELN_ARCHIVE_ROOT}/ro-crate-metadata.json`);
-    expect(entries).to.containEql(`${ELN_ARCHIVE_ROOT}/ro-crate-preview.html`);
-    expect(entries).to.containEql(
-      path.join(
-        ELN_ARCHIVE_ROOT,
-        entityBuilder.getFilePath('snippet-1', 'file-1', 'txt'),
-      ),
+    const zipped = await buffer(zip);
+    const filePath = path.join(
+      ELN_ARCHIVE_ROOT,
+      entityBuilder.getFilePath('snippet-1', 'file-1', 'txt'),
     );
+
+    expect((await listZipEntries(zipped)).sort()).to.eql(
+      [
+        `${ELN_ARCHIVE_ROOT}/ro-crate-metadata.json`,
+        `${ELN_ARCHIVE_ROOT}/ro-crate-preview.html`,
+        filePath,
+      ].sort(),
+    );
+
+    // The file entry carries the streamed bytes.
+    const files = await readZipEntries(zipped);
+    expect(files.get(filePath)?.toString()).to.equal('file bytes');
   });
 });
 

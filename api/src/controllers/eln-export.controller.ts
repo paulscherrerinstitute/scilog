@@ -14,7 +14,6 @@ import {pipeline} from 'node:stream/promises';
   voters: [basicAuthorization],
 })
 export class ElnExportController {
-  static readonly ARCHIVE_ROOT = ELN_ARCHIVE_ROOT;
   static readonly ELN_MEDIA_TYPE = 'application/vnd.eln+zip';
   constructor(
     @service(ElnExportService) private elnExportService: ElnExportService,
@@ -57,7 +56,7 @@ export class ElnExportController {
     response.set('Content-Type', ElnExportController.ELN_MEDIA_TYPE);
     response.set(
       'Content-Disposition',
-      `attachment; filename="${ElnExportController.ARCHIVE_ROOT}-${id}.eln"`,
+      `attachment; filename="${ELN_ARCHIVE_ROOT}-${id}.eln"`,
     );
     await pipeline(zip, response);
   }

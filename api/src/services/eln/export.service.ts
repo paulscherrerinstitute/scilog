@@ -12,8 +12,8 @@ import {SecurityBindings, UserProfile} from '@loopback/security';
 
 import {RawEntity} from 'ro-crate/lib/types';
 import {ROCrate} from 'ro-crate';
-import path from 'path';
-import {Readable} from 'stream';
+import path from 'node:path';
+import {Readable} from 'node:stream';
 import {ArchiveService, AssetDescriptor} from '../archive.service';
 import {FileStorageService} from '../file-storage.service';
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
@@ -65,8 +65,8 @@ export class ElnExportService {
   }
 
   // Build the ELN archive for a logbook and return it as a readable stream.
-  public async buildElnStream(id: string): Promise<Readable> {
-    const {rocrate, fileMetadata} = await this.getRoCrateMetadata(id);
+  public async buildElnStream(logbookId: string): Promise<Readable> {
+    const {rocrate, fileMetadata} = await this.getRoCrateMetadata(logbookId);
 
     // Build asset descriptors from GridFS streams for files referenced in snippets
     const assets: Array<AssetDescriptor> = fileMetadata.map(
