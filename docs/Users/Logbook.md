@@ -34,7 +34,7 @@ Use the **Export** button in the logbook's toolbar to open the export dialog:
 - **Export to PDF** downloads a printable snapshot of the logbook contents.
 - **Export to ELN** downloads the logbook as an `.eln` archive (a zipped RO-Crate following the [ELN file format](https://github.com/TheELNConsortium/TheELNFileFormat)). Such an archive can later be re-imported into SciLog — see [Importing from an `.eln` archive](Dashboard.md#importing-from-an-eln-archive) — which is useful for backup or for moving content between SciLog instances.
 
-For the details of the ELN format SciLog produces, see [ELN Conventions](../Development/eln-conventions.md).
+For the details of the ELN format SciLog produces, see [ELN Conventions](../Ingestor/eln-conventions.md).
 
 
 ## Multi User Behaviour
