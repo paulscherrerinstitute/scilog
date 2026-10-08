@@ -1,3 +1,10 @@
+## [3.0.1](https://github.com/paulscherrerinstitute/scilog/compare/v3.0.0...v3.0.1) (2026-10-08)
+
+
+### Bug Fixes
+
+* **web:** answer 404 for missing app files ([#822](https://github.com/paulscherrerinstitute/scilog/issues/822)) ([80198c8](https://github.com/paulscherrerinstitute/scilog/commit/80198c89d2e3456ed495b7e9010ad790b374f0ea))
+
 # [3.0.0](https://github.com/paulscherrerinstitute/scilog/compare/v2.14.4...v3.0.0) (2026-10-08)
 
 
