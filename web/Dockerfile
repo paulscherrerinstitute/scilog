@@ -1,8 +1,8 @@
-# syntax=docker/dockerfile:1
+# syntax=docker/dockerfile:1@sha256:4edf897a3ffa55b89f906fc8cc78afdb3f1834cc9c7083565e611a8a7d5fe99e
 
 # Full dependency install. Shared by the build and test stages, and used
 # directly as the dev compose target (source is bind-mounted there).
-FROM node:22.23.3-slim AS deps
+FROM node:22.23.3-slim@sha256:c3de60bf2f9dd0ac6370e6117950ff62d6e339527e7472301c9c78a017978392 AS deps
 
 WORKDIR /frontend
 
@@ -36,7 +36,7 @@ CMD ["npm", "run", "test"]
 
 # Static file server for the compiled bundle. The unprivileged image runs
 # as uid 101 and listens on 8080 instead of 80.
-FROM nginxinc/nginx-unprivileged:1.31-alpine AS production
+FROM nginxinc/nginx-unprivileged:1.31-alpine@sha256:b9241c6e7b8e9a862f129d8d4199ab64b10390949a78bdd5603379b32c844083 AS production
 
 COPY --from=build /frontend/dist/ /usr/share/nginx/html/
 COPY nginx/default.conf /etc/nginx/conf.d/default.conf
