@@ -1,5 +1,8 @@
 # SciLog
 
+[![Latest release](https://img.shields.io/github/v/release/paulscherrerinstitute/scilog)](https://github.com/paulscherrerinstitute/scilog/releases/latest)
+[![OpenSSF Scorecard](https://api.scorecard.dev/projects/github.com/paulscherrerinstitute/scilog/badge)](https://scorecard.dev/viewer/?uri=github.com/paulscherrerinstitute/scilog)
+
 A collaborative electronic logbook for experiments at scientific user facilities.
 
 ## Why SciLog?
