@@ -49,14 +49,6 @@ export class ScicatRoCrateController {
 
       const assets: Array<AssetDescriptor> = [
         {
-          // Explicitly create a directory entry as validation fails in scicat-rocrate
-          // service otherwise
-          // TO-DO: Remove this once the fix (v2.6.6) is deployed:
-          // https://github.com/paulscherrerinstitute/scicat-rocrate/issues/338
-          stream: null,
-          archivePath: `${DATA_DIR}/`,
-        },
-        {
           stream: pdfStream,
           archivePath: `${DATA_DIR}/${pdfName}`,
         },

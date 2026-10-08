@@ -3,12 +3,7 @@ import {ZipArchive} from 'archiver';
 import {finished, Readable} from 'node:stream';
 
 export interface AssetDescriptor {
-  // A null stream + an archivePath with trailing slash indicates
-  // to zipStream to create a directory entry
-  // This is NOT required by the zip format, but only a temporary
-  // measure until the following
-  // TO-DO: Remove once https://github.com/paulscherrerinstitute/scicat-rocrate/issues/338 deployed
-  stream: Readable | null;
+  stream: Readable;
   archivePath: string;
 }
 
@@ -18,18 +13,11 @@ export class ArchiveService {
   zipStream(assets: AssetDescriptor[]): Readable {
     const archive = new ZipArchive();
     for (const {stream, archivePath} of assets) {
-      // TO-DO: Remove this branch
-      // once https://github.com/paulscherrerinstitute/scicat-rocrate/issues/338 deployed
-      if (stream === null) {
-        // archiver reads the trailing slash and writes a directory entry.
-        archive.append('', {name: archivePath});
-        continue;
-      }
       stream.on('error', err => archive.destroy(err));
       archive.append(stream, {name: archivePath});
     }
 
-    finished(archive, () => assets.forEach(({stream}) => stream?.destroy()));
+    finished(archive, () => assets.forEach(({stream}) => stream.destroy()));
 
     archive.finalize().catch(err => archive.destroy(err));
     return archive;
