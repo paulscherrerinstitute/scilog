@@ -2,7 +2,7 @@
 
 # Shared foundation for every stage: OS, workdir, and chromium
 # (required for PDF export, even in production).
-FROM node:22.23.3-slim@sha256:c3de60bf2f9dd0ac6370e6117950ff62d6e339527e7472301c9c78a017978392 AS base
+FROM node:24.21.0-slim@sha256:d6aa754f16b3197301076f047b5def2f02ea1dbbc2ca920407d46d7ec7f87b20 AS base
 
 WORKDIR /home/node/app
 
