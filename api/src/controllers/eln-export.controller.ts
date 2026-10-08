@@ -7,7 +7,7 @@ import {authenticate} from '@loopback/authentication';
 import {authorize} from '@loopback/authorization';
 import {basicAuthorization} from '../services/basic.authorizor';
 import {FileRepository} from '../repositories/file.repository';
-import {RoCrateExportService} from '../services';
+import {ElnExportService} from '../services';
 import {EntityBuilderService} from '../services';
 import {ArchiveService, AssetDescriptor} from '../services/archive.service';
 import {Readable} from 'node:stream';
@@ -25,19 +25,19 @@ import path from 'path';
   allowedRoles: ['any-authenticated-user'],
   voters: [basicAuthorization],
 })
-export class RoCrateController {
+export class ElnExportController {
   static readonly ARCHIVE_ROOT = 'scilog-eln-export';
   static readonly ELN_MEDIA_TYPE = 'application/vnd.eln+zip';
   constructor(
     @repository(FileRepository) private fileRepository: FileRepository,
-    @service(RoCrateExportService)
-    private rocrateExportService: RoCrateExportService,
+    @service(ElnExportService)
+    private elnExportService: ElnExportService,
     @service(ArchiveService) private archiveService: ArchiveService,
     @service(EntityBuilderService) private entityBuilder: EntityBuilderService,
   ) {}
 
-  // GET /rocrates/{id}
-  @get('/rocrates/{id}', {
+  // GET /logbooks/export/{id}/eln/metadata
+  @get('/logbooks/export/{id}/eln/metadata', {
     security: OPERATION_SECURITY_SPEC,
     responses: {
       '200': {
@@ -46,29 +46,31 @@ export class RoCrateController {
       },
     },
   })
-  async findById(@param.path.string('id') id: string): Promise<object> {
-    const {rocrate} = await this.rocrateExportService.getRoCrateMetadata(id);
+  async exportElnMetadata(
+    @param.path.string('id') id: string,
+  ): Promise<object> {
+    const {rocrate} = await this.elnExportService.getRoCrateMetadata(id);
     return rocrate;
   }
 
-  // GET /rocrates/{id}/download
-  @get('/rocrates/{id}/download', {
+  // GET /logbooks/export/{id}/eln
+  @get('/logbooks/export/{id}/eln', {
     security: OPERATION_SECURITY_SPEC,
     responses: {
       '200': {
         description: 'Rocrate model instance',
         content: {
-          [RoCrateController.ELN_MEDIA_TYPE]: {schema: {type: 'object'}},
+          [ElnExportController.ELN_MEDIA_TYPE]: {schema: {type: 'object'}},
         },
       },
     },
   })
-  async downloadById(
+  async exportEln(
     @param.path.string('id') id: string,
     @inject(RestBindings.Http.RESPONSE) response: Response,
   ) {
     const {rocrate, fileMetadata} =
-      await this.rocrateExportService.getRoCrateMetadata(id);
+      await this.elnExportService.getRoCrateMetadata(id);
 
     // Build asset descriptors from GridFS streams for files referenced in snippets
     const bucket = new mongodb.GridFSBucket(
@@ -79,7 +81,7 @@ export class RoCrateController {
         return {
           stream: bucket.openDownloadStream(fileId as unknown as ObjectId),
           archivePath: path.join(
-            RoCrateController.ARCHIVE_ROOT,
+            ElnExportController.ARCHIVE_ROOT,
             this.entityBuilder.getFilePath(snippetId, fileId, fileExt),
           ),
         };
@@ -91,7 +93,7 @@ export class RoCrateController {
     assets.push({
       stream: Readable.from([metadataJson]),
       archivePath: path.join(
-        RoCrateController.ARCHIVE_ROOT,
+        ElnExportController.ARCHIVE_ROOT,
         'ro-crate-metadata.json',
       ),
     });
@@ -103,16 +105,16 @@ export class RoCrateController {
     assets.push({
       stream: Readable.from([previewHtml]),
       archivePath: path.join(
-        RoCrateController.ARCHIVE_ROOT,
+        ElnExportController.ARCHIVE_ROOT,
         'ro-crate-preview.html',
       ),
     });
 
     const zip = this.archiveService.zipStream(assets);
-    response.set('Content-Type', RoCrateController.ELN_MEDIA_TYPE);
+    response.set('Content-Type', ElnExportController.ELN_MEDIA_TYPE);
     response.set(
       'Content-Disposition',
-      `attachment; filename="${RoCrateController.ARCHIVE_ROOT}-${id}.eln"`,
+      `attachment; filename="${ElnExportController.ARCHIVE_ROOT}-${id}.eln"`,
     );
     await pipeline(zip, response);
   }

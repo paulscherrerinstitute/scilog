@@ -3,7 +3,7 @@
 // This file is licensed under the MIT License.
 // License text available at https://opensource.org/licenses/MIT
 
-export * from './ro-crate-export.service';
+export * from './eln/export.service';
 export * from './entity-builder.service';
 export * from './archive.service';
 export * from './logbook-pdf.service';

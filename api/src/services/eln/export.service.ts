@@ -1,13 +1,13 @@
 import {injectable, BindingScope, service, inject} from '@loopback/core';
-import {Basesnippet, Paragraph, Logbook, LinkType} from '../models';
-import {EntityBuilderService} from './entity-builder.service';
+import {Basesnippet, Paragraph, Logbook, LinkType} from '../../models';
+import {EntityBuilderService} from '../entity-builder.service';
 import {Filter, repository} from '@loopback/repository';
 import {
   BasesnippetRepository,
   FileRepository,
   LogbookRepository,
-} from '../repositories';
-import {Filesnippet} from '../models/file.model';
+} from '../../repositories';
+import {Filesnippet} from '../../models/file.model';
 import {SecurityBindings, UserProfile} from '@loopback/security';
 
 import {RawEntity} from 'ro-crate/lib/types';
@@ -20,7 +20,7 @@ export interface FileMetadata {
 }
 
 @injectable({scope: BindingScope.TRANSIENT})
-export class RoCrateExportService {
+export class ElnExportService {
   private crate: ROCrate;
   private fileMetadata: FileMetadata[];
   private logbookEntity: RawEntity;

@@ -357,7 +357,7 @@ export class LogbookItemDataService extends RemoteDataService {
 
   exportELN(logbookId: string): Promise<Blob> {
     return this.httpClient
-      .get(`${this.serverSettings.getServerAddress()}rocrates/${logbookId}/download`, {
+      .get(`${this.serverSettings.getServerAddress()}logbooks/export/${logbookId}/eln`, {
         responseType: 'blob',
       })
       .toPromise();
