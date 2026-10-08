@@ -1,3 +1,10 @@
+# [3.0.0](https://github.com/paulscherrerinstitute/scilog/compare/v2.14.4...v3.0.0) (2026-10-08)
+
+
+### Reverts
+
+* "chore(deps): update mongo docker tag to v9" ([#823](https://github.com/paulscherrerinstitute/scilog/issues/823)) ([174b82b](https://github.com/paulscherrerinstitute/scilog/commit/174b82b133e2137470fab663bb9862af8831801a)), closes [paulscherrerinstitute/scilog#803](https://github.com/paulscherrerinstitute/scilog/issues/803)
+
 ## [2.14.4](https://github.com/paulscherrerinstitute/scilog/compare/v2.14.3...v2.14.4) (2026-10-07)
 
 
