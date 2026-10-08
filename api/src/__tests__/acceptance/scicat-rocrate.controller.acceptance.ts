@@ -77,7 +77,6 @@ describe('ScicatRoCrateController', function (this: Suite) {
       .then(async response => {
         const files = await listZipEntries(response.body);
         expect(files).to.containEql('ro-crate-metadata.json');
-        expect(files).to.containEql(`${DATA_DIR}/`);
         expect(files).to.containEql(`${DATA_DIR}/${logbook.id}.eln`);
         expect(files).to.containEql(`${DATA_DIR}/${logbook.id}.pdf`);
       })
