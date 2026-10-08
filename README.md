@@ -41,32 +41,29 @@ The [importTools](./importTools) folder has common tooling scripts for integrati
 ### Docs
 The [docs](./docs) folder contains a preliminary and unpolished first draft of the documentation. It is made available [here](https://paulscherrerinstitute.github.io/scilog/) but still hasn't been officially maintained.
 
-### Local environment
-The [config](./config) folder contains configuration options for creating a local environment with docker. See the [getting started](#getting-started) section for instructions.
-
 ## Getting started
 
-### Full stack (frontend + backend)
-The easiest way to get started is using the provided [docker compose file](./config/docker-compose.yaml). Docker v2.29.0 or later is required.
+The easiest way to get started is the [compose file](./compose.yaml) in the repository root. It runs the backend with a seeded database and the frontend, both with live reload.
 
-Setting the compose profiles spins up the matching services. To create all of them, the backend (with some seeded data) and the frontend, run:
+First, create the local configuration from the provided examples:
 
 ```bash
-docker compose --profile '*' up -d
+cp api/datasource.example.json api/datasource.json
+cp api/functionalAccounts.example.json api/functionalAccounts.json
+cp web/config.example.json web/config.json
 ```
 
-You can then go to `http://localhost` to access the UI and `http://localhost/api/v1/explorer` to access the backend Swagger UI (including the openAPI specs). To login use:
+Then start everything:
 
-| Username         | Password      |
-| ---------------- | ------------- |
-| scilog@scilog    | scilog@scilog |
+```bash
+docker compose up -d
+```
+
+You can then go to `http://localhost:4200` to access the UI and `http://localhost:3000/api/v1/explorer` to access the backend Swagger UI (including the OpenAPI specs). On the **Admin** tab, log in with the email and password of the admin account in `api/functionalAccounts.json`.
 
 After that, you can start creating logbooks (`Add logbook`) and play around.
 
-To change configuration options or check the default ones, have a look at the files referenced by the [docker compose file](./config/docker-compose.yaml) and their content inside the [config](./config) folder.
-
-### Backend only
-For backend development, see the [backend README](./api/README.md).
+To work on one part only, see the [backend README](./api/README.md) and the [frontend README](./web/README.md).
 
 For questions or support, email us at: [scilog-help@lists.psi.ch](mailto:scilog-help@lists.psi.ch)
 
