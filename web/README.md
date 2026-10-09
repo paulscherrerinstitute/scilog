@@ -10,7 +10,7 @@ Copy the example config and edit as needed:
 cp config.example.json config.json
 ```
 
-`config.json` is git-ignored and bind-mounted by `compose.yaml` to `assets/config.json`, which the app fetches at runtime.
+`config.json` is git-ignored and bind-mounted by `web-development` to `src/assets/config.json`, which the app fetches at runtime. `web-production` uses `config.example.json` instead.
 
 ## Development server
 
