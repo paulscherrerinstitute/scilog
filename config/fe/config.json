@@ -1,7 +1,0 @@
-{
-    "lbBaseURL": "http://localhost/api/v1/",
-    "oAuth2Endpoint": {
-        "authURL": "auth/keycloak",
-        "displayText": "keycloak"
-    }
-}
