@@ -36,7 +36,6 @@ import {
   RestExplorerComponent,
 } from '@loopback/rest-explorer';
 import {ServiceMixin} from '@loopback/service-proxy';
-import path from 'path';
 import {PasswordHasherBindings} from './keys';
 import {User} from './models';
 import {FileRepository, ParagraphRepository} from './repositories';
@@ -95,9 +94,6 @@ export class SciLogDbApplication extends BootMixin(
 
     // Set up the custom sequence
     this.sequence(MySequence);
-
-    // Set up default home page
-    this.static('/', path.join(__dirname, '../public'));
 
     // Customize @loopback/rest-explorer configuration here
     this.configure(RestExplorerBindings.COMPONENT).to({
