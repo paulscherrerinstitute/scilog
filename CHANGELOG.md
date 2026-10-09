@@ -1,3 +1,10 @@
+## [3.0.2](https://github.com/paulscherrerinstitute/scilog/compare/v3.0.1...v3.0.2) (2026-10-09)
+
+
+### Bug Fixes
+
+* **api:** mark the session cookie as secure over https ([#839](https://github.com/paulscherrerinstitute/scilog/issues/839)) ([96ffc59](https://github.com/paulscherrerinstitute/scilog/commit/96ffc597b0164f31f18b8b6e46d3a83cb57f1ba4))
+
 ## [3.0.1](https://github.com/paulscherrerinstitute/scilog/compare/v3.0.0...v3.0.1) (2026-10-08)
 
 
