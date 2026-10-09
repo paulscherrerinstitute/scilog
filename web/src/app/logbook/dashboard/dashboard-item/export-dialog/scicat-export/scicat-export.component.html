@@ -1,0 +1,46 @@
+@if (inProgress || loadingGroups) {
+  <div>
+    <mat-progress-bar mode="query" [color]="'accent'"></mat-progress-bar>
+  </div>
+}
+@if (!showResult) {
+  <h2>Export to SciCat</h2>
+  <p>
+    A SciCat dataset will be created from this logbook. Choose the owner group it should belong to.
+  </p>
+  <mat-form-field>
+    <mat-label>Owner group</mat-label>
+    <mat-select [(value)]="ownerGroup" [disabled]="inProgress || loadingGroups" required>
+      @for (group of accessGroups; track group) {
+        <mat-option [value]="group">{{ group }}</mat-option>
+      }
+    </mat-select>
+  </mat-form-field>
+  @if (!loadingGroups && !accessGroups.length) {
+    <p>No SciCat access groups were found for your account.</p>
+  }
+  <div>
+    <button mat-button (click)="close()" [disabled]="inProgress">Cancel</button>
+    <button mat-button (click)="submit()" [disabled]="!ownerGroup || inProgress">
+      Export to SciCat
+    </button>
+  </div>
+} @else if (createdPid) {
+  <h2>Dataset created</h2>
+  <p>
+    A SciCat dataset was created from this logbook, and an archive job was submitted for it. You can
+    now view it in SciCat.
+  </p>
+  <div>
+    <a mat-button [href]="datasetUrl" target="_blank" rel="noopener">
+      Open in SciCat <mat-icon>open_in_new</mat-icon>
+    </a>
+    <button mat-button (click)="close()">Close</button>
+  </div>
+} @else {
+  <h2>Export failed</h2>
+  <p>{{ errorMessage }}</p>
+  <div>
+    <button mat-button (click)="close()">Close</button>
+  </div>
+}
