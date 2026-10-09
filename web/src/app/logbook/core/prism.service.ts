@@ -6,7 +6,18 @@ import { isPlatformBrowser } from '@angular/common';
 import 'prismjs';
 import 'prismjs/plugins/toolbar/prism-toolbar';
 // import 'prismjs/plugins/copy-to-clipboard/prism-copy-to-clipboard';
-import 'prismjs-components-importer/esm';
+// Languages offered by the editor's code block (see ckeditor-config.ts);
+// markup/html, css and javascript/js are part of the prismjs core bundle.
+import 'prismjs/components/prism-c';
+import 'prismjs/components/prism-cpp';
+import 'prismjs/components/prism-typescript';
+import 'prismjs/components/prism-python';
+import 'prismjs/components/prism-matlab';
+import 'prismjs/components/prism-julia';
+import 'prismjs/components/prism-bash';
+import 'prismjs/components/prism-docker';
+import 'prismjs/components/prism-json';
+import 'prismjs/components/prism-yaml';
 
 declare var Prism: any;
 

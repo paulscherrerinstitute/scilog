@@ -85,6 +85,8 @@ export let CKeditorConfig = {
     },
   },
   codeBlock: {
+    // Keep in sync with the Prism language imports in prism.service.ts,
+    // otherwise code blocks in a new language won't be highlighted.
     languages: [
       { language: 'python', label: 'Python' },
       { language: 'matlab', label: 'MATLAB' },
