@@ -1,3 +1,10 @@
+## [3.0.3](https://github.com/paulscherrerinstitute/scilog/compare/v3.0.2...v3.0.3) (2026-10-09)
+
+
+### Bug Fixes
+
+* **deps:** update dependency prismjs to v1.30.0 [security] ([#700](https://github.com/paulscherrerinstitute/scilog/issues/700)) ([56dc2c2](https://github.com/paulscherrerinstitute/scilog/commit/56dc2c2e98a342a0dde4a977774577f414260a16))
+
 ## [3.0.2](https://github.com/paulscherrerinstitute/scilog/compare/v3.0.1...v3.0.2) (2026-10-09)
 
 
