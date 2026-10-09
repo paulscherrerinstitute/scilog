@@ -14,13 +14,13 @@ The API will be available at `http://localhost:3000/api/v1/explorer`.
 
 ## Docker Compose services
 
-| Service            | Description                                  | Profile      |
-| ------------------ | -------------------------------------------- | ------------ |
-| `mongo`            | MongoDB 8 replica set                        | *(default)*  |
-| `mongo-seed`       | Seeds the database via `init/seed.js`        | *(default)*  |
-| `api-development`  | Dev server with live reload (`npm run dev`)  | *(default)*  |
-| `api-test`         | Runs the test suite                          | `test`       |
-| `api-production`   | Production image (compiled JS only)          | `production` |
+| Service           | Description                                                        | Profile      |
+| ----------------- | ------------------------------------------------------------------ | ------------ |
+| `mongo`           | MongoDB 8 replica set                                              | *(default)*  |
+| `mongo-seed`      | Seeds the database via `init/seed.js`                              | *(default)*  |
+| `api-development` | Dev server with live reload (`npm run dev`)                        | *(default)*  |
+| `api-test`        | Runs the test suite                                                | `test`       |
+| `api-production`  | Production image (compiled JS only), runs with the example configs | `production` |
 
 ### Running tests
 
@@ -54,4 +54,4 @@ cp oidc.example.json oidc.json
 cp functionalAccounts.example.json functionalAccounts.json
 ```
 
-These files are git-ignored and bind-mounted into the container at runtime.
+These files are git-ignored. `api-development` reads them from the mounted source folder; `api-production` uses the example files instead.

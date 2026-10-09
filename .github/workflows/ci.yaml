@@ -278,12 +278,6 @@ jobs:
         with:
           persist-credentials: false
 
-      # The production service mounts these; they aren't in git.
-      - name: Use example config
-        run: |
-          cp datasource.example.json datasource.json
-          cp oidc.example.json oidc.json
-
       - name: Start production image
         run: docker compose up --wait api-production
 
@@ -318,10 +312,6 @@ jobs:
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
-
-      # The production service mounts this; it isn't in git.
-      - name: Use example config
-        run: cp config.example.json config.json
 
       - name: Start production image
         run: docker compose up --wait web-production
