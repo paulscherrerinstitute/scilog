@@ -1,6 +1,6 @@
 services:
   mongo:
-    image: mongo:8@sha256:d731d77bfd7afd66bd487bdf627b5bf7ce4c3602ec461d635977021db529ebbc
+    image: mongo:8.2.12@sha256:e0ce8c35124d4a9f9785532d1f268f39e9728ffa1cb38f46fa482436424c4bd3
     container_name: mongo
     command: ["--replSet", "rs0"]
     volumes:
@@ -9,7 +9,7 @@ services:
       test: ["CMD", "mongosh", "--eval", "try { rs.status() } catch(e) { rs.initiate({_id:'rs0', members:[{_id:0, host:'mongo:27017'}]}) }"]
 
   mongo-seed:
-    image: mongo:8@sha256:d731d77bfd7afd66bd487bdf627b5bf7ce4c3602ec461d635977021db529ebbc
+    image: mongo:8.2.12@sha256:e0ce8c35124d4a9f9785532d1f268f39e9728ffa1cb38f46fa482436424c4bd3
     container_name: mongo-seed
     depends_on:
       mongo:
