@@ -67,7 +67,7 @@ jobs:
       - name: Set up Node.js
         uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
         with:
-          node-version: 22.23.3 # same as api/Dockerfile
+          node-version: 24.21.0 # same as api/Dockerfile
           cache: npm
           cache-dependency-path: api/package-lock.json
 
@@ -103,7 +103,7 @@ jobs:
       - name: Set up Node.js
         uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
         with:
-          node-version: 22.23.3 # same as web/Dockerfile
+          node-version: 24.21.0 # same as web/Dockerfile
           cache: npm
           cache-dependency-path: web/package-lock.json
 
