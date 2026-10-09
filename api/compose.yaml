@@ -35,7 +35,7 @@ services:
     tty: true
     init: true
     healthcheck:
-      test: ["CMD", "node", "-e", "fetch('http://localhost:3000/api/v1').then(r => { if (!r.ok) throw r.status })"]
+      test: ["CMD", "node", "-e", "fetch('http://localhost:3000/api/v1/health/live').then(r => { if (!r.ok) throw r.status })"]
     environment:
       JWT_SECRET: my-super-secret-key
       BASE_PATH: /api/v1
