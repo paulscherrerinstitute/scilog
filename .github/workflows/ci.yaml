@@ -13,7 +13,7 @@ concurrency:
 jobs:
   detect-changes:
     name: Detect changes
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-26.04
     timeout-minutes: 5
     permissions:
       contents: read # checkout; git diff in the merge queue
@@ -51,7 +51,7 @@ jobs:
     name: Lint api
     needs: detect-changes
     if: needs.detect-changes.outputs.api == 'true'
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-26.04
     timeout-minutes: 10
     permissions:
       contents: read
@@ -87,7 +87,7 @@ jobs:
     name: Lint web
     needs: detect-changes
     if: needs.detect-changes.outputs.web == 'true'
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-26.04
     timeout-minutes: 10
     permissions:
       contents: read
@@ -123,7 +123,7 @@ jobs:
     name: Lint sdk
     needs: detect-changes
     if: needs.detect-changes.outputs.sdk == 'true'
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-26.04
     timeout-minutes: 10
     permissions:
       contents: read
@@ -156,7 +156,7 @@ jobs:
     name: Lint workflows
     needs: detect-changes
     if: needs.detect-changes.outputs.workflows == 'true'
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-26.04
     timeout-minutes: 10
     permissions:
       contents: read
@@ -183,7 +183,7 @@ jobs:
     name: Test api
     needs: [detect-changes, lint-api]
     if: needs.detect-changes.outputs.api == 'true'
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-26.04
     timeout-minutes: 20
     permissions:
       contents: read
@@ -203,7 +203,7 @@ jobs:
     name: Test web
     needs: [detect-changes, lint-web]
     if: needs.detect-changes.outputs.web == 'true'
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-26.04
     timeout-minutes: 20
     permissions:
       contents: read
@@ -223,7 +223,7 @@ jobs:
     name: Test sdk
     needs: [detect-changes, lint-sdk]
     if: needs.detect-changes.outputs.sdk == 'true'
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-26.04
     timeout-minutes: 15
     permissions:
       contents: read
@@ -267,7 +267,7 @@ jobs:
       - test-api
       - test-web
       - test-sdk
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-26.04
     timeout-minutes: 2
     permissions: {}
     steps:

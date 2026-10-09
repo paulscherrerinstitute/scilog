@@ -19,7 +19,7 @@ jobs:
     if: >-
       github.ref == 'refs/heads/main' &&
       !startsWith(github.event.head_commit.message, 'chore(release):')
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-26.04
     timeout-minutes: 15
     permissions:
       contents: write # push the release commit and tag, create the GitHub release
@@ -65,7 +65,7 @@ jobs:
   build-sdk:
     name: Build sdk
     if: github.ref_type == 'tag'
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-26.04
     timeout-minutes: 10
     permissions:
       contents: read # checkout
@@ -97,7 +97,7 @@ jobs:
     name: Publish sdk
     needs: build-sdk
     if: github.ref_type == 'tag'
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-26.04
     timeout-minutes: 10
     environment:
       name: pypi
