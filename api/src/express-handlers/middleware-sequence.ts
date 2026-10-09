@@ -22,6 +22,8 @@ export class ExpressRequestHandlersProvider implements Provider<
       secret: process.env.SESSION_SECRET ?? 'someSecret',
       resave: false,
       saveUninitialized: false,
+      proxy: true,
+      cookie: {secure: 'auto'},
       ...(process.env.SESSION_STORE_BUILDER
         ? {store: sessionStoreBuilder(this.mongoDataSource.settings.url)}
         : {}),
