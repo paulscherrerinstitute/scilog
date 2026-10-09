@@ -45,6 +45,15 @@
       "description": "Update jasmine and its type definitions together",
       "matchPackageNames": ["jasmine-core", "@types/jasmine"],
       "groupName": "jasmine"
+    },
+    {
+      "description": "Update the mongodb driver together with the packages that use it",
+      "matchPackageNames": [
+        "loopback-connector-mongodb",
+        "mongodb",
+        "connect-mongo"
+      ],
+      "groupName": "mongodb"
     }
   ]
 }
