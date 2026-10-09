@@ -39,7 +39,7 @@ The [sdk/python](./sdk/python) folder contains a wrapper of the backend REST API
 The [importTools](./importTools) folder has common tooling scripts for integration with SciLog, using the SDK.
 
 ### Docs
-The [docs](./docs) folder contains a preliminary and unpolished first draft of the documentation. It is made available [here](https://paulscherrerinstitute.github.io/scilog/) but still hasn't been officially maintained.
+The [docs](./docs) folder contains a preliminary and unpolished first draft of the documentation. It is made available [here](https://paulscherrerinstitute.github.io/scilog/) but still hasn't been officially maintained. To preview it locally, run `npm ci && npx honkit serve` inside the folder.
 
 ## Getting started
 
