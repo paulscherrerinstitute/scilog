@@ -74,8 +74,10 @@ export class DashboardItemComponent implements OnInit, ComponentCanDeactivate, O
     this.subscriptions.push(
       this.route.queryParamMap.subscribe((data) => {
         console.log('query params: ', data);
-        if (data['params'].id) {
-          this.configIndex = data['params'].id;
+        const id = data.get('id');
+        // only digits (0-9), at least one: rejects empty, negative, decimal or hex ids
+        if (id !== null && /^\d+$/.test(id)) {
+          this.configIndex = Number(id);
           this.dashboardView = false;
         }
         if (this.viewSubscription != null) {
@@ -84,14 +86,9 @@ export class DashboardItemComponent implements OnInit, ComponentCanDeactivate, O
         this.viewSubscription = this.views.currentWidgetConfigs.subscribe((config) => {
           console.log(config);
           if (config != null && config.length > 0 && this.configIndex < config.length) {
-            if (typeof this.configIndex !== 'undefined') {
-              console.log(config);
-              console.log(this.configIndex);
-              this.config = config[this.configIndex].config;
-            } else {
-              this.configIndex = this.route.snapshot.queryParams.id;
-              this.config = config[this.configIndex].config;
-            }
+            console.log(config);
+            console.log(this.configIndex);
+            this.config = config[this.configIndex].config;
           }
         });
       }),
