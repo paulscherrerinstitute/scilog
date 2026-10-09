@@ -3,14 +3,14 @@ import {Suite} from 'mocha';
 import {SciLogDbApplication} from '../..';
 import {clearDatabase, createUserToken, setupApplication} from './test-helper';
 import _ from 'lodash';
-const Mongo = require('mongodb');
+import {ObjectId} from 'mongodb';
 
 describe('Edit', function (this: Suite) {
   this.timeout(5000);
   let app: SciLogDbApplication;
   let client: Client;
   let token: string;
-  const parentId = Mongo.ObjectId(123);
+  const parentId = new ObjectId(123);
   const editSnippet = {
     ownerGroup: 'editAcceptance',
     createACL: ['editAcceptance'],
@@ -75,7 +75,7 @@ describe('Edit', function (this: Suite) {
   });
 
   it(`should delete all edit snippets with parentId=${parentId}`, async () => {
-    const newParentId = Mongo.ObjectId(456);
+    const newParentId = new ObjectId(456);
     await client
       .post('/basesnippets')
       .set('Authorization', 'Bearer ' + token)

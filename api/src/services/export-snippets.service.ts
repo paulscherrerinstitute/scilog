@@ -12,6 +12,7 @@ import {writeFile} from 'fs/promises';
 import {create as tarCreate} from 'tar';
 import {mkdirSync, existsSync} from 'fs';
 import {basename, join} from 'path';
+import {ObjectId} from 'mongodb';
 
 @bind({
   scope: BindingScope.TRANSIENT,
@@ -252,10 +253,9 @@ export class ExportService {
       href != null &&
       (href.startsWith('https://') || href.startsWith('http://'))
     ) {
-      const objectId = require('mongodb').ObjectId;
       const hrefParts = href.split('/');
       const fileId = hrefParts.pop();
-      if (objectId.isValid(fileId) && hrefParts.pop() === 'download')
+      if (fileId && ObjectId.isValid(fileId) && hrefParts.pop() === 'download')
         return fileId;
       return;
     } else if (
