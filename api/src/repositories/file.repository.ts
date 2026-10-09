@@ -7,7 +7,7 @@ import {AutoAddRepository} from './autoadd.repository.base';
 import crypto from 'crypto';
 import {AnyBulkWriteOperation, Db, GridFSBucket, ObjectId} from 'mongodb';
 
-type FileDoc = {_id: string; _fileId: ObjectId};
+type FileDoc = {_id: ObjectId; _fileId: ObjectId};
 
 export class FileRepository extends SnippetRepositoryMixin<
   Filesnippet,

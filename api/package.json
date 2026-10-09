@@ -9,7 +9,7 @@
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "engines": {
-    "node": ">=10.16"
+    "node": "22 || 24 || 26"
   },
   "scripts": {
     "build": "lb-tsc --copy-resources",
@@ -47,13 +47,13 @@
     "@loopback/rest-explorer": "8.0.16",
     "@loopback/service-proxy": "8.0.15",
     "archiver": "8.0.0",
-    "connect-mongo": "4.6.0",
+    "connect-mongo": "6.0.0",
     "express-session": "1.19.0",
     "formidable": "3.5.4",
     "isemail": "3.2.0",
     "jsdom": "29.1.1",
-    "loopback-connector-mongodb": "5.6.0",
-    "mongodb": "4.17.2",
+    "loopback-connector-mongodb": "8.0.2",
+    "mongodb": "5.9.2",
     "passport-openidconnect": "0.1.2",
     "pdf-merger-js": "5.1.2",
     "prismjs": "1.30.0",
