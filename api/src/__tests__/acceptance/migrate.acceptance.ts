@@ -6,7 +6,6 @@ import {createSandbox} from 'sinon';
 import {FileRepository, ParagraphRepository} from '../../repositories';
 import * as util from '../../utils/misc';
 import {Db, GridFSBucket} from 'mongodb';
-const mongodb = require('mongodb');
 import fs from 'fs';
 import {testdb} from '../testdb.datasource';
 import path from 'path';
@@ -76,7 +75,7 @@ describe('Migrate', function (this: Suite) {
 
   async function givenFileSnippet() {
     const db: Db = testdb?.connector?.db;
-    const bucket: GridFSBucket = new mongodb.GridFSBucket(db);
+    const bucket: GridFSBucket = new GridFSBucket(db);
     const uploadStream = bucket.openUploadStream('hello.txt');
     fs.createReadStream(
       path.resolve('src', '__tests__', 'test-data', 'hello.txt'),

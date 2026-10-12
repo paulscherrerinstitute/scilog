@@ -6,7 +6,6 @@ import {FileRelations, Filesnippet} from '../models/file.model';
 import {AutoAddRepository} from './autoadd.repository.base';
 import crypto from 'crypto';
 import {AnyBulkWriteOperation, Db, GridFSBucket, ObjectId} from 'mongodb';
-const mongodb = require('mongodb');
 
 type FileDoc = {_id: string; _fileId: ObjectId};
 
@@ -25,7 +24,7 @@ export class FileRepository extends SnippetRepositoryMixin<
   constructor(@inject('datasources.mongo') dataSource: MongoDataSource) {
     super(Filesnippet, dataSource);
     this.db = this.dataSource.connector.db;
-    this.bucket = new mongodb.GridFSBucket(this.db);
+    this.bucket = new GridFSBucket(this.db);
   }
   private db: Db;
   private bucket: GridFSBucket;

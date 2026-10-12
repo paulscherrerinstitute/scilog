@@ -3,7 +3,7 @@ import {param, get, Response, RestBindings, HttpErrors} from '@loopback/rest';
 import {inject} from '@loopback/core';
 import {FileRepository} from '../repositories/file.repository';
 
-const Mongo = require('mongodb');
+import {GridFSBucket} from 'mongodb';
 
 export class ImageController {
   constructor(
@@ -35,7 +35,7 @@ export class ImageController {
     if (typeof data?._fileId == 'undefined') {
       throw new HttpErrors.BadRequest(`Retrieving sandbox data is deprecated.`);
     }
-    const bucket = new Mongo.GridFSBucket(
+    const bucket = new GridFSBucket(
       this.fileRepository.dataSource.connector?.db,
     );
     response.set('Content-Type', data.contentType);

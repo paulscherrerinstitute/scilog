@@ -2,6 +2,7 @@ import {TokenService} from '@loopback/authentication';
 import {TokenServiceBindings} from '@loopback/authentication-jwt';
 import {AnyObject} from '@loopback/repository';
 import {UserProfile} from '@loopback/security';
+import {MongoClient, ObjectId} from 'mongodb';
 import {SciLogDbApplication} from '../application';
 import {MongoDataSource} from '../datasources';
 import {Basesnippet} from '../models';
@@ -19,7 +20,6 @@ export interface WebsocketContainer {
 }
 
 export async function startWebsocket(app: SciLogDbApplication) {
-  const Mongo = require('mongodb');
   const WebSocket = require('ws');
   const websocketMap: WebsocketContainer = {};
 
@@ -100,7 +100,7 @@ export async function startWebsocket(app: SciLogDbApplication) {
     ) => {
       const parentDoc = db
         .collection('Basesnippet')
-        .findOne({_id: Mongo.ObjectId(parentId)});
+        .findOne({_id: new ObjectId(parentId)});
       // eslint-disable-next-line  @typescript-eslint/no-explicit-any
       return parentDoc.then((document: any) => {
         if (document?.snippetType === 'logbook') {
@@ -134,12 +134,9 @@ export async function startWebsocket(app: SciLogDbApplication) {
   const dataSourceSettings: AnyObject = (
     app.getSync('datasources.mongo') as MongoDataSource
   ).settings;
-  Mongo.MongoClient.connect(dataSourceSettings.url, {
-    useUnifiedTopology: dataSourceSettings.useUnifiedTopology,
-    // eslint-disable-next-line  @typescript-eslint/no-explicit-any
-  }).then((client: any) => {
+  await MongoClient.connect(dataSourceSettings.url).then(client => {
     const db = client.db(dataSourceSettings.database);
-    const collection = db.collection('Basesnippet');
+    const collection = db.collection<Basesnippet>('Basesnippet');
     const changeStream = collection.watch(); //[{'$match': {'fullDocument.ownerGroup': 'p17301'}}]
     // console.log(collection);
     // eslint-disable-next-line  @typescript-eslint/no-explicit-any
@@ -156,7 +153,7 @@ export async function startWebsocket(app: SciLogDbApplication) {
 
             // make sure all subscribers have the permission to read the changestream
             const doc = await collection.findOne({
-              _id: Mongo.ObjectId(change.documentKey._id),
+              _id: new ObjectId(change.documentKey._id),
             });
             if (!doc) return;
             // console.log(websocketMap[id])
@@ -209,8 +206,7 @@ export async function startWebsocket(app: SciLogDbApplication) {
         });
       }
     });
-    // eslint-disable-next-line  @typescript-eslint/no-explicit-any
-    changeStream.on('error', (err: any) => {
+    changeStream.on('error', err => {
       console.log('Error in ChangeStream:');
       console.log(err);
     });
