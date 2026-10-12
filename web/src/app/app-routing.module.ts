@@ -16,37 +16,46 @@ import { ProfileSettingsComponent } from '@shared/settings/profile-settings/prof
 import { DownloadComponent } from '@shared/download/download.component';
 import { NavigationGuardService } from './logbook/core/navigation-guard-service';
 import { AuthCallbackComponent } from './auth-callback/auth-callback.component';
+import { authGuard } from '@shared/auth-services/auth.guard';
 
-const routes: Routes = [
+// Every route needs a logged-in user unless it is listed before the guarded
+// group, so new routes are protected by default.
+export const routes: Routes = [
   { path: '', redirectTo: '/login', pathMatch: 'full' },
   { path: 'login', component: LoginComponent },
   { path: 'auth-callback', component: AuthCallbackComponent },
-  { path: 'overview', component: OverviewComponent },
-  { path: 'download/:fileId', component: DownloadComponent },
   {
-    path: 'logbooks/:logbookId',
-    component: LogbookComponent,
+    path: '',
+    canActivateChild: [authGuard],
     children: [
+      { path: 'overview', component: OverviewComponent },
+      { path: 'download/:fileId', component: DownloadComponent },
       {
-        path: 'dashboard',
-        component: DashboardComponent,
-        canDeactivate: mapToCanDeactivate([NavigationGuardService]),
+        path: 'logbooks/:logbookId',
+        component: LogbookComponent,
+        children: [
+          {
+            path: 'dashboard',
+            component: DashboardComponent,
+            canDeactivate: mapToCanDeactivate([NavigationGuardService]),
+          },
+          { path: 'todos', component: TodosComponent },
+          { path: 'logbook', component: LogbookItemComponent },
+          { path: 'snippetViewer', component: SnippetViewerComponent },
+          { path: 'chat', component: ChatComponent },
+          { path: 'graph', component: ChartComponent },
+          {
+            path: 'dashboard-item',
+            component: DashboardItemComponent,
+            canDeactivate: mapToCanDeactivate([NavigationGuardService]),
+          },
+          { path: '**', redirectTo: '/overview', pathMatch: 'full' },
+        ],
       },
-      { path: 'todos', component: TodosComponent },
-      { path: 'logbook', component: LogbookItemComponent },
-      { path: 'snippetViewer', component: SnippetViewerComponent },
-      { path: 'chat', component: ChatComponent },
-      { path: 'graph', component: ChartComponent },
-      {
-        path: 'dashboard-item',
-        component: DashboardItemComponent,
-        canDeactivate: mapToCanDeactivate([NavigationGuardService]),
-      },
-      { path: '**', redirectTo: '/overview', pathMatch: 'full' },
+      { path: 'viewSettings', component: ViewSettingsComponent, outlet: 'settings' },
+      { path: 'profileSettings', component: ProfileSettingsComponent, outlet: 'settings' },
     ],
   },
-  { path: 'viewSettings', component: ViewSettingsComponent, outlet: 'settings' },
-  { path: 'profileSettings', component: ProfileSettingsComponent, outlet: 'settings' },
   { path: '**', redirectTo: '/overview', pathMatch: 'full' },
 ];
 

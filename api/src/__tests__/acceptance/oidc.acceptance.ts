@@ -6,7 +6,7 @@ import {SciLogDbApplication} from '../..';
 import {UserRepository} from '../../repositories';
 import OIDCStrategy from 'passport-openidconnect';
 import {RequestContext, RestBindings} from '@loopback/rest';
-import {InvocationContext, Next} from '@loopback/core';
+import {Interceptor, InvocationContext, Next} from '@loopback/core';
 import {verifyFunctionFactory} from '../../authentication-strategies/types';
 import {createUserToken, oidcOptions, setupApplication} from './test-helper';
 
@@ -16,6 +16,7 @@ describe('OIDC services', function (this: Suite) {
   let client: Client;
   let userRepo: UserRepository;
   let token: string;
+  let passportOidc: Interceptor;
 
   const profileData = {
     name: {
@@ -47,6 +48,7 @@ describe('OIDC services', function (this: Suite) {
   before('setupApplication', async () => {
     ({app, client} = await setupApplication({oidcOptions: oidcOptions}));
     token = await createUserToken(app, client, ['logbookAcceptance']);
+    passportOidc = await app.get<Interceptor>('passport-oidc');
   });
   before('userRepo', async () => {
     userRepo = await app.get('repositories.UserRepository');
@@ -113,6 +115,85 @@ describe('OIDC services', function (this: Suite) {
     expect(verifiedUser)
       .to.have.property('roles')
       .and.to.be.eql(userData.roles);
+  });
+
+  describe('return to the opened page', () => {
+    beforeEach(() => {
+      // earlier tests replace the passport step; use the real one so the
+      // session is renewed on login as in production
+      app.getBinding('passport-oidc').to(passportOidc);
+      const authenticate = OIDCStrategy.prototype.authenticate;
+      sandbox.stub(OIDCStrategy.prototype, 'authenticate').callsFake(function (
+        this: OIDCStrategy,
+        req,
+        options,
+      ) {
+        if (req.url.startsWith('/auth/oidc/callback')) {
+          return this.success(userData);
+        }
+        return authenticate.call(this, req, options);
+      });
+    });
+
+    async function login(query = '', cookie: string[] = []) {
+      const res = await client
+        .get(`/auth/oidc/login${query}`)
+        .set('Cookie', cookie)
+        .expect(303);
+      return res.get('Set-Cookie') ?? cookie;
+    }
+
+    async function callback(cookie: string[]) {
+      const res = await client
+        .get('/auth/oidc/callback')
+        .set('Cookie', cookie)
+        .expect(302);
+      const location = new URL(res.headers.location, 'http://web.invalid');
+      expect(location.pathname).to.eql('/success-redirect');
+      return {
+        returnUrl: location.searchParams.get('returnUrl'),
+        cookie: res.get('Set-Cookie') ?? [],
+      };
+    }
+
+    it('passes the returnUrl of the login on to the web app once', async () => {
+      const cookie = await login('?returnUrl=/logbooks/1/dashboard');
+
+      const first = await callback(cookie);
+      expect(first.returnUrl).to.eql('/logbooks/1/dashboard');
+      expect(first.cookie).to.not.be.empty();
+      expect(first.cookie).to.not.eql(cookie);
+      expect((await callback(first.cookie)).returnUrl).to.be.null();
+    });
+
+    it('keeps the query of the returnUrl', async () => {
+      const cookie = await login(
+        `?returnUrl=${encodeURIComponent('/logbooks/1/dashboard?a=1&b=2')}`,
+      );
+
+      expect((await callback(cookie)).returnUrl).to.eql(
+        '/logbooks/1/dashboard?a=1&b=2',
+      );
+    });
+
+    it('forgets the returnUrl of an earlier, unfinished login', async () => {
+      const cookie = await login('?returnUrl=/logbooks/1/dashboard');
+      await login('', cookie);
+
+      expect((await callback(cookie)).returnUrl).to.be.null();
+    });
+
+    it('drops a returnUrl pointing outside the app', async () => {
+      const cookie = await login('?returnUrl=https://evil.com');
+
+      expect((await callback(cookie)).returnUrl).to.be.null();
+    });
+
+    it('keeps the redirect unchanged without returnUrl', async () => {
+      const cookie = await login();
+
+      expect((await callback(cookie)).returnUrl).to.be.null();
+    });
   });
 
   it('Logout with unauthenticated user should fail', async () => {
