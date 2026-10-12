@@ -1,4 +1,5 @@
 import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
+import { By } from '@angular/platform-browser';
 import { MatDialogModule, MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { provideHttpClientTesting } from '@angular/common/http/testing';
 import { AddContentComponent, extractNotificationMessage } from './add-content.component';
@@ -8,7 +9,7 @@ import { ChangeStreamNotification } from '@shared/changestreamnotification.model
 import { LinkType, Paragraphs } from '@model/paragraphs';
 import { AppConfigService } from 'src/app/app-config.service';
 import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http';
-import { Component } from '@angular/core';
+import { Component, input } from '@angular/core';
 import { TagEditorComponent } from '@shared/tag-editor/tag-editor.component';
 import { CKEditorModule, ChangeEvent } from '@ckeditor/ckeditor5-angular';
 
@@ -18,6 +19,39 @@ class AddContentServiceMock {
 }
 
 const getConfig = () => ({});
+
+@Component({ selector: 'app-tag-editor', template: '' })
+class TagEditorStubComponent {}
+
+// eslint-disable-next-line @angular-eslint/component-selector
+@Component({ selector: 'ckeditor', template: '' })
+class CKEditorStubComponent {
+  data = input<string>();
+}
+
+function configureTestingModule(dialogData: object) {
+  return TestBed.configureTestingModule({
+    imports: [MatDialogModule, TagEditorStubComponent, AddContentComponent],
+    providers: [
+      { provide: MAT_DIALOG_DATA, useValue: dialogData },
+      { provide: MatDialogRef, useValue: {} },
+      { provide: AddContentService, useClass: AddContentServiceMock },
+      { provide: AppConfigService, useValue: { getConfig } },
+      provideHttpClient(withInterceptorsFromDi()),
+      provideHttpClientTesting(),
+    ],
+  })
+    .overrideComponent(AddContentComponent, {
+      add: { imports: [TagEditorStubComponent, CKEditorStubComponent] },
+      remove: { imports: [TagEditorComponent, CKEditorModule] },
+    })
+    .compileComponents();
+}
+
+function getEditorStub(fixture: ComponentFixture<AddContentComponent>) {
+  return fixture.debugElement.query(By.directive(CKEditorStubComponent))
+    .componentInstance as CKEditorStubComponent;
+}
 
 describe('AddContentComponent', () => {
   let component: AddContentComponent;
@@ -62,31 +96,7 @@ describe('AddContentComponent', () => {
     ],
   };
 
-  @Component({ selector: 'app-tag-editor', template: '' })
-  class TagEditorStubComponent {}
-
-  // eslint-disable-next-line @angular-eslint/component-selector
-  @Component({ selector: 'ckeditor', template: '' })
-  class CKEditorStubComponent {}
-
-  beforeEach(waitForAsync(() => {
-    TestBed.configureTestingModule({
-      imports: [MatDialogModule, TagEditorStubComponent, AddContentComponent],
-      providers: [
-        { provide: MAT_DIALOG_DATA, useValue: {} },
-        { provide: MatDialogRef, useValue: {} },
-        { provide: AddContentService, useClass: AddContentServiceMock },
-        { provide: AppConfigService, useValue: { getConfig } },
-        provideHttpClient(withInterceptorsFromDi()),
-        provideHttpClientTesting(),
-      ],
-    })
-      .overrideComponent(AddContentComponent, {
-        add: { imports: [TagEditorStubComponent, CKEditorStubComponent] },
-        remove: { imports: [TagEditorComponent, CKEditorModule] },
-      })
-      .compileComponents();
-  }));
+  beforeEach(waitForAsync(() => configureTestingModule({})));
 
   beforeEach(() => {
     fixture = TestBed.createComponent(AddContentComponent);
@@ -337,6 +347,17 @@ describe('AddContentComponent', () => {
     expect(component.sendMessage).toHaveBeenCalledTimes(0);
   });
 
+  it('should not reload the editor when autosaving', () => {
+    const editor = getEditorStub(fixture);
+    const contentAtOpen = editor.data();
+
+    component.editorConfig.autosave.save({ getData: () => '<p>edited</p>' });
+    fixture.detectChanges();
+
+    expect(component.data).toBe('<p>edited</p>');
+    expect(editor.data()).toBe(contentAtOpen);
+  });
+
   it('should mark for deletion and send message', () => {
     spyOn(component, 'sendMessage');
     component.dialogTitle = 'Modify data snippet';
@@ -428,4 +449,16 @@ describe('AddContentComponent', () => {
   function combineHtmlFigureHash(figureMock: string[], hash: string) {
     return figureMock[0] + ' title="' + hash + '"' + figureMock[1];
   }
+});
+
+describe('AddContentComponent opened for editing', () => {
+  beforeEach(waitForAsync(() =>
+    configureTestingModule({ snippet: { id: '123' }, content: '<p>message</p>' })));
+
+  it('should give the editor the message content', () => {
+    const fixture = TestBed.createComponent(AddContentComponent);
+    fixture.detectChanges();
+
+    expect(getEditorStub(fixture).data()).toBe('<p>message</p>');
+  });
 });

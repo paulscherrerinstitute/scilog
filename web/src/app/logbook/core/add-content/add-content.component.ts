@@ -53,6 +53,7 @@ export class AddContentComponent implements OnInit, OnDestroy {
   public editorConfig: any = CKeditorConfig;
 
   data: any = '';
+  initialData = '';
   message: any;
   notification: ChangeStreamNotification = {};
   liveFeedback: boolean;
@@ -100,6 +101,9 @@ export class AddContentComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.setupComponent();
+    // The editor only takes its content once: feeding later changes back into
+    // it would reload the whole document, resetting the cursor and any drag.
+    this.initialData = this.data;
     this.subscriptions.push(
       this.dataService.currentMessage.subscribe((message) => {
         console.log(message);
