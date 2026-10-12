@@ -14,6 +14,7 @@ import {
   patch,
   del,
   requestBody,
+  HttpErrors,
 } from '@loopback/rest';
 import {UserPreference} from '../models';
 import {UserPreferenceRepository} from '../repositories';
@@ -21,6 +22,8 @@ import {authenticate} from '@loopback/authentication';
 import {authorize} from '@loopback/authorization';
 import {basicAuthorization} from '../services/basic.authorizor';
 import {OPERATION_SECURITY_SPEC} from '../utils/security-spec';
+import {SecurityBindings, securityId, UserProfile} from '@loopback/security';
+import {inject} from '@loopback/core';
 @authenticate('jwt')
 @authorize({
   allowedRoles: ['any-authenticated-user'],
@@ -28,9 +31,25 @@ import {OPERATION_SECURITY_SPEC} from '../utils/security-spec';
 })
 export class UserPreferenceController {
   constructor(
+    @inject(SecurityBindings.USER) private user: UserProfile,
     @repository(UserPreferenceRepository)
     public userPreferenceRepository: UserPreferenceRepository,
   ) {}
+
+  private get userId(): string {
+    return this.user[securityId];
+  }
+
+  private async ownedOrThrow(id: string): Promise<void> {
+    const owned = await this.userPreferenceRepository.findOne({
+      where: {id, userId: this.userId},
+    });
+    if (!owned) {
+      throw new HttpErrors.NotFound(
+        `Entity not found: UserPreference with id "${id}"`,
+      );
+    }
+  }
 
   @post('/user-preferences', {
     security: OPERATION_SECURITY_SPEC,
@@ -56,6 +75,7 @@ export class UserPreferenceController {
     })
     userPreference: Omit<UserPreference, 'id'>,
   ): Promise<UserPreference> {
+    userPreference.userId = this.userId;
     return this.userPreferenceRepository.create(userPreference);
   }
 
@@ -71,7 +91,9 @@ export class UserPreferenceController {
   async count(
     @param.where(UserPreference) where?: Where<UserPreference>,
   ): Promise<Count> {
-    return this.userPreferenceRepository.count(where);
+    return this.userPreferenceRepository.count({
+      and: [where ?? {}, {userId: this.userId}],
+    });
   }
 
   @get('/user-preferences', {
@@ -95,7 +117,10 @@ export class UserPreferenceController {
   async find(
     @param.filter(UserPreference) filter?: Filter<UserPreference>,
   ): Promise<UserPreference[]> {
-    return this.userPreferenceRepository.find(filter);
+    return this.userPreferenceRepository.find({
+      ...filter,
+      where: {and: [filter?.where ?? {}, {userId: this.userId}]},
+    });
   }
 
   @patch('/user-preferences', {
@@ -118,7 +143,10 @@ export class UserPreferenceController {
     userPreference: UserPreference,
     @param.where(UserPreference) where?: Where<UserPreference>,
   ): Promise<Count> {
-    return this.userPreferenceRepository.updateAll(userPreference, where);
+    userPreference.userId = this.userId;
+    return this.userPreferenceRepository.updateAll(userPreference, {
+      and: [where ?? {}, {userId: this.userId}],
+    });
   }
 
   @get('/user-preferences/{id}', {
@@ -139,6 +167,7 @@ export class UserPreferenceController {
     @param.filter(UserPreference, {exclude: 'where'})
     filter?: FilterExcludingWhere<UserPreference>,
   ): Promise<UserPreference> {
+    await this.ownedOrThrow(id);
     return this.userPreferenceRepository.findById(id, filter);
   }
 
@@ -161,6 +190,8 @@ export class UserPreferenceController {
     })
     userPreference: UserPreference,
   ): Promise<void> {
+    await this.ownedOrThrow(id);
+    userPreference.userId = this.userId;
     await this.userPreferenceRepository.updateById(id, userPreference);
   }
 
@@ -173,6 +204,7 @@ export class UserPreferenceController {
     },
   })
   async deleteById(@param.path.string('id') id: string): Promise<void> {
+    await this.ownedOrThrow(id);
     await this.userPreferenceRepository.deleteById(id);
   }
 }
