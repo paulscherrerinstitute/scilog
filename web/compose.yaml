@@ -27,7 +27,7 @@ services:
     ports:
       - 8080:8080
     volumes:
-      - ./config.json:/usr/share/nginx/html/assets/config.json:ro
+      - ./config.example.json:/usr/share/nginx/html/assets/config.json:ro
     profiles: [production]
 
 volumes:

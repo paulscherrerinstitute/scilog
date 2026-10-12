@@ -64,8 +64,8 @@ services:
       JWT_SECRET: my-super-secret-key
       BASE_PATH: /api/v1
     volumes:
-      - ./datasource.json:/home/node/app/datasource.json:ro
-      - ./oidc.json:/home/node/app/oidc.json:ro
+      - ./datasource.example.json:/home/node/app/datasource.json:ro
+      - ./oidc.example.json:/home/node/app/oidc.json:ro
     profiles: [production]
 
 volumes:
