@@ -12,6 +12,7 @@ import {
 } from '@loopback/authentication';
 import {inject, intercept} from '@loopback/core';
 import {mapProfile, OIDCOptions} from '../authentication-strategies/types';
+import {saveReturnUrl, takeReturnUrl} from '../utils/return-url';
 import {TokenServiceBindings, User} from '@loopback/authentication-jwt';
 
 /**
@@ -36,13 +37,19 @@ export class OIDCController {
    */
   loginToThirdParty(
     @param.path.string('provider') provider: string,
+    @param.query.string('returnUrl', {
+      description: 'Page in the web app to return to after login',
+    })
+    returnUrl: string | undefined,
     @inject(AuthenticationBindings.AUTHENTICATION_REDIRECT_URL)
     redirectUrl: string,
     @inject(AuthenticationBindings.AUTHENTICATION_REDIRECT_STATUS)
     status: number,
+    @inject(RestBindings.Http.REQUEST) request: RequestWithSession,
     @inject(RestBindings.Http.RESPONSE)
     response: Response,
   ) {
+    saveReturnUrl(request.session, returnUrl);
     response.statusCode = status || 302;
     response.setHeader('Location', redirectUrl);
     response.end();
@@ -70,7 +77,13 @@ export class OIDCController {
     // create a JSON Web Token based on the user profile
     const token = await this.jwtService.generateToken(userProfile);
 
-    response.redirect(`${oidcOptions.successRedirect}?token=${token}`);
+    const returnUrl = takeReturnUrl(request.session);
+    const returnUrlParam = returnUrl
+      ? `&returnUrl=${encodeURIComponent(returnUrl)}`
+      : '';
+    response.redirect(
+      `${oidcOptions.successRedirect}?token=${token}${returnUrlParam}`,
+    );
     return response;
   }
 
