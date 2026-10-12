@@ -1,3 +1,10 @@
+## [3.0.4](https://github.com/paulscherrerinstitute/scilog/compare/v3.0.3...v3.0.4) (2026-10-12)
+
+
+### Bug Fixes
+
+* **api:** upgrade the mongodb connector to v8 ([#844](https://github.com/paulscherrerinstitute/scilog/issues/844)) ([ce4c5bc](https://github.com/paulscherrerinstitute/scilog/commit/ce4c5bcd9c05772ab2fd6e09ecd2cf64a8f81221)), closes [#809](https://github.com/paulscherrerinstitute/scilog/issues/809)
+
 ## [3.0.3](https://github.com/paulscherrerinstitute/scilog/compare/v3.0.2...v3.0.3) (2026-10-09)
 
 
