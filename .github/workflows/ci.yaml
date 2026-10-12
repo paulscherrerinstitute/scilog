@@ -83,6 +83,15 @@ jobs:
       - name: Check types
         run: npm run typecheck
 
+      - name: Check for a single mongodb driver
+        run: |
+          count=$(npm query '[name=mongodb]' | jq length)
+          if [ "$count" -ne 1 ]; then
+            echo "::error::Found $count copies of mongodb; our code and loopback-connector-mongodb must share one driver"
+            npm ls mongodb --all
+            exit 1
+          fi
+
   lint-web:
     name: Lint web
     needs: detect-changes
