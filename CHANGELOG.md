@@ -1,3 +1,10 @@
+## [3.0.7](https://github.com/paulscherrerinstitute/scilog/compare/v3.0.6...v3.0.7) (2026-10-13)
+
+
+### Bug Fixes
+
+* **api:** require a session secret instead of a default ([#855](https://github.com/paulscherrerinstitute/scilog/issues/855)) ([c2631a9](https://github.com/paulscherrerinstitute/scilog/commit/c2631a9e0ef365f0be8e8730e4379aee81403c4b))
+
 ## [3.0.6](https://github.com/paulscherrerinstitute/scilog/compare/v3.0.5...v3.0.6) (2026-10-13)
 
 
