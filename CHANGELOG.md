@@ -1,3 +1,10 @@
+## [3.0.6](https://github.com/paulscherrerinstitute/scilog/compare/v3.0.5...v3.0.6) (2026-10-13)
+
+
+### Bug Fixes
+
+* **web:** stop printing the login token to the console ([#856](https://github.com/paulscherrerinstitute/scilog/issues/856)) ([a8da345](https://github.com/paulscherrerinstitute/scilog/commit/a8da34565dab8f865b6cda1f92ee028fbfa31e1c))
+
 ## [3.0.5](https://github.com/paulscherrerinstitute/scilog/compare/v3.0.4...v3.0.5) (2026-10-13)
 
 
