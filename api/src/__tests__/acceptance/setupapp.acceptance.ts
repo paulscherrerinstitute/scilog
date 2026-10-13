@@ -26,6 +26,14 @@ describe('SetupApp', () => {
     expect(spyBind.calledWith('datasources.config.mongo')).to.be.false;
   });
 
+  [undefined, ''].forEach(sessionSecret => {
+    it(`Refuses to start with the session secret ${JSON.stringify(sessionSecret)}`, async () => {
+      await expect(setupApplication({sessionSecret})).to.be.rejectedWith(
+        'SESSION_SECRET must be set to sign session cookies',
+      );
+    });
+  });
+
   it('Tries to set oidc strategy', async () => {
     const spyBind = sandbox.spy(SciLogDbApplication.prototype, 'bind');
     app = (await setupApplication()).app;

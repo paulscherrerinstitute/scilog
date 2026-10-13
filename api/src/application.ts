@@ -36,7 +36,7 @@ import {
   RestExplorerComponent,
 } from '@loopback/rest-explorer';
 import {ServiceMixin} from '@loopback/service-proxy';
-import {PasswordHasherBindings} from './keys';
+import {PasswordHasherBindings, SESSION_SECRET} from './keys';
 import {User} from './models';
 import {FileRepository, ParagraphRepository} from './repositories';
 import {MySequence} from './sequence';
@@ -131,6 +131,8 @@ export class SciLogDbApplication extends BootMixin(
       (process.env.JWT_SECRET as string) ??
         crypto.randomBytes(12).toString('hex'),
     );
+    if (this.options.sessionSecret)
+      this.bind(SESSION_SECRET).to(this.options.sessionSecret);
     this.bind(UserServiceBindings.USER_SERVICE).toClass(MyUserService);
 
     this.add(createBindingFromClass(SecuritySpecEnhancer));
@@ -192,6 +194,11 @@ export class SciLogDbApplication extends BootMixin(
   // eslint-disable-next-line @typescript-eslint/ban-ts-comment
   // @ts-ignore
   async start(): Promise<void> {
+    // checked here, not in the constructor, as the openapi-spec and migrate
+    // scripts create the app without serving requests
+    if (!this.isBound(SESSION_SECRET)) {
+      throw new Error('SESSION_SECRET must be set to sign session cookies');
+    }
     // Use `databaseSeeding` flag to control if products/users should be pre
     // populated into the database. Its value is default to `true`.
     if (this.options.databaseSeeding !== false) {

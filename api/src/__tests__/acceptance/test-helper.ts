@@ -52,6 +52,7 @@ export async function setupApplication<T extends SciLogDbApplication>(
 ): Promise<AppWithClient<T>> {
   const app = new appClass({
     rest: givenHttpServerConfig(),
+    sessionSecret: 'test-session-secret',
     ...options,
   }) as T;
   await app.boot();

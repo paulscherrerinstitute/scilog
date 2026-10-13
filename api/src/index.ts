@@ -42,6 +42,7 @@ if (require.main === module) {
     oidcOptions: fs.existsSync(path.resolve(__dirname, '../oidc.json'))
       ? require('../oidc.json')
       : undefined,
+    sessionSecret: process.env.SESSION_SECRET,
   };
 
   main(config).catch(err => {
