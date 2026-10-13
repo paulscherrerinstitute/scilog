@@ -1,3 +1,10 @@
+## [3.0.5](https://github.com/paulscherrerinstitute/scilog/compare/v3.0.4...v3.0.5) (2026-10-13)
+
+
+### Bug Fixes
+
+* **web:** stop autosave from resetting the editor ([#848](https://github.com/paulscherrerinstitute/scilog/issues/848)) ([4803d21](https://github.com/paulscherrerinstitute/scilog/commit/4803d2106cc896fe74cbfd2cc6604c395a053980)), closes [#400](https://github.com/paulscherrerinstitute/scilog/issues/400) [#449](https://github.com/paulscherrerinstitute/scilog/issues/449)
+
 ## [3.0.4](https://github.com/paulscherrerinstitute/scilog/compare/v3.0.3...v3.0.4) (2026-10-12)
 
 
