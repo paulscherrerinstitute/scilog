@@ -1,17 +1,14 @@
-/* eslint-disable  @typescript-eslint/no-explicit-any */
-
 import {asAuthStrategy, AuthenticationStrategy} from '@loopback/authentication';
 import {StrategyAdapter} from '@loopback/authentication-passport';
 import {inject, injectable} from '@loopback/core';
 import {RedirectRoute, Request} from '@loopback/rest';
 import {UserProfile} from '@loopback/security';
-import {Strategy} from 'passport';
-const oidcStrategy = require('passport-openidconnect');
+import passport, {Strategy} from 'passport';
+import OIDCStrategy from 'passport-openidconnect';
 import {User} from '../models';
 import {mapProfile, OIDCOptions, verifyFunctionFactory} from './types';
 import {UserRepository} from '../repositories';
 import {repository} from '@loopback/repository';
-const passport = require('passport');
 
 @injectable(asAuthStrategy)
 export class OIDCAuthentication implements AuthenticationStrategy {
@@ -27,7 +24,7 @@ export class OIDCAuthentication implements AuthenticationStrategy {
     @repository(UserRepository)
     public userRepository: UserRepository,
   ) {
-    const strategy: Strategy = new oidcStrategy(
+    const strategy: Strategy = new OIDCStrategy(
       this.oidcOptions,
       verifyFunctionFactory(this.userRepository, this.oidcOptions.rolesClaims),
     );
@@ -44,6 +41,6 @@ export class OIDCAuthentication implements AuthenticationStrategy {
    * @param request
    */
   async authenticate(request: Request): Promise<UserProfile | RedirectRoute> {
-    return (this.strategy as any).authenticate(request);
+    return this.strategy.authenticate(request);
   }
 }
