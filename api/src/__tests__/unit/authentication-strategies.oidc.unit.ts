@@ -11,37 +11,35 @@ import {UserRepository} from '../../repositories';
 import _ from 'lodash';
 
 describe('Authentication strategies roles', function (this: Suite) {
+  const baseProfile: Profile = {provider: 'oidc', id: 'anId', displayName: ''};
+
   it('Should return an empty list', () => {
-    const emptyRoles = roles({} as Profile);
+    const emptyRoles = roles(baseProfile);
     expect(emptyRoles).to.be.eql([]);
   });
 
   it('Should return an empty list since json is undefined', () => {
-    const profile = {} as Profile;
-    const emptyRoles = roles({...profile, _json: undefined});
+    const emptyRoles = roles({...baseProfile, _json: undefined});
     expect(emptyRoles).to.be.eql([]);
   });
 
   it('Should return an empty list since roles is undefined', () => {
-    const profile = {} as Profile;
-    const emptyRoles = roles({...profile, _json: {roles: undefined}});
+    const emptyRoles = roles({...baseProfile, _json: {roles: undefined}});
     expect(emptyRoles).to.be.eql([]);
   });
 
   it('Should return the list of roles', () => {
-    const profile = {} as Profile;
     const emptyRoles = roles({
-      ...profile,
+      ...baseProfile,
       _json: {roles: ['g12345', 'g78910']},
     });
     expect(emptyRoles).to.be.eql(['g12345', 'g78910']);
   });
 
   it('Should merge roles from groups claim when explicitly configured', () => {
-    const profile = {} as Profile;
     const mergedRoles = roles(
       {
-        ...profile,
+        ...baseProfile,
         _json: {roles: ['g12345'], groups: ['groupA', 'groupB']},
       },
       ['roles', 'groups'],
@@ -50,10 +48,9 @@ describe('Authentication strategies roles', function (this: Suite) {
   });
 
   it('Should read roles from a custom-named claim when configured', () => {
-    const profile = {} as Profile;
     const customRoles = roles(
       {
-        ...profile,
+        ...baseProfile,
         _json: {roles: ['ignored'], beamtimes: ['p11111', 'p22222']},
       },
       ['beamtimes'],
@@ -62,26 +59,23 @@ describe('Authentication strategies roles', function (this: Suite) {
   });
 
   it('Should return an empty list when configured claim is absent', () => {
-    const profile = {} as Profile;
-    const customRoles = roles({...profile, _json: {roles: ['g12345']}}, [
+    const customRoles = roles({...baseProfile, _json: {roles: ['g12345']}}, [
       'beamtimes',
     ]);
     expect(customRoles).to.be.eql([]);
   });
 
   it('Should return the list of roles without applying any regex', () => {
-    const profile = {} as Profile;
     const emptyRoles = roles({
-      ...profile,
+      ...baseProfile,
       _json: {roles: ['g12345', 'g78910', 'e98765']},
     });
     expect(emptyRoles).to.be.eql(['g12345', 'g78910', 'e98765']);
   });
 
   it('Should return the list of roles including the p-group from e group', () => {
-    const profile = {} as Profile;
     const emptyRoles = roles({
-      ...profile,
+      ...baseProfile,
       _json: {roles: ['g12345', 'g78910']},
       username: 'e98765',
     });
@@ -89,9 +83,8 @@ describe('Authentication strategies roles', function (this: Suite) {
   });
 
   it('Should return the list of roles not including the p-group from e group as smaller than 5 digits', () => {
-    const profile = {} as Profile;
     const emptyRoles = roles({
-      ...profile,
+      ...baseProfile,
       _json: {roles: ['g12345', 'g78910']},
       username: 'e9876',
     });
@@ -99,9 +92,8 @@ describe('Authentication strategies roles', function (this: Suite) {
   });
 
   it('Should return the list of roles not including the p-group from e group as not made of digits only', () => {
-    const profile = {} as Profile;
     const emptyRoles = roles({
-      ...profile,
+      ...baseProfile,
       _json: {roles: ['g12345', 'g78910']},
       username: 'e987a',
     });
@@ -109,9 +101,8 @@ describe('Authentication strategies roles', function (this: Suite) {
   });
 
   it('Should return the list of roles not including the p-group from e group as longer than 5 digits', () => {
-    const profile = {} as Profile;
     const emptyRoles = roles({
-      ...profile,
+      ...baseProfile,
       _json: {roles: ['g12345', 'g78910']},
       username: 'e987654',
     });
@@ -139,7 +130,7 @@ describe('Authentication strategies roles', function (this: Suite) {
     },
   ].forEach((test, i) => {
     it(`Should return the first name and last name splitted accordingly ${i}`, () => {
-      expect(extractFirstLastName(test.profile as Profile)).to.be.eql(
+      expect(extractFirstLastName({...baseProfile, ...test.profile})).to.be.eql(
         test.expected,
       );
     });
@@ -178,11 +169,11 @@ describe('Authentication strategies roles', function (this: Suite) {
       emails: [{value: 'a@user'}],
       displayName: 'A User',
       _json: {roles: ['ignored'], beamtimes: ['p11111']},
-    } as unknown as Profile;
+    };
     verify(
       'iss',
       profile,
-      {} as never,
+      {},
       undefined,
       'idToken',
       'accessToken',
@@ -204,6 +195,37 @@ describe('Authentication strategies roles', function (this: Suite) {
         }
       },
     );
+  });
+
+  it('Should declare the 9 arguments passport-openidconnect picks by length', () => {
+    const verify = verifyFunctionFactory(createStubInstance(UserRepository));
+    expect(verify.length).to.eql(9);
+  });
+
+  [
+    undefined,
+    {},
+    {emails: 'a@user'},
+    {emails: []},
+    {emails: [{}]},
+    {emails: [{value: 1}]},
+  ].forEach(profile => {
+    it(`Should reject a login without an email in the profile ${JSON.stringify(profile)}`, () => {
+      const verify = verifyFunctionFactory(createStubInstance(UserRepository));
+      expect(() =>
+        verify(
+          'iss',
+          profile,
+          {},
+          {},
+          'idToken',
+          'accessToken',
+          'refreshToken',
+          undefined,
+          () => {},
+        ),
+      ).to.throw('email-id is required in returned profile to login');
+    });
   });
 
   it('Should update a user', async () => {

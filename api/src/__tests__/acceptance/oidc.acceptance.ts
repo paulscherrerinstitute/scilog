@@ -4,7 +4,7 @@ import {createSandbox} from 'sinon';
 import {Suite} from 'mocha';
 import {SciLogDbApplication} from '../..';
 import {UserRepository} from '../../repositories';
-const oidcStrategy = require('passport-openidconnect');
+import OIDCStrategy from 'passport-openidconnect';
 import {RequestContext, RestBindings} from '@loopback/rest';
 import {InvocationContext, Next} from '@loopback/core';
 import {verifyFunctionFactory} from '../../authentication-strategies/types';
@@ -63,7 +63,7 @@ describe('OIDC services', function (this: Suite) {
 
   it('login with OIDC and checks if authenticate is correctly called', async () => {
     const mockAuthenticate = sandbox.spy(
-      oidcStrategy.prototype,
+      OIDCStrategy.prototype,
       'authenticate',
     );
 
@@ -80,21 +80,18 @@ describe('OIDC services', function (this: Suite) {
         const requestCtx = invocationCtx.getSync<RequestContext>(
           RestBindings.Http.CONTEXT,
         );
-        verifyFunctionFactory(userRepo)(
-          '',
-          profileData,
-          // eslint-disable-next-line  @typescript-eslint/no-explicit-any
-          undefined as any,
-          undefined,
-          // eslint-disable-next-line  @typescript-eslint/no-explicit-any
-          undefined as any,
-          // eslint-disable-next-line  @typescript-eslint/no-explicit-any
-          undefined as any,
-          // eslint-disable-next-line  @typescript-eslint/no-explicit-any
-          undefined as any,
-          undefined,
-          // eslint-disable-next-line  @typescript-eslint/no-misused-promises
-          next,
+        await new Promise<void>((resolve, reject) =>
+          verifyFunctionFactory(userRepo)(
+            '',
+            profileData,
+            undefined,
+            undefined,
+            undefined,
+            undefined,
+            undefined,
+            undefined,
+            err => (err ? reject(err) : resolve()),
+          ),
         );
         const request = requestCtx.request;
         request.user = userData;

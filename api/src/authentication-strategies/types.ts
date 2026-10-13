@@ -4,6 +4,7 @@
 // License text available at https://opensource.org/licenses/MIT
 
 import {Profile} from 'passport';
+import OIDCStrategy from 'passport-openidconnect';
 import {User} from '../models';
 import {UserProfile, securityId} from '@loopback/security';
 import {UserRepository} from '../repositories';
@@ -38,20 +39,41 @@ export type OIDCOptions = {
   rolesClaims?: string[];
 };
 
+/**
+ * Login callback for passport-openidconnect. The library decides which
+ * arguments to pass by counting the parameters this function declares;
+ * only with 9 does it pass the user info profile separately, and position
+ * 9 is `done`. Keep all 9, even the unused ones.
+ *
+ * The user info profile comes from an extra request to the identity
+ * provider, and is undefined when skipUserProfile turns that request off.
+ */
 export type VerifyFunction = (
   claimIss: string,
-  profile: Profile,
-  idProfile: ProfileUser,
-  // eslint-disable-next-line  @typescript-eslint/no-explicit-any
-  context: any,
-  idToken: string,
-  accessToken: string,
-  refreshToken: string,
-  // eslint-disable-next-line  @typescript-eslint/no-explicit-any
-  params: any,
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  done: (error: any, user?: any, info?: any) => void,
+  profile: object | undefined,
+  idProfile: unknown,
+  context: unknown,
+  idToken: unknown,
+  accessToken: unknown,
+  refreshToken: unknown,
+  params: unknown,
+  done: OIDCStrategy.VerifyCallback,
 ) => void;
+
+/**
+ * The user info profile as passport-openidconnect builds it, with the email
+ * address that login needs.
+ */
+type UserInfoProfile = Profile & {
+  emails: [{value: string}, ...{value: string}[]];
+  _json?: Record<string, unknown>;
+};
+
+function isUserInfoProfile(profile: unknown): profile is UserInfoProfile {
+  if (typeof profile !== 'object' || profile === null) return false;
+  if (!('emails' in profile) || !Array.isArray(profile.emails)) return false;
+  return typeof profile.emails[0]?.value === 'string';
+}
 
 /**
  * provides an appropriate verify function for oauth2 strategies
@@ -66,21 +88,18 @@ export const verifyFunctionFactory = function (
   rolesClaims?: string[],
 ): VerifyFunction {
   return function (
-    claimIss: string,
-    profile: Profile,
-    idProfile: ProfileUser,
-    // eslint-disable-next-line  @typescript-eslint/no-explicit-any
-    context: any,
-    idToken: string,
-    accessToken: string,
-    refreshToken: string,
-    // eslint-disable-next-line  @typescript-eslint/no-explicit-any
-    params: any,
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    done: (error: any, user?: any, info?: any) => void,
+    claimIss,
+    profile,
+    idProfile,
+    context,
+    idToken,
+    accessToken,
+    refreshToken,
+    params,
+    done,
   ) {
     // look up a linked user for the profile
-    if (!profile?.emails?.length) {
+    if (!isUserInfoProfile(profile)) {
       throw new Error('email-id is required in returned profile to login');
     }
     const {firstName, lastName} = extractFirstLastName(profile);
