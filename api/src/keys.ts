@@ -27,3 +27,6 @@ export namespace UserServiceBindings {
  */
 export const EXPORT_SERVICE =
   BindingKey.create<ExportService>('services.Export');
+
+/** The secret that signs session cookies, from the SESSION_SECRET environment variable. */
+export const SESSION_SECRET = BindingKey.create<string>('session.secret');

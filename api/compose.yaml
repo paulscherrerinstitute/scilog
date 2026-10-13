@@ -38,6 +38,7 @@ services:
       test: ["CMD", "node", "-e", "fetch('http://localhost:3000/api/v1/health/live').then(r => { if (!r.ok) throw r.status })"]
     environment:
       JWT_SECRET: my-super-secret-key
+      SESSION_SECRET: my-super-secret-session-key
       BASE_PATH: /api/v1
 
   api-test:
@@ -62,6 +63,7 @@ services:
       - 3000:3000
     environment:
       JWT_SECRET: my-super-secret-key
+      SESSION_SECRET: my-super-secret-session-key
       BASE_PATH: /api/v1
     volumes:
       - ./datasource.example.json:/home/node/app/datasource.json:ro

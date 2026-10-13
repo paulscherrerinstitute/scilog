@@ -38,6 +38,7 @@ git checkout main
 cd api
 npm install
 npm run test
+export SESSION_SECRET=<a long random string>
 npm run start
 ```
 
@@ -68,6 +69,7 @@ There are the following configuration files that need to be adjusted to your sit
 1. `api/functionalAccounts.json` : defines the functional accounts, such as admin, beamline accounts etc
 2. `api/datasource.json` : defines the connection to the Mongo DB , default settings are in the code
 3. `oidc.json` : TODO
+4. `SESSION_SECRET` environment variable : required, signs the session cookies used during OIDC login
 
 ```
 # Example functionalAccounts.json with admin and one beamline account
