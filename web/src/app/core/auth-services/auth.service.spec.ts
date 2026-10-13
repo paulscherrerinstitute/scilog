@@ -63,4 +63,10 @@ describe('AuthService', () => {
       },
     ),
   ));
+
+  it('does not print the token to the console', () => {
+    const log = spyOn(console, 'log');
+    service.setSession({ token: 'a-secret-token' });
+    expect(JSON.stringify(log.calls.allArgs())).not.toContain('a-secret-token');
+  });
 });

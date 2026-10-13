@@ -81,8 +81,7 @@ export class LoginComponent implements OnInit {
     const val = this.form.value;
     if (val.email && val.password) {
       try {
-        let data = await this.authService.login(val.email, val.password).toPromise();
-        console.log(data);
+        await this.authService.login(val.email, val.password).toPromise();
         console.log('User is logged in');
         this.router.navigateByUrl('/overview');
       } catch (error) {
