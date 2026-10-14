@@ -296,4 +296,14 @@ describe('SnippetComponent', () => {
       expect(component._enableEdit.update).toEqual(t.output);
     });
   });
+  [
+    { updatedAt: '2021-03-29T11:55:20.128Z', id_session: '438', edited: false },
+    { updatedAt: '2021-03-29T12:43:20.630Z', id_session: '438', edited: true },
+    { updatedAt: '2021-03-29T12:43:20.630Z', id_session: '', edited: false },
+  ].forEach((t, i) => {
+    it(`should tell whether the snippet was edited ${i}`, () => {
+      component.snippet = { createdAt: '2021-03-29T11:55:20.128Z', ...t };
+      expect(component.isEdited).toEqual(t.edited);
+    });
+  });
 });
