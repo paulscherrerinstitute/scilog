@@ -23,6 +23,7 @@ jobs:
       web: ${{ steps.filter.outputs.web }}
       sdk: ${{ steps.filter.outputs.sdk }}
       workflows: ${{ steps.filter.outputs.workflows }}
+      docs: ${{ steps.filter.outputs.docs }}
     steps:
       - name: Checkout
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
@@ -44,6 +45,9 @@ jobs:
             sdk:
               - *ci
               - sdk/python/**
+            docs:
+              - *ci
+              - docs/**
             workflows:
               - .github/workflows/**
 
@@ -187,6 +191,36 @@ jobs:
         with:
           advanced-security: false
           annotations: true
+
+  build-docs:
+    name: Build docs
+    needs: detect-changes
+    if: needs.detect-changes.outputs.docs == 'true'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    permissions:
+      contents: read
+    defaults:
+      run:
+        working-directory: docs
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Set up Node.js
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: 24
+          cache: npm
+          cache-dependency-path: docs/package-lock.json
+
+      - name: Install dependencies
+        run: npm ci --no-audit --no-fund
+
+      - name: Build
+        run: npx honkit build
 
   test-api:
     name: Test api
@@ -346,6 +380,7 @@ jobs:
       - lint-web
       - lint-sdk
       - lint-workflows
+      - build-docs
       - test-api
       - test-web
       - test-sdk
@@ -359,6 +394,6 @@ jobs:
         uses: re-actors/alls-green@b5b5b37504aa4183270bd3d855c52a67f212be35 # v1.3.0
         with:
           allowed-skips: >-
-            lint-api, lint-web, lint-sdk, lint-workflows, test-api, test-web,
-            test-sdk, test-api-image, test-web-image
+            lint-api, lint-web, lint-sdk, lint-workflows, build-docs,
+            test-api, test-web, test-sdk, test-api-image, test-web-image
           jobs: ${{ toJSON(needs) }}
