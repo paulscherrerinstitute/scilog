@@ -50,7 +50,6 @@ import { MatMenuTrigger, MatMenu, MatMenuItem } from '@angular/material/menu';
   styleUrls: ['./snippet.component.scss'],
   animations: [
     trigger('highlightSnippet', [
-      state('default', style({ backgroundColor: 'var(--snippet-color)' })),
       state('highlight', style({ backgroundColor: '#efefef' })),
       transition('highlight => default', animate('2000ms ease-out')),
       transition('default => highlight', animate('200ms ease-in')),

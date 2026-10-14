@@ -119,6 +119,9 @@ $sidenav-text-color-dark: $toolbar-color;
 $snippet: mat.m2-get-color-from-palette($scilog-colors-light, A200);
 $snippet-dark: mat.m2-get-color-from-palette($scilog-colors-dark, 700);
 
+$message: mat.m2-get-color-from-palette($scilog-colors-light, 100);
+$message-dark: mat.m2-get-color-from-palette($scilog-colors-dark, 600);
+
 $slider-checked: mat.m2-get-color-from-palette($scilog-colors-light, 500);
 $slider-checked-dark: mat.m2-get-color-from-palette($scilog-colors-dark, 500);
 
@@ -229,6 +232,10 @@ $colors: (
   --snippet-color: (
     $snippet,
     $snippet-dark,
+  ),
+  --message-color: (
+    $message,
+    $message-dark,
   ),
   --logbook-name-tag: (
     $logbook-name-tag,
