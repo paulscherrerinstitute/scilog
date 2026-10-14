@@ -31,3 +31,17 @@
   max-width: 100%;
   height: auto;
 }
+
+/* wide tables scroll inside their figure, as with the editor's TableScroll plugin;
+   the single grid column is as wide as the table, so the caption spans all of it */
+::ng-deep .snippet-content.ck-content figure.table:not(.layout-table) {
+  display: grid;
+  width: fit-content;
+  max-width: 100%;
+  overflow-x: auto;
+}
+
+/* the caption comes after the table in the HTML; the editor's content styles show it on top */
+::ng-deep .snippet-content.ck-content figure.table:not(.layout-table) > figcaption {
+  order: -1;
+}
