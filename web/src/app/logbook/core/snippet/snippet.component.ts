@@ -28,16 +28,9 @@ import { WidgetItemConfig } from '@model/config';
 import { Edits } from 'src/app/core/model/edits';
 import { Basesnippets } from 'src/app/core/model/basesnippets';
 import { IsAllowedService } from 'src/app/overview/is-allowed.service';
-import {
-  MatCard,
-  MatCardAvatar,
-  MatCardContent,
-  MatCardHeader,
-  MatCardSubtitle,
-} from '@angular/material/card';
+import { MatCard, MatCardContent, MatCardHeader, MatCardSubtitle } from '@angular/material/card';
 import { NgClass, DatePipe } from '@angular/common';
 import { MatIcon } from '@angular/material/icon';
-import { NgxJdenticonModule } from 'ngx-jdenticon';
 import { MatTooltip } from '@angular/material/tooltip';
 import { MatIconButton } from '@angular/material/button';
 import { MatMenuTrigger, MatMenu, MatMenuItem } from '@angular/material/menu';
@@ -59,13 +52,11 @@ import { MatMenuTrigger, MatMenu, MatMenuItem } from '@angular/material/menu';
     MatCard,
     NgClass,
     MatIcon,
-    NgxJdenticonModule,
     MatTooltip,
     MatIconButton,
     MatMenuTrigger,
     MatMenu,
     MatMenuItem,
-    MatCardAvatar,
     MatCardContent,
     MatCardHeader,
     MatCardSubtitle,
@@ -119,7 +110,7 @@ export class SnippetComponent implements OnInit, AfterContentInit, AfterViewChec
   timerId = null;
   _enableEdit = { update: false, delete: false };
   snippetIsAccessedByAnotherUser = false;
-  avatarHash = 'anotherUser';
+  editingBy = '';
 
   enableComments = true;
   showEditButtons = true;
@@ -156,7 +147,6 @@ export class SnippetComponent implements OnInit, AfterContentInit, AfterViewChec
       } else {
         this.styleClass = 'messages';
       }
-      this.avatarHash = this.snippet.updatedBy;
     }
     if (this.snippet.linkType == LinkType.COMMENT) {
       this.styleClass = 'snippetComment';
@@ -294,8 +284,8 @@ export class SnippetComponent implements OnInit, AfterContentInit, AfterViewChec
     }
   }
 
-  lockEditUntilTimeout(updateBy: string, timeOut?: number) {
-    this.avatarHash = updateBy;
+  lockEditUntilTimeout(editingBy: string, timeOut?: number) {
+    this.editingBy = editingBy;
     this.lockEdit();
     this.setEditTimeout(timeOut ?? this._timeoutMilliseconds);
     console.log(typeof this.timerId);

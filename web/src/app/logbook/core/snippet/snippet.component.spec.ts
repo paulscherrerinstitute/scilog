@@ -222,13 +222,39 @@ describe('SnippetComponent', () => {
   });
 
   it('should lock the edit timeout and set by', () => {
-    const avatarForUser = 'aTestUserForlockEditUntilTimeout';
+    const editingBy = 'aTestUserForlockEditUntilTimeout';
     spyOn(component, 'lockEdit');
     spyOn(component, 'setEditTimeout');
-    component.lockEditUntilTimeout(avatarForUser);
-    expect(component.avatarHash).toEqual(avatarForUser);
+    component.lockEditUntilTimeout(editingBy);
+    expect(component.editingBy).toEqual(editingBy);
     expect(component.lockEdit).toHaveBeenCalledTimes(1);
     expect(component.setEditTimeout).toHaveBeenCalledTimes(1);
+  });
+
+  describe('header', () => {
+    const editedSnippet = {
+      ...snippetMock,
+      updatedAt: '2021-03-23T10:00:00.000Z',
+      id_session: 'aSession',
+    };
+    const subtitle = () =>
+      fixture.nativeElement.querySelector('mat-card-subtitle').textContent as string;
+
+    it('should show "edited" when nobody is editing', () => {
+      component.snippet = editedSnippet;
+      fixture.detectChanges();
+      expect(subtitle()).toContain('· edited');
+      expect(subtitle()).not.toContain('is editing');
+    });
+
+    it('should show who is editing instead of "edited"', () => {
+      component.snippet = editedSnippet;
+      component.editingBy = 'alice@psi.ch';
+      component.snippetIsAccessedByAnotherUser = true;
+      fixture.detectChanges();
+      expect(subtitle()).toContain('alice@psi.ch is editing');
+      expect(subtitle()).not.toContain('· edited');
+    });
   });
 
   it('should set locked', () => {

@@ -111,17 +111,10 @@ mat-toolbar {
   margin-top: 4px;
 }
 
-.avatar-image {
-  height: 25px;
-  width: 25px;
-  border-radius: 50%;
-}
-
-.avatar-block {
-  display: flex;
-  padding-left: 8px;
-  flex-direction: column;
-  align-items: center;
+// the signed-in user, as a header above the menu items
+.menu-username {
+  padding: 8px 16px 12px;
+  opacity: 0.6;
 }
 
 .logbook-name-tag {

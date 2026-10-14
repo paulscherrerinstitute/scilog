@@ -9,20 +9,17 @@
     @if (isHighlighted) {
       <mat-icon>star</mat-icon>
     }
-    @if (snippetIsAccessedByAnotherUser && !snippet.isMessage) {
-      <svg
-        mat-card-avatar
-        [data-jdenticon-value]="avatarHash"
-        matTooltip="Another user is currently editing this snippet."
-      ></svg>
-    }
     <mat-card-subtitle>
       @if (config?.view?.showSnippetHeader && indexOrdered) {
         #{{ indexOrdered }} ·
       }
       <span class="no-wrap">{{ snippet.createdBy }}</span>
       &ngsp;<span class="no-wrap">· {{ snippet.createdAt | date: 'medium' }}</span>
-      @if (isEdited) {
+      @if (snippetIsAccessedByAnotherUser && !snippet.isMessage) {
+        &ngsp;<span class="no-wrap editing"
+          >· <mat-icon inline>edit</mat-icon> {{ editingBy }} is editing</span
+        >
+      } @else if (isEdited) {
         &ngsp;<span class="no-wrap">· edited</span>
       }
     </mat-card-subtitle>
