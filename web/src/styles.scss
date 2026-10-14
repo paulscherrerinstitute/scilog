@@ -12,6 +12,12 @@ body {
 :root {
   --ck-content-font-family: Roboto, 'Helvetica Neue', sans-serif;
 }
+/* The editor saves inline images as a plain `img`, without the
+   wrapper that limits their width in the editor. */
+.ck-content img {
+  max-width: 100%;
+  height: auto;
+}
 @import 'styles/colors';
 @import 'styles/animations';
 @import 'styles/theme';
