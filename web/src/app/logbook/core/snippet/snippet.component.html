@@ -23,7 +23,12 @@
         }
         {{ snippet.createdBy }}
       </mat-card-subtitle>
-      <mat-card-subtitle>{{ snippet.createdAt | date: 'medium' }}</mat-card-subtitle>
+      <mat-card-subtitle>
+        <span class="no-wrap">{{ snippet.createdAt | date: 'medium' }}</span>
+        @if (isEdited) {
+          &ngsp;<span class="no-wrap">· edited</span>
+        }
+      </mat-card-subtitle>
       @if (showEditButtonsMenu) {
         <button
           mat-icon-button

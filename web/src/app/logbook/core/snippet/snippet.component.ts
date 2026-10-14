@@ -195,6 +195,13 @@ export class SnippetComponent implements OnInit, AfterContentInit, AfterViewChec
     return this._subsnippets.value;
   }
 
+  // The API sets `createdAt` and `updatedAt` with two separate clock reads,
+  // so a new entry can have two different times. The web app sends
+  // `id_session` only when it saves an edited entry, so check that too.
+  get isEdited() {
+    return this.snippet?.updatedAt !== this.snippet?.createdAt && !!this.snippet?.id_session;
+  }
+
   ngAfterContentInit() {
     this._subsnippets.subscribe(() => {
       this.setLocked();

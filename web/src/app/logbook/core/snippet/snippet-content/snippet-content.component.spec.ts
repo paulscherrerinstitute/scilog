@@ -187,42 +187,17 @@ describe('SnippetContentComponent', () => {
     expect(link.href).toEqual(`${document.baseURI}download/${snippetMock.files[0].fileId}`);
   });
 
-  const editTest = [
-    ['2021-03-29T11:55:20.128Z', ''],
-    ['2021-03-29T12:43:20.630Z', '<span class="snippet-edited">(edited)</span>'],
-    ['2021-03-29T12:43:20.630Z', ''],
-  ];
-  editTest.forEach((t, i) => {
-    it(`should check if snippet was edited ${i}`, () => {
-      const createdAt = '2021-03-29T11:55:20.128Z';
-      const snippetMock = {
-        createdAt: createdAt,
-        updatedAt: t[0],
-        id_session: t[1],
-      };
-      component.snippet = snippetMock;
-      expect(component['setEdited']('')).toEqual(t[1]);
-    });
-  });
-
-  editTest.forEach((t, i) => {
-    it(`should add (edited) note ${i}`, () => {
-      const createdAt = '2021-03-29T11:55:20.128Z';
-      const snippetMock = {
-        createdAt: createdAt,
-        updatedAt: t[0],
-        id_session: t[1],
-      };
-      const openTag = !t[1] ? '<p>' : '<p class="snippet-content-edited">';
-      const textContent = 'some text</p>';
-      component.snippet = snippetMock;
-      component.prepareContent();
-      spyOn(component.htmlContent, 'emit');
-      component.content = `<p>${textContent}`;
-      expect(TestBed.inject(DomSanitizer).sanitize(SecurityContext.HTML, component.html)).toEqual(
-        `${openTag}${textContent}${t[1]}`,
-      );
-      expect(component.htmlContent.emit).toHaveBeenCalledWith(`<p>${textContent}`);
-    });
+  it('should show the content of an edited entry as it is', () => {
+    component.snippet = {
+      createdAt: '2021-03-29T11:55:20.128Z',
+      updatedAt: '2021-03-29T12:43:20.630Z',
+      id_session: '438',
+    };
+    spyOn(component.htmlContent, 'emit');
+    component.content = '<p>some text</p>';
+    expect(TestBed.inject(DomSanitizer).sanitize(SecurityContext.HTML, component.html)).toEqual(
+      '<p>some text</p>',
+    );
+    expect(component.htmlContent.emit).toHaveBeenCalledWith('<p>some text</p>');
   });
 });
