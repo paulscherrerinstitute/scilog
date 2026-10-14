@@ -109,17 +109,18 @@
       </span>
     </div>
   </mat-card-content>
+  @if (comments.length) {
+    <div class="snippet-comments">
+      <div *ngFor="let snippet of comments; let i = index">
+        <app-snippet
+          [snippet]="snippet"
+          [updatedAt]="snippet.updatedAt"
+          [index]="i"
+          [config]="config"
+          [hideMetadata]="hideMetadata"
+          [subsnippets]="snippet.subsnippets"
+        ></app-snippet>
+      </div>
+    </div>
+  }
 </mat-card>
-
-<div *ngFor="let snippet of snippet?.subsnippets; let i = index">
-  <ng-container *ngIf="snippet.linkType !== 'quote' && snippet.snippetType === 'paragraph'">
-    <app-snippet
-      [snippet]="snippet"
-      [updatedAt]="snippet.updatedAt"
-      [index]="i"
-      [config]="config"
-      [hideMetadata]="hideMetadata"
-      [subsnippets]="snippet.subsnippets"
-    ></app-snippet>
-  </ng-container>
-</div>
