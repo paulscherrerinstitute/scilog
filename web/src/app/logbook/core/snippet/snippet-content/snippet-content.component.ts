@@ -30,9 +30,9 @@ export class SnippetContentComponent implements OnInit, AfterViewInit, AfterView
   _content: string;
   span: any;
   files: string[] = [];
-  defaultFigureWidth = '85%';
   contentWidth = null;
   _prismed = false;
+  _sized = false;
   _edited = '';
 
   @ViewChild('contentDiv') contentRef: ElementRef;
@@ -64,6 +64,11 @@ export class SnippetContentComponent implements OnInit, AfterViewInit, AfterView
       this.prismservice.highlightAll();
       this._prismed = true;
     }
+    // the [innerHtml] sanitizer strips style attributes, so the image widths are set again here
+    if (!this._sized) {
+      this.setImageWidths(this.contentRef.nativeElement);
+      this._sized = true;
+    }
   }
 
   prepareContent() {
@@ -84,8 +89,8 @@ export class SnippetContentComponent implements OnInit, AfterViewInit, AfterView
       }
       let imageId = file.accessHash ?? file.fileId;
       this.setImageUrl(img, imageId);
-      this.setImageStyle(img, file.style);
     });
+    this.setImageWidths(this.span);
 
     const fileLinks = this.span.querySelectorAll('.fileLink');
     fileLinks.forEach((fileRef) => {
@@ -120,16 +125,15 @@ export class SnippetContentComponent implements OnInit, AfterViewInit, AfterView
     (img.parentElement as HTMLAnchorElement).href = srcUrl;
   }
 
-  private setImageStyle(img: HTMLImageElement, style: any) {
-    if (style == undefined) {
-      return;
-    }
-    const width = style.width != '' ? style.width : this.defaultFigureWidth;
-    img.setAttribute('width', width);
-
-    if (style.height != '') {
-      img.setAttribute('height', style.height);
-    }
+  // puts a resized image's width on its figure, as the editor does
+  private setImageWidths(root: HTMLElement) {
+    root.querySelectorAll('figure.image img').forEach((img: HTMLImageElement) => {
+      const width = this.snippet?.files?.find((file) => file.fileHash == img.title)?.style?.width;
+      if (!width) return;
+      const figure = img.closest('figure.image') as HTMLElement;
+      figure.classList.add('image_resized');
+      figure.style.width = width;
+    });
   }
 
   private _srcUrlFromImageId(imageId: string) {
@@ -158,6 +162,7 @@ export class SnippetContentComponent implements OnInit, AfterViewInit, AfterView
     this._content = value;
     this.htmlContent.emit(this._content);
     this._prismed = false;
+    this._sized = false;
   }
 
   get content() {
