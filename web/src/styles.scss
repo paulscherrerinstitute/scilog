@@ -9,6 +9,9 @@ body {
   font-family: Roboto, 'Helvetica Neue', sans-serif;
   background-color: #f0f0f0;
 }
+:root {
+  --ck-content-font-family: Roboto, 'Helvetica Neue', sans-serif;
+}
 @import 'styles/colors';
 @import 'styles/animations';
 @import 'styles/theme';
