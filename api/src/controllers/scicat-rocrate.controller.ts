@@ -5,11 +5,7 @@ import {OPERATION_SECURITY_SPEC} from '../utils/security-spec';
 import {authenticate} from '@loopback/authentication';
 import {authorize} from '@loopback/authorization';
 import {basicAuthorization} from '../services/basic.authorizor';
-import {ElnExportService} from '../services';
-import {DATA_DIR, ScicatCrateService} from '../services/scicat-crate.service';
-import {LogbookPdfService} from '../services/logbook-pdf.service';
-import {ArchiveService, AssetDescriptor} from '../services/archive.service';
-import {Readable} from 'node:stream';
+import {ScicatCrateService} from '../services/scicat-crate.service';
 import {pipeline} from 'node:stream/promises';
 
 @authenticate('jwt')
@@ -19,10 +15,7 @@ import {pipeline} from 'node:stream/promises';
 })
 export class ScicatRoCrateController {
   constructor(
-    @service(ElnExportService) private elnExportService: ElnExportService,
-    @service(ArchiveService) private archiveService: ArchiveService,
     @service(ScicatCrateService) private scicatCrateService: ScicatCrateService,
-    @service(LogbookPdfService) private logbookPdfService: LogbookPdfService,
   ) {}
 
   // GET /logbooks/export/{id}/scicat-rocrate
@@ -30,8 +23,20 @@ export class ScicatRoCrateController {
     security: OPERATION_SECURITY_SPEC,
     responses: {
       '200': {
-        description: 'Rocrate model instance',
-        content: {'application/zip': {schema: {type: 'object'}}},
+        description: 'Logbook packaged as a SciCat dataset RO-Crate',
+        content: {
+          'application/zip': {
+            schema: {type: 'string', format: 'binary'},
+          },
+        },
+      },
+      '404': {
+        description: 'No logbook exists with the given id',
+      },
+      '409': {
+        description:
+          "The logbook's creator has no first and last name on record, " +
+          'which are required to build the crate',
       },
     },
   })
@@ -39,40 +44,14 @@ export class ScicatRoCrateController {
     @param.path.string('id') id: string,
     @inject(RestBindings.Http.RESPONSE) response: Response,
   ) {
-    const metadataJson = await this.scicatCrateService.getMetadataJson(id);
+    const zip = await this.scicatCrateService.buildCrateStream(id);
 
-    const {stream: pdfStream, pdfName} =
-      await this.logbookPdfService.exportPdf(id);
+    response.set('Content-Type', 'application/zip');
+    response.set(
+      'Content-Disposition',
+      `attachment; filename="logbook-${id}-as-dataset.zip"`,
+    );
 
-    try {
-      const elnStream = await this.elnExportService.buildElnStream(id);
-
-      const assets: Array<AssetDescriptor> = [
-        {
-          stream: pdfStream,
-          archivePath: `${DATA_DIR}/${pdfName}`,
-        },
-        {
-          stream: elnStream,
-          archivePath: `${DATA_DIR}/${id}.eln`,
-        },
-        {
-          stream: Readable.from([metadataJson]),
-          archivePath: 'ro-crate-metadata.json',
-        },
-      ];
-
-      const zip = this.archiveService.zipStream(assets);
-
-      response.set('Content-Type', 'application/zip');
-      response.set(
-        'Content-Disposition',
-        `attachment; filename="logbook-${id}-as-dataset.zip"`,
-      );
-
-      await pipeline(zip, response);
-    } finally {
-      pdfStream.destroy();
-    }
+    await pipeline(zip, response);
   }
 }

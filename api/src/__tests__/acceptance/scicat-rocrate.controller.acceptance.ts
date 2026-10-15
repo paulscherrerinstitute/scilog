@@ -6,7 +6,6 @@ import {clearDatabase, createUserToken, setupApplication} from './test-helper';
 import {DatabaseHelper} from '../database.helpers';
 import {listZipEntries} from '../zip.helpers';
 import {LogbookPdfService} from '../../services/logbook-pdf.service';
-import {DATA_DIR} from '../../services/scicat-crate.service';
 
 describe('ScicatRoCrateController', function (this: Suite) {
   this.timeout(5000);
@@ -60,6 +59,9 @@ describe('ScicatRoCrateController', function (this: Suite) {
     location: 'aLocation',
   };
 
+  // HTTP smoke test: confirms the controller wiring (status, headers, piping)
+  // The detailed zip assembly and metadata contents are covered by
+  // the ScicatCrateService unit tests.
   it('exports a logbook as a scicat-rocrate dataset zip', async () => {
     const logbook = await databaseHelper.givenLogbook(logbookSnippet, {
       currentUser: user,
@@ -77,12 +79,33 @@ describe('ScicatRoCrateController', function (this: Suite) {
       .then(async response => {
         const files = await listZipEntries(response.body);
         expect(files).to.containEql('ro-crate-metadata.json');
-        expect(files).to.containEql(`${DATA_DIR}/${logbook.id}.eln`);
-        expect(files).to.containEql(`${DATA_DIR}/${logbook.id}.pdf`);
       })
       .catch(error => {
         throw error;
       });
+  });
+
+  it('returns 404 when exporting a logbook the user cannot read', async () => {
+    const logbook = await databaseHelper.givenLogbook(logbookSnippet, {
+      currentUser: user,
+    });
+
+    // a second user who is not a member of the logbook's owner group
+    const otherUser = {
+      email: 'other@loopback.io',
+      firstName: 'No',
+      lastName: 'Access',
+      roles: ['any-authenticated-user'],
+    };
+    const otherToken = await createUserToken(app, client, undefined, otherUser);
+
+    // the read ACL filters the logbook out for this user, so it looks absent
+    // as the created logbook's readACL is:	['scicatRoCrateAcceptance']
+    await client
+      .get(`/logbooks/export/${logbook.id}/scicat-rocrate`)
+      .set('Authorization', 'Bearer ' + otherToken)
+      .set('Content-Type', 'application/json')
+      .expect(404);
   });
 
   it('throws 404 for non-existing logbook', async () => {
