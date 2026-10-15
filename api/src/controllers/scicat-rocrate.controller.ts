@@ -31,7 +31,8 @@ export class ScicatRoCrateController {
         },
       },
       '404': {
-        description: 'No logbook exists with the given id',
+        description:
+          'No logbook exists with the given id or user not authorized to read it',
       },
       '409': {
         description:
