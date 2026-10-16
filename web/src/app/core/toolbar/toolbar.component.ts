@@ -28,7 +28,6 @@ import { MatIcon } from '@angular/material/icon';
 import { SearchWindowComponent } from '../../logbook/core/search-window/search-window.component';
 import { MatTooltip } from '@angular/material/tooltip';
 import { MatMenuTrigger, MatMenu, MatMenuItem } from '@angular/material/menu';
-import { NgxJdenticonModule } from 'ngx-jdenticon';
 
 @Component({
   selector: 'app-toolbar',
@@ -47,7 +46,6 @@ import { NgxJdenticonModule } from 'ngx-jdenticon';
     NgFor,
     MatMenuItem,
     NgStyle,
-    NgxJdenticonModule,
   ],
 })
 export class ToolbarComponent implements OnInit, OnDestroy {
@@ -58,7 +56,6 @@ export class ToolbarComponent implements OnInit, OnDestroy {
   subscriptions: Subscription[] = [];
   logbookName: string;
   isLogbookOpen = false;
-  avatarHash: string = 'UserHash';
   username: string;
   showVersionInfo = true;
   versionInfo = 'BETA';
@@ -106,9 +103,7 @@ export class ToolbarComponent implements OnInit, OnDestroy {
     );
     this.subscriptions.push(
       this.userPreferences.currentUserInfo.subscribe((userInfo: UserInfo) => {
-        this.avatarHash = userInfo.email;
         this.username = userInfo.username;
-        console.log(this.avatarHash);
       }),
     );
     this.subscriptions.push(

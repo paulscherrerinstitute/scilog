@@ -226,7 +226,7 @@ describe('SnippetComponent', () => {
     spyOn(component, 'lockEdit');
     spyOn(component, 'setEditTimeout');
     component.lockEditUntilTimeout(avatarForUser);
-    expect(component.avatarHash).toEqual(avatarForUser);
+    expect(component.editingBy).toEqual(avatarForUser);
     expect(component.lockEdit).toHaveBeenCalledTimes(1);
     expect(component.setEditTimeout).toHaveBeenCalledTimes(1);
   });
