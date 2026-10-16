@@ -8,6 +8,7 @@ import {
 } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { AuthService } from '@shared/auth-services/auth.service';
+import { DEFAULT_RETURN_URL, safeReturnUrl } from '@shared/auth-services/return-url';
 import { AppConfig, AppConfigService, Oauth2Endpoint } from '../app-config.service';
 import { DOCUMENT, NgIf } from '@angular/common';
 import { MatCard, MatCardTitle, MatCardImage, MatCardContent } from '@angular/material/card';
@@ -72,7 +73,9 @@ export class LoginComponent implements OnInit {
     this.route.queryParams.subscribe((params) => {
       if (!!params.token) {
         this.authService.setSession({ token: params.token });
-        this.router.navigateByUrl('/overview');
+        this.router.navigateByUrl(safeReturnUrl(params.returnUrl) ?? DEFAULT_RETURN_URL, {
+          replaceUrl: true,
+        });
       }
     });
   }
@@ -83,7 +86,7 @@ export class LoginComponent implements OnInit {
       try {
         await this.authService.login(val.email, val.password).toPromise();
         console.log('User is logged in');
-        this.router.navigateByUrl('/overview');
+        this.router.navigateByUrl(this.returnUrl ?? DEFAULT_RETURN_URL, { replaceUrl: true });
       } catch (error) {
         switch (error.statusText) {
           case 'Unknown Error':
@@ -101,6 +104,12 @@ export class LoginComponent implements OnInit {
   }
 
   redirectOIDC(authURL: string) {
-    this.document.location.href = `${this.appConfig.lbBaseURL}/${authURL}/login`;
+    const returnUrl = this.returnUrl;
+    const query = returnUrl ? `?returnUrl=${encodeURIComponent(returnUrl)}` : '';
+    this.document.location.href = `${this.appConfig.lbBaseURL}/${authURL}/login${query}`;
+  }
+
+  private get returnUrl(): string | undefined {
+    return safeReturnUrl(this.route.snapshot.queryParams.returnUrl);
   }
 }

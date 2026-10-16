@@ -2,8 +2,9 @@ import { TestBed } from '@angular/core/testing';
 
 import { AuthInterceptor } from './auth.interceptor';
 import { ServerSettingsService } from '@shared/config/server-settings.service';
-import { HttpEvent, HttpHandler, HttpRequest } from '@angular/common/http';
-import { of } from 'rxjs';
+import { HttpErrorResponse, HttpEvent, HttpHandler, HttpRequest } from '@angular/common/http';
+import { DOCUMENT } from '@angular/common';
+import { of, throwError } from 'rxjs';
 
 describe('AuthInterceptor', () => {
   const serverSettingsService = jasmine.createSpyObj('ServerSettingsService', [
@@ -55,6 +56,42 @@ describe('AuthInterceptor', () => {
         done();
       },
       error: done.fail,
+    });
+  });
+
+  describe('on a 401 from the SciLog backend', () => {
+    let location: Pick<Location, 'pathname' | 'search' | 'hash' | 'href'>;
+
+    function failWith401() {
+      TestBed.overrideProvider(DOCUMENT, { useValue: { location } });
+      const interceptor = TestBed.inject(AuthInterceptor);
+      const next = jasmine.createSpyObj<HttpHandler>('HttpHandler', ['handle']);
+      next.handle.and.returnValue(
+        throwError(
+          () => new HttpErrorResponse({ status: 401, url: 'https://scilog-backend.psi.ch/api/v1' }),
+        ),
+      );
+      interceptor
+        .intercept(new HttpRequest('GET', 'https://scilog-backend.psi.ch/api/v1'), next)
+        .subscribe({ error: () => undefined });
+    }
+
+    it('goes to the login page with the current page as return address', () => {
+      location = { pathname: '/logbooks/1/dashboard', search: '?x=1', hash: '#y', href: '' };
+      failWith401();
+      expect(location.href).toEqual('/login?returnUrl=%2Flogbooks%2F1%2Fdashboard%3Fx%3D1%23y');
+    });
+
+    it('stays on the login page, keeping its return address', () => {
+      const href = 'http://localhost/login?returnUrl=%2Flogbooks%2F1%2Fdashboard';
+      location = {
+        pathname: '/login',
+        search: '?returnUrl=%2Flogbooks%2F1%2Fdashboard',
+        hash: '',
+        href,
+      };
+      failWith401();
+      expect(location.href).toEqual(href);
     });
   });
 });

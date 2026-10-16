@@ -2,7 +2,7 @@ import { provideHttpClientTesting } from '@angular/common/http/testing';
 import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 import { UntypedFormBuilder } from '@angular/forms';
 import { RouterTestingModule } from '@angular/router/testing';
-import { Router } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { of } from 'rxjs';
 import { AuthService } from '@shared/auth-services/auth.service';
 import { AppConfigService, Oauth2Endpoint } from '../app-config.service';
@@ -69,5 +69,92 @@ describe('LoginComponent', () => {
     component.form.setValue({ email: 'a@b', password: 'secret' });
     await component.login();
     expect(JSON.stringify(log.calls.allArgs())).not.toContain('a-secret-token');
+  });
+});
+
+describe('LoginComponent return address', () => {
+  let router: jasmine.SpyObj<Router>;
+  let authService: jasmine.SpyObj<AuthService>;
+
+  function createComponent(queryParams: Record<string, string>) {
+    TestBed.configureTestingModule({
+      imports: [LoginComponent],
+      providers: [
+        UntypedFormBuilder,
+        { provide: AppConfigService, useValue: { getConfig: () => ({ lbBaseURL: 'http://api' }) } },
+        {
+          provide: ActivatedRoute,
+          useValue: { queryParams: of(queryParams), snapshot: { queryParams } },
+        },
+        { provide: Router, useValue: router },
+        { provide: AuthService, useValue: authService },
+      ],
+    });
+    const fixture = TestBed.createComponent(LoginComponent);
+    fixture.detectChanges();
+    return fixture.componentInstance;
+  }
+
+  beforeEach(() => {
+    router = jasmine.createSpyObj<Router>('Router', ['navigateByUrl']);
+    authService = jasmine.createSpyObj<AuthService>('AuthService', ['login', 'setSession']);
+    authService.login.and.returnValue(of({ email: 'a@b', password: 'secret' }));
+  });
+
+  async function loginWithPassword(queryParams: Record<string, string>) {
+    const component = createComponent(queryParams);
+    component.form.setValue({ email: 'a@b', password: 'secret' });
+    await component.login();
+  }
+
+  it('goes to the return address after a password login', async () => {
+    await loginWithPassword({ returnUrl: '/logbooks/1/dashboard' });
+    expect(router.navigateByUrl).toHaveBeenCalledWith('/logbooks/1/dashboard', {
+      replaceUrl: true,
+    });
+  });
+
+  it('goes to the overview after a password login without a return address', async () => {
+    await loginWithPassword({});
+    expect(router.navigateByUrl).toHaveBeenCalledWith('/overview', { replaceUrl: true });
+  });
+
+  it('goes to the overview for a return address outside the app', async () => {
+    await loginWithPassword({ returnUrl: '//evil.com' });
+    expect(router.navigateByUrl).toHaveBeenCalledWith('/overview', { replaceUrl: true });
+  });
+
+  it('goes to the return address after an OIDC login', () => {
+    createComponent({ token: 'a-token', returnUrl: '/logbooks/1/dashboard' });
+    expect(authService.setSession).toHaveBeenCalledWith({ token: 'a-token' });
+    expect(router.navigateByUrl).toHaveBeenCalledWith('/logbooks/1/dashboard', {
+      replaceUrl: true,
+    });
+  });
+
+  it('goes to the overview after an OIDC login without a return address', () => {
+    createComponent({ token: 'a-token' });
+    expect(router.navigateByUrl).toHaveBeenCalledWith('/overview', { replaceUrl: true });
+  });
+
+  it('goes to the overview after an OIDC login with a return address outside the app', () => {
+    createComponent({ token: 'a-token', returnUrl: '//evil.com' });
+    expect(router.navigateByUrl).toHaveBeenCalledWith('/overview', { replaceUrl: true });
+  });
+
+  it('passes the return address on to the OIDC login', () => {
+    const component = createComponent({ returnUrl: '/logbooks/1/dashboard' });
+    component.document = { location: { href: '' } } as unknown as Document;
+    component.redirectOIDC('auth/keycloak');
+    expect(component.document.location.href).toEqual(
+      'http://api/auth/keycloak/login?returnUrl=%2Flogbooks%2F1%2Fdashboard',
+    );
+  });
+
+  it('starts the OIDC login without a return address when there is none', () => {
+    const component = createComponent({});
+    component.document = { location: { href: '' } } as unknown as Document;
+    component.redirectOIDC('auth/keycloak');
+    expect(component.document.location.href).toEqual('http://api/auth/keycloak/login');
   });
 });
