@@ -1,3 +1,10 @@
+# [3.1.0](https://github.com/paulscherrerinstitute/scilog/compare/v3.0.7...v3.1.0) (2026-10-16)
+
+
+### Features
+
+* **web:** use the app font in the editor ([#860](https://github.com/paulscherrerinstitute/scilog/issues/860)) ([7458a91](https://github.com/paulscherrerinstitute/scilog/commit/7458a91737b6bd79ad88dc4fa3f1fe01863e7940))
+
 ## [3.0.7](https://github.com/paulscherrerinstitute/scilog/compare/v3.0.6...v3.0.7) (2026-10-13)
 
 
