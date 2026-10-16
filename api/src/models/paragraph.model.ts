@@ -27,13 +27,14 @@ export class Paragraph extends Basesnippet {
 
   @property({
     type: 'string',
-    description: 'Markup contents in markdown (MD) syntax of this paragraph',
+    description: 'HTML content of this paragraph',
   })
   textcontent?: string;
 
   @property({
     type: 'string',
-    description: 'HTML sanitized elements text content',
+    description:
+      'Plain text of textcontent without HTML tags, set by the API for search. Not safe to insert as HTML.',
     index: true,
   })
   htmlTextcontent?: string;
