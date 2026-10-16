@@ -1,3 +1,10 @@
+# [3.2.0](https://github.com/paulscherrerinstitute/scilog/compare/v3.1.0...v3.2.0) (2026-10-16)
+
+
+### Features
+
+* **api:** add endpoint to export logbook as scicat-rocrate ([#746](https://github.com/paulscherrerinstitute/scilog/issues/746)) ([a9bbf72](https://github.com/paulscherrerinstitute/scilog/commit/a9bbf728913cc608a34d146f38a98f706a851599))
+
 # [3.1.0](https://github.com/paulscherrerinstitute/scilog/compare/v3.0.7...v3.1.0) (2026-10-16)
 
 
