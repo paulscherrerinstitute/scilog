@@ -1,49 +1,65 @@
+@use '@angular/material' as mat;
+
 .snippet {
+  @include mat.card-overrides(
+    (
+      outlined-container-color: var(--snippet-color),
+    )
+  );
   margin: 8px;
   min-height: 100%;
   text-align: left;
-  background-color: var(--snippet-color);
   color: var(--default-text-color);
 }
 
 .messages {
-  background-color: rgb(39, 117, 163) !important;
+  @include mat.card-overrides(
+    (
+      outlined-container-color: var(--message-color),
+      outlined-container-shape: 12px,
+      subtitle-text-color: rgba(0, 0, 0, 0.6),
+    )
+  );
   margin: 8px 8px 8px 32px;
   min-height: 100%;
   text-align: left;
-  border-radius: 10px;
-  border-color: rgb(39, 117, 163);
   color: var(--default-text-color);
-  /* width: fit-content; */
-  /* float:right; */
 }
 
 .messagesReply {
-  background-color: rgb(238, 238, 238) !important;
+  @include mat.card-overrides(
+    (
+      outlined-container-color: var(--main-background),
+      outlined-container-shape: 12px,
+      subtitle-text-color: rgba(0, 0, 0, 0.6),
+    )
+  );
   margin: 8px 32px 8px 8px;
   min-height: 100%;
   text-align: left;
-  border-radius: 10px;
-  /* border-color: rgb(39, 117, 163); */
-  /* width: fit-content; */
-  /* float: left; */
+  color: var(--default-text-color);
 }
 
 .snippetComment {
   margin: 8px 0;
   min-height: 100%;
   text-align: left;
-  background-color: rgb(247, 242, 197) !important;
+  color: var(--default-text-color);
 }
 
 .snippetQuote {
+  @include mat.card-overrides(
+    (
+      outlined-container-color: var(--main-background),
+    )
+  );
   margin: 1em 0;
   min-height: 100%;
   text-align: left;
   opacity: 0.9;
   border-left: 4px solid #86a7b1;
   border-right: 4px solid #86a7b1;
-  background-color: #ebebeb !important;
+  color: var(--default-text-color);
 }
 
 .mat-fab-top-right {
