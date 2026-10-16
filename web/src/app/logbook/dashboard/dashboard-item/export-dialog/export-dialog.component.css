@@ -8,3 +8,11 @@
 .download-link {
   display: none;
 }
+
+app-scicat-export {
+  opacity: 1;
+  transition: opacity 200ms ease-in;
+  @starting-style {
+    opacity: 0;
+  }
+}
