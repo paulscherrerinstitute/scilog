@@ -4,7 +4,7 @@ import {MongoDataSource} from '../datasources';
 import {SnippetRepositoryMixin} from '../mixins';
 import {Paragraph, ParagraphRelations} from '../models';
 import {AutoAddRepository} from './autoadd.repository.base';
-import {sanitizeTextContent} from '../utils/misc';
+import {JSDOM} from 'jsdom';
 
 export class ParagraphRepository extends SnippetRepositoryMixin<
   Paragraph,
@@ -29,11 +29,11 @@ export class ParagraphRepository extends SnippetRepositoryMixin<
     });
     const baseSnippetRepository = await this.baseSnippetRepository();
     for await (const paragraph of paragraphsCursor) {
-      const sanitised = sanitizeTextContent(paragraph.textcontent);
-      if (!sanitised) continue;
+      const text = JSDOM.fragment(paragraph.textcontent).textContent;
+      if (!text) continue;
       await baseSnippetRepository.updateById(
         `${paragraph._id}`,
-        {htmlTextcontent: sanitised},
+        {htmlTextcontent: text},
         {currentUser: {roles: ['admin']}},
       );
     }
