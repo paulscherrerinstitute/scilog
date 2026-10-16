@@ -1,10 +1,5 @@
-::ng-deep .snippet-content p,
-.snippet-content-edited {
+::ng-deep .snippet-content p {
   margin: 5px;
-}
-
-::ng-deep .snippet-content .snippet-content-edited {
-  display: inline-block;
 }
 
 ::ng-deep .snippet-content .fileLink {
@@ -18,13 +13,6 @@
 ::ng-deep .snippet-content .fileLink ::before {
   font-family: 'Material Design Icons';
   content: '\F13CD'; /* this is the icon code which can be gotten from the MDI cheatsheet here: https://pictogrammers.github.io/@mdi/font/5.4.55/ */
-}
-
-::ng-deep .snippet-content .snippet-edited {
-  display: inline-block;
-  font-size-adjust: 0.4;
-  opacity: 0.4;
-  font-size: 90%;
 }
 
 ::ng-deep .snippet-content img {

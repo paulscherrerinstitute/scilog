@@ -208,6 +208,10 @@ export class SnippetComponent implements OnInit, AfterContentInit, AfterViewChec
     return this._subsnippets.value;
   }
 
+  get isEdited() {
+    return this.snippet?.updatedAt !== this.snippet?.createdAt && !!this.snippet?.id_session;
+  }
+
   ngAfterContentInit() {
     this._subsnippets.subscribe(() => {
       this.setLocked();
