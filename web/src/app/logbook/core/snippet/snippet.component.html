@@ -81,7 +81,7 @@
     </mat-card-header>
   }
 
-  <mat-card-content class="card-content">
+  <mat-card-content>
     <div *ngFor="let snippet of snippet?.subsnippets; let i = index">
       <ng-container *ngIf="snippet?.linkType === 'quote'">
         <app-snippet
