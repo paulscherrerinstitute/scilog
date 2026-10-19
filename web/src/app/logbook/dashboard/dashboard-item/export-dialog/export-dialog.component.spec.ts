@@ -23,9 +23,9 @@ describe('ExportDialogComponent', () => {
   let fixture: ComponentFixture<ExportDialogComponent>;
   let logbookItemDataSpy: any;
   logbookItemDataSpy = jasmine.createSpyObj('LogbookItemDataService', ['exportLogbook']);
-  logbookItemDataSpy.exportLogbook.and.returnValue(
-    of(new Blob(['data:image/png;base64,iVBORw0KGgoAAAANSUhE'], { type: 'image/png' })).toPromise(),
-  );
+  const resolveExport = () =>
+    of(new Blob(['data:image/png;base64,iVBORw0KGgoAAAANSUhE'], { type: 'image/png' })).toPromise();
+  logbookItemDataSpy.exportLogbook.and.callFake(resolveExport);
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
@@ -46,6 +46,7 @@ describe('ExportDialogComponent', () => {
   });
 
   afterEach(() => {
+    logbookItemDataSpy.exportLogbook.and.callFake(resolveExport);
     logbookItemDataSpy.exportLogbook.calls.reset();
     mockDialogRef.close.calls.reset();
   });
@@ -72,5 +73,13 @@ describe('ExportDialogComponent', () => {
     expect(component['downloadLink'].nativeElement.download.slice(0, 18)).toEqual(
       `export - ${datePrefix}`,
     );
+  });
+
+  it('should keep the dialog open and show an error when the export fails', async () => {
+    logbookItemDataSpy.exportLogbook.and.rejectWith('network down');
+    await component.exportData('pdf');
+    expect(component.errMessage).toContain('Export failed');
+    expect(component.inProgress).toBe(false);
+    expect(mockDialogRef.close).not.toHaveBeenCalled();
   });
 });

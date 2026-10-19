@@ -10,5 +10,8 @@
       <button mat-button (click)="exportData('eln')">Export to ELN</button>
     </div>
   </div>
+  @if (this.errMessage) {
+    <div class="error-message">{{ this.errMessage }}</div>
+  }
   <a class="download-link" #downloadLink></a>
 </mat-dialog-content>

@@ -8,3 +8,7 @@
 .download-link {
   display: none;
 }
+
+.error-message {
+  color: var(--warn-color);
+}
