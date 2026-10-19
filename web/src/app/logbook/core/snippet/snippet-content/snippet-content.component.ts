@@ -15,6 +15,7 @@ import { Filecontainer } from 'src/app/core/model/basesnippets';
 import { PrismService } from '../../prism.service';
 import { HtmlSanitizerService } from '../html-sanitizer.service';
 import { SafeHtml } from '@angular/platform-browser';
+import { parseInertHtml } from '../../../../entries/parse-inert-html';
 
 @Component({
   selector: 'app-snippet-content',
@@ -76,8 +77,7 @@ export class SnippetContentComponent implements OnInit, AfterViewInit, AfterView
       return;
     }
 
-    this.span = document.createElement('figure');
-    this.span.innerHTML = this.snippet?.textcontent;
+    this.span = parseInertHtml(this.snippet?.textcontent);
     const images = this.span.querySelectorAll('img');
     this.addLinksToImages(images);
 
@@ -97,7 +97,7 @@ export class SnippetContentComponent implements OnInit, AfterViewInit, AfterView
         return file['fileHash'] == fileRef['pathname'].substring(1);
       });
       if (typeof file != 'undefined') {
-        fileRef['href'] = fileRef['baseURI'] + 'download/' + file.fileId;
+        fileRef['href'] = document.baseURI + 'download/' + file.fileId;
       }
     });
     this.content = this.span.innerHTML;
@@ -106,7 +106,7 @@ export class SnippetContentComponent implements OnInit, AfterViewInit, AfterView
   private setEdited(content: string) {
     if (this.snippet?.updatedAt === this.snippet?.createdAt || !this.snippet?.id_session)
       return content;
-    const emptyElement = document.createElement('span');
+    const emptyElement = parseInertHtml('');
     const edited = document.createElement('span');
     edited.classList.add('snippet-edited');
     edited.innerHTML = '(edited)';
