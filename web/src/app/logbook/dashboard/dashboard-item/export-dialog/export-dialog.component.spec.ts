@@ -79,6 +79,7 @@ describe('ExportDialogComponent', () => {
     logbookItemDataSpy.exportLogbook.and.rejectWith('network down');
     await component.exportData('pdf');
     expect(component.errMessage).toContain('Export failed');
+    expect(component.errMessage).toContain('network down');
     expect(component.inProgress).toBe(false);
     expect(mockDialogRef.close).not.toHaveBeenCalled();
   });
