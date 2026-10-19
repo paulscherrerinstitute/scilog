@@ -58,9 +58,6 @@ export function extractNotificationMessage(htmlData: string, fileStorage: any = 
     if (typeof f != 'undefined') {
       snippetFiles.push(f);
     }
-    if (typeof link.target != 'undefined') {
-      link.target = '_blank';
-    }
   });
 
   console.log(snippetFiles);
