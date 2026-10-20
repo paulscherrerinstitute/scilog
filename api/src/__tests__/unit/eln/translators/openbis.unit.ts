@@ -36,7 +36,7 @@ describe('OpenbisTranslator.validate', () => {
 
   it('rejects a crate with more than one BOOK', () => {
     const crate = validOpenbisCrate();
-    crate.addEntity({'@id': '/DEMO/BOOK2', '@type': 'BOOK'});
+    crate.addEntity({'@id': '/DEMO/BOOK2', '@type': 'openBIS:BOOK'});
     expect(translator.validate(crate)).to.containDeep([
       {code: ElnErrorCode.INVALID_ELN_STRUCTURE},
     ]);
