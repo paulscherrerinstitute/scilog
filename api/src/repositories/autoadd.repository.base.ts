@@ -356,6 +356,24 @@ export class AutoAddRepository<
             ctx.instance.updatedBy ??
             currentUser?.email ??
             'unknown@domain.org';
+          if (!currentUser?.roles?.includes('admin')) {
+            const parent = await this.getParent(ctx.instance);
+            const allowed = arrayOfUniqueFrom(
+              parent.createACL,
+              parent.adminACL,
+            );
+            const identities = [
+              ...(currentUser?.roles ?? []),
+              currentUser?.email,
+            ];
+            if (
+              (parent.createACL?.length ?? 0) > 0 &&
+              !allowed.some(acl => identities.includes(acl))
+            )
+              throw new HttpErrors.Forbidden(
+                'Not allowed to create snippet in this parent.',
+              );
+          }
           await this.aclDefaultOnCreation(ctx.instance);
           if (
             !currentUser.roles.some(
