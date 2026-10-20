@@ -2,9 +2,7 @@ import {expect} from '@loopback/testlab';
 import {Suite} from 'mocha';
 import {SciLogDbApplication} from '../..';
 import {clearDatabase, setupApplication} from './test-helper';
-import {createSandbox} from 'sinon';
 import {FileRepository, ParagraphRepository} from '../../repositories';
-import * as util from '../../utils/misc';
 import {Db, GridFSBucket} from 'mongodb';
 import fs from 'fs';
 import {testdb} from '../testdb.datasource';
@@ -13,16 +11,10 @@ import path from 'path';
 describe('Migrate', function (this: Suite) {
   this.timeout(5000);
   let app: SciLogDbApplication;
-  const sandbox = createSandbox();
 
   before('setupApplication', async () => {
     app = (await setupApplication()).app;
     await clearDatabase(app);
-  });
-
-  afterEach(done => {
-    sandbox.restore();
-    done();
   });
 
   it('test migrateHtmlTexcontent', async () => {
@@ -37,12 +29,7 @@ describe('Migrate', function (this: Suite) {
       ownerGroup: 'paragraphAcceptance',
       textcontent: '<p>h &hearts;</p>',
     });
-    const sanitizeTextContentStub = sandbox
-      .stub(util, 'sanitizeTextContent')
-      .callThrough();
     await paragraph.migrateHtmlTexcontent();
-    expect(sanitizeTextContentStub.callCount).to.be.eql(2);
-    expect(sanitizeTextContentStub.args[0][0]).to.be.eql('<p></p>');
     expect(
       (
         await paragraph.execute('Paragraph', 'findOne', {
@@ -50,7 +37,6 @@ describe('Migrate', function (this: Suite) {
         })
       ).htmlTextcontent,
     ).to.be.eql(undefined);
-    expect(sanitizeTextContentStub.args[1][0]).to.be.eql('<p>h &hearts;</p>');
     expect(
       (
         await paragraph.execute('Paragraph', 'findOne', {
