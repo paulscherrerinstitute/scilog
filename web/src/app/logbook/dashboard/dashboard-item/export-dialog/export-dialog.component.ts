@@ -74,6 +74,6 @@ export class ExportDialogComponent {
       // fallback to Angular's HttpErrorResponse.message
       detail = err.message;
     }
-    return `Export failed (HTTP ${err.status}): ${detail}`;
+    return `Export failed (${err.status} ${err.statusText}): ${detail}`;
   }
 }
