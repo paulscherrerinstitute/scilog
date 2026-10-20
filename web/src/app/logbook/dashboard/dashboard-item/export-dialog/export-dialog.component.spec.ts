@@ -3,6 +3,7 @@ import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 import { ExportDialogComponent } from './export-dialog.component';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { LogbookItemDataService } from '@shared/remote-data.service';
+import { HttpErrorResponse } from '@angular/common/http';
 import { of } from 'rxjs';
 import { AppConfigService } from 'src/app/app-config.service';
 
@@ -75,11 +76,35 @@ describe('ExportDialogComponent', () => {
     );
   });
 
-  it('should keep the dialog open and show an error when the export fails', async () => {
-    logbookItemDataSpy.exportLogbook.and.rejectWith('network down');
+  it('should show the parsed server message when the export fails with a LoopBack error', async () => {
+    const message = 'Entity not found: Filesnippet with id "69245ac1a46515a17eb31fe6"';
+    const errorBody = new Blob(
+      [
+        JSON.stringify({
+          error: { statusCode: 404, name: 'Error', message, code: 'ENTITY_NOT_FOUND' },
+        }),
+      ],
+      { type: 'application/json' },
+    );
+    logbookItemDataSpy.exportLogbook.and.rejectWith(
+      new HttpErrorResponse({ error: errorBody, status: 404, statusText: 'Not Found' }),
+    );
     await component.exportData('pdf');
-    expect(component.errMessage).toContain('Export failed');
-    expect(component.errMessage).toContain('network down');
+    expect(component.errMessage).toContain('404');
+    expect(component.errMessage).toContain(message);
+    expect(component.inProgress).toBe(false);
+    expect(mockDialogRef.close).not.toHaveBeenCalled();
+  });
+
+  it('should fall back to the HttpClient error message when the response has no parseable body', async () => {
+    const error = new HttpErrorResponse({
+      error: new ProgressEvent('error'),
+      status: 0,
+      statusText: 'Unknown Error',
+    });
+    logbookItemDataSpy.exportLogbook.and.rejectWith(error);
+    await component.exportData('pdf');
+    expect(component.errMessage).toContain(error.message);
     expect(component.inProgress).toBe(false);
     expect(mockDialogRef.close).not.toHaveBeenCalled();
   });

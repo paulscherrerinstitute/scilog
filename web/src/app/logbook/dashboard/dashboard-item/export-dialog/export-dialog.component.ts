@@ -5,6 +5,8 @@ import { DatePipe, NgIf } from '@angular/common';
 import { CdkScrollable } from '@angular/cdk/scrolling';
 import { MatProgressBar } from '@angular/material/progress-bar';
 import { MatButton } from '@angular/material/button';
+import { HttpErrorResponse } from '@angular/common/http';
+import { LoopBackError } from '@model/loopback-error';
 
 @Component({
   selector: 'app-export-dialog',
@@ -52,9 +54,26 @@ export class ExportDialogComponent {
       window.URL.revokeObjectURL(url);
       this.close();
     } catch (err) {
-      this.errMessage = `Export failed: ${err}`;
+      this.errMessage = await this.describeError(err);
     } finally {
       this.inProgress = false;
     }
+  }
+
+  private async describeError(err: unknown): Promise<string> {
+    if (!(err instanceof HttpErrorResponse)) {
+      return `Export failed: ${err}`;
+    }
+    let detail: string;
+    try {
+      // try parsing as LoopBack server message
+      const blob = await (err.error as Blob).text();
+      const body = JSON.parse(blob) as LoopBackError;
+      detail = body.error.message;
+    } catch {
+      // fallback to Angular's HttpErrorResponse.message
+      detail = err.message;
+    }
+    return `Export failed (HTTP ${err.status}): ${detail}`;
   }
 }
