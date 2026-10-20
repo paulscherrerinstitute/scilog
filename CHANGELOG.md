@@ -1,3 +1,10 @@
+## [3.2.1](https://github.com/paulscherrerinstitute/scilog/compare/v3.2.0...v3.2.1) (2026-10-20)
+
+
+### Bug Fixes
+
+* **api:** read openBIS exports with prefixed types ([#879](https://github.com/paulscherrerinstitute/scilog/issues/879)) ([feaa4dc](https://github.com/paulscherrerinstitute/scilog/commit/feaa4dc26f9a2046cedd13c0fd2c0d62c6855c98))
+
 # [3.2.0](https://github.com/paulscherrerinstitute/scilog/compare/v3.1.0...v3.2.0) (2026-10-16)
 
 
