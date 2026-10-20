@@ -354,8 +354,9 @@ describe('File controller services', function (this: Suite) {
       .set('Authorization', 'Bearer ' + token)
       .expect(200)
       .then(result => {
-        expect(result.text).to.startWith('"use strict"');
-        expect(result.type).to.eql('application/javascript');
+        expect(result.type).to.eql('application/octet-stream');
+        expect(result.header['content-disposition']).to.eql('attachment');
+        expect(result.header['x-content-type-options']).to.eql('nosniff');
       })
       .catch(err => {
         throw err;
