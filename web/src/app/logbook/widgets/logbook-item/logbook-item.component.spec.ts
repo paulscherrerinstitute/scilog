@@ -539,6 +539,38 @@ describe('LogbookItemComponent', () => {
     expect(component.applyFilters([notificationMock[0].content]).length).toBe(0);
   });
 
+  it('should filter out snippets that do not match importance filter', () => {
+    component.config = {
+      general: {
+        type: 'logbook',
+        title: 'Logbook view',
+      },
+      filter: {
+        targetId: '12345parentID',
+        additionalLogbooks: [],
+        tags: [],
+        importance: [1, 2],
+      },
+      view: {
+        order: ['defaultOrder ASC'],
+      },
+    };
+    const snippetMatch: any = {
+      id: '1',
+      parentId: '12345parentID',
+      tags: [],
+      importance: 2,
+    };
+    const snippetNoMatch: any = {
+      id: '2',
+      parentId: '12345parentID',
+      tags: [],
+      importance: 3,
+    };
+    expect(component.applyFilters([snippetMatch]).length).toBe(1);
+    expect(component.applyFilters([snippetNoMatch]).length).toBe(0);
+  });
+
   it('should submit PATCH message', () => {
     spyOn(component['logbookItemDataService'], 'uploadParagraph');
     spyOn(component, '_preparePatchPayload').and.returnValue(jasmine.any(Object));

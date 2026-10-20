@@ -97,4 +97,26 @@ describe('WidgetPreferencesComponent', () => {
   it('should create', () => {
     expect(component).toBeTruthy();
   });
+
+  it('should handle onImportanceChange', () => {
+    component.importance.setValue([1, 2]);
+    component.onImportanceChange(3, true);
+    expect(component.importance.value).toEqual([1, 2, 3]);
+
+    component.onImportanceChange(2, false);
+    expect(component.importance.value).toEqual([1, 3]);
+  });
+
+  it('should apply importance filter in applyChanges', () => {
+    const dialogRefSpy = jasmine.createSpy('close');
+    component['dialogRef'] = { close: dialogRefSpy } as any;
+    component.importance.setValue([2, 4]);
+    component.applyChanges(null);
+    expect(component.data.filter.importance).toEqual([2, 4]);
+    expect(dialogRefSpy).toHaveBeenCalledWith(component.data);
+
+    component.importance.setValue([]);
+    component.applyChanges(null);
+    expect(component.data.filter.importance).toBeUndefined();
+  });
 });

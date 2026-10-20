@@ -41,7 +41,7 @@ import { CKeditorConfig } from '@shared/ckeditor/ckeditor-config';
 import { LogbookScrollService } from '@shared/logbook-scroll.service';
 import { ScrollToElementService } from '@shared/scroll-to-element.service';
 import { LinkType } from 'src/app/core/model/paragraphs';
-import { NgSwitch, NgIf, NgClass, NgStyle } from '@angular/common';
+import { NgSwitch, NgIf, NgFor, NgClass, NgStyle } from '@angular/common';
 import { ResizedDirective } from '../../../core/directives/resized.directive';
 import { UiScrollModule } from 'ngx-ui-scroll';
 import { SnippetComponent as SnippetComponent_1 } from '../../core/snippet/snippet.component';
@@ -50,6 +50,8 @@ import { MatIcon } from '@angular/material/icon';
 import { MatTooltip } from '@angular/material/tooltip';
 import { CKEditorModule, CKEditorComponent } from '@ckeditor/ckeditor5-angular';
 import { TagEditorComponent as TagEditorComponent_1 } from '../../core/tag-editor/tag-editor.component';
+import { FormsModule } from '@angular/forms';
+import { MatRadioModule } from '@angular/material/radio';
 
 @Component({
   selector: 'app-logbook-item',
@@ -126,6 +128,9 @@ import { TagEditorComponent as TagEditorComponent_1 } from '../../core/tag-edito
     CKEditorModule,
     TagEditorComponent_1,
     MatFabButton,
+    FormsModule,
+    MatRadioModule,
+    NgFor,
   ],
 })
 export class LogbookItemComponent implements OnInit, AfterViewInit, OnDestroy {
@@ -164,6 +169,8 @@ export class LogbookItemComponent implements OnInit, AfterViewInit, OnDestroy {
   modifiedMetadata = false;
   metadataPanelExpanded = false;
   tag: string[] = [];
+  importanceLevels = [1, 2, 3, 4, 5];
+  importance: number = 3;
 
   renderedHeights: number[] = [];
   editorClassRef: any = null;
@@ -605,6 +612,7 @@ export class LogbookItemComponent implements OnInit, AfterViewInit, OnDestroy {
     let payload: ChangeStreamNotification = {
       isPrivate: referenceEntry.isPrivate,
       tags: msg.tags,
+      importance: msg.importance,
       snippetType: 'paragraph',
       textcontent: msg.textcontent,
       id_session: localStorage.getItem('id_session'),
@@ -626,6 +634,7 @@ export class LogbookItemComponent implements OnInit, AfterViewInit, OnDestroy {
       accessGroups: referenceEntry.accessGroups,
       isPrivate: referenceEntry.isPrivate,
       tags: msg.tags,
+      importance: msg.importance,
       snippetType: 'paragraph',
       linkType: msg.linkType,
       textcontent: msg.textcontent,
@@ -688,6 +697,11 @@ export class LogbookItemComponent implements OnInit, AfterViewInit, OnDestroy {
       }
       if (!includeSnippet) {
         return includeSnippet;
+      }
+      if (this.config.filter?.importance?.length > 0) {
+        if (!this.config.filter.importance.includes(Number(snippet.importance))) {
+          return false;
+        }
       }
       if (typeof this.config.filter.targetId != 'undefined') {
         let logbookIds = [this.config.filter.targetId, ...this.config.filter.additionalLogbooks];
@@ -934,6 +948,7 @@ export class LogbookItemComponent implements OnInit, AfterViewInit, OnDestroy {
         this.tag = this.childSnippets.last.snippet.tags;
       }
       notification.tags = this.tagEditorRef.tag.map((tag) => tag.name);
+      notification.importance = Number(this.importance ?? 3);
 
       this.submitContent(notification);
       console.log(notification);
