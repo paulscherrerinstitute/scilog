@@ -90,7 +90,7 @@ describe('ExportDialogComponent', () => {
       new HttpErrorResponse({ error: errorBody, status: 404, statusText: 'Not Found' }),
     );
     await component.exportData('pdf');
-    expect(component.errMessage).toContain('404');
+    expect(component.errMessage).toContain('404 Not Found');
     expect(component.errMessage).toContain(message);
     expect(component.inProgress).toBe(false);
     expect(mockDialogRef.close).not.toHaveBeenCalled();
