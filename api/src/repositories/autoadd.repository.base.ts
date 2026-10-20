@@ -17,7 +17,7 @@ import {Basesnippet} from '../models/basesnippet.model';
 import {
   arrayOfUniqueFrom,
   defaultSequentially,
-  sanitizeTextContentInPlace,
+  setHtmlTextcontent,
 } from '../utils/misc';
 import {BasesnippetRepository} from './basesnippet.repository';
 import _ from 'lodash';
@@ -393,7 +393,7 @@ export class AutoAddRepository<
       await baseSnippetRepository.updateParentTagsOnComment(
         ctx.data ?? ctx.instance,
       );
-      sanitizeTextContentInPlace(ctx.data ?? ctx.instance);
+      setHtmlTextcontent(ctx.data ?? ctx.instance);
       console.log('going to save:' + JSON.stringify(ctx, null, 3));
     });
 

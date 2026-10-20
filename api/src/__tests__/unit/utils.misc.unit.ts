@@ -9,8 +9,7 @@ import {
   arrayOfUniqueFrom,
   filterEmptySubsnippets,
   standardiseIncludes,
-  sanitizeTextContent,
-  sanitizeTextContentInPlace,
+  setHtmlTextcontent,
 } from '../../utils/misc';
 
 describe('Utils unit tests', function (this: Suite) {
@@ -264,17 +263,6 @@ describe('Utils unit tests', function (this: Suite) {
   });
 
   [
-    {input: '<p>a</p>', expected: 'a'},
-    {input: '<p><div>abc</div>def</p>', expected: 'abcdef'},
-    {input: '<p>def</p><div>ghi</div>', expected: 'defghi'},
-    {input: '<p>h &hearts;</p>', expected: 'h ♥'},
-  ].forEach((t, i) => {
-    it(`Should test sanitizeTextContent ${i}`, () => {
-      expect(sanitizeTextContent(t.input)).to.be.eql(t.expected);
-    });
-  });
-
-  [
     {input: undefined, expected: undefined},
     {input: {textcontent: undefined}, expected: {textcontent: undefined}},
     {input: {textcontent: '<p></p>'}, expected: {textcontent: '<p></p>'}},
@@ -282,9 +270,27 @@ describe('Utils unit tests', function (this: Suite) {
       input: {textcontent: '<p>a</p>'},
       expected: {textcontent: '<p>a</p>', htmlTextcontent: 'a'},
     },
+    {
+      input: {textcontent: '<p><div>abc</div>def</p>'},
+      expected: {
+        textcontent: '<p><div>abc</div>def</p>',
+        htmlTextcontent: 'abcdef',
+      },
+    },
+    {
+      input: {textcontent: '<p>def</p><div>ghi</div>'},
+      expected: {
+        textcontent: '<p>def</p><div>ghi</div>',
+        htmlTextcontent: 'defghi',
+      },
+    },
+    {
+      input: {textcontent: '<p>h &hearts;</p>'},
+      expected: {textcontent: '<p>h &hearts;</p>', htmlTextcontent: 'h ♥'},
+    },
   ].forEach((t, i) => {
-    it(`Should test sanitizeTextContentInPlace ${i}`, () => {
-      sanitizeTextContentInPlace(t.input);
+    it(`Should test setHtmlTextcontent ${i}`, () => {
+      setHtmlTextcontent(t.input);
       expect(t.input).to.be.eql(t.expected);
     });
   });
