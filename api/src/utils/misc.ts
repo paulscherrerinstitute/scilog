@@ -117,13 +117,6 @@ export function standardiseIncludes(filter: Pick<Filter, 'include'>) {
   });
 }
 
-export function sanitizeTextContent(textcontent: string) {
-  const dom = new JSDOM('<!DOCTYPE html>');
-  const div = dom.window.document.createElement('div');
-  div.innerHTML = textcontent;
-  return div.textContent ?? undefined;
-}
-
 export function rejectOperatorKeys(key: string, value: unknown) {
   if (key.startsWith('$'))
     throw new HttpErrors.BadRequest(
@@ -132,12 +125,17 @@ export function rejectOperatorKeys(key: string, value: unknown) {
   return value;
 }
 
-export function sanitizeTextContentInPlace(data?: {
+/**
+ * Sets `htmlTextcontent` to the plain text of the entry's HTML, which
+ * search uses. The text is not safe to insert as HTML: escaped markup
+ * such as `&lt;img&gt;` becomes `<img>`.
+ */
+export function setHtmlTextcontent(data?: {
   textcontent?: string;
   htmlTextcontent?: string;
 }) {
   if (typeof data?.textcontent !== 'string') return;
-  const sanitisedText = sanitizeTextContent(data.textcontent);
-  if (!sanitisedText) return;
-  data.htmlTextcontent = sanitisedText;
+  const text = JSDOM.fragment(data.textcontent).textContent;
+  if (!text) return;
+  data.htmlTextcontent = text;
 }
