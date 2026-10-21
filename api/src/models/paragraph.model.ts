@@ -56,6 +56,17 @@ export class Paragraph extends Basesnippet {
   })
   isMessage?: boolean;
 
+  @property({
+    type: 'number',
+    description: 'Importance level of this paragraph, from 1 (lowest) to 5 (highest).',
+    jsonSchema: {
+      type: 'integer',
+      minimum: 1,
+      maximum: 5,
+    },
+  })
+  importance?: number;
+
   @property.array(Object, {
     type: 'object',
     description: 'Information about the embedded files.',
