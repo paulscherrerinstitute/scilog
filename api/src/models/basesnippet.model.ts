@@ -163,6 +163,11 @@ export class Basesnippet extends Entity {
 
   @property({
     type: 'number',
+    jsonSchema: {
+      type: 'integer',
+      minimum: 1,
+      maximum: 5,
+    },
     description: 'Importance level of snippet (1–5)',
     index: true,
   })
