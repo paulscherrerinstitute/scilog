@@ -101,10 +101,13 @@ describe('OIDC services', function (this: Suite) {
       });
 
     const res = await client.get('/auth/oidc/callback').expect(302);
-    expect(res.headers.location).to.startWith(`success-redirect`);
+    const location = new URL(res.headers.location);
+    expect(location.origin + location.pathname).to.eql(
+      'http://web.invalid/success-redirect',
+    );
     const jwtService = await app.get(TokenServiceBindings.TOKEN_SERVICE);
     const verifiedUser = await jwtService.verifyToken(
-      res.headers.location.split('?token=')[1],
+      location.searchParams.get('token')!,
     );
     expect(verifiedUser)
       .to.have.property('email')
@@ -148,7 +151,7 @@ describe('OIDC services', function (this: Suite) {
         .get('/auth/oidc/callback')
         .set('Cookie', cookie)
         .expect(302);
-      const location = new URL(res.headers.location, 'http://web.invalid');
+      const location = new URL(res.headers.location);
       expect(location.pathname).to.eql('/success-redirect');
       return {
         returnUrl: location.searchParams.get('returnUrl'),
@@ -183,10 +186,10 @@ describe('OIDC services', function (this: Suite) {
       expect((await callback(cookie)).returnUrl).to.be.null();
     });
 
-    it('drops a returnUrl pointing outside the app', async () => {
+    it('passes the returnUrl on as is; the web app checks it', async () => {
       const cookie = await login('?returnUrl=https://evil.com');
 
-      expect((await callback(cookie)).returnUrl).to.be.null();
+      expect((await callback(cookie)).returnUrl).to.eql('https://evil.com');
     });
 
     it('keeps the redirect unchanged without returnUrl', async () => {

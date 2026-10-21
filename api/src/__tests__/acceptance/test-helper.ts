@@ -41,7 +41,7 @@ export const oidcOptions = {
   authorizationURL: 'oidc-authorization-url',
   tokenURL: 'tokenURL',
   clientID: 'clientID',
-  successRedirect: 'success-redirect',
+  successRedirect: 'http://web.invalid/success-redirect',
   endSessionEndpoint: 'aUrl',
   postLogoutRedirectUri: 'aRedirectUrl',
 };

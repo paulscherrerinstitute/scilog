@@ -11,7 +11,7 @@ import {
 import { Observable } from 'rxjs';
 import { tap } from 'rxjs/operators';
 import { ServerSettingsService } from '@shared/config/server-settings.service';
-import { isLoginPage, loginUrl } from './return-url';
+import { isAuthPage, loginUrl } from './return-url';
 
 @Injectable()
 export class AuthInterceptor implements HttpInterceptor {
@@ -24,9 +24,10 @@ export class AuthInterceptor implements HttpInterceptor {
     localStorage.removeItem('scicat_token');
     sessionStorage.removeItem('scilog-auto-selection-logbook');
     // a wrong password on the login page also answers 401; stay there so the
-    // message and the return address are kept
+    // message and the return address are kept. Also stay on the SciCat
+    // callback, so its access token is not copied into a return address.
     const { pathname, search, hash } = this.location;
-    if (isLoginPage(pathname)) return;
+    if (isAuthPage(pathname)) return;
     this.location.href = loginUrl(pathname + search + hash);
   }
 

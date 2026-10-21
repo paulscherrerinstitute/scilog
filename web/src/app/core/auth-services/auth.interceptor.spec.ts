@@ -93,5 +93,12 @@ describe('AuthInterceptor', () => {
       failWith401();
       expect(location.href).toEqual(href);
     });
+
+    it('stays on the SciCat callback, so its token is not put into a URL', () => {
+      const href = 'http://localhost/auth-callback?access-token=x';
+      location = { pathname: '/auth-callback', search: '?access-token=x', hash: '', href };
+      failWith401();
+      expect(location.href).toEqual(href);
+    });
   });
 });

@@ -77,13 +77,11 @@ export class OIDCController {
     // create a JSON Web Token based on the user profile
     const token = await this.jwtService.generateToken(userProfile);
 
+    const redirect = new URL(oidcOptions.successRedirect);
+    redirect.searchParams.set('token', token);
     const returnUrl = takeReturnUrl(request.session);
-    const returnUrlParam = returnUrl
-      ? `&returnUrl=${encodeURIComponent(returnUrl)}`
-      : '';
-    response.redirect(
-      `${oidcOptions.successRedirect}?token=${token}${returnUrlParam}`,
-    );
+    if (returnUrl) redirect.searchParams.set('returnUrl', returnUrl);
+    response.redirect(redirect.href);
     return response;
   }
 

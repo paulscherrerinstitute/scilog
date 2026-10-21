@@ -1,4 +1,4 @@
-import { loginUrl, safeReturnUrl } from './return-url';
+import { afterLoginUrl, loginUrl, safeReturnUrl } from './return-url';
 
 describe('safeReturnUrl', () => {
   [
@@ -7,6 +7,7 @@ describe('safeReturnUrl', () => {
     ['/overview(settings:viewSettings)', '/overview(settings:viewSettings)'],
     ['/%2F%2Fevil.com', '/%2F%2Fevil.com'],
     ['/loginfoo', '/loginfoo'],
+    ['/auth-callbackfoo', '/auth-callbackfoo'],
   ].forEach(([value, expected]) => {
     it(`keeps the app page ${value}`, () => {
       expect(safeReturnUrl(value)).toEqual(expected);
@@ -27,12 +28,30 @@ describe('safeReturnUrl', () => {
     '/login',
     '/login/x',
     '/login?returnUrl=/overview',
+    '/login;a=1',
+    '/login(settings:viewSettings)',
+    '/%6Cogin',
+    '/auth-callback',
+    '/auth-callback?access-token=x',
+    '/a(b',
     '',
     undefined,
     ['/a', '/b'],
   ].forEach((value) => {
     it(`rejects ${JSON.stringify(value)}`, () => {
       expect(safeReturnUrl(value)).toBeUndefined();
+    });
+  });
+});
+
+describe('afterLoginUrl', () => {
+  it('opens the return address if it is a page of this app', () => {
+    expect(afterLoginUrl('/logbooks/1/dashboard')).toEqual('/logbooks/1/dashboard');
+  });
+
+  ['//evil.com', '/login', undefined].forEach((value) => {
+    it(`opens the overview for ${JSON.stringify(value)}`, () => {
+      expect(afterLoginUrl(value)).toEqual('/overview');
     });
   });
 });
