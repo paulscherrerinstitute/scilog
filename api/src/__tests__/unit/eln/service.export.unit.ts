@@ -198,7 +198,7 @@ describe('ElnExportService (unit)', () => {
       .withArgs('file-1', {}, {currentUser: user})
       .rejects(new EntityNotFoundError(FileRepository.name, 'file-1'));
     fileRepository.stubs.exists
-      .withArgs('file-1', {currentUser: {roles: ['admin']}})
+      .withArgs('file-1', {openAccess: true})
       .resolves(true);
 
     const elnExportService = new ElnExportService(
@@ -230,7 +230,7 @@ describe('ElnExportService (unit)', () => {
       .withArgs('file-1', {}, {currentUser: user})
       .rejects(new EntityNotFoundError(FileRepository.name, 'file-1'));
     fileRepository.stubs.exists
-      .withArgs('file-1', {currentUser: {roles: ['admin']}})
+      .withArgs('file-1', {openAccess: true})
       .resolves(false);
 
     const elnExportService = new ElnExportService(
