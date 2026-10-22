@@ -31,23 +31,12 @@ export class AuthInterceptor implements HttpInterceptor {
     this.location.href = loginUrl(pathname + search + hash);
   }
 
-  private isRequestToService(service: BackendService, req_url: string): boolean {
+  private isSameOrigin(url: string, base?: string): boolean {
     try {
-      const base = this.serviceBaseUrl(service);
-      if (!base) return false;
-      return new URL(req_url).origin === new URL(base).origin;
-    } catch (err) {
+      return !!base && new URL(url).origin === new URL(base).origin;
+    } catch {
       // new URL(...) fails for request to static assets (e.g. /assets/config.json)
       return false;
-    }
-  }
-
-  private serviceBaseUrl(service: BackendService): string | undefined {
-    switch (service) {
-      case 'scilog':
-        return this.serverSettingsService.getServerAddress();
-      case 'scicat':
-        return this.serverSettingsService.getSciCatServerAddress();
     }
   }
 
@@ -64,10 +53,12 @@ export class AuthInterceptor implements HttpInterceptor {
           if (err instanceof HttpErrorResponse) {
             console.log('err.status', err);
             if (err.status === 401) {
-              if (this.isRequestToService('scicat', err.url)) {
-                const returnUrl = window.location.pathname + window.location.search;
-                window.location.href = this.serverSettingsService.getScicatLoginUrl(returnUrl);
-              } else if (this.isRequestToService('scilog', err.url)) {
+              if (this.isSameOrigin(err.url, this.serverSettingsService.getSciCatServerAddress())) {
+                const returnUrl = this.location.pathname + this.location.search;
+                this.location.href = this.serverSettingsService.getScicatLoginUrl(returnUrl);
+              } else if (
+                this.isSameOrigin(err.url, this.serverSettingsService.getServerAddress())
+              ) {
                 this.logout();
               }
             }
@@ -81,9 +72,9 @@ export class AuthInterceptor implements HttpInterceptor {
     let idToken = '';
     // Check if request is to scicat or scilog backend and include their respective tokens.
     // Requests to any other origin (e.g. scicat-rocrate service) should include neither token.
-    if (this.isRequestToService('scicat', req.url)) {
+    if (this.isSameOrigin(req.url, this.serverSettingsService.getSciCatServerAddress())) {
       idToken = localStorage.getItem('scicat_token');
-    } else if (this.isRequestToService('scilog', req.url)) {
+    } else if (this.isSameOrigin(req.url, this.serverSettingsService.getServerAddress())) {
       idToken = localStorage.getItem('id_token');
     }
 
