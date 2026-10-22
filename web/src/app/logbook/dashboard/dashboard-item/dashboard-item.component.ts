@@ -59,6 +59,7 @@ export class DashboardItemComponent implements OnInit, ComponentCanDeactivate, O
   @Output() openWidgetPreferences = new EventEmitter<any>();
 
   @ViewChild(LogbookItemComponent) logbookChild: LogbookItemComponent;
+  @ViewChild(TodosComponent) todosChild!: TodosComponent;
 
   subscriptions: any[] = [];
   dashboardView = true;
@@ -106,6 +107,10 @@ export class DashboardItemComponent implements OnInit, ComponentCanDeactivate, O
     dialogConfig.disableClose = true;
     dialogConfig.data = this.config;
     this.dialog.open(ExportDialogComponent, dialogConfig);
+  }
+
+  exportTasksFromHeader() {
+    this.todosChild?.exportTasksToLogbook();
   }
 
   async openPreferences() {
