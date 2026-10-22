@@ -1,3 +1,10 @@
+## [3.2.2](https://github.com/paulscherrerinstitute/scilog/compare/v3.2.1...v3.2.2) (2026-10-22)
+
+
+### Bug Fixes
+
+* return to the opened page after login ([#852](https://github.com/paulscherrerinstitute/scilog/issues/852)) ([0b99995](https://github.com/paulscherrerinstitute/scilog/commit/0b9999532b793ae29db8858f3c1d1304e4de0ab2)), closes [#445](https://github.com/paulscherrerinstitute/scilog/issues/445)
+
 ## [3.2.1](https://github.com/paulscherrerinstitute/scilog/compare/v3.2.0...v3.2.1) (2026-10-20)
 
 
