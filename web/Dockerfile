@@ -2,7 +2,7 @@
 
 # Full dependency install. Shared by the build and test stages, and used
 # directly as the dev compose target (source is bind-mounted there).
-FROM node:22.23.3-slim@sha256:c3de60bf2f9dd0ac6370e6117950ff62d6e339527e7472301c9c78a017978392 AS deps
+FROM node:24.22.1-slim@sha256:55fb5f5a527ea2c5c4a95f963e48ef90aa38c7b346054fdc8ee9957a2b55d205 AS deps
 
 WORKDIR /frontend
 
