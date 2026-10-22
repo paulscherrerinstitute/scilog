@@ -1,3 +1,8 @@
+.snippet-content {
+  /* Keeps content with `position: fixed` or `absolute` inside its entry. */
+  contain: paint;
+}
+
 table {
   border-collapse: collapse;
 }
