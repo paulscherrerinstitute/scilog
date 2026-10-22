@@ -1,5 +1,6 @@
-::ng-deep .snippet-content p {
-  margin: 5px;
+/* the card's padding is the space below the content, as with Material's own last-child rule */
+::ng-deep .snippet-content > :last-child {
+  margin-bottom: 0;
 }
 
 ::ng-deep .snippet-content .fileLink {

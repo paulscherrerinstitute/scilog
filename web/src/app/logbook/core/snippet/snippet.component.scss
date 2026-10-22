@@ -1,30 +1,22 @@
 @import '../../../../styles/shadows';
 
 .snippet {
-  margin-bottom: 0px;
-  margin-left: 20px;
-  margin-right: 20px;
-  /* margin-top: 1px; */
+  margin: 8px;
   min-height: 100%;
   text-align: left;
   border-radius: 2px;
-  padding: 10px 0px;
   background-color: var(--snippet-color);
   color: var(--default-text-color);
 }
 
 .messages {
   background-color: rgb(39, 117, 163) !important;
-  margin-bottom: 5px;
-  margin-left: 80px;
-  margin-right: 20px;
-  margin-top: 1px;
+  margin: 8px 8px 8px 32px;
   min-height: 100%;
   text-align: left;
   border-radius: 10px;
   border-color: rgb(39, 117, 163);
   color: var(--default-text-color);
-  padding: 20px 0px;
   @include default-shadow;
   /* width: fit-content; */
   /* float:right; */
@@ -32,41 +24,29 @@
 
 .messagesReply {
   background-color: rgb(238, 238, 238) !important;
-  margin-bottom: 5px;
-  margin-left: 20px;
-  margin-right: 80px;
-  margin-top: 1px;
+  margin: 8px 32px 8px 8px;
   min-height: 100%;
   text-align: left;
   border-radius: 10px;
   /* border-color: rgb(39, 117, 163); */
-  padding: 20px 0px;
   @include default-shadow;
   /* width: fit-content; */
   /* float: left; */
 }
 
 .snippetComment {
-  margin-bottom: 1px;
-  margin-left: 60px;
-  margin-right: 20px;
-  /* margin-top: 1px; */
+  margin: 8px 8px 8px 32px;
   min-height: 100%;
   text-align: left;
   border-radius: 2px;
-  padding: 10px 0px;
   background-color: rgb(247, 242, 197) !important;
 }
 
 .snippetQuote {
-  margin-bottom: 1px;
-  margin-left: -25px;
-  margin-right: -5px;
-  margin-top: -12px;
+  margin: 1em 0;
   min-height: 100%;
   text-align: left;
   border-radius: 2px;
-  padding: 10px 0px;
   opacity: 0.9;
   border-left: 4px solid #86a7b1;
   border-right: 4px solid #86a7b1;
@@ -80,15 +60,6 @@
 
 .mat-fab-top-right:hover {
   opacity: 1;
-}
-
-.card-content {
-  padding-left: 20px;
-  padding-right: 20px;
-  padding-bottom: 0;
-  padding-top: 4px;
-  margin-right: 20px;
-  margin-left: 8px;
 }
 
 .imageSnippet {
