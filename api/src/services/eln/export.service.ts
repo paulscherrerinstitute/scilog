@@ -200,11 +200,11 @@ export class ElnExportService {
       );
       return fileObj;
     } catch (err) {
-      // if the file is not found as user, but found as admin
-      // implies user does not have access to it
+      // the file is not found for this user, but exists when the ACL is
+      // bypassed: implies the user does not have access to it
       if (
         err instanceof EntityNotFoundError &&
-        (await this.fileExistsAsAdmin(fileId))
+        (await this.fileRepository.exists(fileId, {openAccess: true}))
       ) {
         throw new HttpErrors.Forbidden(
           `You do not have access to a file in this logbook (file id: ${fileId}).`,
@@ -212,14 +212,6 @@ export class ElnExportService {
       }
       throw err;
     }
-  }
-
-  private async fileExistsAsAdmin(
-    fileId: string | undefined,
-  ): Promise<boolean> {
-    return this.fileRepository.exists(fileId, {
-      currentUser: {roles: ['admin']},
-    });
   }
 
   private getFilter(id: string): Filter<Basesnippet> {
