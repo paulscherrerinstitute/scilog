@@ -1,3 +1,11 @@
+## [3.2.3](https://github.com/paulscherrerinstitute/scilog/compare/v3.2.2...v3.2.3) (2026-10-22)
+
+
+### Bug Fixes
+
+* **deps:** update dependency node to v24.22.1 ([#799](https://github.com/paulscherrerinstitute/scilog/issues/799)) ([ede72ac](https://github.com/paulscherrerinstitute/scilog/commit/ede72accb2e9a19eacce244fa5cc96d226d3d494))
+* **web:** sanitize entries with DOMPurify ([#877](https://github.com/paulscherrerinstitute/scilog/issues/877)) ([7ba2c41](https://github.com/paulscherrerinstitute/scilog/commit/7ba2c41f1639de33ad71ad0952cf6dda874621b3)), closes [#873](https://github.com/paulscherrerinstitute/scilog/issues/873)
+
 ## [3.2.2](https://github.com/paulscherrerinstitute/scilog/compare/v3.2.1...v3.2.2) (2026-10-22)
 
 
