@@ -18,7 +18,12 @@
         <ng-container *ngIf="config?.view?.showSnippetHeader">#{{ indexOrdered }} · </ng-container>
         {{ snippet.createdBy }}
       </mat-card-subtitle>
-      <mat-card-subtitle>{{ snippet.createdAt | date: 'medium' }}</mat-card-subtitle>
+      <mat-card-subtitle>
+        {{ snippet.createdAt | date: 'medium' }}
+        @if (isEdited) {
+          · edited
+        }
+      </mat-card-subtitle>
       <ng-container *ngIf="showEditButtonsMenu">
         <button
           mat-icon-button
