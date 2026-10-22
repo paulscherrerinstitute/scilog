@@ -212,6 +212,14 @@ export class SnippetComponent implements OnInit, AfterContentInit, AfterViewChec
     return this.snippet?.updatedAt !== this.snippet?.createdAt && !!this.snippet?.id_session;
   }
 
+  get comments() {
+    return (
+      this.snippet?.subsnippets?.filter(
+        (snippet) => snippet.linkType !== LinkType.QUOTE && snippet.snippetType === 'paragraph',
+      ) ?? []
+    );
+  }
+
   ngAfterContentInit() {
     this._subsnippets.subscribe(() => {
       this.setLocked();
