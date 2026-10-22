@@ -62,6 +62,37 @@
   color: var(--default-text-color);
 }
 
+/* parts of a header line, separated by a "·" that is hidden when a part starts a new line:
+   the row is shifted left by one gap and clipped, so a gap at the start of a line is cut off */
+mat-card-subtitle:has(> .subtitle-parts) {
+  overflow: hidden;
+}
+
+.subtitle-parts {
+  display: flex;
+  flex-wrap: wrap;
+  margin-left: -1em;
+
+  > span {
+    margin-left: 1em;
+  }
+
+  .separated::before {
+    content: '·';
+    display: inline-block;
+    width: 1em;
+    margin-left: -1em;
+    text-align: center;
+  }
+
+  // the pencil's tip sits on the baseline and its top at the height of digits
+  mat-icon {
+    height: 1em;
+    line-height: 1;
+    vertical-align: -0.125em;
+  }
+}
+
 .mat-fab-top-right {
   margin-left: auto;
   opacity: 0.1;

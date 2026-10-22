@@ -8,15 +8,19 @@
   @if (showHeader) {
     <mat-card-header>
       <mat-icon *ngIf="isHighlighted">star</mat-icon>
-      <svg
-        mat-card-avatar
-        [data-jdenticon-value]="avatarHash"
-        *ngIf="snippetIsAccessedByAnotherUser && !snippet.isMessage"
-        matTooltip="Another user is currently editing this snippet."
-      ></svg>
       <mat-card-subtitle>
-        <ng-container *ngIf="config?.view?.showSnippetHeader">#{{ indexOrdered }} · </ng-container>
-        {{ snippet.createdBy }}
+        <span class="subtitle-parts">
+          <span
+            ><ng-container *ngIf="config?.view?.showSnippetHeader"
+              >#{{ indexOrdered }} · </ng-container
+            >{{ snippet.createdBy }}</span
+          >
+          @if (snippetIsAccessedByAnotherUser && !snippet.isMessage) {
+            <span class="separated"
+              ><mat-icon inline>edit</mat-icon> {{ editingBy }} is editing</span
+            >
+          }
+        </span>
       </mat-card-subtitle>
       <mat-card-subtitle>
         {{ snippet.createdAt | date: 'medium' }}

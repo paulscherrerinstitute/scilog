@@ -8,7 +8,6 @@ import { ConditionalHeadersInterceptor } from '@shared/auth-services/conditional
 import { AuthService } from '@shared/auth-services/auth.service';
 import { Router } from '@angular/router';
 import { CookieService } from 'ngx-cookie-service';
-import { JDENTICON_CONFIG } from 'ngx-jdenticon';
 import { BrowserModule, bootstrapApplication } from '@angular/platform-browser';
 import { AppRoutingModule } from './app/app-routing.module';
 import { provideAnimations } from '@angular/platform-browser/animations';
@@ -48,21 +47,6 @@ bootstrapApplication(AppComponent, {
       deps: [AuthService, Router],
     },
     CookieService,
-    {
-      // Custom identicon style
-      provide: JDENTICON_CONFIG,
-      useValue: {
-        lightness: {
-          color: [0.31, 0.54],
-          grayscale: [0.63, 0.82],
-        },
-        saturation: {
-          color: 0.5,
-          grayscale: 0.5,
-        },
-        backColor: '#222',
-      },
-    },
     provideHttpClient(withInterceptorsFromDi()),
     provideAnimations(),
     {
