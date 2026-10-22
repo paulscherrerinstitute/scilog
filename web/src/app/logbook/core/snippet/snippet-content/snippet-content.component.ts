@@ -13,6 +13,8 @@ import { ChangeStreamNotification } from '../../changestreamnotification.model';
 import { AppConfigService } from 'src/app/app-config.service';
 import { Filecontainer } from 'src/app/core/model/basesnippets';
 import { PrismService } from '../../prism.service';
+import { HtmlSanitizerService } from '../html-sanitizer.service';
+import { SafeHtml } from '@angular/platform-browser';
 
 @Component({
   selector: 'app-snippet-content',
@@ -28,6 +30,7 @@ export class SnippetContentComponent implements OnInit, AfterViewInit, AfterView
   @Output() isLoading = new EventEmitter<boolean>();
 
   _content: string;
+  html: SafeHtml;
   span: any;
   files: string[] = [];
   defaultFigureWidth = '85%';
@@ -40,6 +43,7 @@ export class SnippetContentComponent implements OnInit, AfterViewInit, AfterView
   constructor(
     private appConfigService: AppConfigService,
     private prismservice: PrismService,
+    private htmlSanitizer: HtmlSanitizerService,
   ) {
     console.log(this);
   }
@@ -141,13 +145,8 @@ export class SnippetContentComponent implements OnInit, AfterViewInit, AfterView
     for (const image of images) {
       if (!image.parentElement.firstChild.href) {
         const hrefElement = document.createElement('a');
-        hrefElement.setAttribute('target', '_blank');
-        hrefElement.setAttribute('rel', 'noopener noreferrer');
         image.parentElement.appendChild(hrefElement);
         hrefElement.appendChild(image);
-      } else {
-        image.parentElement.firstChild.setAttribute('target', '_blank');
-        image.parentElement.firstChild.setAttribute('rel', 'noopener noreferrer');
       }
       if (image.parentElement.firstChild != image)
         image.parentElement.insertBefore(image, image.parentElement.firstChild);
@@ -156,11 +155,12 @@ export class SnippetContentComponent implements OnInit, AfterViewInit, AfterView
 
   set content(value: string) {
     this._content = value;
+    this.html = this.htmlSanitizer.sanitize(this.setEdited(value ?? ''));
     this.htmlContent.emit(this._content);
     this._prismed = false;
   }
 
   get content() {
-    return this.setEdited(this._content ?? '');
+    return this._content;
   }
 }

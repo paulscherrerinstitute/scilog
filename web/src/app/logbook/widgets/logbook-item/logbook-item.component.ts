@@ -29,7 +29,7 @@ import { ActivatedRoute } from '@angular/router';
 import { ViewsService } from '@shared/views.service';
 import { ClassicEditor } from '@shared/ckeditor/editor';
 import { CK5ImageUploadAdapter } from '@shared/ckeditor/ck5-image-upload-adapter';
-import { extractNotificationMessage } from '@shared/add-content/add-content.component';
+import { extractNotificationMessage } from '../../../entries/entry-content';
 import { UserPreferencesService } from '@shared/user-preferences.service';
 import { debounceTime } from 'rxjs/operators';
 import { TagEditorComponent } from '@shared/tag-editor/tag-editor.component';

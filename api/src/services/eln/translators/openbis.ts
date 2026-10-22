@@ -1,7 +1,8 @@
 /**
  * Translator for openBIS-exported ELN archives: RO-Crate 1.1 with the openBIS
- * vocabulary — UPPERCASE entity types (BOOK/MESSAGE/COMMENT/PERSON) and dotted
- * `openBIS:has*` link/field names.
+ * vocabulary — `openBIS:`-prefixed UPPERCASE entity types
+ * (`openBIS:BOOK`/`MESSAGE`/`COMMENT`/`PERSON`) and dotted `openBIS:has*`
+ * link/field names.
  */
 
 import path from 'node:path';
@@ -58,7 +59,7 @@ export class OpenbisTranslator implements Translator {
    * (in `validatePerson`) rather than once per thing they authored.
    */
   validate(crate: ROCrate): ElnError[] {
-    const books = entitiesOfType(crate, 'BOOK');
+    const books = entitiesOfType(crate, 'openBIS:BOOK');
     if (books.length === 0) {
       return [{code: ElnErrorCode.MISSING_ELN_ENTITY, message: 'Missing BOOK'}];
     }
@@ -72,9 +73,9 @@ export class OpenbisTranslator implements Translator {
     }
     return [
       ...books.flatMap(validateBook),
-      ...entitiesOfType(crate, 'MESSAGE').flatMap(validateMessage),
-      ...entitiesOfType(crate, 'COMMENT').flatMap(validateComment),
-      ...entitiesOfType(crate, 'PERSON').flatMap(validatePerson),
+      ...entitiesOfType(crate, 'openBIS:MESSAGE').flatMap(validateMessage),
+      ...entitiesOfType(crate, 'openBIS:COMMENT').flatMap(validateComment),
+      ...entitiesOfType(crate, 'openBIS:PERSON').flatMap(validatePerson),
     ];
   }
 
@@ -85,7 +86,7 @@ export class OpenbisTranslator implements Translator {
    * mode has already resolved the `openBIS:has*` references to entities.
    */
   toSciLog(crate: ROCrate): LogbookDraft {
-    const book = entitiesOfType(crate, 'BOOK')[0];
+    const book = entitiesOfType(crate, 'openBIS:BOOK')[0];
     // validate() rejects crates with no BOOK, so this should never happen.
     if (!book) throw new Error('OpenbisTranslator: no BOOK entity in crate');
     return buildLogbook(book);

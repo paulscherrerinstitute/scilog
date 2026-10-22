@@ -2,7 +2,7 @@ import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 import { By } from '@angular/platform-browser';
 import { MatDialogModule, MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { provideHttpClientTesting } from '@angular/common/http/testing';
-import { AddContentComponent, extractNotificationMessage } from './add-content.component';
+import { AddContentComponent } from './add-content.component';
 import { AddContentService } from '@shared/add-content.service';
 import { of } from 'rxjs';
 import { ChangeStreamNotification } from '@shared/changestreamnotification.model';
@@ -271,46 +271,6 @@ describe('AddContentComponent', () => {
     expect(component.data).toBe(figureMockSizeAfter);
   });
 
-  it('should extract notification with new files', () => {
-    let figureMock =
-      '<figure class="image image_resized" style="width:79%;"><img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAEjgAAA2oCAIAAACtz6bAAAAACXBIWXMAAHsIAAB7CAF"></figure>"';
-    let figureMockNoSrc = ['<figure class="image image_resized"><img src=""', '></figure>"'];
-
-    let message = extractNotificationMessage(figureMock);
-    expect(message.files[0].style).toEqual({ height: '', width: '79%' });
-    expect(message.files[0].style).toEqual({ height: '', width: '79%' });
-    expect(message.files[0].fileExtension).toEqual('image/png');
-    expect(message.files[0].file).toBeTruthy();
-    expect(message.files[0].fileHash).toBeTruthy();
-    combineHtmlFigureHash(figureMockNoSrc, message.files[0].fileHash);
-    expect(message.textcontent).toEqual(
-      combineHtmlFigureHash(figureMockNoSrc, message.files[0].fileHash),
-    );
-  });
-
-  it('should extract notification without files', () => {
-    let figureMock =
-      '<figure class="image image_resized" style="width:79%;"><img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAEjgAAA2oCAIAAACtz6bAAAAACXBIWXMAAHsIAAB7CAF"></figure>"';
-    let figureMockNoSrc = ['<figure class="image image_resized"><img src=""', '></figure>"'];
-    let fileStorageMock = [{ fileHash: 'myHash' }];
-
-    let message = extractNotificationMessage(figureMock, fileStorageMock);
-    expect(message.files[0].style).toEqual({ height: '', width: '79%' });
-    expect(message.files[0].style).toEqual({ height: '', width: '79%' });
-    expect(message.files[0].fileHash).toBeTruthy();
-    combineHtmlFigureHash(figureMockNoSrc, message.files[0].fileHash);
-    expect(message.textcontent).toEqual(
-      combineHtmlFigureHash(figureMockNoSrc, message.files[0].fileHash),
-    );
-  });
-
-  it('should extract links', () => {
-    let linkMock = '<p><a class="fileLink" href="file:myHash">myFile.pdf</a></p>';
-    let linkStorageMock = [{ fileHash: 'myHash' }];
-    let message = extractNotificationMessage(linkMock, linkStorageMock);
-    expect(message.files[0].fileHash).toEqual('myHash');
-  });
-
   it('should include every attached file, not just the most recent, when preparing a message', () => {
     let linkMock =
       '<p><a class="fileLink" href="file:hashA">fileA.pdf</a> <a class="fileLink" href="file:hashB">fileB.pdf</a></p>';
@@ -445,10 +405,6 @@ describe('AddContentComponent', () => {
       files: [],
     });
   });
-
-  function combineHtmlFigureHash(figureMock: string[], hash: string) {
-    return figureMock[0] + ' title="' + hash + '"' + figureMock[1];
-  }
 });
 
 describe('AddContentComponent opened for editing', () => {

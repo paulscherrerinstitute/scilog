@@ -6,7 +6,6 @@ import { Logbooks } from '@model/logbooks';
 import { LinkType } from '@model/paragraphs';
 import { ChangeStreamNotification } from '@shared/changestreamnotification.model';
 import { ServerSettingsService } from './config/server-settings.service';
-import { User } from '@model/user';
 import { Tasks } from '@model/tasks';
 import { UserPreferences, WidgetItemConfig } from '@model/config';
 import { UserInfo } from '@model/user-info';
@@ -593,7 +592,7 @@ export class AuthDataService extends RemoteDataService {
   login(principal: string, password: string) {
     let headers = new HttpHeaders();
     headers = headers.set('Content-Type', 'application/json; charset=utf-8');
-    return this.postSnippet<User>('users/login', { principal, password }, headers);
+    return this.postSnippet<{ token: string }>('users/login', { principal, password }, headers);
   }
 }
 
