@@ -1,4 +1,5 @@
 import { inject, Injectable } from '@angular/core';
+import { DOCUMENT } from '@angular/common';
 import {
   HttpRequest,
   HttpHandler,
@@ -10,18 +11,25 @@ import {
 import { Observable } from 'rxjs';
 import { tap } from 'rxjs/operators';
 import { ServerSettingsService } from '@shared/config/server-settings.service';
-
-function logout() {
-  localStorage.removeItem('id_token');
-  localStorage.removeItem('id_session');
-  localStorage.removeItem('scicat_token');
-  sessionStorage.removeItem('scilog-auto-selection-logbook');
-  location.href = '/login';
-}
+import { isAuthPage, loginUrl } from './return-url';
 
 @Injectable()
 export class AuthInterceptor implements HttpInterceptor {
   private serverSettingsService = inject(ServerSettingsService);
+  private location = inject(DOCUMENT).location;
+
+  private logout() {
+    localStorage.removeItem('id_token');
+    localStorage.removeItem('id_session');
+    localStorage.removeItem('scicat_token');
+    sessionStorage.removeItem('scilog-auto-selection-logbook');
+    // a wrong password on the login page also answers 401; stay there so the
+    // message and the return address are kept. Also stay on the SciCat
+    // callback, so its access token is not copied into a return address.
+    const { pathname, search, hash } = this.location;
+    if (isAuthPage(pathname)) return;
+    this.location.href = loginUrl(pathname + search + hash);
+  }
 
   private isRequestToSciCatBackend(req_url: string): boolean {
     try {
@@ -47,7 +55,7 @@ export class AuthInterceptor implements HttpInterceptor {
             console.log('err.status', err);
             if (err.status === 401) {
               if (!this.isRequestToSciCatBackend(err.url)) {
-                logout();
+                this.logout();
               } else {
                 const returnUrl = window.location.pathname + window.location.search;
                 window.location.href = this.serverSettingsService.getScicatLoginUrl(returnUrl);
