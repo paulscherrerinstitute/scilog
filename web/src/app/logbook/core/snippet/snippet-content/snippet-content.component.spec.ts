@@ -130,6 +130,48 @@ describe('SnippetContentComponent', () => {
     expect(component['_srcUrlFromImageId']).toHaveBeenCalledTimes(1);
   });
 
+  const imageSnippet = (width: string) => ({
+    textcontent:
+      '<figure class="image"><img src="" title="60f9799b-e8bb-41c8-a1a7-5f88d35ea851"></figure>',
+    files: [
+      {
+        style: { width, height: '' },
+        fileExtension: 'image/png',
+        fileHash: '60f9799b-e8bb-41c8-a1a7-5f88d35ea851',
+        fileId: '6061c0283587f37b851694c7',
+      },
+    ],
+  });
+
+  it('should put the width of a resized image on its figure', () => {
+    component.snippet = imageSnippet('87.74%');
+    component.prepareContent();
+
+    const figure = component.span.querySelector('figure.image');
+    expect(figure.classList).toContain('image_resized');
+    expect(figure.style.width).toEqual('87.74%');
+    expect(figure.querySelector('img').hasAttribute('width')).toBeFalse();
+  });
+
+  it('should not set a width on an image that was not resized', () => {
+    component.snippet = imageSnippet('');
+    component.prepareContent();
+
+    const figure = component.span.querySelector('figure.image');
+    expect(figure.classList).not.toContain('image_resized');
+    expect(figure.style.width).toEqual('');
+  });
+
+  it('should keep the width of a resized image when displayed', () => {
+    component.snippet = imageSnippet('50%');
+    component.prepareContent();
+    fixture.detectChanges();
+
+    const figure = component.contentRef.nativeElement.querySelector('figure.image');
+    expect(figure.classList).toContain('image_resized');
+    expect(figure.style.width).toEqual('50%');
+  });
+
   it('should load file with accessHash', () => {
     let snippetMock = {
       id: '6061c0283587f37b851694c8',
