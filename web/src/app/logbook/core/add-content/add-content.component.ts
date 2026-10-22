@@ -21,8 +21,10 @@ import { CdkScrollable } from '@angular/cdk/scrolling';
 import { CKEditorModule, ChangeEvent } from '@ckeditor/ckeditor5-angular';
 import { TagEditorComponent } from '../tag-editor/tag-editor.component';
 import { MatTooltip } from '@angular/material/tooltip';
-import { NgIf } from '@angular/common';
+import { NgIf, NgFor } from '@angular/common';
 import { MatButton } from '@angular/material/button';
+import { FormsModule } from '@angular/forms';
+import { MatRadioModule } from '@angular/material/radio';
 
 interface editorDataInput {
   snippet: ChangeStreamNotification;
@@ -44,6 +46,9 @@ interface editorDataInput {
     MatTooltip,
     MatDialogActions,
     NgIf,
+    NgFor,
+    FormsModule,
+    MatRadioModule,
     MatButton,
     MatDialogClose,
   ],
@@ -64,6 +69,9 @@ export class AddContentComponent implements OnInit, OnDestroy {
   metadataPanelExpanded = false;
   tag: string[] = [];
   defaultTags: string[] = [];
+  importanceLevels = [1, 2, 3, 4, 5];
+  importance: number = 3;
+  LinkType = LinkType;
   subsnippets: Basesnippets[] = [];
   subscriptions: Subscription[] = [];
   contentChanged: boolean = false;
@@ -89,6 +97,9 @@ export class AddContentComponent implements OnInit, OnDestroy {
       this.message = data.snippet;
       this.config = data.config;
       this.data = typeof data.content == 'undefined' ? '' : data.content;
+      if (data?.snippet?.importance) {
+        this.importance = data.snippet.importance;
+      }
       if (typeof data.defaultTags != 'undefined') {
         this.tag = data.defaultTags;
       }
@@ -204,6 +215,9 @@ export class AddContentComponent implements OnInit, OnDestroy {
       this.message?.files ? this.message.files : [],
     );
     notification.id = this.notification.id;
+    if (this.notification.linkType === LinkType.PARAGRAPH) {
+      notification.importance = this.importance;
+    }
     this.sendMessage(notification);
   }
 
@@ -252,6 +266,9 @@ export class AddContentComponent implements OnInit, OnDestroy {
       this.notification.textcontent = notification.textcontent;
       this.notification.files = notification.files;
       this.notification.tags = this.tag;
+      if (this.notification.linkType === LinkType.PARAGRAPH) {
+        this.notification.importance = this.importance;
+      }
     } else {
       this.notification.textcontent = '';
     }
