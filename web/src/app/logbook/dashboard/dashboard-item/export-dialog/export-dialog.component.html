@@ -1,14 +1,23 @@
 <mat-dialog-content>
-  <div *ngIf="inProgress">
-    <mat-progress-bar mode="query" [color]="'accent'"></mat-progress-bar>
-  </div>
-  <div class="exportDialog-container">
-    <h2>Export logbook</h2>
-    <div>
-      <button mat-button (click)="close()">Cancel</button>
-      <button mat-button (click)="exportData('pdf')">Export to PDF</button>
-      <button mat-button (click)="exportData('eln')">Export to ELN</button>
+  @if (showScicatExport) {
+    <app-scicat-export [logbookId]="config.filter.targetId" (closed)="close()"></app-scicat-export>
+  } @else {
+    @if (inProgress) {
+      <div>
+        <mat-progress-bar mode="query" [color]="'accent'"></mat-progress-bar>
+      </div>
+    }
+    <div class="exportDialog-container">
+      <h2>Export logbook</h2>
+      <div>
+        <button mat-button (click)="close()">Cancel</button>
+        <button mat-button (click)="exportData('pdf')">Export to PDF</button>
+        <button mat-button (click)="exportData('eln')">Export to ELN</button>
+        @if (scicatEnabled) {
+          <button mat-button (click)="showScicatExport = true">Export to SciCat</button>
+        }
+      </div>
     </div>
-  </div>
+  }
   <a class="download-link" #downloadLink></a>
 </mat-dialog-content>

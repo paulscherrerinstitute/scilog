@@ -1,21 +1,24 @@
 import { Component, ElementRef, Inject, ViewChild } from '@angular/core';
 import { MatDialogRef, MAT_DIALOG_DATA, MatDialogContent } from '@angular/material/dialog';
 import { LogbookItemDataService } from '@shared/remote-data.service';
-import { DatePipe, NgIf } from '@angular/common';
+import { DatePipe } from '@angular/common';
 import { CdkScrollable } from '@angular/cdk/scrolling';
 import { MatProgressBar } from '@angular/material/progress-bar';
 import { MatButton } from '@angular/material/button';
+import { AppConfigService } from 'src/app/app-config.service';
+import { ScicatExportComponent } from './scicat-export/scicat-export.component';
 
 @Component({
   selector: 'app-export-dialog',
   templateUrl: './export-dialog.component.html',
   styleUrls: ['./export-dialog.component.css'],
   providers: [DatePipe],
-  imports: [CdkScrollable, MatDialogContent, NgIf, MatProgressBar, MatButton],
+  imports: [CdkScrollable, MatDialogContent, MatProgressBar, MatButton, ScicatExportComponent],
 })
 export class ExportDialogComponent {
   config: any;
   inProgress = false;
+  showScicatExport = false;
 
   @ViewChild('downloadLink') private downloadLink: ElementRef;
 
@@ -24,8 +27,14 @@ export class ExportDialogComponent {
     private logbookItemDataService: LogbookItemDataService,
     private dialogRef: MatDialogRef<ExportDialogComponent>,
     private datePipe: DatePipe,
+    private appConfigService: AppConfigService,
   ) {
     this.config = data;
+  }
+
+  get scicatEnabled(): boolean {
+    const scicat = this.appConfigService.getScicatSettings();
+    return !!scicat?.rocrateBaseURL;
   }
 
   close() {
@@ -33,7 +42,6 @@ export class ExportDialogComponent {
   }
 
   async exportData(option: 'pdf' | 'eln') {
-    console.log(this.config);
     this.inProgress = true;
     const blob =
       option === 'pdf'
