@@ -1,3 +1,10 @@
+## [3.2.4](https://github.com/paulscherrerinstitute/scilog/compare/v3.2.3...v3.2.4) (2026-10-23)
+
+
+### Bug Fixes
+
+* **web:** parse entry content without running it ([#891](https://github.com/paulscherrerinstitute/scilog/issues/891)) ([8d13d8d](https://github.com/paulscherrerinstitute/scilog/commit/8d13d8da70a9df2b751f386eb79fd6684b7045d8))
+
 ## [3.2.3](https://github.com/paulscherrerinstitute/scilog/compare/v3.2.2...v3.2.3) (2026-10-22)
 
 
