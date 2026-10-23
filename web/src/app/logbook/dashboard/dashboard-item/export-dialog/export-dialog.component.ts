@@ -54,6 +54,7 @@ export class ExportDialogComponent {
       window.URL.revokeObjectURL(url);
       this.close();
     } catch (err) {
+      console.error('Export failed', err);
       this.errMessage = await this.describeError(err);
     } finally {
       this.inProgress = false;
@@ -64,16 +65,18 @@ export class ExportDialogComponent {
     if (!(err instanceof HttpErrorResponse)) {
       return `Export failed: ${err}`;
     }
-    let detail: string;
+    const status = err.status ? ` (${err.status})` : '';
+    const genericMessage = 'contact support if the problem persists.';
+    let message: string;
     try {
-      // try parsing as LoopBack server message
+      // the server returns a LoopBack error as a JSON blob body
       const blob = await (err.error as Blob).text();
       const body = JSON.parse(blob) as LoopBackError;
-      detail = body.error.message;
+      message = body.error.message || genericMessage;
     } catch {
-      // fallback to Angular's HttpErrorResponse.message
-      detail = err.message;
+      // unparseable error body: network / CORS error, etc
+      message = genericMessage;
     }
-    return `Export failed (${err.status} ${err.statusText}): ${detail}`;
+    return `Export failed${status}: ${message}`;
   }
 }
