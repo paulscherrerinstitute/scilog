@@ -1,3 +1,32 @@
+## [3.2.4](https://github.com/paulscherrerinstitute/scilog/compare/v3.2.3...v3.2.4) (2026-10-23)
+
+
+### Bug Fixes
+
+* **web:** parse entry content without running it ([#891](https://github.com/paulscherrerinstitute/scilog/issues/891)) ([8d13d8d](https://github.com/paulscherrerinstitute/scilog/commit/8d13d8da70a9df2b751f386eb79fd6684b7045d8))
+
+## [3.2.3](https://github.com/paulscherrerinstitute/scilog/compare/v3.2.2...v3.2.3) (2026-10-22)
+
+
+### Bug Fixes
+
+* **deps:** update dependency node to v24.22.1 ([#799](https://github.com/paulscherrerinstitute/scilog/issues/799)) ([ede72ac](https://github.com/paulscherrerinstitute/scilog/commit/ede72accb2e9a19eacce244fa5cc96d226d3d494))
+* **web:** sanitize entries with DOMPurify ([#877](https://github.com/paulscherrerinstitute/scilog/issues/877)) ([7ba2c41](https://github.com/paulscherrerinstitute/scilog/commit/7ba2c41f1639de33ad71ad0952cf6dda874621b3)), closes [#873](https://github.com/paulscherrerinstitute/scilog/issues/873)
+
+## [3.2.2](https://github.com/paulscherrerinstitute/scilog/compare/v3.2.1...v3.2.2) (2026-10-22)
+
+
+### Bug Fixes
+
+* return to the opened page after login ([#852](https://github.com/paulscherrerinstitute/scilog/issues/852)) ([0b99995](https://github.com/paulscherrerinstitute/scilog/commit/0b9999532b793ae29db8858f3c1d1304e4de0ab2)), closes [#445](https://github.com/paulscherrerinstitute/scilog/issues/445)
+
+## [3.2.1](https://github.com/paulscherrerinstitute/scilog/compare/v3.2.0...v3.2.1) (2026-10-20)
+
+
+### Bug Fixes
+
+* **api:** read openBIS exports with prefixed types ([#879](https://github.com/paulscherrerinstitute/scilog/issues/879)) ([feaa4dc](https://github.com/paulscherrerinstitute/scilog/commit/feaa4dc26f9a2046cedd13c0fd2c0d62c6855c98))
+
 # [3.2.0](https://github.com/paulscherrerinstitute/scilog/compare/v3.1.0...v3.2.0) (2026-10-16)
 
 

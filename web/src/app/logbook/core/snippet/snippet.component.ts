@@ -2,7 +2,6 @@ import {
   Component,
   OnInit,
   Input,
-  SecurityContext,
   ElementRef,
   ViewChild,
   Output,
@@ -15,7 +14,6 @@ import {
   OnDestroy,
 } from '@angular/core';
 import { ChangeStreamNotification } from '../changestreamnotification.model';
-import { DomSanitizer } from '@angular/platform-browser';
 import { MatDialogConfig, MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { AddContentComponent } from '../add-content/add-content.component';
 import { Paragraphs, LinkType } from '@model/paragraphs';
@@ -116,7 +114,6 @@ export class SnippetComponent implements OnInit, AfterContentInit, AfterViewChec
   snippetIsAccessedByAnotherUser = false;
   avatarHash = 'anotherUser';
 
-  snippetContent: any;
   enableComments = true;
   showEditButtons = true;
   showInfoButton = true;
@@ -134,7 +131,6 @@ export class SnippetComponent implements OnInit, AfterContentInit, AfterViewChec
   _subsnippets: BehaviorSubject<Basesnippets[]>;
 
   constructor(
-    private sanitizer: DomSanitizer,
     public dialog: MatDialog,
     private logbookItemDataService: LogbookItemDataService,
     private userPreferences: UserPreferencesService,
@@ -163,15 +159,6 @@ export class SnippetComponent implements OnInit, AfterContentInit, AfterViewChec
       this.showEditButtonsMenu = false;
     }
     // console.log(this.snippet);
-
-    if (this.snippet.files && this.snippet.files.length > 0) {
-      var span = document.createElement('figure');
-      span.innerHTML = this.snippet?.textcontent;
-      this.snippetContent = span;
-    } else {
-      this.content = this.snippet?.textcontent;
-    }
-    this.content = this.sanitizer.sanitize(SecurityContext.HTML, this.content);
 
     if (!this.config.view.hideMetadata) {
       if (typeof this.snippet?.tags == 'undefined' || this.snippet.tags.length == 0) {

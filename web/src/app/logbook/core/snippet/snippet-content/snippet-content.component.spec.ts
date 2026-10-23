@@ -1,4 +1,6 @@
+import { SecurityContext } from '@angular/core';
 import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
+import { DomSanitizer } from '@angular/platform-browser';
 
 import { SnippetContentComponent } from './snippet-content.component';
 import { AppConfigService } from 'src/app/app-config.service';
@@ -168,8 +170,7 @@ describe('SnippetContentComponent', () => {
     const link = component.span.firstChild;
 
     expect(link).toBeInstanceOf(HTMLAnchorElement);
-    const base = link.baseURI;
-    expect(link.href).toEqual(`${base}download/${snippetMock.files[0].fileId}`);
+    expect(link.href).toEqual(`${document.baseURI}download/${snippetMock.files[0].fileId}`);
   });
 
   const editTest = [
@@ -204,7 +205,9 @@ describe('SnippetContentComponent', () => {
       component.prepareContent();
       spyOn(component.htmlContent, 'emit');
       component.content = `<p>${textContent}`;
-      expect(component.content).toEqual(`${openTag}${textContent}${t[1]}`);
+      expect(TestBed.inject(DomSanitizer).sanitize(SecurityContext.HTML, component.html)).toEqual(
+        `${openTag}${textContent}${t[1]}`,
+      );
       expect(component.htmlContent.emit).toHaveBeenCalledWith(`<p>${textContent}`);
     });
   });

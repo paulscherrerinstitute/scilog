@@ -171,8 +171,12 @@ export class SciLogDbApplication extends BootMixin(
         toInterceptor(passport.initialize() as ExpressRequestHandler),
       );
       this.bind('passport-session-mw').to(toInterceptor(passport.session()));
+      // passport regenerates the session on login; keepSessionInfo keeps the
+      // returnUrl saved by the login route for the callback
       this.bind('passport-oidc').to(
-        toInterceptor(passport.authenticate('openidconnect')),
+        toInterceptor(
+          passport.authenticate('openidconnect', {keepSessionInfo: true}),
+        ),
       );
     }
   }

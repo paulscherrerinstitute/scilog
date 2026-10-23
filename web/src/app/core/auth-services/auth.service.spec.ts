@@ -37,10 +37,7 @@ describe('AuthService', () => {
       [AuthService, HttpTestingController, ServerSettingsService],
       (authService: AuthService, backend: HttpTestingController) => {
         // Set up
-        const responseObject = {
-          success: true,
-          message: 'login was successful',
-        };
+        const responseObject = { token: 'a-token' };
         const principal = 'test@example.com';
         const password = 'testPassword';
         let response = null;
@@ -60,6 +57,7 @@ describe('AuthService', () => {
 
         expect(requestWrapper.request.method).toEqual('POST');
         expect(response).toEqual(responseObject);
+        expect(localStorage.getItem('id_token')).toEqual('a-token');
       },
     ),
   ));

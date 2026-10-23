@@ -26,11 +26,11 @@ const SCILOG_ELN_PATH = path.resolve(
   'scilog.eln',
 );
 
-const OPENBIS_ZIP_PATH = path.resolve(
+const OPENBIS_FULL_PATH = path.resolve(
   'src',
   '__tests__',
   'test-data',
-  'openbis.zip',
+  'openbis-full.zip',
 );
 
 const OWNER_GROUP = 'elnImportAcceptance';
@@ -564,7 +564,7 @@ describe('Logbook .eln import', function (this: Suite) {
     });
   });
 
-  describe('importing openbis.zip', () => {
+  describe('importing openbis-full.zip', () => {
     let logbook: Logbook;
     let paragraphs: Paragraph[];
     let comments: Paragraph[];
@@ -572,7 +572,7 @@ describe('Logbook .eln import', function (this: Suite) {
 
     before(async () => {
       ({logbook, paragraphs, comments, files} =
-        await importEln(OPENBIS_ZIP_PATH));
+        await importEln(OPENBIS_FULL_PATH));
     });
 
     describe('logbook', () => {
@@ -613,15 +613,6 @@ describe('Logbook .eln import', function (this: Suite) {
             'Donec vel orci nec odio consequat interdum.',
         );
         expect(html).to.containEql('<figcaption>demo shape</figcaption>');
-      });
-
-      it('rewrites the inline img title to its created fileHash', () => {
-        const message1 = paragraphs.find(p => p.textcontent?.includes('<img'))!;
-        const png = message1.files?.find(f => f.fileExtension === 'png');
-        expect(png).to.not.be.undefined();
-        expect(message1.textcontent).to.match(
-          new RegExp(`title="${png!.fileHash}"`),
-        );
       });
 
       it('tags paragraphs with per-message provenance', () => {
@@ -679,17 +670,10 @@ describe('Logbook .eln import', function (this: Suite) {
           contentSha256:
             'c6d4dbb247366ac91423499eb13d6cc857dbab58ac2d7df6d85cc3b75c0b4031',
         },
-        {
-          filename: 'e5cac887-a24a-497f-9949-b99eb92fff12.png',
-          contentType: 'application/octet-stream',
-          contentSize: 3212,
-          contentSha256:
-            'a1559402e782bccd4e29958999ac950e9d1c5d9c4f3509b9264bd1b45f16bff8',
-        },
       ];
 
       it('imports each schema:hasPart file as a filesnippet', () => {
-        expect(files).to.have.length(3);
+        expect(files).to.have.length(2);
       });
 
       it('defaults contentType and derives size and sha256 from the bytes', () => {

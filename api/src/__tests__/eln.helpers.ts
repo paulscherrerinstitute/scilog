@@ -105,7 +105,7 @@ export function validOpenbisCrate(): ROCrate {
         {'@id': './', '@type': 'Dataset', name: 'name'},
         {
           '@id': '/DEMO/BOOK1',
-          '@type': 'BOOK',
+          '@type': 'openBIS:BOOK',
           'openBIS:hasNAME': 'Demo Logbook',
           'openBIS:hasBOOK.CREATED_AT': '2026-08-24T09:12:15Z',
           'openBIS:hasBOOK.AUTHOR': {'@id': '/PERSON1'},
@@ -116,13 +116,13 @@ export function validOpenbisCrate(): ROCrate {
         },
         {
           '@id': '/PERSON1',
-          '@type': 'PERSON',
+          '@type': 'openBIS:PERSON',
           'openBIS:hasNAME': 'John Doe',
           'openBIS:hasPERSON.EMAIL': 'john.doe@example.org',
         },
         {
           '@id': '/DEMO/MESSAGE1',
-          '@type': 'MESSAGE',
+          '@type': 'openBIS:MESSAGE',
           'openBIS:hasMESSAGE.TEXT':
             '<html><head></head><body><p>hello</p>' +
             '<figure class="image"><img src="data/a%20b.png"></figure></body></html>',
@@ -133,7 +133,7 @@ export function validOpenbisCrate(): ROCrate {
         },
         {
           '@id': '/DEMO/MESSAGE2',
-          '@type': 'MESSAGE',
+          '@type': 'openBIS:MESSAGE',
           'openBIS:hasMESSAGE.TEXT':
             '<html><head></head><body><p>second</p></body></html>',
           'openBIS:hasMESSAGE.CREATED_AT': '2026-08-24T09:19:38Z',
@@ -141,7 +141,7 @@ export function validOpenbisCrate(): ROCrate {
         },
         {
           '@id': '/DEMO/COMMENT1',
-          '@type': 'COMMENT',
+          '@type': 'openBIS:COMMENT',
           'openBIS:hasCOMMENT.TEXT': 'a comment',
           'openBIS:hasCOMMENT.CREATED_AT': '2026-08-24T09:15:02Z',
           'openBIS:hasCOMMENT.AUTHOR': {'@id': '/PERSON1'},
