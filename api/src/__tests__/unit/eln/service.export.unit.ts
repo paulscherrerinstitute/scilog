@@ -1,6 +1,7 @@
 import {
   createStubInstance,
   expect,
+  sinon,
   StubbedInstanceWithSinonAccessor,
 } from '@loopback/testlab';
 import {
@@ -26,6 +27,7 @@ import {buffer} from 'node:stream/consumers';
 import path from 'node:path';
 import {listZipEntries, readZipEntries} from '../../zip.helpers';
 import {GridFSBucketReadStream} from 'mongodb';
+import {HttpErrors} from '@loopback/rest';
 
 // these are more like integration tests for ElnExportService + EntityBuilderService
 // as EntityBuilderService only contains pure functions, we use the real service instead of mocking their outputs
@@ -185,7 +187,7 @@ describe('ElnExportService (unit)', () => {
     });
   });
 
-  it('throws 403 when a user does not have access to an attached file', async () => {
+  it('throws HttpErrors.Forbidden when a user does not have access to an attached file', async () => {
     logbookRepository.stubs.findById.resolves(givenLogbook());
     basesnippetRepository.stubs.find.resolves([
       givenParagraph({
@@ -214,10 +216,10 @@ describe('ElnExportService (unit)', () => {
     const error = await expect(
       elnExportService.getRoCrateMetadata('logbook-id'),
     ).to.be.rejectedWith(/do not have access to a file/);
-    expect((error as {statusCode?: number}).statusCode).to.equal(403);
+    expect(error).to.be.instanceOf(HttpErrors.Forbidden);
   });
 
-  it('throws 404 when an attached file is actually missing', async () => {
+  it('throws EntityNotFoundError when an attached file is actually missing', async () => {
     logbookRepository.stubs.findById.resolves(givenLogbook());
     basesnippetRepository.stubs.find.resolves([
       givenParagraph({
@@ -246,7 +248,12 @@ describe('ElnExportService (unit)', () => {
     const error = await expect(
       elnExportService.getRoCrateMetadata('logbook-id'),
     ).to.be.rejectedWith(/Entity not found/);
-    expect((error as {code?: string}).code).to.equal('ENTITY_NOT_FOUND');
+    sinon.assert.calledOnceWithExactly(fileRepository.stubs.exists, 'file-1', {
+      openAccess: true,
+    });
+    expect((error as EntityNotFoundError<unknown>).code).to.equal(
+      'ENTITY_NOT_FOUND',
+    );
   });
 
   it('builds an eln archive stream with metadata, preview and file bytes', async () => {
