@@ -1,14 +1,37 @@
-import { ChangeStreamNotification } from '@shared/changestreamnotification.model';
-import { LinkType } from '@model/paragraphs';
 import { Filecontainer } from '@model/basesnippets';
 import { v4 as uuid } from 'uuid';
 import { parseInertHtml } from './parse-inert-html';
 
-export function extractNotificationMessage(htmlData: string, fileStorage: any = []) {
-  console.log('extracting notification');
+/** The HTML of an entry and the files it refers to, with the field names of `Paragraphs`. */
+export interface EntryContent {
+  textcontent: string;
+  files: Filecontainer[];
+}
 
-  let dataEditor = htmlData;
-  const span = parseInertHtml(dataEditor);
+/**
+ * Turns the editor's HTML into entry content. `knownFiles` are the files the
+ * HTML may refer to.
+ *
+ * - Returns null only for `''`.
+ * - A `data:` image becomes a new file with a random `fileHash`.
+ * - An `http` image belongs to the first known file whose `accessHash`
+ *   appears in its URL. That file's `style` is overwritten with the width and
+ *   height of the image's parent element. Throws if no known file matches.
+ * - For every image with a file, the `style` of its parent element is removed
+ *   and its `title` is set to the file's `fileHash`.
+ * - A link adds the known file whose `fileHash` is the link's path without
+ *   the leading `/`, as in `file:<fileHash>`. The scheme is not checked.
+ * - `files` lists the images in document order, then the links. A file can
+ *   appear more than once. Known files are the same objects as in
+ *   `knownFiles`.
+ */
+export function entryContentFromEditorHtml(
+  html: string,
+  knownFiles: Filecontainer[] = [],
+): EntryContent | null {
+  if (html == '') return null;
+
+  const span = parseInertHtml(html);
 
   let imgCollection = span.getElementsByTagName('img');
 
@@ -16,7 +39,6 @@ export function extractNotificationMessage(htmlData: string, fileStorage: any = 
 
   for (let index = 0; index < imgCollection.length; index++) {
     let img = imgCollection[index];
-    console.log(img);
     let container: Filecontainer;
     if (img.src.startsWith('data:')) {
       // new image
@@ -35,7 +57,7 @@ export function extractNotificationMessage(htmlData: string, fileStorage: any = 
       img.src = '';
     } else if (img.src.startsWith('http')) {
       // check for existing file
-      container = fileStorage.find((fileEntry) => img.src.includes(fileEntry.accessHash));
+      container = knownFiles.find((fileEntry) => img.src.includes(fileEntry.accessHash));
       container.style = {
         width: img.parentElement.style.width,
         height: img.parentElement.style.height,
@@ -51,8 +73,7 @@ export function extractNotificationMessage(htmlData: string, fileStorage: any = 
 
   let links = span.querySelectorAll('a');
   links.forEach((link) => {
-    console.log(link);
-    let f = fileStorage.find((file) => {
+    let f = knownFiles.find((file) => {
       return file.fileHash == link.pathname.substring(1);
     });
     if (typeof f != 'undefined') {
@@ -60,20 +81,7 @@ export function extractNotificationMessage(htmlData: string, fileStorage: any = 
     }
   });
 
-  console.log(snippetFiles);
-
-  console.log(span.innerHTML);
-
-  let notification: ChangeStreamNotification = null;
-  if (dataEditor != '') {
-    notification = {
-      linkType: LinkType.PARAGRAPH,
-      textcontent: span.innerHTML,
-      files: snippetFiles,
-    };
-  }
-
-  return notification;
+  return { textcontent: span.innerHTML, files: snippetFiles };
 }
 
 function dataURItoBlob(dataURI: string) {
