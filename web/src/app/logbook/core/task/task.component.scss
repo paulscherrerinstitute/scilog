@@ -30,3 +30,19 @@
 .flexExpand {
   flex: 1 1 auto;
 }
+
+.subtasks {
+  margin-left: 32px;
+  margin-top: 8px;
+}
+
+.subtask-input {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 8px 16px 8px 48px;
+}
+
+.subtask-field {
+  flex: 1;
+}
