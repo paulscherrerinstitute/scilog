@@ -2,13 +2,13 @@ import { ChangeStreamNotification } from '@shared/changestreamnotification.model
 import { LinkType } from '@model/paragraphs';
 import { Filecontainer } from '@model/basesnippets';
 import { v4 as uuid } from 'uuid';
+import { parseInertHtml } from './parse-inert-html';
 
 export function extractNotificationMessage(htmlData: string, fileStorage: any = []) {
   console.log('extracting notification');
 
   let dataEditor = htmlData;
-  var span = document.createElement('figure');
-  span.innerHTML = dataEditor;
+  const span = parseInertHtml(dataEditor);
 
   let imgCollection = span.getElementsByTagName('img');
 

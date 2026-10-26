@@ -170,8 +170,7 @@ describe('SnippetContentComponent', () => {
     const link = component.span.firstChild;
 
     expect(link).toBeInstanceOf(HTMLAnchorElement);
-    const base = link.baseURI;
-    expect(link.href).toEqual(`${base}download/${snippetMock.files[0].fileId}`);
+    expect(link.href).toEqual(`${document.baseURI}download/${snippetMock.files[0].fileId}`);
   });
 
   const editTest = [

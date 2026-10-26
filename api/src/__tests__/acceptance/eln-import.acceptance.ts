@@ -26,12 +26,29 @@ const SCILOG_ELN_PATH = path.resolve(
   'scilog.eln',
 );
 
-const OPENBIS_FULL_PATH = path.resolve(
-  'src',
-  '__tests__',
-  'test-data',
-  'openbis-full.zip',
-);
+// The same openBIS BOOK, exported with and without its PERSON and data files.
+// File sizes and sha256 values are computed from the fixture zip.
+const OPENBIS_EXPORTS = [
+  {
+    fixture: 'openbis-full.zip',
+    author: 'john.doe@doe.com',
+    files: [
+      {
+        filename: 'Lorem ipsum dolor.txt',
+        contentSize: 4039,
+        contentSha256:
+          'dcbf575ab43a37be110dadefa5115e6b7bb7bf35c36c9e3b44225abdcd7ae56d',
+      },
+      {
+        filename: 'demo-file.csv',
+        contentSize: 391,
+        contentSha256:
+          'c6d4dbb247366ac91423499eb13d6cc857dbab58ac2d7df6d85cc3b75c0b4031',
+      },
+    ],
+  },
+  {fixture: 'openbis-minimal.zip', author: undefined, files: []},
+];
 
 const OWNER_GROUP = 'elnImportAcceptance';
 
@@ -145,6 +162,11 @@ describe('Logbook .eln import', function (this: Suite) {
       .expect(200);
     const sha = crypto.createHash('sha256').update(response.body).digest('hex');
     expect(sha).to.equal(sha256);
+  }
+
+  /** The `eln:author:` tags of a snippet. */
+  function authorTagsOf(snippet: Logbook | Paragraph): string[] {
+    return (snippet.tags ?? []).filter(t => t.startsWith('eln:author:'));
   }
 
   describe('authorization', () => {
@@ -564,136 +586,129 @@ describe('Logbook .eln import', function (this: Suite) {
     });
   });
 
-  describe('importing openbis-full.zip', () => {
-    let logbook: Logbook;
-    let paragraphs: Paragraph[];
-    let comments: Paragraph[];
-    let files: Filesnippet[];
+  for (const {fixture, author, files: expectedFiles} of OPENBIS_EXPORTS) {
+    describe(`importing ${fixture}`, () => {
+      const authorTags = author ? [`eln:author:${author}`] : [];
+      let logbook: Logbook;
+      let paragraphs: Paragraph[];
+      let comments: Paragraph[];
+      let files: Filesnippet[];
 
-    before(async () => {
-      ({logbook, paragraphs, comments, files} =
-        await importEln(OPENBIS_FULL_PATH));
-    });
-
-    describe('logbook', () => {
-      it('creates a logbook with metadata from the openBIS BOOK', () => {
-        expect(logbook.snippetType).to.equal('logbook');
-        expect(logbook.name).to.equal('Demo Logbook');
+      before(async () => {
+        ({logbook, paragraphs, comments, files} = await importEln(
+          path.resolve('src', '__tests__', 'test-data', fixture),
+        ));
       });
 
-      it('attaches the logbook to the given location', () => {
-        expect(logbook.location).to.equal(locationId);
+      describe('logbook', () => {
+        it('creates a logbook with metadata from the openBIS BOOK', () => {
+          expect(logbook.snippetType).to.equal('logbook');
+          expect(logbook.name).to.equal('Demo Logbook');
+        });
+
+        it('attaches the logbook to the given location', () => {
+          expect(logbook.location).to.equal(locationId);
+        });
+
+        it('records the importing user as createdBy', () => {
+          expect(logbook.createdBy).to.equal(userData.email);
+        });
+
+        it('tags the logbook with openBIS import provenance', () => {
+          expect(logbook.tags).to.containDeep([
+            'eln:source:openbis',
+            'eln:created:2026-08-24',
+          ]);
+          expect(authorTagsOf(logbook)).to.deepEqual(authorTags);
+        });
       });
 
-      it('records the importing user as createdBy', () => {
-        expect(logbook.createdBy).to.equal(userData.email);
+      describe('paragraphs', () => {
+        it('creates one paragraph per openBIS MESSAGE', () => {
+          expect(paragraphs).to.have.length(2);
+          expect(
+            paragraphs.every(p => p.linkType === 'paragraph'),
+          ).to.be.true();
+        });
+
+        it('preserves the message body as an html fragment', () => {
+          const message1 = paragraphs.find(p =>
+            p.textcontent?.includes('<img'),
+          )!;
+          const html = message1.textcontent ?? '';
+          expect(html).to.not.match(/<html|<body/i); // wrapper stripped
+          expect(html).to.containEql(
+            '<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. ' +
+              'Donec vel orci nec odio consequat interdum.',
+          );
+          expect(html).to.containEql('<figcaption>demo shape</figcaption>');
+        });
+
+        it('tags paragraphs with per-message provenance', () => {
+          const message1 = paragraphs.find(p =>
+            p.textcontent?.includes('<img'),
+          )!;
+          expect(message1.tags).to.containDeep(['eln:created:2026-08-24']);
+          expect(authorTagsOf(message1)).to.deepEqual(authorTags);
+        });
       });
 
-      it('tags the logbook with openBIS import provenance', () => {
-        expect(logbook.tags).to.containDeep([
-          'eln:source:openbis',
-          'eln:author:john.doe@doe.com',
-          'eln:created:2026-08-24',
-        ]);
-      });
-    });
+      describe('comments', () => {
+        it('nests the openBIS COMMENT under its message', () => {
+          const message1 = paragraphs.find(p =>
+            p.textcontent?.includes('<img'),
+          )!;
+          expect(comments).to.have.length(1);
+          expect(comments[0].linkType).to.equal('comment');
+          expect(
+            (comments[0] as Paragraph & {parentId?: string}).parentId,
+          ).to.equal(message1.id);
+        });
 
-    describe('paragraphs', () => {
-      it('creates one paragraph per openBIS MESSAGE', () => {
-        expect(paragraphs).to.have.length(2);
-        expect(paragraphs.every(p => p.linkType === 'paragraph')).to.be.true();
-      });
+        it('keeps the plain comment text as its content', () => {
+          const html = comments[0].textcontent ?? '';
+          // stored as-is: the raw text, not a <p> wrapper
+          expect(html).to.startWith(
+            'Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
+          );
+          expect(html).to.containEql('Curabitur ac molestie ex.');
+        });
 
-      it('preserves the message body as an html fragment', () => {
-        const message1 = paragraphs.find(p => p.textcontent?.includes('<img'))!;
-        const html = message1.textcontent ?? '';
-        expect(html).to.not.match(/<html|<body/i); // wrapper stripped
-        expect(html).to.containEql(
-          '<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. ' +
-            'Donec vel orci nec odio consequat interdum.',
-        );
-        expect(html).to.containEql('<figcaption>demo shape</figcaption>');
-      });
-
-      it('tags paragraphs with per-message provenance', () => {
-        const message1 = paragraphs.find(p => p.textcontent?.includes('<img'))!;
-        expect(message1.tags).to.containDeep([
-          'eln:author:john.doe@doe.com',
-          'eln:created:2026-08-24',
-        ]);
-      });
-    });
-
-    describe('comments', () => {
-      it('nests the openBIS COMMENT under its message', () => {
-        const message1 = paragraphs.find(p => p.textcontent?.includes('<img'))!;
-        expect(comments).to.have.length(1);
-        expect(comments[0].linkType).to.equal('comment');
-        expect(
-          (comments[0] as Paragraph & {parentId?: string}).parentId,
-        ).to.equal(message1.id);
+        it('tags the comment with its provenance', () => {
+          expect(comments[0].tags).to.containDeep(['eln:created:2026-08-24']);
+          expect(authorTagsOf(comments[0])).to.deepEqual(authorTags);
+        });
       });
 
-      it('keeps the plain comment text as its content', () => {
-        const html = comments[0].textcontent ?? '';
-        // stored as-is: the raw text, not a <p> wrapper
-        expect(html).to.startWith(
-          'Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
-        );
-        expect(html).to.containEql('Curabitur ac molestie ex.');
-      });
+      describe('files', () => {
+        it('imports each schema:hasPart file as a filesnippet', () => {
+          expect(files).to.have.length(expectedFiles.length);
+        });
 
-      it('tags the comment with its provenance', () => {
-        expect(comments[0].tags).to.containDeep([
-          'eln:author:john.doe@doe.com',
-          'eln:created:2026-08-24',
-        ]);
-      });
-    });
+        if (expectedFiles.length > 0) {
+          // The bare openBIS File entities carry no size/sha/type. Size and
+          // sha256 are derived from the bytes; contentType defaults to
+          // octet-stream (mime detection deferred).
+          it('defaults contentType and derives size and sha256 from the bytes', () => {
+            for (const e of expectedFiles) {
+              const file = files.find(f => f.filename === e.filename);
+              expect(file).to.not.be.undefined();
+              expect(file).to.containDeep({
+                contentType: 'application/octet-stream',
+                contentSize: e.contentSize,
+                contentSha256: e.contentSha256,
+              });
+            }
+          });
 
-    describe('files', () => {
-      // The bare openBIS File entities carry no size/sha/type. Size and sha256
-      // are derived from the bytes; contentType defaults to octet-stream (mime
-      // detection deferred). Values computed from the fixture zip.
-      const EXPECTED = [
-        {
-          filename: 'Lorem ipsum dolor.txt',
-          contentType: 'application/octet-stream',
-          contentSize: 4039,
-          contentSha256:
-            'dcbf575ab43a37be110dadefa5115e6b7bb7bf35c36c9e3b44225abdcd7ae56d',
-        },
-        {
-          filename: 'demo-file.csv',
-          contentType: 'application/octet-stream',
-          contentSize: 391,
-          contentSha256:
-            'c6d4dbb247366ac91423499eb13d6cc857dbab58ac2d7df6d85cc3b75c0b4031',
-        },
-      ];
-
-      it('imports each schema:hasPart file as a filesnippet', () => {
-        expect(files).to.have.length(2);
-      });
-
-      it('defaults contentType and derives size and sha256 from the bytes', () => {
-        for (const e of EXPECTED) {
-          const file = files.find(f => f.filename === e.filename);
-          expect(file).to.not.be.undefined();
-          expect(file).to.containDeep({
-            contentType: e.contentType,
-            contentSize: e.contentSize,
-            contentSha256: e.contentSha256,
+          it('stores the file bytes in GridFS', async () => {
+            for (const e of expectedFiles) {
+              const file = files.find(f => f.filename === e.filename)!;
+              await expectStoredBytes(file, e.contentSha256);
+            }
           });
         }
       });
-
-      it('stores the file bytes in GridFS', async () => {
-        for (const e of EXPECTED) {
-          const file = files.find(f => f.filename === e.filename)!;
-          await expectStoredBytes(file, e.contentSha256);
-        }
-      });
     });
-  });
+  }
 });

@@ -17,6 +17,7 @@ import { CK5ImageUploadAdapter } from '../ckeditor/ck5-image-upload-adapter';
 import { Basesnippets } from '@model/basesnippets';
 import { CKeditorConfig } from '../ckeditor/ckeditor-config';
 import { extractNotificationMessage } from '../../../entries/entry-content';
+import { parseInertHtml } from '../../../entries/parse-inert-html';
 import { CdkScrollable } from '@angular/cdk/scrolling';
 import { CKEditorModule, ChangeEvent } from '@ckeditor/ckeditor5-angular';
 import { TagEditorComponent } from '../tag-editor/tag-editor.component';
@@ -269,8 +270,7 @@ export class AddContentComponent implements OnInit, OnDestroy {
   }
 
   adjustContentForEditor() {
-    var span = document.createElement('figure');
-    span.innerHTML = this.data;
+    const span = parseInertHtml(this.data);
     let figures = span.querySelectorAll('figure');
     figures.forEach((fig) => {
       const imgCollection = fig.getElementsByTagName('img');
