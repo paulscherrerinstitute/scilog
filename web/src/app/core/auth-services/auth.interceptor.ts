@@ -31,11 +31,10 @@ export class AuthInterceptor implements HttpInterceptor {
     this.location.href = loginUrl(pathname + search + hash);
   }
 
-  private isRequestToSciCatBackend(req_url: string): boolean {
+  private isSameOrigin(url: string, base?: string): boolean {
     try {
-      const origin = new URL(req_url).origin;
-      return origin === new URL(this.serverSettingsService.getSciCatServerAddress()).origin;
-    } catch (err) {
+      return !!base && new URL(url).origin === new URL(base).origin;
+    } catch {
       // new URL(...) fails for request to static assets (e.g. /assets/config.json)
       return false;
     }
@@ -54,11 +53,13 @@ export class AuthInterceptor implements HttpInterceptor {
           if (err instanceof HttpErrorResponse) {
             console.log('err.status', err);
             if (err.status === 401) {
-              if (!this.isRequestToSciCatBackend(err.url)) {
+              if (this.isSameOrigin(err.url, this.serverSettingsService.getSciCatServerAddress())) {
+                const returnUrl = this.location.pathname + this.location.search;
+                this.location.href = this.serverSettingsService.getScicatLoginUrl(returnUrl);
+              } else if (
+                this.isSameOrigin(err.url, this.serverSettingsService.getServerAddress())
+              ) {
                 this.logout();
-              } else {
-                const returnUrl = window.location.pathname + window.location.search;
-                window.location.href = this.serverSettingsService.getScicatLoginUrl(returnUrl);
               }
             }
           }
@@ -69,11 +70,14 @@ export class AuthInterceptor implements HttpInterceptor {
 
   intercept(req: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
     let idToken = '';
-    if (this.isRequestToSciCatBackend(req.url)) {
+    // Check if request is to scicat or scilog backend and include their respective tokens.
+    // Requests to any other origin (e.g. scicat-rocrate service) should include neither token.
+    if (this.isSameOrigin(req.url, this.serverSettingsService.getSciCatServerAddress())) {
       idToken = localStorage.getItem('scicat_token');
-    } else {
+    } else if (this.isSameOrigin(req.url, this.serverSettingsService.getServerAddress())) {
       idToken = localStorage.getItem('id_token');
     }
+
     if (idToken) {
       const cloned = req.clone({
         headers: req.headers.set('Authorization', 'Bearer ' + idToken),
