@@ -109,3 +109,14 @@ td {
   opacity: 0.4;
   font-size: 90%;
 }
+
+/* from the editor's content styles: a resized image's figure carries the width and is centred; the image fills it */
+::ng-deep .snippet-content .image.image_resized {
+  display: block;
+  box-sizing: border-box;
+  margin: 0.9em auto;
+}
+
+::ng-deep .snippet-content .image.image_resized img {
+  width: 100%;
+}
