@@ -120,6 +120,7 @@ export class RemoteDataService {
         ...this.staticFilters(),
         ...this.tagsFilter(config.filter),
         ...this.parentFilter(config.filter),
+        ...this.importanceFilter(config.filter),
       ],
     };
 
@@ -153,6 +154,17 @@ export class RemoteDataService {
     );
     if (parentIds.length === 0) return [];
     return [{ parentId: { inq: parentIds } }];
+  }
+
+  protected importanceFilter(configFilter: { importance?: number[] }) {
+    if (!configFilter?.importance || configFilter.importance.length === 0) {
+      return [];
+    }
+    return [
+      {
+        importance: { inq: configFilter.importance },
+      },
+    ];
   }
 
   protected addIncludeScope(configFilter?: { tags?: string[]; excludeTags?: string[] }): object {
