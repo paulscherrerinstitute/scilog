@@ -157,6 +157,7 @@ export class LogbookItemComponent implements OnInit, AfterViewInit, OnDestroy {
   searchSnippetIndex: string = '';
 
   dataService: Subscription = null;
+  private destroyed = false;
   changeStreamSubscriptions: Subscription[] = [];
   postEntrySubscription: Subscription = null;
   currentViewSubscription: Subscription = null;
@@ -281,7 +282,7 @@ export class LogbookItemComponent implements OnInit, AfterViewInit, OnDestroy {
         this.logbookScrollService.reset();
       }),
     );
-
+    this.dataService = this.data.handleMessages((message) => this.submitContent(message));
     this.updateViewSubscription();
 
     this.scrollToElement();
@@ -342,6 +343,7 @@ export class LogbookItemComponent implements OnInit, AfterViewInit, OnDestroy {
 
         await this.logbookScrollService.initialize(this.config);
         this.logbookCount = (await this.logbookItemDataService.getCount(this.config)).count;
+        if (this.destroyed) return;
         this.logbookScrollService.containerRef = this.snippetContainerRef;
         this.startNotificationManager(); // Only runs on real config change
       }
@@ -350,35 +352,21 @@ export class LogbookItemComponent implements OnInit, AfterViewInit, OnDestroy {
   //private notificationManagerStarted = false;
 
   startNotificationManager() {
-    if (typeof this.config != 'undefined') {
-      if (this.changeStreamSubscriptions.length > 0) {
-        this.changeStreamSubscriptions.forEach((sub) => sub.unsubscribe());
-      }
-      let logbooks = [this.config.filter.targetId, ...this.config.filter?.additionalLogbooks];
-      console.log('Subscribing to the following logbooks: ', logbooks);
-      logbooks.forEach((log) => {
-        this.changeStreamSubscriptions.push(
-          this.notificationService.getNotification(log, this.config).subscribe((notification) => {
-            console.log(notification);
-            this.notifications.push(notification);
-            this.parseNotification(notification);
-          }),
-        );
+    if (!this.config || this.destroyed) return;
+    this.changeStreamSubscriptions.forEach((s) => s.unsubscribe());
+    this.changeStreamSubscriptions = [];
+    const logbooks = [
+      this.config.filter.targetId,
+      ...(this.config.filter?.additionalLogbooks ?? []),
+    ];
+    logbooks.forEach((log) => {
+      const sub = this.notificationService.getNotification(log, this.config).subscribe((notification) => {
+        this.parseNotification(notification);
       });
-
-      if (this.dataService == null) {
-        this.dataService = this.data.currentMessage.subscribe((message) => {
-          // console.log(message);
-          this.message = message;
-          if (message != null && Object.keys(this.message).length != 0) {
-            // console.log(this.message);
-            this.submitContent(message);
-            this.message = null;
-          }
-        });
-      }
-    }
+      this.changeStreamSubscriptions.push(sub);
+    });
   }
+
 
   async parseNotification(notification: ChangeStreamNotification) {
     switch (notification.operationType) {
@@ -486,7 +474,7 @@ export class LogbookItemComponent implements OnInit, AfterViewInit, OnDestroy {
                     return;
                   }
 
-                  // ✅ HARD DUPLICATE CHECK BY ID
+                  //  HARD DUPLICATE CHECK BY ID
                   const alreadyExists = parentComponent.snippet.subsnippets?.some(
                     (s) => s.id === notification.content.id,
                   );
@@ -630,25 +618,9 @@ export class LogbookItemComponent implements OnInit, AfterViewInit, OnDestroy {
   //     subSnippet[key] = notification.content[key];
   //   }
   // }
-
-  private submitting = false;
   submitContent(msg: ChangeStreamNotification) {
-    console.log('SUBMITssssss TYPE CHECK', msg.id, msg.linkType);
+    console.log('SUBMIT TYPE CHECK', msg.id, msg.linkType);
     console.log('FILES SENT:', msg.files);
-
-    if (this.submitting) {
-      console.warn('🚫 submit blocked: already submitting');
-      console.log('test console23');
-      console.log('test console25665');
-      return;
-    }
-
-    this.submitting = true;
-
-    setTimeout(() => {
-      this.submitting = false;
-    }, 500);
-
     // in the future, this should be extended to support inserting snippets below/above other snippets
     // for now, I just take the last array entry
     let referenceEntry: ChangeStreamNotification = {};
@@ -735,7 +707,6 @@ export class LogbookItemComponent implements OnInit, AfterViewInit, OnDestroy {
       payload.ownerGroup = this.userPreferences.userInfo.username;
     }
     console.log('posting data');
-    console.log('test console');
     console.log('FINAL IMPORTANCE SENT:', msg.importance);
 
     console.log(payload);
@@ -835,7 +806,7 @@ export class LogbookItemComponent implements OnInit, AfterViewInit, OnDestroy {
 
       if (!includeSnippet) return false;
 
-      // ✅ IMPORTANCE FILTER
+      //  IMPORTANCE FILTER
       if (this.config.filter?.importance?.length > 0) {
         if (!this.config.filter.importance.includes(Number(snippet.importance))) {
           console.log('CONFIG IMPORTANCE IN LOGBOOK:', this.config.filter.importance);
@@ -1143,6 +1114,7 @@ export class LogbookItemComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   ngOnDestroy() {
+    this.destroyed = true;
     if (this.currentViewSubscription != null) {
       this.currentViewSubscription.unsubscribe();
     }
