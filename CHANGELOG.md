@@ -1,3 +1,10 @@
+## [3.2.5](https://github.com/paulscherrerinstitute/scilog/compare/v3.2.4...v3.2.5) (2026-10-23)
+
+
+### Bug Fixes
+
+* **api:** make the openBIS author optional ([#902](https://github.com/paulscherrerinstitute/scilog/issues/902)) ([54d8424](https://github.com/paulscherrerinstitute/scilog/commit/54d8424833f43d5a5c75649d0bb082d1faa3685d))
+
 ## [3.2.4](https://github.com/paulscherrerinstitute/scilog/compare/v3.2.3...v3.2.4) (2026-10-23)
 
 

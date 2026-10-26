@@ -94,20 +94,22 @@ describe('OpenbisTranslator.validate', () => {
     ]);
   });
 
-  it('rejects a missing author', () => {
+  it('accepts an author reference to a PERSON not in the crate', () => {
     const crate = validOpenbisCrate();
     crate.setProperty(MESSAGE, 'openBIS:hasMESSAGE.AUTHOR', {'@id': '/GHOST'});
-    expect(translator.validate(crate)).to.containDeep([
-      {code: ElnErrorCode.MISSING_ELN_ENTITY},
-    ]);
+    expect(translator.validate(crate)).to.be.empty();
   });
 
-  it('rejects a PERSON without an email', () => {
+  it('accepts a MESSAGE without an author field', () => {
+    const crate = validOpenbisCrate();
+    crate.deleteProperty(MESSAGE, 'openBIS:hasMESSAGE.AUTHOR');
+    expect(translator.validate(crate)).to.be.empty();
+  });
+
+  it('accepts a PERSON without an email', () => {
     const crate = validOpenbisCrate();
     crate.deleteProperty(PERSON, 'openBIS:hasPERSON.EMAIL');
-    expect(translator.validate(crate)).to.containDeep([
-      {code: ElnErrorCode.INVALID_AUTHOR},
-    ]);
+    expect(translator.validate(crate)).to.be.empty();
   });
 
   it('collects errors from across the graph', () => {
@@ -167,6 +169,29 @@ describe('OpenbisTranslator.toSciLog', () => {
         name: 'Demo Logbook',
         tags: ['eln:source:openbis', 'eln:id:/DEMO/BOOK1'],
       });
+    });
+
+    /** The tags of the valid crate's BOOK, without the `eln:author:` tag. */
+    function tagsWithoutAuthor(): string[] {
+      return (
+        translator.toSciLog(validOpenbisCrate()).fields.tags ?? []
+      ).filter(tag => !tag.startsWith('eln:author:'));
+    }
+
+    it('omits the author tag when the author PERSON is not in the crate', () => {
+      const crate = validOpenbisCrate();
+      crate.setProperty(BOOK, 'openBIS:hasBOOK.AUTHOR', {'@id': '/GHOST'});
+      expect(translator.toSciLog(crate).fields.tags).to.deepEqual(
+        tagsWithoutAuthor(),
+      );
+    });
+
+    it('omits the author tag when the PERSON has no email', () => {
+      const crate = validOpenbisCrate();
+      crate.deleteProperty(PERSON, 'openBIS:hasPERSON.EMAIL');
+      expect(translator.toSciLog(crate).fields.tags).to.deepEqual(
+        tagsWithoutAuthor(),
+      );
     });
 
     it('drops the created tag when CREATED_AT is unparseable', () => {

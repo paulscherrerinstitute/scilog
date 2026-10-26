@@ -54,9 +54,8 @@ export class OpenbisTranslator implements Translator {
 
   /**
    * Validate the crate's openBIS entities. RO-Crate's `@graph` is a flat,
-   * type-tagged node list, so each entity type is scanned once — every entity
-   * is validated a single time, and a shared author's email is checked once
-   * (in `validatePerson`) rather than once per thing they authored.
+   * type-tagged node list, so each entity type is scanned once, and every
+   * entity is validated a single time.
    */
   validate(crate: ROCrate): ElnError[] {
     const books = entitiesOfType(crate, 'openBIS:BOOK');
@@ -75,7 +74,6 @@ export class OpenbisTranslator implements Translator {
       ...books.flatMap(validateBook),
       ...entitiesOfType(crate, 'openBIS:MESSAGE').flatMap(validateMessage),
       ...entitiesOfType(crate, 'openBIS:COMMENT').flatMap(validateComment),
-      ...entitiesOfType(crate, 'openBIS:PERSON').flatMap(validatePerson),
     ];
   }
 
@@ -96,45 +94,30 @@ export class OpenbisTranslator implements Translator {
 // --- per-entity validation: each returns the entity's errors. Link mode
 // resolves child references, so none of these need the crate. Codes follow the
 // failure-kind axis: MISSING_* for an absent entity/field, INVALID_* for one
-// present but malformed. ---
+// present but malformed. The author is optional: it only feeds the
+// `eln:author:` tag, so a missing field, a reference to a PERSON not in the
+// crate, or a PERSON without an email is not an error. ---
 
 function validateBook(book: Entity): ElnError[] {
-  const requiredFields = [FIELD.NAME, FIELD.BOOK_AUTHOR, FIELD.BOOK_CREATED];
+  const requiredFields = [FIELD.NAME, FIELD.BOOK_CREATED];
   return [
     ...missingFieldErrors(book, requiredFields),
     ...referenceErrors(book, FIELD.BOOK_MESSAGES),
-    ...referenceErrors(book, FIELD.BOOK_AUTHOR),
   ];
 }
 
 function validateMessage(message: Entity): ElnError[] {
-  const requiredFields = [FIELD.MESSAGE_AUTHOR, FIELD.MESSAGE_CREATED];
+  const requiredFields = [FIELD.MESSAGE_CREATED];
   return [
     ...missingFieldErrors(message, requiredFields),
     ...referenceErrors(message, FIELD.FILES),
     ...referenceErrors(message, FIELD.MESSAGE_COMMENTS),
-    ...referenceErrors(message, FIELD.MESSAGE_AUTHOR),
   ];
 }
 
 function validateComment(comment: Entity): ElnError[] {
-  const requiredFields = [FIELD.COMMENT_AUTHOR, FIELD.COMMENT_CREATED];
-  return [
-    ...missingFieldErrors(comment, requiredFields),
-    ...referenceErrors(comment, FIELD.COMMENT_AUTHOR),
-  ];
-}
-
-/** A PERSON is an author, so it must carry an email. */
-function validatePerson(person: Entity): ElnError[] {
-  return person[FIELD.EMAIL]?.length
-    ? []
-    : [
-        {
-          code: ElnErrorCode.INVALID_AUTHOR,
-          message: `${person['@id']}: missing email`,
-        },
-      ];
+  const requiredFields = [FIELD.COMMENT_CREATED];
+  return missingFieldErrors(comment, requiredFields);
 }
 
 function entitiesOfType(crate: ROCrate, type: string): Entity[] {
