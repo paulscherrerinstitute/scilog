@@ -19,8 +19,8 @@ class NativeElementMock {
 
 const enabledScicatSettings = {
   scicatWidgetEnabled: true,
-  lbBaseURL: '',
-  frontendBaseURL: '',
+  lbBaseURL: 'https://scicat.example',
+  frontendBaseURL: 'https://discovery.example',
   rocrateBaseURL: 'https://scicat-rocrate.example',
 };
 
@@ -89,7 +89,7 @@ describe('ExportDialogComponent', () => {
     );
   });
 
-  it('should enable SciCat export when scicat is configured with a rocrate URL', () => {
+  it('should enable SciCat export when scicat is fully configured', () => {
     expect(component.scicatEnabled).toBeTrue();
   });
 
@@ -100,10 +100,24 @@ describe('ExportDialogComponent', () => {
 
   it('should not enable SciCat export when the rocrate URL is missing', () => {
     appConfigServiceSpy.getScicatSettings.and.returnValue({
-      scicatWidgetEnabled: true,
-      lbBaseURL: '',
-      frontendBaseURL: '',
+      ...enabledScicatSettings,
       rocrateBaseURL: '',
+    });
+    expect(component.scicatEnabled).toBeFalse();
+  });
+
+  it('should not enable SciCat export when the scicat lbBaseURL is missing', () => {
+    appConfigServiceSpy.getScicatSettings.and.returnValue({
+      ...enabledScicatSettings,
+      lbBaseURL: '',
+    });
+    expect(component.scicatEnabled).toBeFalse();
+  });
+
+  it('should not enable SciCat export when the frontendBaseURL is missing', () => {
+    appConfigServiceSpy.getScicatSettings.and.returnValue({
+      ...enabledScicatSettings,
+      frontendBaseURL: '',
     });
     expect(component.scicatEnabled).toBeFalse();
   });

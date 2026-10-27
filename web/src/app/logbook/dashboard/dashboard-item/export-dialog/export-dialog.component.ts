@@ -34,7 +34,7 @@ export class ExportDialogComponent {
 
   get scicatEnabled(): boolean {
     const scicat = this.appConfigService.getScicatSettings();
-    return !!scicat?.rocrateBaseURL;
+    return !!scicat?.rocrateBaseURL && !!scicat?.lbBaseURL && !!scicat?.frontendBaseURL;
   }
 
   close() {
