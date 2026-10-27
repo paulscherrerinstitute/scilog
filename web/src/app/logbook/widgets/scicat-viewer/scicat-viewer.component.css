@@ -1,3 +1,10 @@
+:host {
+  display: block;
+  height: calc(100% - 64px); /* dashboard-item header + tile padding */
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
 #dataset-details table th {
   text-align: left;
 }
