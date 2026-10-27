@@ -104,6 +104,9 @@ export class ScicatExportComponent implements OnInit {
       const detail = typeof body === 'string' ? body : body ? JSON.stringify(body) : err.message;
       return `The export failed (HTTP ${err.status}): ${detail}`;
     }
-    return `The export failed: ${err}`;
+    if (err instanceof Error) {
+      return `The export failed: ${err}`;
+    }
+    return `The export failed: ${JSON.stringify(err)}`;
   }
 }
