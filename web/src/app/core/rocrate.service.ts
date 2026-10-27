@@ -31,6 +31,14 @@ export class RocrateService {
         zip,
         { headers },
       )
-      .pipe(map((response) => response[DATA_DIR_KEY]));
+      .pipe(
+        map((response) => {
+          const pid = response[DATA_DIR_KEY];
+          if (!pid) {
+            throw new Error(`Unexpected response from scicat-rocrate: ${JSON.stringify(response)}`);
+          }
+          return pid;
+        }),
+      );
   }
 }

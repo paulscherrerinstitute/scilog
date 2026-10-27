@@ -52,4 +52,21 @@ describe('RocrateService', () => {
     expect(req.request.body).toBe(zip);
     req.flush({ 'data/': pid });
   });
+
+  it('errors when the response is missing the data/ key', (done: DoneFn) => {
+    const zip = new Blob(['zip-content'], { type: 'application/zip' });
+    const response = { somethingElse: 'x' };
+
+    service.importRoCrate(zip, 'psi-demo').subscribe({
+      next: () => fail('expected importRoCrate to error'),
+      error: (err: Error) => {
+        expect(err.message).toContain('Unexpected response from scicat-rocrate');
+        expect(err.message).toContain(JSON.stringify(response));
+        done();
+      },
+    });
+
+    const req = httpMock.expectOne('https://scicat-rocrate.example/api/v1/ro-crate/import');
+    req.flush(response);
+  });
 });
