@@ -32,10 +32,10 @@
     now view it in SciCat.
   </p>
   <div>
+    <button mat-button (click)="close()">Close</button>
     <a mat-button [href]="datasetUrl" target="_blank" rel="noopener">
       Open in SciCat <mat-icon>open_in_new</mat-icon>
     </a>
-    <button mat-button (click)="close()">Close</button>
   </div>
 } @else {
   <h2>Export failed</h2>
