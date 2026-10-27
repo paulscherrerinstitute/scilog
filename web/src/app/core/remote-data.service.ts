@@ -24,7 +24,7 @@ interface Count {
 })
 export class RemoteDataService {
   get imagesLocation() {
-    return `${this.serverSettings.getServerAddress()}/images`;
+    return `${this.serverAddress}/images`;
   }
 
   constructor(
@@ -32,10 +32,10 @@ export class RemoteDataService {
     protected serverSettings: ServerSettingsService,
   ) {}
 
+  protected readonly serverAddress = this.serverSettings.getServerAddress();
+
   protected deleteSnippet(snippetPath: string, snippetId: string) {
-    return this.httpClient.delete(
-      this.serverSettings.getServerAddress() + snippetPath + '/' + snippetId,
-    );
+    return this.httpClient.delete(this.serverAddress + snippetPath + '/' + snippetId);
   }
 
   protected patchSnippet<T>(
@@ -44,15 +44,13 @@ export class RemoteDataService {
     payload: any,
     headers: HttpHeaders,
   ) {
-    return this.httpClient.patch<T>(
-      this.serverSettings.getServerAddress() + snippetPath + '/' + snippetId,
-      payload,
-      { headers },
-    );
+    return this.httpClient.patch<T>(this.serverAddress + snippetPath + '/' + snippetId, payload, {
+      headers,
+    });
   }
 
   protected postSnippet<T>(snippetPath: string, payload: any, headers: HttpHeaders) {
-    return this.httpClient.post<T>(this.serverSettings.getServerAddress() + snippetPath, payload, {
+    return this.httpClient.post<T>(this.serverAddress + snippetPath, payload, {
       headers,
     });
   }
@@ -61,15 +59,13 @@ export class RemoteDataService {
     if (header == null) {
       header = new HttpHeaders().append('accept', 'application/json');
     }
-    return this.httpClient.post(
-      this.serverSettings.getServerAddress() + 'filesnippet/files',
-      formData,
-      { headers: header },
-    );
+    return this.httpClient.post(this.serverAddress + 'filesnippet/files', formData, {
+      headers: header,
+    });
   }
 
   protected getSnippets<T>(snippetPath: string, options: Object) {
-    return this.httpClient.get<T>(this.serverSettings.getServerAddress() + snippetPath, options);
+    return this.httpClient.get<T>(this.serverAddress + snippetPath, options);
   }
 
   protected async postImage(payloadImage: Images) {
@@ -356,7 +352,7 @@ export class LogbookItemDataService extends RemoteDataService {
 
   exportELN(logbookId: string): Promise<Blob> {
     return this.httpClient
-      .get(`${this.serverSettings.getServerAddress()}logbooks/export/${logbookId}/eln`, {
+      .get(`${this.serverAddress}logbooks/export/${logbookId}/eln`, {
         responseType: 'blob',
       })
       .toPromise();
@@ -393,11 +389,7 @@ export class LogbookDataService extends RemoteDataService {
   touchLogbook(logbookId: string): Promise<void> {
     const headers = new HttpHeaders().set('Content-Type', 'application/json');
     return this.httpClient
-      .patch<void>(
-        this.serverSettings.getServerAddress() + 'logbooks/' + logbookId + '/touch',
-        {},
-        { headers },
-      )
+      .patch<void>(this.serverAddress + 'logbooks/' + logbookId + '/touch', {}, { headers })
       .toPromise();
   }
 
@@ -410,11 +402,9 @@ export class LogbookDataService extends RemoteDataService {
     const formData = new FormData();
     formData.append('file', file);
     return firstValueFrom(
-      this.httpClient.post<Logbooks>(
-        `${this.serverSettings.getServerAddress()}logbooks/import/eln`,
-        formData,
-        { params: { 'location-id': locationId } },
-      ),
+      this.httpClient.post<Logbooks>(`${this.serverAddress}logbooks/import/eln`, formData, {
+        params: { 'location-id': locationId },
+      }),
     );
   }
 
