@@ -1,3 +1,10 @@
+## [3.2.6](https://github.com/paulscherrerinstitute/scilog/compare/v3.2.5...v3.2.6) (2026-10-27)
+
+
+### Bug Fixes
+
+* add vertical scrolling to scicat widget ([#911](https://github.com/paulscherrerinstitute/scilog/issues/911)) ([aa80444](https://github.com/paulscherrerinstitute/scilog/commit/aa8044454595640655a967f881d6635806409819)), closes [#910](https://github.com/paulscherrerinstitute/scilog/issues/910) [#910](https://github.com/paulscherrerinstitute/scilog/issues/910)
+
 ## [3.2.5](https://github.com/paulscherrerinstitute/scilog/compare/v3.2.4...v3.2.5) (2026-10-23)
 
 
