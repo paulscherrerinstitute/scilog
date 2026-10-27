@@ -81,15 +81,14 @@ export class ScicatExportComponent implements OnInit {
       const pid = await firstValueFrom(this.rocrateService.importRoCrate(zip, this.ownerGroup));
       this.createdPid = pid;
       this.datasetUrl = this.scicatService.getDatasetDetailPageUrl(pid);
-      this.showResult = true;
       this.snackBar.showSnackbarMessage('Dataset created in SciCat', 'resolved');
     } catch (err) {
       this.createdPid = null;
       this.errorMessage = this.describeError(err);
-      this.showResult = true;
       this.snackBar.showSnackbarMessage('Export to SciCat failed', 'warning');
     } finally {
       this.inProgress = false;
+      this.showResult = true;
     }
   }
 
