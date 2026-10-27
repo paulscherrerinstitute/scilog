@@ -1,7 +1,8 @@
 import {injectable, BindingScope, service, inject} from '@loopback/core';
 import {Basesnippet, Paragraph, Logbook, LinkType} from '../../models';
 import {EntityBuilderService} from '../entity-builder.service';
-import {Filter, repository} from '@loopback/repository';
+import {EntityNotFoundError, Filter, repository} from '@loopback/repository';
+import {HttpErrors} from '@loopback/rest';
 import {
   BasesnippetRepository,
   FileRepository,
@@ -170,11 +171,7 @@ export class ElnExportService {
     );
     paragraphEntity.hasPart ||= [];
     for (const file of paragraph.files ?? []) {
-      const fileObj: Filesnippet = await this.fileRepository.findById(
-        file.fileId,
-        {},
-        {currentUser: this.user},
-      );
+      const fileObj: Filesnippet = await this.findFileOrForbidden(file.fileId);
       paragraphEntity.hasPart.push(
         this.entityBuilder.buildFileEntity(paragraph.id, fileObj),
       );
@@ -190,6 +187,31 @@ export class ElnExportService {
       });
     }
     paragraphEntity.text = paragraph.textcontent;
+  }
+
+  private async findFileOrForbidden(
+    fileId: string | undefined,
+  ): Promise<Filesnippet> {
+    try {
+      const fileObj = await this.fileRepository.findById(
+        fileId,
+        {},
+        {currentUser: this.user},
+      );
+      return fileObj;
+    } catch (err) {
+      // the file is not found for this user, but exists when the ACL is
+      // bypassed: implies the user does not have access to it
+      if (
+        err instanceof EntityNotFoundError &&
+        (await this.fileRepository.exists(fileId, {openAccess: true}))
+      ) {
+        throw new HttpErrors.Forbidden(
+          `You do not have access to a file in this logbook (file id: ${fileId}).`,
+        );
+      }
+      throw err;
+    }
   }
 
   private getFilter(id: string): Filter<Basesnippet> {

@@ -1,6 +1,7 @@
 import {
   createStubInstance,
   expect,
+  sinon,
   StubbedInstanceWithSinonAccessor,
 } from '@loopback/testlab';
 import {
@@ -12,6 +13,7 @@ import {
   FileRepository,
   LogbookRepository,
 } from '../../../repositories';
+import {EntityNotFoundError} from '@loopback/repository';
 import {
   ArchiveService,
   EntityBuilderService,
@@ -25,6 +27,7 @@ import {buffer} from 'node:stream/consumers';
 import path from 'node:path';
 import {listZipEntries, readZipEntries} from '../../zip.helpers';
 import {GridFSBucketReadStream} from 'mongodb';
+import {HttpErrors} from '@loopback/rest';
 
 // these are more like integration tests for ElnExportService + EntityBuilderService
 // as EntityBuilderService only contains pure functions, we use the real service instead of mocking their outputs
@@ -182,6 +185,75 @@ describe('ElnExportService (unit)', () => {
     expect(snippet2Entity.hasPart).to.containEql({
       '@id': entityBuilder.getFilePath('snippet-2', 'file-2', 'txt'),
     });
+  });
+
+  it('throws HttpErrors.Forbidden when a user does not have access to an attached file', async () => {
+    logbookRepository.stubs.findById.resolves(givenLogbook());
+    basesnippetRepository.stubs.find.resolves([
+      givenParagraph({
+        id: 'snippet-1',
+        textcontent: 'Paragraph 1',
+        files: [{fileId: 'file-1'}],
+      }),
+    ]);
+    fileRepository.stubs.findById
+      .withArgs('file-1', {}, {currentUser: user})
+      .rejects(new EntityNotFoundError(FileRepository.name, 'file-1'));
+    fileRepository.stubs.exists
+      .withArgs('file-1', {openAccess: true})
+      .resolves(true);
+
+    const elnExportService = new ElnExportService(
+      user,
+      basesnippetRepository,
+      logbookRepository,
+      fileRepository,
+      entityBuilder,
+      archiveService,
+      fileStorage,
+    );
+
+    const error = await expect(
+      elnExportService.getRoCrateMetadata('logbook-id'),
+    ).to.be.rejectedWith(/do not have access to a file/);
+    expect(error).to.be.instanceOf(HttpErrors.Forbidden);
+  });
+
+  it('throws EntityNotFoundError when an attached file is actually missing', async () => {
+    logbookRepository.stubs.findById.resolves(givenLogbook());
+    basesnippetRepository.stubs.find.resolves([
+      givenParagraph({
+        id: 'snippet-1',
+        textcontent: 'Paragraph 1',
+        files: [{fileId: 'file-1'}],
+      }),
+    ]);
+    fileRepository.stubs.findById
+      .withArgs('file-1', {}, {currentUser: user})
+      .rejects(new EntityNotFoundError(FileRepository.name, 'file-1'));
+    fileRepository.stubs.exists
+      .withArgs('file-1', {openAccess: true})
+      .resolves(false);
+
+    const elnExportService = new ElnExportService(
+      user,
+      basesnippetRepository,
+      logbookRepository,
+      fileRepository,
+      entityBuilder,
+      archiveService,
+      fileStorage,
+    );
+
+    const error = await expect(
+      elnExportService.getRoCrateMetadata('logbook-id'),
+    ).to.be.rejectedWith(/Entity not found/);
+    sinon.assert.calledOnceWithExactly(fileRepository.stubs.exists, 'file-1', {
+      openAccess: true,
+    });
+    expect((error as EntityNotFoundError<unknown>).code).to.equal(
+      'ENTITY_NOT_FOUND',
+    );
   });
 
   it('builds an eln archive stream with metadata, preview and file bytes', async () => {
