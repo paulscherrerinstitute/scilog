@@ -29,7 +29,7 @@ import { ActivatedRoute } from '@angular/router';
 import { ViewsService } from '@shared/views.service';
 import { ClassicEditor } from '@shared/ckeditor/editor';
 import { CK5ImageUploadAdapter } from '@shared/ckeditor/ck5-image-upload-adapter';
-import { extractNotificationMessage } from '../../../entries/entry-content';
+import { entryContentFromEditorHtml } from '../../../entries/entry-content';
 import { UserPreferencesService } from '@shared/user-preferences.service';
 import { debounceTime } from 'rxjs/operators';
 import { TagEditorComponent } from '@shared/tag-editor/tag-editor.component';
@@ -918,12 +918,13 @@ export class LogbookItemComponent implements OnInit, AfterViewInit, OnDestroy {
 
   addContent(isMessage = false) {
     this.forceScrollToEnd = true;
-    let notification: ChangeStreamNotification = extractNotificationMessage(
+    const content = entryContentFromEditorHtml(
       this.editorContentRef.editorInstance.getData(),
       this.editorContentRef.editorInstance.fileAttachments,
     );
 
-    if (notification != null) {
+    if (content != null) {
+      const notification: ChangeStreamNotification = { ...content, linkType: LinkType.PARAGRAPH };
       notification.parentId = this.targetId;
       notification.isMessage = isMessage;
       if (
@@ -936,7 +937,6 @@ export class LogbookItemComponent implements OnInit, AfterViewInit, OnDestroy {
       notification.tags = this.tagEditorRef.tag.map((tag) => tag.name);
 
       this.submitContent(notification);
-      console.log(notification);
       this.editorContentRef.editorInstance.setData('');
     }
   }
