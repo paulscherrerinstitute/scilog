@@ -14,9 +14,10 @@ export interface EntryContent {
  *
  * - Returns null only for `''`.
  * - A `data:` image becomes a new file with a random `fileHash`.
- * - An `http` image belongs to the first known file whose `accessHash`
- *   appears in its URL. That file's `style` is overwritten with the width and
- *   height of the image's parent element. Throws if no known file matches.
+ * - An `http` image belongs to the known file whose `accessHash`, or `fileId`
+ *   if it has no `accessHash`, is the last segment of the URL path. That file's
+ *   `style` is overwritten with the width and height of the image's parent
+ *   element. Throws if the URL is not valid or no known file matches.
  * - For every image with a file, the `style` of its parent element is removed
  *   and its `title` is set to the file's `fileHash`.
  * - A link adds the known file whose `fileHash` is the link's path without
@@ -57,7 +58,10 @@ export function entryContentFromEditorHtml(
       img.src = '';
     } else if (img.src.startsWith('http')) {
       // check for existing file
-      container = knownFiles.find((fileEntry) => img.src.includes(fileEntry.accessHash));
+      const imageId = new URL(img.src).pathname.split('/').pop();
+      container = knownFiles.find(
+        (fileEntry) => (fileEntry.accessHash ?? fileEntry.fileId) == imageId,
+      );
       container.style = {
         width: img.parentElement.style.width,
         height: img.parentElement.style.height,

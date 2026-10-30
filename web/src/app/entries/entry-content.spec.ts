@@ -77,6 +77,27 @@ describe('entryContentFromEditorHtml', () => {
       expect(img.title).toBe('h1');
       expect(img.getAttribute('src')).toBe(src);
     });
+
+    it('links an image to a known file without accessHash by its fileId', () => {
+      const content = entryContentFromEditorHtml(
+        '<figure class="image"><img src="http://localhost/images/id1"></figure>',
+        [{ fileHash: 'h1', fileId: 'id1' }],
+      );
+
+      expect(content.files.map((file) => file.fileHash)).toEqual(['h1']);
+    });
+
+    it('links an image to the file with the whole id, not one that is part of it', () => {
+      const content = entryContentFromEditorHtml(
+        '<figure class="image"><img src="http://localhost/images/abcdef"></figure>',
+        [
+          { fileHash: 'h1', accessHash: 'abc' },
+          { fileHash: 'h2', accessHash: 'abcdef' },
+        ],
+      );
+
+      expect(content.files.map((file) => file.fileHash)).toEqual(['h2']);
+    });
   });
 
   describe('links', () => {
