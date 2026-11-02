@@ -67,6 +67,14 @@ describe('RemoteDataService', () => {
       service['parentFilter']({ targetId: 'target', additionalLogbooks: ['add1', 'add2'] }),
     ).toEqual([{ parentId: { inq: ['target', 'add1', 'add2'] } }]);
   });
+
+  it('should test importanceFilter', () => {
+    expect(service['importanceFilter']({})).toEqual([]);
+    expect(service['importanceFilter']({ importance: [] })).toEqual([]);
+    expect(service['importanceFilter']({ importance: [1, 3, 5] })).toEqual([
+      { importance: { inq: [1, 3, 5] } },
+    ]);
+  });
 });
 
 describe('LogbookItemDataService', () => {

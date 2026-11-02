@@ -403,6 +403,7 @@ describe('AddContentComponent', () => {
       id: '6061d9a13587f37b851694d5',
       linkType: 'paragraph',
       files: [],
+      importance: 3,
     });
   });
 });

@@ -20,6 +20,7 @@ export interface WidgetItemConfig {
     ownerGroup?: string;
     accessGroups?: string[];
     snippetType?: string[];
+    importance?: number[];
   };
   view: {
     order?: string[];
