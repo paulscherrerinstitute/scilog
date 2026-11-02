@@ -11,6 +11,7 @@ export interface ScicatSettings {
   scicatWidgetEnabled: boolean;
   lbBaseURL: string;
   frontendBaseURL: string;
+  rocrateBaseURL: string;
 }
 
 export interface AppConfig {

@@ -1,3 +1,17 @@
+# [3.3.0](https://github.com/paulscherrerinstitute/scilog/compare/v3.2.6...v3.3.0) (2026-10-29)
+
+
+### Features
+
+* **web:** add export to scicat dialog ([#789](https://github.com/paulscherrerinstitute/scilog/issues/789)) ([414ab66](https://github.com/paulscherrerinstitute/scilog/commit/414ab662055b942cb012ffaab7efd6df34ca7681)), closes [#746](https://github.com/paulscherrerinstitute/scilog/issues/746)
+
+## [3.2.6](https://github.com/paulscherrerinstitute/scilog/compare/v3.2.5...v3.2.6) (2026-10-27)
+
+
+### Bug Fixes
+
+* add vertical scrolling to scicat widget ([#911](https://github.com/paulscherrerinstitute/scilog/issues/911)) ([aa80444](https://github.com/paulscherrerinstitute/scilog/commit/aa8044454595640655a967f881d6635806409819)), closes [#910](https://github.com/paulscherrerinstitute/scilog/issues/910) [#910](https://github.com/paulscherrerinstitute/scilog/issues/910)
+
 ## [3.2.5](https://github.com/paulscherrerinstitute/scilog/compare/v3.2.4...v3.2.5) (2026-10-23)
 
 
