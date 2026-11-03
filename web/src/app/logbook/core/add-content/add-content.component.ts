@@ -17,7 +17,6 @@ import { CK5ImageUploadAdapter } from '../ckeditor/ck5-image-upload-adapter';
 import { Basesnippets, Filecontainer } from '@model/basesnippets';
 import { CKeditorConfig } from '../ckeditor/ckeditor-config';
 import { entryContentFromEditorHtml } from '../../../entries/entry-content';
-import { parseInertHtml } from '../../../entries/parse-inert-html';
 import { CdkScrollable } from '@angular/cdk/scrolling';
 import { CKEditorModule, ChangeEvent } from '@ckeditor/ckeditor5-angular';
 import { TagEditorComponent } from '../tag-editor/tag-editor.component';
@@ -93,7 +92,6 @@ export class AddContentComponent implements OnInit, OnDestroy {
         this.tag = data.defaultTags;
       }
       this.defaultTags = data.defaultTags;
-      this.adjustContentForEditor();
       this.initialized = true;
       console.log(this.data);
     }
@@ -275,23 +273,6 @@ export class AddContentComponent implements OnInit, OnDestroy {
   sendMessage(message: ChangeStreamNotification = undefined) {
     console.log(this.notification);
     this.dataService.changeMessage(message ?? this.notification);
-  }
-
-  adjustContentForEditor() {
-    const span = parseInertHtml(this.data);
-    let figures = span.querySelectorAll('figure');
-    figures.forEach((fig) => {
-      const imgCollection = fig.getElementsByTagName('img');
-      if (imgCollection.length != 1) {
-        return;
-      }
-      const img = imgCollection[0];
-      if (!img.hasAttribute('width')) {
-        return;
-      }
-      fig.setAttribute('style', 'width:' + img.getAttribute('width') + ';');
-    });
-    this.data = span.innerHTML;
   }
 
   loadLastUnsavedEdit() {

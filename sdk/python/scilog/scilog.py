@@ -4,6 +4,7 @@ import functools
 import json
 import logging
 import os
+import re
 import uuid
 import warnings
 from typing import Tuple, TypeVar, cast
@@ -73,6 +74,7 @@ class SciLogCore:
     """
 
     IMAGE_TYPES = ["png", "jpg", "jpeg"]
+    IMAGE_WIDTH_PATTERN = re.compile(r"\d+(\.\d+)?(%|px)")
 
     def __init__(self, high_level_interface) -> None:
         self._hli = high_level_interface
@@ -308,7 +310,7 @@ class SciLogCore:
 
     @staticmethod
     def prepare_file_content(
-        filepath: str, fsnippet: Filesnippet | None = None, width: str = "82.25%", height: str = ""
+        filepath: str, fsnippet: Filesnippet | None = None, width: str | None = None
     ) -> Tuple[dict, str]:
         """
         Prepare file content and textcontent for appending to a snippet.
@@ -316,8 +318,12 @@ class SciLogCore:
         Args:
             filepath (str): Path to the file that ought to be prepared
             fsnippet (Filesnippet | None): Optional Filesnippet containing metadata of the file
-            width (str): Optional width for the file display (only relevant for images). Defaults to "82.25%" which corresponds to the default image width in SciLog.
-            height (str): Optional height for the file display (only relevant for images). Defaults to "" which corresponds to the default image height in SciLog.
+            width (str | None): Optional width of an image, in % or px, e.g. "50%" or "640px".
+                It is stored on the image's figure, as the editor stores a resized image.
+                Without a width, the image is shown at its own size, at most the text width.
+
+        Raises:
+            ValueError: If width is not a number followed by % or px.
 
         Returns:
             Tuple[dict, str]: A tuple containing the file information dictionary and the text content string
@@ -328,16 +334,21 @@ class SciLogCore:
         access_hash = fsnippet.accessHash if fsnippet and fsnippet.accessHash else None
 
         if file_extension in SciLogCore.IMAGE_TYPES:
-            textcontent = (
-                f'<figure class="image image_resized"><img src="" title="{file_hash}"></figure>'
-            )
+            if width:
+                if not SciLogCore.IMAGE_WIDTH_PATTERN.fullmatch(width):
+                    raise ValueError(
+                        f"width must be a number followed by % or px, e.g. '50%', not '{width}'."
+                    )
+                figure = f'<figure class="image image_resized" style="width:{width};">'
+            else:
+                figure = '<figure class="image">'
+            textcontent = f'{figure}<img src="" title="{file_hash}"></figure>'
             file_info = {
                 "fileHash": file_hash,
                 "filepath": filepath,
                 "fileExtension": f"image/{file_extension}",
                 "fileId": file_id,
                 "accessHash": access_hash,
-                "style": {"width": width, "height": height},
             }
 
         else:
