@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import os
+import warnings
 from typing import TYPE_CHECKING, List, Union
 
 from typeguard import typechecked
@@ -53,8 +54,10 @@ class LogbookMessage:
 
         Args:
             file_path (str): Full path to the file that ought to be added.
-            width (str | int | None): Optional width for the file display.
-            height (str | int | None): Optional height for the file display.
+            width (str | int | None): Optional width of an image, in % or px, e.g. "50%" or
+                "640px". An int is taken as px.
+            height (str | int | None): Deprecated and ignored. An image keeps its proportions,
+                so its height follows from its width.
 
         Returns:
             LogbookMessage: The current logbook message.
@@ -62,19 +65,17 @@ class LogbookMessage:
         if not os.path.exists(file_path):
             raise FileNotFoundError(f"File {file_path} could not be found.")
 
-        def _convert_and_append(key, value: str | int) -> None:
-            if isinstance(value, int):
-                if value <= 0:
-                    raise ValueError(f"{key} must be a positive integer.")
-                value = f"{value}px"
-            dimensions[key] = value
-
-        dimensions = {}
-        if width is not None:
-            _convert_and_append("width", width)
         if height is not None:
-            _convert_and_append("height", height)
-        file_info, textcontent = SciLogCore.prepare_file_content(file_path, **dimensions)
+            warnings.warn(
+                "add_file(height=...) is deprecated and ignored: an image's height follows from its width.",
+                DeprecationWarning,
+                stacklevel=2,
+            )
+        if isinstance(width, int):
+            if width <= 0:
+                raise ValueError("width must be a positive integer.")
+            width = f"{width}px"
+        file_info, textcontent = SciLogCore.prepare_file_content(file_path, width=width)
         if self._content.files:
             self._content.files.append(file_info)
         else:

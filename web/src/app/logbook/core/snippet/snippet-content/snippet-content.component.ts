@@ -34,7 +34,6 @@ export class SnippetContentComponent implements OnInit, AfterViewInit, AfterView
   html: SafeHtml;
   span: any;
   files: string[] = [];
-  defaultFigureWidth = '85%';
   contentWidth = null;
   _prismed = false;
   _edited = '';
@@ -88,7 +87,6 @@ export class SnippetContentComponent implements OnInit, AfterViewInit, AfterView
       }
       let imageId = file.accessHash ?? file.fileId;
       this.setImageUrl(img, imageId);
-      this.setImageStyle(img, file.style);
     });
 
     const fileLinks = this.span.querySelectorAll('.fileLink');
@@ -122,18 +120,6 @@ export class SnippetContentComponent implements OnInit, AfterViewInit, AfterView
     const srcUrl = this._srcUrlFromImageId(id);
     img.src = srcUrl;
     (img.parentElement as HTMLAnchorElement).href = srcUrl;
-  }
-
-  private setImageStyle(img: HTMLImageElement, style: any) {
-    if (style == undefined) {
-      return;
-    }
-    const width = style.width != '' ? style.width : this.defaultFigureWidth;
-    img.setAttribute('width', width);
-
-    if (style.height != '') {
-      img.setAttribute('height', style.height);
-    }
   }
 
   private _srcUrlFromImageId(imageId: string) {
