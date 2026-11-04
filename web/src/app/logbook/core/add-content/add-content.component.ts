@@ -10,7 +10,6 @@ import { ClassicEditor } from '../ckeditor/editor';
 import { AddContentService } from '../add-content.service';
 import { ChangeStreamNotification } from '../changestreamnotification.model';
 import { LinkType } from '@model/paragraphs';
-import { Subscription } from 'rxjs';
 import { LogbookInfoService } from '@shared/logbook-info.service';
 import { HttpClient } from '@angular/common/http';
 import { CK5ImageUploadAdapter } from '../ckeditor/ck5-image-upload-adapter';
@@ -29,6 +28,7 @@ interface editorDataInput {
   content: string;
   defaultTags: string[];
   config: any;
+  originId?: string;
 }
 
 @Component({
@@ -65,12 +65,13 @@ export class AddContentComponent implements OnInit, OnDestroy {
   tag: string[] = [];
   defaultTags: string[] = [];
   subsnippets: Basesnippets[] = [];
-  subscriptions: Subscription[] = [];
   contentChanged: boolean = false;
   initialized: boolean = false;
   config: any = [];
+  originId: string;
   editor: any;
   lastEdit: { message?: string; tags?: string } = {};
+  private editCleanupPublished = false;
 
   constructor(
     private dataService: AddContentService,
@@ -87,6 +88,7 @@ export class AddContentComponent implements OnInit, OnDestroy {
     if (data != null) {
       this.message = data.snippet;
       this.config = data.config;
+      this.originId = data.originId;
       this.data = typeof data.content == 'undefined' ? '' : data.content;
       if (typeof data.defaultTags != 'undefined') {
         this.tag = data.defaultTags;
@@ -102,14 +104,6 @@ export class AddContentComponent implements OnInit, OnDestroy {
     // The editor only takes its content once: feeding later changes back into
     // it would reload the whole document, resetting the cursor and any drag.
     this.initialData = this.data;
-    this.subscriptions.push(
-      this.dataService.currentMessage.subscribe((message) => {
-        console.log(message);
-        if (message != null) {
-          // this.message = message;
-        }
-      }),
-    );
   }
 
   setupComponent() {
@@ -272,7 +266,7 @@ export class AddContentComponent implements OnInit, OnDestroy {
 
   sendMessage(message: ChangeStreamNotification = undefined) {
     console.log(this.notification);
-    this.dataService.changeMessage(message ?? this.notification);
+    this.dataService.changeMessage(message ?? this.notification, this.originId);
   }
 
   loadLastUnsavedEdit() {
@@ -301,16 +295,14 @@ export class AddContentComponent implements OnInit, OnDestroy {
 
   ngOnDestroy(): void {
     this.sendEditDelitionMessage();
-    console.log('deleting add-content subscriptions');
-    this.subscriptions.forEach((subscription) => subscription.unsubscribe());
   }
 
   sendEditDelitionMessage() {
-    if (this.dialogTitle === 'Modify data snippet') {
-      this.notification.snippetType = 'edit';
-      this.notification.toDelete = true;
-      this.sendMessage();
-    }
+    if (this.dialogTitle !== 'Modify data snippet' || this.editCleanupPublished) return;
+    this.editCleanupPublished = true;
+    this.notification.snippetType = 'edit';
+    this.notification.toDelete = true;
+    this.sendMessage();
   }
 
   @HostListener('window:beforeunload')

@@ -17,7 +17,7 @@ import { ChangeStreamNotification } from '@shared/changestreamnotification.model
 import { HttpClient } from '@angular/common/http';
 import { AddContentComponent } from '@shared/add-content/add-content.component';
 import { AddContentService } from '@shared/add-content.service';
-import { MatDialogConfig, MatDialog } from '@angular/material/dialog';
+import { MatDialogConfig, MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { v4 as uuid } from 'uuid';
 import { trigger, state, style, animate, transition } from '@angular/animations';
 
@@ -135,9 +135,10 @@ export class LogbookItemComponent implements OnInit, AfterViewInit, OnDestroy {
   @Input()
   configIndex: number;
 
+  readonly originId = uuid();
+
   showLoadingCircle = true;
   viewOption = 'widgets';
-  message: ChangeStreamNotification;
   notifications: ChangeStreamNotification[] = [];
   array: ChangeStreamNotification[];
   key = 'defaultOrder';
@@ -150,6 +151,7 @@ export class LogbookItemComponent implements OnInit, AfterViewInit, OnDestroy {
   searchSnippetIndex: string = '';
 
   dataService: Subscription = null;
+  private editorDialogs = new Set<MatDialogRef<any, any>>();
   changeStreamSubscriptions: Subscription[] = [];
   postEntrySubscription: Subscription = null;
   currentViewSubscription: Subscription = null;
@@ -270,6 +272,19 @@ export class LogbookItemComponent implements OnInit, AfterViewInit, OnDestroy {
       }),
     );
 
+    this.dataService = this.data.handleMessages(this.originId, (message) =>
+      this.submitContent(message),
+    );
+    this.subscriptions.push(
+      this.dialog.afterOpened.subscribe((dialogRef) => {
+        const editor = dialogRef.componentInstance;
+        if (editor instanceof AddContentComponent && editor.originId === this.originId) {
+          this.editorDialogs.add(dialogRef);
+          dialogRef.afterClosed().subscribe(() => this.editorDialogs.delete(dialogRef));
+        }
+      }),
+    );
+
     this.updateViewSubscription();
 
     this.scrollToElement();
@@ -332,18 +347,6 @@ export class LogbookItemComponent implements OnInit, AfterViewInit, OnDestroy {
           }),
         );
       });
-
-      if (this.dataService == null) {
-        this.dataService = this.data.currentMessage.subscribe((message) => {
-          // console.log(message);
-          this.message = message;
-          if (message != null && Object.keys(this.message).length != 0) {
-            // console.log(this.message);
-            this.submitContent(message);
-            this.message = null;
-          }
-        });
-      }
     }
   }
 
@@ -764,6 +767,7 @@ export class LogbookItemComponent implements OnInit, AfterViewInit, OnDestroy {
     dialogConfig.data = {
       defaultTags: this.childSnippets?.last?.snippet?.tags,
       config: this.config,
+      originId: this.originId,
     };
     const dialogRef = this.dialog.open(AddContentComponent, dialogConfig);
   }
@@ -972,6 +976,23 @@ export class LogbookItemComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   ngOnDestroy() {
+    const dialogsToClose = new Set([
+      ...this.editorDialogs,
+      ...this.dialog.openDialogs.filter(
+        (dialogRef) =>
+          dialogRef.componentInstance instanceof AddContentComponent &&
+          dialogRef.componentInstance.originId === this.originId,
+      ),
+    ]);
+    dialogsToClose.forEach((dialogRef) => {
+      const editor = dialogRef.componentInstance;
+      if (editor instanceof AddContentComponent) {
+        editor.sendEditDelitionMessage();
+        dialogRef.close();
+      }
+    });
+    this.editorDialogs.clear();
+
     if (this.currentViewSubscription != null) {
       this.currentViewSubscription.unsubscribe();
     }
