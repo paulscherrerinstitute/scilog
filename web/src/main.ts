@@ -5,8 +5,6 @@ import { AppConfigService } from './app/app-config.service';
 import { HTTP_INTERCEPTORS, provideHttpClient, withInterceptorsFromDi } from '@angular/common/http';
 import { AuthInterceptor } from '@shared/auth-services/auth.interceptor';
 import { ConditionalHeadersInterceptor } from '@shared/auth-services/conditional-headers.interceptor';
-import { AuthService } from '@shared/auth-services/auth.service';
-import { Router } from '@angular/router';
 import { CookieService } from 'ngx-cookie-service';
 import { JDENTICON_CONFIG } from 'ngx-jdenticon';
 import { BrowserModule, bootstrapApplication } from '@angular/platform-browser';
@@ -45,7 +43,6 @@ bootstrapApplication(AppComponent, {
       provide: HTTP_INTERCEPTORS,
       useClass: AuthInterceptor,
       multi: true,
-      deps: [AuthService, Router],
     },
     CookieService,
     {
