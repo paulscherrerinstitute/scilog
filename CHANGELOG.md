@@ -1,3 +1,10 @@
+## [3.3.2](https://github.com/paulscherrerinstitute/scilog/compare/v3.3.1...v3.3.2) (2026-11-04)
+
+
+### Bug Fixes
+
+* **web:** handle error in export logbook dialog ([#878](https://github.com/paulscherrerinstitute/scilog/issues/878)) ([93b93a4](https://github.com/paulscherrerinstitute/scilog/commit/93b93a43338e26e4d256468e3ff9a96024564b1f)), closes [#874](https://github.com/paulscherrerinstitute/scilog/issues/874)
+
 ## [3.3.1](https://github.com/paulscherrerinstitute/scilog/compare/v3.3.0...v3.3.1) (2026-11-04)
 
 
