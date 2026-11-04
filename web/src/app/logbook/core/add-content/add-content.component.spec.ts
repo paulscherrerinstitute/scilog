@@ -4,7 +4,6 @@ import { MatDialogModule, MAT_DIALOG_DATA, MatDialogRef } from '@angular/materia
 import { provideHttpClientTesting } from '@angular/common/http/testing';
 import { AddContentComponent } from './add-content.component';
 import { AddContentService } from '@shared/add-content.service';
-import { of } from 'rxjs';
 import { ChangeStreamNotification } from '@shared/changestreamnotification.model';
 import { LinkType, Paragraphs } from '@model/paragraphs';
 import { AppConfigService } from 'src/app/app-config.service';
@@ -14,8 +13,7 @@ import { TagEditorComponent } from '@shared/tag-editor/tag-editor.component';
 import { CKEditorModule, ChangeEvent } from '@ckeditor/ckeditor5-angular';
 
 class AddContentServiceMock {
-  currentMessage = of({});
-  changeMessage(notification: ChangeStreamNotification) {}
+  changeMessage = jasmine.createSpy('changeMessage');
 }
 
 const getConfig = () => ({});
@@ -96,7 +94,7 @@ describe('AddContentComponent', () => {
     ],
   };
 
-  beforeEach(waitForAsync(() => configureTestingModule({})));
+  beforeEach(waitForAsync(() => configureTestingModule({ originId: 'widget-1' })));
 
   beforeEach(() => {
     fixture = TestBed.createComponent(AddContentComponent);
@@ -138,6 +136,19 @@ describe('AddContentComponent', () => {
     expect(component.addButtonLabel).toBe('Done');
     expect(component.sendMessage).toHaveBeenCalledTimes(1);
     expect(setFromLocalStorageSpy).toHaveBeenCalledTimes(1);
+  });
+
+  it('should route the initial edit lock and autosave using the originating widget ID', () => {
+    component.message = { id: 'snippet-1' };
+    const changeMessageSpy = component['dataService'].changeMessage as jasmine.Spy;
+    changeMessageSpy.calls.reset();
+
+    component.setupComponent();
+    expect(changeMessageSpy).toHaveBeenCalledOnceWith(component.notification, 'widget-1');
+
+    changeMessageSpy.calls.reset();
+    component.changeChain('<p>autosaved</p>');
+    expect(changeMessageSpy).toHaveBeenCalledOnceWith(component.notification, 'widget-1');
   });
 
   it('should get data from editor before sending', () => {
@@ -225,9 +236,11 @@ describe('AddContentComponent', () => {
   });
 
   it('should send message', () => {
-    spyOn(component['dataService'], 'changeMessage');
+    const changeMessageSpy = component['dataService'].changeMessage as jasmine.Spy;
+    changeMessageSpy.calls.reset();
+    component.originId = 'widget-1';
     component.sendMessage();
-    expect(component['dataService'].changeMessage).toHaveBeenCalledWith(component.notification);
+    expect(changeMessageSpy).toHaveBeenCalledOnceWith(component.notification, 'widget-1');
   });
 
   it('should adjust figure HTML content for ckeditor', () => {
@@ -326,6 +339,19 @@ describe('AddContentComponent', () => {
     expect(component.notification.toDelete).toEqual(true);
   });
 
+  it('should publish edit cleanup only once', () => {
+    component.dialogTitle = 'Modify data snippet';
+    component.originId = 'widget-1';
+    const changeMessageSpy = component['dataService'].changeMessage as jasmine.Spy;
+    changeMessageSpy.calls.reset();
+
+    component.sendEditDelitionMessage();
+    component.sendEditDelitionMessage();
+
+    expect(changeMessageSpy).toHaveBeenCalledOnceWith(component.notification, 'widget-1');
+    expect(component.notification.toDelete).toBe(true);
+  });
+
   it('should not mark for deletion and send message', () => {
     spyOn(component, 'sendMessage');
     component.sendEditDelitionMessage();
@@ -409,7 +435,11 @@ describe('AddContentComponent', () => {
 
 describe('AddContentComponent opened for editing', () => {
   beforeEach(waitForAsync(() =>
-    configureTestingModule({ snippet: { id: '123' }, content: '<p>message</p>' })));
+    configureTestingModule({
+      snippet: { id: '123' },
+      content: '<p>message</p>',
+      originId: 'widget-1',
+    })));
 
   it('should give the editor the message content', () => {
     const fixture = TestBed.createComponent(AddContentComponent);

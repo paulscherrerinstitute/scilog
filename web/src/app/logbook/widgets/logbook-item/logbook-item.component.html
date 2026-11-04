@@ -23,6 +23,7 @@
         [updatedAt]="snippet.updatedAt"
         [index]="i + 1"
         [config]="config"
+        [originId]="originId"
         [indexOrdered]="_indexOrder(i)"
         (isLoading)="logbookScrollService.setItemStatus(snippet.id, $event)"
       >
