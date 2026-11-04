@@ -7,6 +7,8 @@ import {listZipEntries} from '../zip.helpers';
 import {ROCrate} from 'ro-crate';
 import {ElnExportController} from '../../controllers';
 import {ELN_ARCHIVE_ROOT} from '../../services';
+import {FileRepository, ParagraphRepository} from '../../repositories';
+import {LinkType} from '../../models';
 
 describe('ElnExportController', function (this: Suite) {
   this.timeout(5000);
@@ -116,5 +118,48 @@ describe('ElnExportController', function (this: Suite) {
       .set('Authorization', 'Bearer ' + token)
       .set('Content-Type', 'application/json')
       .expect(404);
+  });
+
+  // A paragraph the user can read that references a file the user cannot must
+  // yield 403, not 404. The file's readACL simply leaves the user out -- the
+  // state scilog issue #847 produces by not propagating a logbook's accessGroup
+  // changes to its files.
+  it('throws 403 when the user cannot access an attached file', async () => {
+    const logbook = await databaseHelper.givenLogbook(logbookSnippet, {
+      currentUser: user,
+    });
+
+    const fileRepository = await app.getRepository(FileRepository);
+    const paragraphRepository = await app.getRepository(ParagraphRepository);
+
+    // a file whose readACL excludes the user: it exists, but the access hook
+    // hides it from this user
+    const inaccessibleFile = await fileRepository.create(
+      {snippetType: 'image', readACL: ['someOtherGroup']},
+      {currentUser: user},
+    );
+
+    // a paragraph the user can read (it inherits the logbook's readACL),
+    // referencing the file the user cannot
+    await paragraphRepository.create(
+      {
+        parentId: logbook.id,
+        linkType: LinkType.PARAGRAPH,
+        textcontent: 'Paragraph referencing a restricted file',
+        files: [{fileId: inaccessibleFile.id}],
+      },
+      {currentUser: user},
+    );
+
+    await client
+      .get(`/logbooks/export/${logbook.id}/eln/metadata`)
+      .set('Authorization', 'Bearer ' + token)
+      .set('Content-Type', 'application/json')
+      .expect(403)
+      .then(result => {
+        expect(result.body.error.message).to.match(
+          /do not have access to a file/,
+        );
+      });
   });
 });
