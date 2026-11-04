@@ -189,4 +189,25 @@ describe('ExportDialogComponent', () => {
     });
     expect(component.scicatEnabled).toBeFalse();
   });
+
+  it('should render the error message in the template when an export fails', () => {
+    component.errMessage = 'Export failed (404): something went wrong';
+    fixture.detectChanges();
+    const errorMessage: HTMLElement = fixture.nativeElement.querySelector('.error-message');
+    expect(errorMessage).not.toBeNull();
+    expect(errorMessage.textContent!.trim()).toBe('Export failed (404): something went wrong');
+  });
+
+  it('should disable the export buttons while an export is in progress', () => {
+    component.inProgress = true;
+    fixture.detectChanges();
+    const buttons: HTMLButtonElement[] = Array.from(
+      fixture.nativeElement.querySelectorAll('button'),
+    );
+    const exportButtons = buttons.filter((b) =>
+      ['Export to PDF', 'Export to ELN', 'Export to SciCat'].includes(b.textContent!.trim()),
+    );
+    expect(exportButtons.length).toBe(3);
+    exportButtons.forEach((b) => expect(b.disabled).toBeTrue());
+  });
 });
