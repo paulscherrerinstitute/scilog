@@ -5,6 +5,8 @@ import { DatePipe } from '@angular/common';
 import { CdkScrollable } from '@angular/cdk/scrolling';
 import { MatProgressBar } from '@angular/material/progress-bar';
 import { MatButton } from '@angular/material/button';
+import { HttpErrorResponse } from '@angular/common/http';
+import { LoopBackError } from '@model/loopback-error';
 import { AppConfigService } from 'src/app/app-config.service';
 import { ScicatExportComponent } from './scicat-export/scicat-export.component';
 
@@ -18,6 +20,7 @@ import { ScicatExportComponent } from './scicat-export/scicat-export.component';
 export class ExportDialogComponent {
   config: any;
   inProgress = false;
+  errMessage?: string = undefined;
   showScicatExport = false;
 
   @ViewChild('downloadLink') private downloadLink: ElementRef;
@@ -43,11 +46,12 @@ export class ExportDialogComponent {
 
   async exportData(option: 'pdf' | 'eln') {
     this.inProgress = true;
-    const blob =
-      option === 'pdf'
-        ? await this.logbookItemDataService.exportLogbook(option, this.config, 0, Infinity)
-        : await this.logbookItemDataService.exportELN(this.config.filter.targetId);
-    if (typeof blob != 'undefined') {
+    this.errMessage = undefined;
+    try {
+      const blob =
+        option === 'pdf'
+          ? await this.logbookItemDataService.exportLogbook(option, this.config, 0, Infinity)
+          : await this.logbookItemDataService.exportELN(this.config.filter.targetId);
       const url = window.URL.createObjectURL(blob);
       const link = this.downloadLink.nativeElement;
       link.href = url;
@@ -57,7 +61,31 @@ export class ExportDialogComponent {
       )}${option === 'eln' ? '.eln' : ''}`;
       link.click();
       window.URL.revokeObjectURL(url);
+      this.close();
+    } catch (err) {
+      console.error('Export failed', err);
+      this.errMessage = await this.describeError(err);
+    } finally {
+      this.inProgress = false;
     }
-    this.close();
+  }
+
+  private async describeError(err: unknown): Promise<string> {
+    if (!(err instanceof HttpErrorResponse)) {
+      return `Export failed: ${err}`;
+    }
+    const status = err.status ? ` (${err.status})` : '';
+    const genericMessage = 'contact support if the problem persists.';
+    let message: string;
+    try {
+      // the server returns a LoopBack error as a JSON blob body
+      const blob = await (err.error as Blob).text();
+      const body = JSON.parse(blob) as LoopBackError;
+      message = body.error.message || genericMessage;
+    } catch {
+      // unparseable error body: network / CORS error, etc
+      message = genericMessage;
+    }
+    return `Export failed${status}: ${message}`;
   }
 }

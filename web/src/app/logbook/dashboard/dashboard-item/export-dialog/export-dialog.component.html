@@ -11,13 +11,22 @@
       <h2>Export logbook</h2>
       <div>
         <button mat-button (click)="close()">Cancel</button>
-        <button mat-button (click)="exportData('pdf')">Export to PDF</button>
-        <button mat-button (click)="exportData('eln')">Export to ELN</button>
+        <button mat-button [disabled]="inProgress" (click)="exportData('pdf')">
+          Export to PDF
+        </button>
+        <button mat-button [disabled]="inProgress" (click)="exportData('eln')">
+          Export to ELN
+        </button>
         @if (scicatEnabled) {
-          <button mat-button (click)="showScicatExport = true">Export to SciCat</button>
+          <button mat-button [disabled]="inProgress" (click)="showScicatExport = true">
+            Export to SciCat
+          </button>
         }
       </div>
     </div>
+    @if (this.errMessage) {
+      <div class="error-message">{{ this.errMessage }}</div>
+    }
   }
   <a class="download-link" #downloadLink></a>
 </mat-dialog-content>

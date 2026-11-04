@@ -9,6 +9,10 @@
   display: none;
 }
 
+.error-message {
+  color: var(--warn-color);
+}
+
 app-scicat-export {
   opacity: 1;
   transition: opacity 200ms ease-in;
