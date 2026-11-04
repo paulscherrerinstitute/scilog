@@ -1,3 +1,10 @@
+## [3.3.1](https://github.com/paulscherrerinstitute/scilog/compare/v3.3.0...v3.3.1) (2026-11-04)
+
+
+### Bug Fixes
+
+* **api:** throw 403 in eln export when file not accessible ([#882](https://github.com/paulscherrerinstitute/scilog/issues/882)) ([61bd37a](https://github.com/paulscherrerinstitute/scilog/commit/61bd37a866c0ba4e7ea218a788ef74107d7cb3c9))
+
 # [3.3.0](https://github.com/paulscherrerinstitute/scilog/compare/v3.2.6...v3.3.0) (2026-10-29)
 
 
