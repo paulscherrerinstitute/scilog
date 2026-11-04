@@ -8,6 +8,10 @@ import {basicAuthorization} from '../services/basic.authorizor';
 import {ElnExportService, ELN_ARCHIVE_ROOT} from '../services';
 import {pipeline} from 'node:stream/promises';
 
+const FORBIDDEN_RESPONSE = {
+  description: 'User does not have access to a file in this logbook',
+};
+
 @authenticate('jwt')
 @authorize({
   allowedRoles: ['any-authenticated-user'],
@@ -27,6 +31,7 @@ export class ElnExportController {
         description: 'Rocrate model instance',
         content: {'application/json': {schema: {type: 'object'}}},
       },
+      '403': FORBIDDEN_RESPONSE,
     },
   })
   async exportElnMetadata(
@@ -46,6 +51,7 @@ export class ElnExportController {
           [ElnExportController.ELN_MEDIA_TYPE]: {schema: {type: 'object'}},
         },
       },
+      '403': FORBIDDEN_RESPONSE,
     },
   })
   async exportEln(
