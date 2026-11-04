@@ -16,7 +16,7 @@ import { HttpClient } from '@angular/common/http';
 import { CK5ImageUploadAdapter } from '../ckeditor/ck5-image-upload-adapter';
 import { Basesnippets } from '@model/basesnippets';
 import { CKeditorConfig } from '../ckeditor/ckeditor-config';
-import { extractNotificationMessage } from '../../../entries/entry-content';
+import { entryContentFromEditorHtml } from '../../../entries/entry-content';
 import { parseInertHtml } from '../../../entries/parse-inert-html';
 import { CdkScrollable } from '@angular/cdk/scrolling';
 import { CKEditorModule, ChangeEvent } from '@ckeditor/ckeditor5-angular';
@@ -200,10 +200,16 @@ export class AddContentComponent implements OnInit, OnDestroy {
   }
 
   private sendEditMessage() {
-    const notification = extractNotificationMessage(
+    const content = entryContentFromEditorHtml(
       this.data,
       this.message?.files ? this.message.files : [],
     );
+    // No null check: for empty editor HTML this throws, and no edit is sent.
+    const notification: ChangeStreamNotification = {
+      linkType: LinkType.PARAGRAPH,
+      textcontent: content.textcontent,
+      files: content.files,
+    };
     notification.id = this.notification.id;
     this.sendMessage(notification);
   }
@@ -245,13 +251,13 @@ export class AddContentComponent implements OnInit, OnDestroy {
   }
 
   prepareMessage(data: string) {
-    let notification = extractNotificationMessage(data, [
+    const content = entryContentFromEditorHtml(data, [
       ...(this.message?.files ?? []),
       ...this.fileStorage,
     ]);
-    if (notification != null) {
-      this.notification.textcontent = notification.textcontent;
-      this.notification.files = notification.files;
+    if (content != null) {
+      this.notification.textcontent = content.textcontent;
+      this.notification.files = content.files;
       this.notification.tags = this.tag;
     } else {
       this.notification.textcontent = '';
