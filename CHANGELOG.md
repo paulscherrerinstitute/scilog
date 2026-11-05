@@ -1,3 +1,10 @@
+## [3.3.3](https://github.com/paulscherrerinstitute/scilog/compare/v3.3.2...v3.3.3) (2026-11-05)
+
+
+### Bug Fixes
+
+* **web:** link images to their file by the exact id ([#907](https://github.com/paulscherrerinstitute/scilog/issues/907)) ([3204366](https://github.com/paulscherrerinstitute/scilog/commit/3204366f4a4ee79f9b4421cf906ce9e0d9afb5b2)), closes [#893](https://github.com/paulscherrerinstitute/scilog/issues/893) [#893](https://github.com/paulscherrerinstitute/scilog/issues/893)
+
 ## [3.3.2](https://github.com/paulscherrerinstitute/scilog/compare/v3.3.1...v3.3.2) (2026-11-04)
 
 
