@@ -137,8 +137,9 @@ function filesnippetFromFile(file: Entity): Partial<Filesnippet> {
 function buildLogbook(book: Entity): LogbookDraft {
   return {
     fields: logbookFromBook(book),
-    // Comments also appear in a Book's hasPart, but are built under their
-    // message via the `comment` field, so only messages are taken here.
+    // A Book's hasPart holds only messages; comments are built under their
+    // message via the `comment` field. The type filter also keeps import
+    // working for older crates that still list comments in the Book's hasPart.
     paragraphs: partsOfType(book, 'Message').map(buildParagraph),
   };
 }

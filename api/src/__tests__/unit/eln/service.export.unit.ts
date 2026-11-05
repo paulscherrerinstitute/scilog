@@ -101,17 +101,14 @@ describe('ElnExportService (unit)', () => {
     // expect logbook name/description to match
     expect(logbookEntity.name).to.equal('Test Logbook');
     expect(logbookEntity.description).to.equal('A logbook for testing');
-    // expect hasPart to contain three snippets: two paragraphs and a comment
+    // expect hasPart to contain two paragraphs
     expect(logbookEntity.hasPart).to.be.Array();
-    expect(logbookEntity.hasPart).to.have.length(3);
+    expect(logbookEntity.hasPart).to.have.length(2);
     expect(logbookEntity.hasPart).to.containEql({
       '@id': entityBuilder.getEntityId('snippet-1'),
     });
     expect(logbookEntity.hasPart).to.containEql({
       '@id': entityBuilder.getEntityId('snippet-2'),
-    });
-    expect(logbookEntity.hasPart).to.containEql({
-      '@id': entityBuilder.getEntityId('snippet-3'),
     });
 
     // expect second snippet to have comment as comment
