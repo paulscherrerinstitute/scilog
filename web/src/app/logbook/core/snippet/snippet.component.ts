@@ -90,6 +90,9 @@ export class SnippetComponent implements OnInit, AfterContentInit, AfterViewChec
   };
 
   @Input()
+  originId: string;
+
+  @Input()
   showEditButtonsMenu: boolean = true;
 
   @Input()
@@ -234,6 +237,7 @@ export class SnippetComponent implements OnInit, AfterContentInit, AfterViewChec
   }
 
   editSnippet() {
+    if (!this.originId) return;
     console.log('edit snippet');
     console.log(this.snippet.id);
     const dialogConfig = new MatDialogConfig();
@@ -243,6 +247,7 @@ export class SnippetComponent implements OnInit, AfterContentInit, AfterViewChec
       content: this.content,
       defaultTags: this.snippet.tags,
       config: this.config,
+      originId: this.originId,
     };
     const dialogRef = this.dialog.open(AddContentComponent, dialogConfig);
     this._editDialog = dialogRef;
@@ -296,6 +301,7 @@ export class SnippetComponent implements OnInit, AfterContentInit, AfterViewChec
   }
 
   addComment() {
+    if (!this.originId) return;
     console.log('adding a comment');
     console.log(this.snippet.id);
     const dialogConfig = new MatDialogConfig();
@@ -309,7 +315,12 @@ export class SnippetComponent implements OnInit, AfterContentInit, AfterViewChec
       parentId: parentId,
       linkType: LinkType.COMMENT,
     };
-    dialogConfig.data = { snippet: snippet, defaultTags: this.snippet.tags, config: this.config };
+    dialogConfig.data = {
+      snippet: snippet,
+      defaultTags: this.snippet.tags,
+      config: this.config,
+      originId: this.originId,
+    };
     this.openAddContentComponent(dialogConfig);
   }
 
@@ -326,6 +337,7 @@ export class SnippetComponent implements OnInit, AfterContentInit, AfterViewChec
   }
 
   async addCitation() {
+    if (!this.originId) return;
     console.log('adding a citation');
     console.log(this.snippet.id);
     const dialogConfig = new MatDialogConfig();
@@ -342,7 +354,12 @@ export class SnippetComponent implements OnInit, AfterContentInit, AfterViewChec
       linkType: LinkType.QUOTE,
       subsnippets: [this.snippet],
     };
-    dialogConfig.data = { snippet: snippet, defaultTags: this.snippet.tags, config: this.config };
+    dialogConfig.data = {
+      snippet: snippet,
+      defaultTags: this.snippet.tags,
+      config: this.config,
+      originId: this.originId,
+    };
     this.openAddContentComponent(dialogConfig);
   }
 
