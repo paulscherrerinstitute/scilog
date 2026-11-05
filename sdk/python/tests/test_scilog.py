@@ -74,7 +74,7 @@ def test_send_logbook_message_with_file(scilog, tmpdir):
     assert "img src" in payload["textcontent"]
     assert payload["files"][0]["fileId"] == "file1"
     assert payload["files"][0]["accessHash"] == "hash1"
-    assert payload["files"][0]["style"] == {"width": "82.25%", "height": ""}
+    assert "style" not in payload["files"][0]
     assert "filepath" not in payload["files"][0]
 
 
@@ -145,46 +145,75 @@ def test_prepare_file_content_image(scilog, filepath, fsnippet):
     assert info["filepath"] == filepath
     assert info["fileExtension"] == "image/png"
     assert info["fileId"] is None
-    assert info["style"] == {"width": "82.25%", "height": ""}
+    assert "style" not in info
 
-    assert (
-        textcontent
-        == f'<figure class="image image_resized"><img src="" title="{info["fileHash"]}"></figure>'
-    )
+    assert textcontent == f'<figure class="image"><img src="" title="{info["fileHash"]}"></figure>'
 
 
-def test_prepare_file_content_image_with_custom_dimensions(scilog):
+@pytest.mark.parametrize("width", ["640px", "50%", "82.25%"])
+def test_prepare_file_content_image_with_width(scilog, width):
     log = scilog
-    info, textcontent = log.core.prepare_file_content(
-        "./test_file.png", width="640", height="480px"
-    )
+    info, textcontent = log.core.prepare_file_content("./test_file.png", width=width)
 
-    assert info["style"] == {"width": "640", "height": "480px"}
+    assert "style" not in info
     assert (
         textcontent
-        == f'<figure class="image image_resized"><img src="" title="{info["fileHash"]}"></figure>'
+        == f'<figure class="image image_resized" style="width:{width};"><img src="" title="{info["fileHash"]}"></figure>'
     )
+
+
+@pytest.mark.parametrize("width", ["640", "50 %", "50%;color:red", "-5px", "wide"])
+def test_prepare_file_content_image_rejects_invalid_width(scilog, width):
+    log = scilog
+    with pytest.raises(ValueError):
+        log.core.prepare_file_content("./test_file.png", width=width)
 
 
 @pytest.mark.parametrize(
-    "width,height,expected_style",
+    "width,expected_width",
     [
-        ("640px", "480px", {"width": "640px", "height": "480px"}),
-        (640, 480, {"width": "640px", "height": "480px"}),
-        (640, "480px", {"width": "640px", "height": "480px"}),
+        ("640px", "640px"),
+        (640, "640px"),
+        ("50%", "50%"),
     ],
 )
-def test_logbook_message_add_file_stores_dimensions(tmpdir, width, height, expected_style):
+def test_logbook_message_add_file_stores_width(tmpdir, width, expected_width):
     test_file = tmpdir.join("test_file.png")
     test_file.write("test content")
 
     msg = LogbookMessage()
-    msg.add_file(str(test_file), width=width, height=height)
+    msg.add_file(str(test_file), width=width)
 
     assert msg._content.files is not None
     assert msg._content.files[0]["filepath"] == str(test_file)
-    assert msg._content.files[0]["style"] == expected_style
-    assert '<figure class="image image_resized"><img src="" title="' in msg._content.textcontent
+    assert "style" not in msg._content.files[0]
+    assert (
+        f'<figure class="image image_resized" style="width:{expected_width};"><img src="" title="'
+        in msg._content.textcontent
+    )
+
+
+def test_logbook_message_add_file_without_width(tmpdir):
+    test_file = tmpdir.join("test_file.png")
+    test_file.write("test content")
+
+    msg = LogbookMessage()
+    msg.add_file(str(test_file))
+
+    assert '<figure class="image"><img src="" title="' in msg._content.textcontent
+
+
+def test_logbook_message_add_file_warns_about_height(tmpdir):
+    test_file = tmpdir.join("test_file.png")
+    test_file.write("test content")
+
+    msg = LogbookMessage()
+    with pytest.warns(DeprecationWarning, match="height"):
+        msg.add_file(str(test_file), width="50%", height=480)
+
+    assert 'style="width:50%;"' in msg._content.textcontent
+    assert "height" not in msg._content.textcontent
+    assert "style" not in msg._content.files[0]
 
 
 @pytest.mark.parametrize("filepath,fsnippet", [("./test_file.pdf", None)])

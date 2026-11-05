@@ -40,14 +40,14 @@ describe('entryContentFromEditorHtml', () => {
       expect(Array.from(bytes)).toEqual([0, 1, 255]);
     });
 
-    it('moves the figure width into files[].style', () => {
+    it('keeps the figure width in the HTML', () => {
       const content = entryContentFromEditorHtml(
         `<figure class="image image_resized" style="width:79%;"><img src="${IMAGE_DATA_URI}"></figure>`,
       );
 
-      expect(content.files[0].style).toEqual({ width: '79%', height: '' });
+      expect(content.files[0].style).toBeUndefined();
       const figure = parseBody(content.textcontent).querySelector('figure');
-      expect(figure.hasAttribute('style')).toBeFalse();
+      expect(figure.style.width).toBe('79%');
     });
 
     it('gives each new image its own file', () => {
@@ -67,12 +67,11 @@ describe('entryContentFromEditorHtml', () => {
     it('links an http image to the known file with that accessHash', () => {
       const src = 'http://localhost/images/abc';
       const content = entryContentFromEditorHtml(
-        `<figure class="image image_resized" style="width:50%;"><img src="${src}"></figure>`,
+        `<figure class="image"><img src="${src}"></figure>`,
         [{ fileHash: 'h1', accessHash: 'abc' }],
       );
 
       expect(content.files[0].fileHash).toBe('h1');
-      expect(content.files[0].style).toEqual({ width: '50%', height: '' });
       const img = parseBody(content.textcontent).querySelector('img');
       expect(img.title).toBe('h1');
       expect(img.getAttribute('src')).toBe(src);
@@ -97,6 +96,28 @@ describe('entryContentFromEditorHtml', () => {
       );
 
       expect(content.files.map((file) => file.fileHash)).toEqual(['h2']);
+    });
+
+    it('keeps the figure width in the HTML and leaves the known file unchanged', () => {
+      const knownFile = { fileHash: 'h1', accessHash: 'abc', style: { width: '20%', height: '' } };
+      const knownFileBefore = structuredClone(knownFile);
+      const content = entryContentFromEditorHtml(
+        '<figure class="image image_resized" style="width:50%;"><img src="http://localhost/images/abc"></figure>',
+        [knownFile],
+      );
+
+      expect(content.files[0]).toBe(knownFile);
+      expect(knownFile).toEqual(knownFileBefore);
+      const figure = parseBody(content.textcontent).querySelector('figure');
+      expect(figure.style.width).toBe('50%');
+    });
+
+    it('throws for an http image that matches no known file', () => {
+      const src = 'https://example.com/plot.png';
+
+      expect(() =>
+        entryContentFromEditorHtml(`<figure class="image"><img src="${src}"></figure>`),
+      ).toThrowError(`No known file for image ${src}`);
     });
   });
 

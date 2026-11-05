@@ -15,11 +15,9 @@ export interface EntryContent {
  * - Returns null only for `''`.
  * - A `data:` image becomes a new file with a random `fileHash`.
  * - An `http` image belongs to the known file whose `accessHash`, or `fileId`
- *   if it has no `accessHash`, is the last segment of the URL path. That file's
- *   `style` is overwritten with the width and height of the image's parent
- *   element. Throws if the URL is not valid or no known file matches.
- * - For every image with a file, the `style` of its parent element is removed
- *   and its `title` is set to the file's `fileHash`.
+ *   if it has no `accessHash`, is the last segment of the URL path. Throws if
+ *   the URL is not valid or no known file matches.
+ * - For every image with a file, its `title` is set to the file's `fileHash`.
  * - A link adds the known file whose `fileHash` is the link's path without
  *   the leading `/`, as in `file:<fileHash>`. The scheme is not checked.
  * - `files` lists the images in document order, then the links. A file can
@@ -47,10 +45,6 @@ export function entryContentFromEditorHtml(
       let type = img.src.split(',')[0].split(':')[1].split(';')[0];
       let file = new File([blobData], 'subFigure', { type: type });
       container = {
-        style: {
-          width: img.parentElement.style.width,
-          height: img.parentElement.style.height,
-        },
         file: file,
         fileHash: uuid(),
         fileExtension: type,
@@ -63,15 +57,10 @@ export function entryContentFromEditorHtml(
         (fileEntry) => (fileEntry.accessHash ?? fileEntry.fileId) === imageId,
       );
       if (!container) throw new Error(`No known file for image ${img.src}`);
-      container.style = {
-        width: img.parentElement.style.width,
-        height: img.parentElement.style.height,
-      };
     }
 
     if (container != undefined) {
       snippetFiles.push(container);
-      img.parentElement.removeAttribute('style');
       img.title = container.fileHash;
     }
   }
