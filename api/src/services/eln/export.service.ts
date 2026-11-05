@@ -158,8 +158,6 @@ export class ElnExportService {
       );
       parent.comment ||= [];
       parent.comment.push(commentEntity);
-      this.logbookEntity.hasPart ||= [];
-      this.logbookEntity.hasPart.push(commentEntity);
     }
 
     await this.handleFiles(paragraph);
