@@ -16,7 +16,10 @@ import { ViewsService } from '@shared/views.service';
 import { Subscription } from 'rxjs';
 import { ExportDialogComponent } from './export-dialog/export-dialog.component';
 import { WidgetItemConfig } from '@model/config';
-import { ComponentCanDeactivate } from '../../core/navigation-guard-service';
+import {
+  ComponentCanDeactivate,
+  NavigationGuardService,
+} from '../../core/navigation-guard-service';
 import { NgStyle, NgIf, NgSwitch, NgSwitchCase, NgSwitchDefault } from '@angular/common';
 import { MatIconButton } from '@angular/material/button';
 import { MatTooltip } from '@angular/material/tooltip';
@@ -68,6 +71,7 @@ export class DashboardItemComponent implements OnInit, ComponentCanDeactivate, O
     private dialog: MatDialog,
     private route: ActivatedRoute,
     private views: ViewsService,
+    private navigationGuard: NavigationGuardService,
   ) {}
 
   ngOnInit(): void {
@@ -134,7 +138,8 @@ export class DashboardItemComponent implements OnInit, ComponentCanDeactivate, O
 
   @HostListener('window:beforeunload')
   canDeactivate(): boolean {
-    if (false) return true;
-    return false;
+    // Allow a navigation the user already confirmed (e.g. the SciCat SSO
+    // redirect); otherwise warn before leaving.
+    return this.navigationGuard.suppressUnloadPrompt;
   }
 }

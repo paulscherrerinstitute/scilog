@@ -12,7 +12,7 @@ import { Subscription } from 'rxjs';
 import { ViewsService } from '@shared/views.service';
 import { WidgetConfig } from '@model/config';
 import { Hotkeys } from '@shared/hotkeys.service';
-import { ComponentCanDeactivate } from '../core/navigation-guard-service';
+import { ComponentCanDeactivate, NavigationGuardService } from '../core/navigation-guard-service';
 import { ResizedDirective } from '../../core/directives/resized.directive';
 import { NgIf, NgStyle, NgClass, NgFor } from '@angular/common';
 import { MatIconButton, MatButton, MatMiniFabButton } from '@angular/material/button';
@@ -115,6 +115,7 @@ export class DashboardComponent implements OnInit, ComponentCanDeactivate, OnDes
     private router: Router,
     private views: ViewsService,
     private hotkeys: Hotkeys,
+    private navigationGuard: NavigationGuardService,
   ) {}
 
   ngOnInit(): void {
@@ -268,7 +269,8 @@ export class DashboardComponent implements OnInit, ComponentCanDeactivate, OnDes
 
   @HostListener('window:beforeunload')
   canDeactivate(): boolean {
-    if (false) return true;
-    return false;
+    // Allow a navigation the user already confirmed (e.g. the SciCat SSO
+    // redirect); otherwise warn before leaving.
+    return this.navigationGuard.suppressUnloadPrompt;
   }
 }

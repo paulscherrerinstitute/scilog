@@ -5,8 +5,12 @@ export interface ComponentCanDeactivate {
   canDeactivate: () => boolean | Observable<boolean>;
 }
 
-@Injectable()
+@Injectable({ providedIn: 'root' })
 export class NavigationGuardService {
+  // Suppresses the dashboard components' beforeunload warning for a navigation
+  // the user already confirmed (e.g. the SciCat SSO redirect).
+  suppressUnloadPrompt = false;
+
   canDeactivate(component: ComponentCanDeactivate): boolean | Observable<boolean> {
     return (
       component.canDeactivate() ||

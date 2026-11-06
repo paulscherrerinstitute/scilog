@@ -11,11 +11,13 @@ import {
 import { Observable } from 'rxjs';
 import { tap } from 'rxjs/operators';
 import { ServerSettingsService } from '@shared/config/server-settings.service';
+import { NavigationGuardService } from '@shared/navigation-guard-service';
 import { isAuthPage, loginUrl } from './return-url';
 
 @Injectable()
 export class AuthInterceptor implements HttpInterceptor {
   private serverSettingsService = inject(ServerSettingsService);
+  private navigationGuard = inject(NavigationGuardService);
   private location = inject(DOCUMENT).location;
 
   private logout() {
@@ -55,7 +57,17 @@ export class AuthInterceptor implements HttpInterceptor {
             if (err.status === 401) {
               if (this.isSameOrigin(err.url, this.serverSettingsService.getSciCatServerAddress())) {
                 const returnUrl = this.location.pathname + this.location.search;
-                this.location.href = this.serverSettingsService.getScicatLoginUrl(returnUrl);
+                const scicatLoginUrl = this.serverSettingsService.getScicatLoginUrl(returnUrl);
+                if (
+                  confirm(
+                    'SSO with SciCat to continue? ' +
+                      "You'll be redirected there and back (usually automatic). " +
+                      'Some features may be unavailable otherwise.',
+                  )
+                ) {
+                  this.navigationGuard.suppressUnloadPrompt = true;
+                  this.location.href = scicatLoginUrl;
+                }
               } else if (
                 this.isSameOrigin(err.url, this.serverSettingsService.getServerAddress())
               ) {

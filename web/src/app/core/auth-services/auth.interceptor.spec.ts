@@ -2,6 +2,7 @@ import { TestBed } from '@angular/core/testing';
 
 import { AuthInterceptor } from './auth.interceptor';
 import { ServerSettingsService } from '@shared/config/server-settings.service';
+import { NavigationGuardService } from '@shared/navigation-guard-service';
 import { HttpErrorResponse, HttpEvent, HttpHandler, HttpRequest } from '@angular/common/http';
 import { DOCUMENT } from '@angular/common';
 import { of, throwError } from 'rxjs';
@@ -138,7 +139,9 @@ describe('AuthInterceptor', () => {
     return next;
   }
 
-  it('redirects to the SciCat login on a 401 from the SciCat backend', () => {
+  it('redirects to the SciCat login on a 401 from the SciCat backend, once confirmed', () => {
+    spyOn(window, 'confirm').and.returnValue(true);
+    const navigationGuard = TestBed.inject(NavigationGuardService);
     const location = { pathname: '/logbooks/1/dashboard', search: '?x=1', hash: '', href: '' };
     TestBed.overrideProvider(DOCUMENT, { useValue: { location } });
     const interceptor = TestBed.inject(AuthInterceptor);
@@ -149,7 +152,22 @@ describe('AuthInterceptor', () => {
     expect(serverSettingsService.getScicatLoginUrl).toHaveBeenCalledOnceWith(
       '/logbooks/1/dashboard?x=1',
     );
+    expect(navigationGuard.suppressUnloadPrompt).toBeTrue();
     expect(location.href).toEqual(SCICAT_LOGIN_URL);
+  });
+
+  it('stays on the page when the SciCat sign-in is declined', () => {
+    spyOn(window, 'confirm').and.returnValue(false);
+    const navigationGuard = TestBed.inject(NavigationGuardService);
+    const location = { pathname: '/logbooks/1/dashboard', search: '?x=1', hash: '', href: '' };
+    TestBed.overrideProvider(DOCUMENT, { useValue: { location } });
+    const interceptor = TestBed.inject(AuthInterceptor);
+    const url = 'https://scicat-backend.psi.ch/api/v3/datasets';
+    interceptor
+      .intercept(new HttpRequest('GET', url), handlerReturning401(url))
+      .subscribe({ error: () => undefined });
+    expect(navigationGuard.suppressUnloadPrompt).toBeFalse();
+    expect(location.href).toEqual('');
   });
 
   it('neither logs out nor redirects on a 401 from another origin', () => {

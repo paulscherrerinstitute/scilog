@@ -61,7 +61,6 @@ export const routes: Routes = [
 
 @NgModule({
   imports: [RouterModule.forRoot(routes, { canceledNavigationResolution: 'computed' })],
-  providers: [NavigationGuardService],
   exports: [RouterModule],
 })
 export class AppRoutingModule {}
