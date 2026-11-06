@@ -141,9 +141,9 @@ describe('AuthInterceptor', () => {
 
   it('redirects to the SciCat login on a 401 from the SciCat backend, once confirmed', () => {
     spyOn(window, 'confirm').and.returnValue(true);
-    const navigationGuard = TestBed.inject(NavigationGuardService);
     const location = { pathname: '/logbooks/1/dashboard', search: '?x=1', hash: '', href: '' };
     TestBed.overrideProvider(DOCUMENT, { useValue: { location } });
+    const navigationGuard = TestBed.inject(NavigationGuardService);
     const interceptor = TestBed.inject(AuthInterceptor);
     const url = 'https://scicat-backend.psi.ch/api/v3/datasets';
     interceptor
@@ -158,9 +158,9 @@ describe('AuthInterceptor', () => {
 
   it('stays on the page when the SciCat sign-in is declined', () => {
     spyOn(window, 'confirm').and.returnValue(false);
-    const navigationGuard = TestBed.inject(NavigationGuardService);
     const location = { pathname: '/logbooks/1/dashboard', search: '?x=1', hash: '', href: '' };
     TestBed.overrideProvider(DOCUMENT, { useValue: { location } });
+    const navigationGuard = TestBed.inject(NavigationGuardService);
     const interceptor = TestBed.inject(AuthInterceptor);
     const url = 'https://scicat-backend.psi.ch/api/v3/datasets';
     interceptor
