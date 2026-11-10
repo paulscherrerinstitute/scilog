@@ -1,3 +1,10 @@
+## [3.3.4](https://github.com/paulscherrerinstitute/scilog/compare/v3.3.3...v3.3.4) (2026-11-10)
+
+
+### Bug Fixes
+
+* **web:** send files attached in the entry dialog ([#920](https://github.com/paulscherrerinstitute/scilog/issues/920)) ([a9397e2](https://github.com/paulscherrerinstitute/scilog/commit/a9397e2c8b1adbbad98f04f1aa9f51489d4b050c)), closes [#918](https://github.com/paulscherrerinstitute/scilog/issues/918)
+
 ## [3.3.3](https://github.com/paulscherrerinstitute/scilog/compare/v3.3.2...v3.3.3) (2026-11-05)
 
 
