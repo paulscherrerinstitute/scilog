@@ -292,9 +292,11 @@ describe('AddContentComponent', () => {
     // and only then attaches the file.
     component.onChange({ editor, event: {} as ChangeEvent['event'] });
     editor.fileAttachments = [{ fileHash: 'hashA', file: new File([], 'fileA.pdf') }];
-    spyOn(component, 'sendMessage');
+    const changeMessageSpy = spyOn(TestBed.inject(AddContentService), 'changeMessage');
     component.addContent('');
-    expect(component.notification.files.map((file) => file.fileHash)).toEqual(['hashA']);
+    expect(changeMessageSpy).toHaveBeenCalledTimes(1);
+    const sent = changeMessageSpy.calls.mostRecent().args[0];
+    expect(sent.files.map((file) => file.fileHash)).toEqual(['hashA']);
   });
 
   it('should send files attached while editing', () => {
