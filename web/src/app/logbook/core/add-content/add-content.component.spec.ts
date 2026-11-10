@@ -274,10 +274,38 @@ describe('AddContentComponent', () => {
   it('should include every attached file, not just the most recent, when preparing a message', () => {
     let linkMock =
       '<p><a class="fileLink" href="file:hashA">fileA.pdf</a> <a class="fileLink" href="file:hashB">fileB.pdf</a></p>';
-    component.fileStorage = [{ fileHash: 'hashA' } as any, { fileHash: 'hashB' } as any];
+    component.editor = {
+      fileAttachments: [{ fileHash: 'hashA' } as any, { fileHash: 'hashB' } as any],
+    };
     component.prepareMessage(linkMock);
     let fileHashes = component.notification.files.map((file) => file.fileHash);
     expect(fileHashes).toEqual(['hashA', 'hashB']);
+  });
+
+  it('should send a file attached after the last change event', () => {
+    const html = '<p><a href="file:hashA">fileA.pdf</a></p>';
+    const editor: any = { getData: () => html };
+    component.message = { parentId: 'parent', linkType: LinkType.COMMENT };
+    component.setupComponent();
+    component.editor = editor;
+    // The insert-file plugin inserts the link, which fires a change event,
+    // and only then attaches the file.
+    component.onChange({ editor, event: {} as ChangeEvent['event'] });
+    editor.fileAttachments = [{ fileHash: 'hashA', file: new File([], 'fileA.pdf') }];
+    spyOn(component, 'sendMessage');
+    component.addContent('');
+    expect(component.notification.files.map((file) => file.fileHash)).toEqual(['hashA']);
+  });
+
+  it('should send files attached while editing', () => {
+    component.notification = notificationMock;
+    component.message = { id: '123', files: [{ fileHash: 'hashA' }] };
+    component.editor = { fileAttachments: [{ fileHash: 'hashB' }] };
+    component.data = '<p><a href="file:hashA">fileA.pdf</a> <a href="file:hashB">fileB.pdf</a></p>';
+    const sendMessageSpy = spyOn(component, 'sendMessage');
+    component['sendEditMessage']();
+    const files = sendMessageSpy.calls.mostRecent().args[0].files;
+    expect(files.map((file) => file.fileHash)).toEqual(['hashA', 'hashB']);
   });
 
   it('should prepare subsnippets container for quotes', () => {

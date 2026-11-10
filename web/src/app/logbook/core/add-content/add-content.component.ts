@@ -6,7 +6,7 @@ import {
   MatDialogActions,
   MatDialogClose,
 } from '@angular/material/dialog';
-import { ClassicEditor, FileAttachment } from '../ckeditor/editor';
+import { ClassicEditor } from '../ckeditor/editor';
 import { AddContentService } from '../add-content.service';
 import { ChangeStreamNotification } from '../changestreamnotification.model';
 import { LinkType } from '@model/paragraphs';
@@ -14,7 +14,7 @@ import { Subscription } from 'rxjs';
 import { LogbookInfoService } from '@shared/logbook-info.service';
 import { HttpClient } from '@angular/common/http';
 import { CK5ImageUploadAdapter } from '../ckeditor/ck5-image-upload-adapter';
-import { Basesnippets } from '@model/basesnippets';
+import { Basesnippets, Filecontainer } from '@model/basesnippets';
 import { CKeditorConfig } from '../ckeditor/ckeditor-config';
 import { entryContentFromEditorHtml } from '../../../entries/entry-content';
 import { parseInertHtml } from '../../../entries/parse-inert-html';
@@ -69,7 +69,6 @@ export class AddContentComponent implements OnInit, OnDestroy {
   subscriptions: Subscription[] = [];
   contentChanged: boolean = false;
   initialized: boolean = false;
-  fileStorage: FileAttachment[] = [];
   config: any = [];
   editor: any;
   lastEdit: { message?: string; tags?: string } = {};
@@ -200,10 +199,7 @@ export class AddContentComponent implements OnInit, OnDestroy {
   }
 
   private sendEditMessage() {
-    const content = entryContentFromEditorHtml(
-      this.data,
-      this.message?.files ? this.message.files : [],
-    );
+    const content = entryContentFromEditorHtml(this.data, this.knownFiles());
     // No null check: for empty editor HTML this throws, and no edit is sent.
     const notification: ChangeStreamNotification = {
       linkType: LinkType.PARAGRAPH,
@@ -218,7 +214,6 @@ export class AddContentComponent implements OnInit, OnDestroy {
     if (!editor) return;
     localStorage.setItem(`${this.message.id}_message`, editor.getData());
     this.contentChanged = true;
-    this.fileStorage = editor.fileAttachments ?? this.fileStorage;
   }
 
   editorChange(editor: any): any {
@@ -251,10 +246,7 @@ export class AddContentComponent implements OnInit, OnDestroy {
   }
 
   prepareMessage(data: string) {
-    const content = entryContentFromEditorHtml(data, [
-      ...(this.message?.files ?? []),
-      ...this.fileStorage,
-    ]);
+    const content = entryContentFromEditorHtml(data, this.knownFiles());
     if (content != null) {
       this.notification.textcontent = content.textcontent;
       this.notification.files = content.files;
@@ -268,6 +260,16 @@ export class AddContentComponent implements OnInit, OnDestroy {
       // send paragraph and subsnippet (that is a copy of the reference);
       this.notification.linkType = LinkType.PARAGRAPH;
     }
+  }
+
+  /**
+   * The files the editor HTML may refer to: the entry's saved files and the
+   * files attached in the editor. Read the attachments when the content is
+   * sent: the editor adds a file after it inserts the file's link, so a copy
+   * taken on a change event can miss the newest file.
+   */
+  private knownFiles(): Filecontainer[] {
+    return [...(this.message?.files ?? []), ...(this.editor?.fileAttachments ?? [])];
   }
 
   sendMessage(message: ChangeStreamNotification = undefined) {
