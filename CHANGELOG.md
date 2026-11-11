@@ -1,3 +1,10 @@
+## [3.3.6](https://github.com/paulscherrerinstitute/scilog/compare/v3.3.5...v3.3.6) (2026-11-11)
+
+
+### Bug Fixes
+
+* **api:** list comments in their message's hasPart ([#922](https://github.com/paulscherrerinstitute/scilog/issues/922)) ([63c3c49](https://github.com/paulscherrerinstitute/scilog/commit/63c3c495e52bed250915a66fb78520b8a1c801f9)), closes [#921](https://github.com/paulscherrerinstitute/scilog/issues/921)
+
 ## [3.3.5](https://github.com/paulscherrerinstitute/scilog/compare/v3.3.4...v3.3.5) (2026-11-11)
 
 
