@@ -1,3 +1,10 @@
+## [3.3.5](https://github.com/paulscherrerinstitute/scilog/compare/v3.3.4...v3.3.5) (2026-11-11)
+
+
+### Bug Fixes
+
+* **api:** exclude comments from Book's hasPart ([#917](https://github.com/paulscherrerinstitute/scilog/issues/917)) ([9c07c18](https://github.com/paulscherrerinstitute/scilog/commit/9c07c18ab1a6841c400f0562af67f03bf1d8b575)), closes [#916](https://github.com/paulscherrerinstitute/scilog/issues/916) [#916](https://github.com/paulscherrerinstitute/scilog/issues/916)
+
 ## [3.3.4](https://github.com/paulscherrerinstitute/scilog/compare/v3.3.3...v3.3.4) (2026-11-10)
 
 
