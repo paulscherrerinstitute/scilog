@@ -38,7 +38,11 @@ import {
 import {ServiceMixin} from '@loopback/service-proxy';
 import {PasswordHasherBindings, SESSION_SECRET} from './keys';
 import {User} from './models';
-import {FileRepository, ParagraphRepository} from './repositories';
+import {
+  BasesnippetRepository,
+  FileRepository,
+  ParagraphRepository,
+} from './repositories';
 import {MySequence} from './sequence';
 import {BcryptHasher} from './services/hash.password.bcryptjs';
 import {JWTService} from './services/jwt-service';
@@ -222,6 +226,9 @@ export class SciLogDbApplication extends BootMixin(
   async migrateSchema(options?: SchemaMigrationOptions): Promise<void> {
     const paragraphRepo = await this.getRepository(ParagraphRepository);
     await paragraphRepo.migrateHtmlTexcontent();
+
+    const basesnippetRepo = await this.getRepository(BasesnippetRepository);
+    await basesnippetRepo.migrateImageSizes();
 
     const fileRepo = await this.getRepository(FileRepository);
     await fileRepo.migrateFileMetadata();
