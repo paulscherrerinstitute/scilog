@@ -24,7 +24,7 @@ We note that all the above types inherit from CreativeWork.
 ### How are the entities related?
 
 - A Logbook (`Book`) has  `Message`s through the [`hasPart`](https://schema.org/hasPart) property.
-- A `Message` has `Comment`s through the [`comment`](https://schema.org/comment) property.
+- A `Message` has `Comment`s through the [`comment`](https://schema.org/comment) property. The message also lists its comments in [`hasPart`](https://schema.org/hasPart), as the [ELN File Format](https://github.com/TheELNConsortium/TheELNFileFormat/blob/master/SPECIFICATION.md#the-rest) requires.
 - Messages and Comments have files (i.e. `MediaObject`s) through the [`hasPart`](https://schema.org/hasPart) property. 
 (`MediaObject` is aliased to `File` in the [ro-crate context](https://w3id.org/ro/crate/1.2/context))
 
@@ -36,7 +36,7 @@ title: Logbook entity-relations
 ---
 erDiagram
     Book ||--o{ Message : hasPart
-    Message ||--o{ Comment : comment
+    Message ||--o{ Comment : "comment, hasPart"
     Message ||--o{ MediaObject : hasPart
     Comment ||--o{ MediaObject : hasPart
     Message ||--o| Person : author

@@ -111,11 +111,14 @@ describe('ElnExportService (unit)', () => {
       '@id': entityBuilder.getEntityId('snippet-2'),
     });
 
-    // expect second snippet to have comment as comment
+    // expect second snippet to have comment as comment and in hasPart
     const snippet2Entity = rocrate.getEntity(
       entityBuilder.getEntityId('snippet-2'),
     );
     expect(snippet2Entity.comment).to.containEql({
+      '@id': entityBuilder.getEntityId('snippet-3'),
+    });
+    expect(snippet2Entity.hasPart).to.containEql({
       '@id': entityBuilder.getEntityId('snippet-3'),
     });
   });
