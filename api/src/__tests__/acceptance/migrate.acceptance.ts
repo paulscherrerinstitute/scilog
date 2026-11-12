@@ -101,7 +101,7 @@ describe('Migrate', function (this: Suite) {
         width: '85%',
       });
       expect(defaultWidth.textcontent).to.equal(
-        figure('<img src="" title="h1">'),
+        '<figure class="image"><img src="" title="h1"></figure>',
       );
       expect(defaultWidth.files[0]).to.not.have.property('style');
 
@@ -126,19 +126,27 @@ describe('Migrate', function (this: Suite) {
     it('drops a default or empty width', async () => {
       for (const width of ['82.25%', '85%', '']) {
         const doc = await givenMigratedSnippet(figure(), {width});
-        expect(doc.textcontent).to.equal(figure());
+        expect(doc.textcontent).to.equal(
+          '<figure class="image"><img src="" title="h1"></figure>',
+        );
         expect(doc.files).to.eql([
           {fileHash: 'h1', legacyStyle: {width, height: ''}},
         ]);
+
+        const inline = '<p>a <img src="" title="h1"></p>';
+        const inlineDoc = await givenMigratedSnippet(inline, {width});
+        expect(inlineDoc.textcontent).to.equal(inline);
+        expect(inlineDoc.files).to.eql([
+          {fileHash: 'h1', legacyStyle: {width, height: ''}},
+        ]);
       }
-      const natural = figure(
-        '<img style="aspect-ratio:812/463;" src="" width="812" height="463" title="h1">',
-      );
+      const natural =
+        '<figure class="image"><img style="aspect-ratio:812/463;" src="" width="812" height="463" title="h1"></figure>';
       const doc = await givenMigratedSnippet(natural, {width: ''});
       expect(doc.textcontent).to.equal(natural);
     });
 
-    it('keeps a width the figure already has', async () => {
+    it('keeps a width the HTML already has', async () => {
       const html =
         '<figure class="image image_resized" style="width:300px"><img src="" title="h1"></figure>';
       for (const width of ['600px', 'auto']) {
@@ -148,17 +156,46 @@ describe('Migrate', function (this: Suite) {
           {fileHash: 'h1', legacyStyle: {width, height: ''}},
         ]);
       }
+
+      const inline =
+        '<p><img class="image_resized" style="width:20px;" src="" title="h1"></p>';
+      const doc = await givenMigratedSnippet(inline, {width: '85%'});
+      expect(doc.textcontent).to.equal(inline);
     });
 
-    it('moves a px width to an image outside a figure', async () => {
+    it('moves a width to an image outside a figure', async () => {
+      for (const width of ['13px', '50%']) {
+        const doc = await givenMigratedSnippet(
+          '<p>a <img src="" title="h1"></p>',
+          {width},
+        );
+        expect(doc.textcontent).to.equal(
+          `<p>a <img src="" title="h1" style="width: ${width};" class="image_resized"></p>`,
+        );
+      }
+    });
+
+    it('removes a % width attribute from an image outside a figure', async () => {
       const doc = await givenMigratedSnippet(
-        '<p>a <img src="" title="h1"></p>',
-        {
-          width: '13px',
-        },
+        '<p><img style="aspect-ratio:85%/220;" src="" width="85%" height="220" title="h1"></p>',
+        {width: '85%'},
       );
-      expect(doc.textcontent).to.equal(
-        '<p>a <img src="" title="h1" style="width: 13px;" class="image_resized"></p>',
+      expect(doc.textcontent).to.equal('<p><img src="" title="h1"></p>');
+    });
+
+    it('removes image_resized from a target without a width', async () => {
+      const inline = await givenMigratedSnippet(
+        '<p><img class="image_resized" src="" title="h1"></p>',
+        {width: ''},
+      );
+      expect(inline.textcontent).to.equal('<p><img src="" title="h1"></p>');
+
+      const block = await givenMigratedSnippet(
+        '<figure class="image image-style-side image_resized"><img src="" title="h1"></figure>',
+        {width: '82.25%'},
+      );
+      expect(block.textcontent).to.equal(
+        '<figure class="image image-style-side"><img src="" title="h1"></figure>',
       );
     });
 
@@ -190,8 +227,7 @@ describe('Migrate', function (this: Suite) {
 
     it('keeps the style of files no case covers', async () => {
       const cases: [string, string][] = [
-        ['<p><img src="" title="h1"></p>', ''],
-        ['<p><img src="" title="h1"></p>', '50%'],
+        ['<p><img src="" title="h1"></p>', 'auto'],
         [figure(), 'auto'],
         ['<p><a class="fileLink" href="file:h1">a.ps</a></p>', '226px'],
       ];
@@ -213,12 +249,14 @@ describe('Migrate', function (this: Suite) {
       expect(both.textcontent).to.equal(migrated + migrated);
       expect(both.files[0]).to.have.property('legacyStyle');
 
-      // A % width is not moved to an image outside a figure.
-      const partly = figure() + '<p><img src="" title="h1"></p>';
-      const doc = await givenMigratedSnippet(partly, {width: '50%'});
+      // `auto` is kept for a figure with a width, but not for one without.
+      const partly =
+        '<figure class="image" style="width:300px"><img src="" title="h1"></figure>' +
+        figure();
+      const doc = await givenMigratedSnippet(partly, {width: 'auto'});
       expect(doc.textcontent).to.equal(partly);
       expect(doc.files).to.eql([
-        {fileHash: 'h1', style: {width: '50%', height: ''}},
+        {fileHash: 'h1', style: {width: 'auto', height: ''}},
       ]);
     });
 

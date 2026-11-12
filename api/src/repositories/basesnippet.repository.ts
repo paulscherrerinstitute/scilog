@@ -13,7 +13,6 @@ import {
 } from 'mongodb';
 
 type FileStyle = Filecontainer['style'];
-type MigratedFile = Filecontainer & {legacyStyle?: FileStyle};
 type SnippetDoc = {
   _id: ObjectId;
   textcontent?: string;
@@ -23,8 +22,6 @@ type SnippetDoc = {
 // A number followed by % or px, as the editor writes it, or a bare number
 // (rule 2).
 const IMAGE_WIDTH = /^\d+(\.\d+)?(%|px)?$/;
-// Inline images only get px widths or bare numbers (rule 5).
-const INLINE_IMAGE_WIDTH = /^\d+(\.\d+)?(px)?$/;
 const BARE_NUMBER = /^\d+(\.\d+)?$/;
 // Widths the SDK (82.25%) and the web app (85%) stored when there was no size.
 const DEFAULT_WIDTHS = ['82.25%', '85%'];
@@ -55,9 +52,12 @@ export class BasesnippetRepository extends SnippetRepositoryMixin<
    * whose `title` is the file's `fileHash`. "Stored width" is
    * `files[].style.width`.
    *
-   * Image inside `<figure class="image">` (block image):
-   * 1. The figure already has a width: it stays, and no width is added.
-   * 2. Otherwise, stored width is `px`, `%` or a bare number: the figure
+   * The editor writes the width of a block image on its
+   * `<figure class="image">`, and the width of an inline image (outside a
+   * figure) on the `<img>`. "Target" is that figure or `<img>`.
+   *
+   * 1. The target already has a width: it stays, and no width is added.
+   * 2. Otherwise, stored width is `px`, `%` or a bare number: the target
    *    gets `style="width:…"` and `class="image_resized"`. A bare number
    *    gets `px`, because the web app showed it as a `width` attribute on
    *    the `<img>`, where a bare number means pixels.
@@ -67,15 +67,14 @@ export class BasesnippetRepository extends SnippetRepositoryMixin<
    * 4. With any of rules 1–3: if the `<img>` has a `width` attribute in
    *    `%`, remove `width`, `height` and the `aspect-ratio` style. The web
    *    app wrote them, so they are not the natural size of the image.
+   * 5. With any of rules 1–3: if the target has no width, remove its
+   *    `image_resized` class. The web app removed the figure width when it
+   *    saved an entry, but kept this class. With the editor's content
+   *    styles, this class without a width makes the image as wide as the
+   *    text.
    *
-   * Image outside a figure (inline image):
-   * 5. Stored width is `px` or a bare number, and the `<img>` has no
-   *    `style` width: the `<img>` gets `style="width:…"` and
-   *    `class="image_resized"`. A bare number gets `px`, as in rule 2.
-   *
-   * Any other image matches no rule, e.g. a block image without a figure
-   * width and with the stored width `auto`, or an inline image with the
-   * stored width `50%` or empty.
+   * Any other image matches no rule, e.g. a target without a width and
+   * with the stored width `auto`.
    *
    * A file is migrated only if all of its images match a rule. Its `style`
    * then moves to `legacyStyle`. Otherwise the file and its images stay as
@@ -144,7 +143,7 @@ export class BasesnippetRepository extends SnippetRepositoryMixin<
 function moveImageSizesToHtml(
   doc: SnippetDoc,
   parser: DOMParser,
-): {files: MigratedFile[]; textcontent?: string} | undefined {
+): {files: Filecontainer[]; textcontent?: string} | undefined {
   // `<remove>` starts the body, as in the web app's `parseInertHtml`.
   const body = parser.parseFromString(
     '<body><remove></remove>' + (doc.textcontent ?? ''),
@@ -157,7 +156,7 @@ function moveImageSizesToHtml(
 
   let filesChanged = false;
   let htmlChanged = false;
-  const files = (doc.files ?? []).map((file): MigratedFile => {
+  const files = (doc.files ?? []).map((file): Filecontainer => {
     const style = file?.style;
     if (!style) return file;
     const migrations = images
@@ -186,37 +185,35 @@ function planImageMigration(
   style: NonNullable<FileStyle>,
 ): (() => boolean) | undefined {
   const width = style.width ?? '';
-  const figure = imageFigure(img);
-  if (figure) {
-    const figureHasWidth = figure.style.width !== ''; // rule 1
-    const isWidth = IMAGE_WIDTH.test(width); // rule 2
-    const isDefault = width === '' || DEFAULT_WIDTHS.includes(width); // rule 3
-    // No rule matches, e.g. no figure width and the stored width `auto`.
-    if (!figureHasWidth && !isWidth && !isDefault) return undefined;
-    return () => {
-      let changed = false;
-      // Rule 2.
-      if (!figureHasWidth && !isDefault) {
-        setWidth(figure, width);
-        changed = true;
-      }
-      // Rule 4.
-      if (img.getAttribute('width')?.endsWith('%')) {
-        removeSizeAttributes(img);
-        changed = true;
-      }
-      return changed;
-    };
-  }
-  // Rule 5.
-  if (INLINE_IMAGE_WIDTH.test(width) && img.style.width === '') {
-    return () => {
-      setWidth(img, width);
-      return true;
-    };
-  }
-  // Any other inline image, e.g. with the stored width `50%` or empty.
-  return undefined;
+  const target = imageFigure(img) ?? img;
+  const hasWidth = target.style.width !== ''; // rule 1
+  const isWidth = IMAGE_WIDTH.test(width); // rule 2
+  const isDefault = width === '' || DEFAULT_WIDTHS.includes(width); // rule 3
+  // No rule matches, e.g. no target width and the stored width `auto`.
+  if (!hasWidth && !isWidth && !isDefault) return undefined;
+  return () => {
+    let changed = false;
+    // Rule 2.
+    if (!hasWidth && !isDefault) {
+      setWidth(target, width);
+      changed = true;
+    }
+    // Rule 4.
+    if (img.getAttribute('width')?.endsWith('%')) {
+      removeSizeAttributes(img);
+      changed = true;
+    }
+    // Rule 5.
+    if (
+      target.style.width === '' &&
+      target.classList.contains('image_resized')
+    ) {
+      target.classList.remove('image_resized');
+      if (target.classList.length === 0) target.removeAttribute('class');
+      changed = true;
+    }
+    return changed;
+  };
 }
 
 // The closest `<figure class="image">` around the image, as the editor
@@ -229,7 +226,7 @@ function imageFigure(img: HTMLImageElement): HTMLElement | undefined {
 }
 
 // Sets the width as the editor does: `style="width:…"` and `image_resized`.
-// A bare number gets `px` (rules 2 and 5).
+// A bare number gets `px` (rule 2).
 function setWidth(element: HTMLElement, width: string) {
   element.style.width = BARE_NUMBER.test(width) ? `${width}px` : width;
   element.classList.add('image_resized');
