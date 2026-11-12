@@ -780,10 +780,6 @@ export class LogbookItemComponent implements OnInit, AfterViewInit, OnDestroy {
     let fileHash = uuid();
     let snippetFiles: Filecontainer[] = [];
     let file: Filecontainer = {
-      style: {
-        width: '',
-        height: '',
-      },
       fileExtension: 'image/' + this.selectedFile.name.split('.')[1],
       file: this.selectedFile,
       fileHash: fileHash,

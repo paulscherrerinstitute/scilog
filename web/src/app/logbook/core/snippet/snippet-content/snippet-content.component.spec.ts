@@ -50,10 +50,6 @@ describe('SnippetContentComponent', () => {
         '<figure class="image image_resized"><img src="" title="60f9799b-e8bb-41c8-a1a7-5f88d35ea851"></figure>',
       files: [
         {
-          style: {
-            width: '87.74%',
-            height: '',
-          },
           fileExtension: 'image/png',
           fileHash: '60f9799b-e8bb-41c8-a1a7-5f88d35ea851',
           fileId: '6061c0283587f37b851694c7',
@@ -101,10 +97,6 @@ describe('SnippetContentComponent', () => {
         '<figure class="image image_resized"><img src="" title="60f9799b-e8bb-41c8-a1a7-5f88d35ea851"></figure>',
       files: [
         {
-          style: {
-            width: '87.74%',
-            height: '',
-          },
           fileExtension: 'image/png',
           fileHash: '60f9799b-e8bb-41c8-a1a7-5f88d35ea851',
           fileId: '6061c0283587f37b851694c7',
@@ -130,6 +122,28 @@ describe('SnippetContentComponent', () => {
     expect(img.src).toEqual(`http://localhost:3000/images/${snippetMock.files[0].accessHash}`);
     expect(component['_srcUrlFromImageId']).toHaveBeenCalledWith(snippetMock.files[0].accessHash);
     expect(component['_srcUrlFromImageId']).toHaveBeenCalledTimes(1);
+  });
+
+  it('keeps the stored figure style and ignores the old files[].style', () => {
+    component.snippet = {
+      textcontent:
+        '<figure class="image image_resized" style="width:42%;"><img src="" title="h1"></figure>',
+      files: [
+        {
+          style: { width: '87.74%', height: '100px' },
+          fileExtension: 'image/png',
+          fileHash: 'h1',
+          fileId: 'f1',
+        },
+      ],
+    };
+    component.prepareContent();
+
+    const figure = component.span.querySelector('figure');
+    const img = component.span.querySelector('img');
+    expect(figure.style.width).toBe('42%');
+    expect(img.hasAttribute('width')).toBeFalse();
+    expect(img.hasAttribute('height')).toBeFalse();
   });
 
   it('should load file with accessHash', () => {

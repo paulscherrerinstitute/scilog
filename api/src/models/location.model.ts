@@ -4,7 +4,16 @@ import {Basesnippet} from './basesnippet.model';
 export interface Filecontainer {
   className?: string;
   childTag?: string;
+  /** @deprecated Image sizes are in the entry HTML. */
   style?: {
+    width: string;
+    height: string;
+  };
+  /**
+   * The `style` of a file whose image size the migration moved into the
+   * entry HTML. SciLog does not read it.
+   */
+  legacyStyle?: {
     width: string;
     height: string;
   };
