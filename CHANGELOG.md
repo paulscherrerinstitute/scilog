@@ -1,3 +1,10 @@
+## [4.0.2](https://github.com/paulscherrerinstitute/scilog/compare/v4.0.1...v4.0.2) (2026-11-12)
+
+
+### Bug Fixes
+
+* **web:** scroll wide tables inside their entry ([#864](https://github.com/paulscherrerinstitute/scilog/issues/864)) ([157d55e](https://github.com/paulscherrerinstitute/scilog/commit/157d55e2e43035408131102e57c2630d87a06eeb))
+
 ## [4.0.1](https://github.com/paulscherrerinstitute/scilog/compare/v4.0.0...v4.0.1) (2026-11-12)
 
 
