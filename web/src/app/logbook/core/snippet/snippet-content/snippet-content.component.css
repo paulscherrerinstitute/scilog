@@ -1,6 +1,9 @@
 .snippet-content {
   /* Keeps content with `position: fixed` or `absolute` inside its entry. */
   contain: paint;
+  /* Content wider than the entry, such as a wide table, scrolls sideways,
+     as in the editor's editing area. */
+  overflow-x: auto;
 }
 
 ::ng-deep .snippet-content p,
