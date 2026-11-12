@@ -1,3 +1,16 @@
+# [4.0.0](https://github.com/paulscherrerinstitute/scilog/compare/v3.3.6...v4.0.0) (2026-11-12)
+
+
+* feat!: move image sizes into the entry HTML ([#914](https://github.com/paulscherrerinstitute/scilog/issues/914)) ([3ecf627](https://github.com/paulscherrerinstitute/scilog/commit/3ecf6270f0e3a9d1a2665b473e0b48535069ab20)), closes [#896](https://github.com/paulscherrerinstitute/scilog/issues/896)
+
+
+### BREAKING CHANGES
+
+* Images without a size, or with the old default width
+85% or 82.25%, are shown at their own size. Older entries need the
+database migration to keep their image sizes. The SDK's `add_file`
+raises a `ValueError` for a width without `%` or `px`.
+
 ## [3.3.6](https://github.com/paulscherrerinstitute/scilog/compare/v3.3.5...v3.3.6) (2026-11-11)
 
 
