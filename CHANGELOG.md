@@ -1,3 +1,10 @@
+## [4.0.1](https://github.com/paulscherrerinstitute/scilog/compare/v4.0.0...v4.0.1) (2026-11-12)
+
+
+### Bug Fixes
+
+* **web:** show entries with the editor's content styles ([#863](https://github.com/paulscherrerinstitute/scilog/issues/863)) ([b2ed655](https://github.com/paulscherrerinstitute/scilog/commit/b2ed655463be7fa35527ad50eb4e60d28dcd4527)), closes [#873](https://github.com/paulscherrerinstitute/scilog/issues/873)
+
 # [4.0.0](https://github.com/paulscherrerinstitute/scilog/compare/v3.3.6...v4.0.0) (2026-11-12)
 
 
