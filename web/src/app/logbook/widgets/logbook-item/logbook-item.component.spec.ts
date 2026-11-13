@@ -5,12 +5,13 @@ import { LogbookItemComponent } from './logbook-item.component';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { ChangeStreamService } from '@shared/change-stream.service';
 import { AddContentService } from '@shared/add-content.service';
+import { AddContentComponent } from '@shared/add-content/add-content.component';
 import { ViewsService } from '@shared/views.service';
 import { LogbookInfoService } from '@shared/logbook-info.service';
 import { MatSnackBarModule } from '@angular/material/snack-bar';
 import { SnackbarService } from '@shared/snackbar.service';
 import { ActivatedRoute } from '@angular/router';
-import { Observable, BehaviorSubject } from 'rxjs';
+import { Observable, BehaviorSubject, Subject } from 'rxjs';
 import { of } from 'rxjs';
 import { ParamMap } from '@angular/router';
 import { WidgetConfig } from '@model/config';
@@ -26,10 +27,6 @@ import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http'
 import { CKEditorModule } from '@ckeditor/ckeditor5-angular';
 
 class ChangeStreamServiceMock {}
-
-class AddContentServiceMock {
-  currentMessage = of({});
-}
 
 class LogbookInfoServiceMock {
   getLogbookInfo(id: string) {
@@ -221,7 +218,7 @@ describe('LogbookItemComponent', () => {
         { provide: MAT_DIALOG_DATA, useValue: {} },
         { provide: MatDialogRef, useValue: {} },
         { provide: ChangeStreamService, useClass: ChangeStreamServiceMock },
-        { provide: AddContentService, useClass: AddContentServiceMock },
+        { provide: AddContentService, useClass: AddContentService },
         { provide: LogbookInfoService, useClass: LogbookInfoServiceMock },
         { provide: ViewsService, useValue: viewsSpy },
         { provide: SnackbarService, useClass: SnackbarServiceMock },
@@ -260,6 +257,62 @@ describe('LogbookItemComponent', () => {
     // })
     fixture.detectChanges();
     expect(component).toBeTruthy();
+  });
+
+  it('should route an editor message to its widget at config index zero', () => {
+    const submitContentSpy = spyOn(component, 'submitContent');
+    component.configIndex = 0;
+    const message = { textcontent: 'comment' };
+
+    TestBed.inject(AddContentService).changeMessage(message, component.originId);
+
+    expect(submitContentSpy).toHaveBeenCalledOnceWith(message);
+  });
+
+  it('should route a message only to the originating widget when targets overlap', () => {
+    const firstSubmitSpy = spyOn(component, 'submitContent');
+    component.config.filter.additionalLogbooks = ['shared-logbook'];
+    const secondFixture = TestBed.createComponent(LogbookItemComponent);
+    const secondComponent = secondFixture.componentInstance;
+    secondComponent.configIndex = 1;
+    secondComponent.config = defaultConfig[1].config;
+    secondComponent.config.filter.additionalLogbooks = ['shared-logbook'];
+    secondComponent['renderer'] = { setStyle: () => true } as unknown as Renderer2;
+    window.innerWidth = 2000;
+    secondFixture.detectChanges();
+    const secondSubmitSpy = spyOn(secondComponent, 'submitContent');
+    const message = { textcontent: 'comment' };
+
+    expect(secondComponent.originId).not.toEqual(component.originId);
+    expect(secondComponent.config.filter.targetId).toEqual(component.config.filter.targetId);
+    TestBed.inject(AddContentService).changeMessage(message, secondComponent.originId);
+
+    expect(firstSubmitSpy).not.toHaveBeenCalled();
+    expect(secondSubmitSpy).toHaveBeenCalledOnceWith(message);
+    secondFixture.destroy();
+  });
+
+  it('should release and close owned editors before removing the message handler', () => {
+    const cleanupSpy = jasmine.createSpy('sendEditDelitionMessage');
+    const editor = Object.create(AddContentComponent.prototype) as AddContentComponent;
+    editor.originId = component.originId;
+    editor.sendEditDelitionMessage = cleanupSpy;
+    const closed = new Subject<void>();
+    const closeSpy = jasmine.createSpy('close');
+    const dialogRef = {
+      componentInstance: editor,
+      afterClosed: () => closed,
+      close: closeSpy,
+    } as unknown as import('@angular/material/dialog').MatDialogRef<any, any>;
+    component.dialog.afterOpened.next(dialogRef);
+
+    component.ngOnDestroy();
+
+    expect(cleanupSpy).toHaveBeenCalledTimes(1);
+    expect(closeSpy).toHaveBeenCalledTimes(1);
+    const submitContentSpy = spyOn(component, 'submitContent');
+    TestBed.inject(AddContentService).changeMessage({ textcontent: 'late' }, component.originId);
+    expect(submitContentSpy).not.toHaveBeenCalled();
   });
 
   // PARSENOTIFICATION
@@ -866,6 +919,7 @@ describe('LogbookItemComponent', () => {
     const dialogOpenMock = spyOn(component.dialog, 'open');
     component.openDialog();
     expect(dialogOpenMock.calls.mostRecent().args[1].data['defaultTags']).toEqual(undefined);
+    expect(dialogOpenMock.calls.mostRecent().args[1].data['originId']).toEqual(component.originId);
   });
 
   it('should scrollToElement', async () => {

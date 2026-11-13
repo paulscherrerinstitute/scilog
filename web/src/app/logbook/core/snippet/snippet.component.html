@@ -33,7 +33,7 @@
         mat-menu-item
         (click)="editSnippet()"
         [disabled]="!enableEdit.update"
-        *ngIf="showEditButtons"
+        *ngIf="showEditButtons && originId"
         matTooltip="{{ isActionAllowed.tooltips.update }}"
       >
         <mat-icon>edit</mat-icon>
@@ -48,11 +48,11 @@
         <mat-icon>assistant</mat-icon>
         <span>Dashboard name</span>
       </button>
-      <button mat-menu-item (click)="addComment()" *ngIf="enableComments">
+      <button mat-menu-item (click)="addComment()" *ngIf="enableComments && originId">
         <mat-icon>note_add</mat-icon>
         <span>Add comment</span>
       </button>
-      <button mat-menu-item (click)="addCitation()">
+      <button mat-menu-item (click)="addCitation()" *ngIf="originId">
         <mat-icon>reply</mat-icon>
         <span>Reply</span>
       </button>
@@ -104,6 +104,7 @@
           [updatedAt]="snippet?.updatedAt"
           [index]="i"
           [hideMetadata]="hideMetadata"
+          [originId]="originId"
         ></app-snippet>
       </ng-container>
     </div>
@@ -136,6 +137,7 @@
       [updatedAt]="snippet.updatedAt"
       [index]="i"
       [config]="config"
+      [originId]="originId"
       [hideMetadata]="hideMetadata"
       [subsnippets]="snippet.subsnippets"
     ></app-snippet>
