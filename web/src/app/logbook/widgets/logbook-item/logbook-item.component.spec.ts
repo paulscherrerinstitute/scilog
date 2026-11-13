@@ -539,6 +539,55 @@ describe('LogbookItemComponent', () => {
     expect(component.applyFilters([notificationMock[0].content]).length).toBe(0);
   });
 
+  it('should filter out snippets that do not match importance filter', () => {
+    component.config = {
+      general: {
+        type: 'logbook',
+        title: 'Logbook view',
+      },
+      filter: {
+        targetId: '12345parentID',
+        additionalLogbooks: [],
+        tags: [],
+        importance: [1, 2],
+      },
+      view: {
+        order: ['defaultOrder ASC'],
+      },
+    };
+    const snippetMatch: any = {
+      id: '1',
+      parentId: '12345parentID',
+      tags: [],
+      importance: 2,
+    };
+    const snippetNoMatch: any = {
+      id: '2',
+      parentId: '12345parentID',
+      tags: [],
+      importance: 3,
+    };
+    expect(component.applyFilters([snippetMatch]).length).toBe(1);
+    expect(component.applyFilters([snippetNoMatch]).length).toBe(0);
+  });
+
+  it('should include importance in addContent notification', () => {
+    spyOn(component, 'submitContent');
+    component.importance = 5;
+    component.editorContentRef = {
+      editorInstance: {
+        getData: () => '<p>test</p>',
+        setData: jasmine.createSpy('setData'),
+        fileAttachments: [],
+      },
+    } as any;
+    component.tagEditorRef = { tag: [] } as any;
+    component.addContent();
+    expect(component.submitContent).toHaveBeenCalledWith(
+      jasmine.objectContaining({ importance: 5 }),
+    );
+  });
+
   it('should submit PATCH message', () => {
     spyOn(component['logbookItemDataService'], 'uploadParagraph');
     spyOn(component, '_preparePatchPayload').and.returnValue(jasmine.any(Object));
@@ -607,12 +656,14 @@ describe('LogbookItemComponent', () => {
       files: [],
       isMessage: false,
       linkType: 'paragraph',
+      importance: 4,
     };
 
     let res = component._preparePatchPayload(referenceEntry, msg);
     // I guess it should only take these variables if they are not defined in the msg...
     expect(res.isPrivate).toEqual(referenceEntry.isPrivate);
     expect(res.tags).toEqual(msg.tags);
+    expect(res.importance).toEqual(msg.importance);
     expect(res.files).toEqual([]);
     expect(res.snippetType).toEqual('paragraph');
     expect(res.textcontent).toEqual(msg.textcontent);
@@ -623,6 +674,7 @@ describe('LogbookItemComponent', () => {
     expect(res.ownerGroup).toEqual(referenceEntry.ownerGroup);
     expect(res.isPrivate).toEqual(referenceEntry.isPrivate);
     expect(res.tags).toEqual(msg.tags);
+    expect(res.importance).toEqual(msg.importance);
     expect(res.files).toEqual([]);
     expect(res.snippetType).toEqual('paragraph');
     expect(res.linkType).toEqual(msg.linkType);
