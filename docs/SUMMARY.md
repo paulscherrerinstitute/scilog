@@ -10,7 +10,6 @@
 * [Ingestor Guide](Ingestor/README.md)
     * [REST API Examples](Ingestor/RestAPI.md)
     * [Python SDK Usage](Ingestor/PythonSDK.md)
-    * [Import of elog data](Ingestor/MigrateElogData.md)
     * [ELN Conventions](Ingestor/eln-conventions.md)
 * [Operator Guide](Operator/README.md)
     * [Login and Accounts](Operator/Login.md)
