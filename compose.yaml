@@ -1,15 +1,3 @@
 include:
   - api/compose.yaml
   - web/compose.yaml
-
-services:
-  python:
-    build:
-      context: ./importTools
-    volumes:
-      - ./importTools:/usr/src/app
-      - ./sdk/python/scilog:/usr/local/lib/python3.10/site-packages/scilog
-    # infinite loop to keep the container running
-    command: /bin/sh -c "while sleep 1000; do :; done"
-    profiles:
-      - py
