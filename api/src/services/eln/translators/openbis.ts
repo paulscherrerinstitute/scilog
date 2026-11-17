@@ -7,7 +7,6 @@
 
 import path from 'node:path';
 import {JSDOM} from 'jsdom';
-import _ from 'lodash';
 import {Entity, ROCrate} from 'ro-crate';
 import {LinkType} from '../../../models/paragraph.model';
 import {decodeCrateId} from '../crate-id';
@@ -80,8 +79,9 @@ export class OpenbisTranslator implements Translator {
   /**
    * Translate the crate into a logbook draft: the BOOK becomes the logbook, its
    * messages become paragraphs, each message's comments nest under it as
-   * `linkType=comment` paragraphs, and each message's files ride along. Link
-   * mode has already resolved the `openBIS:has*` references to entities.
+   * `linkType=comment` paragraphs, and each message's and comment's files ride
+   * along. Link mode has already resolved the `openBIS:has*` references to
+   * entities.
    */
   toSciLog(crate: ROCrate): LogbookDraft {
     const book = entitiesOfType(crate, 'openBIS:BOOK')[0];
@@ -117,7 +117,10 @@ function validateMessage(message: Entity): ElnError[] {
 
 function validateComment(comment: Entity): ElnError[] {
   const requiredFields = [FIELD.COMMENT_CREATED];
-  return missingFieldErrors(comment, requiredFields);
+  return [
+    ...missingFieldErrors(comment, requiredFields),
+    ...referenceErrors(comment, FIELD.FILES),
+  ];
 }
 
 function entitiesOfType(crate: ROCrate, type: string): Entity[] {
@@ -186,12 +189,11 @@ function buildMessage(message: Entity): ParagraphDraft {
 }
 
 function buildComment(comment: Entity): ParagraphDraft {
-  const text = comment[FIELD.COMMENT_TEXT]?.[0];
   return {
     fields: {
       linkType: LinkType.COMMENT,
-      // openBIS comment text is plain; escape it so markup renders as text.
-      textcontent: text !== undefined ? _.escape(text) : undefined,
+      // Rich text (a full html document), like a message's.
+      textcontent: extractBody(comment[FIELD.COMMENT_TEXT]?.[0]),
       defaultOrder: defaultOrder(comment[FIELD.COMMENT_CREATED]?.[0]),
       tags: entityProvenance(
         comment,
@@ -199,7 +201,7 @@ function buildComment(comment: Entity): ParagraphDraft {
         FIELD.COMMENT_CREATED,
       ),
     },
-    files: [],
+    files: (comment[FIELD.FILES] ?? []).map(buildFile),
     paragraphs: [],
   };
 }
@@ -240,7 +242,7 @@ function defaultOrder(created: string | undefined): number | undefined {
   return created ? new Date(created).getTime() * 1000 : undefined;
 }
 
-/** The `<body>` inner html of a full-document message, or undefined. */
+/** The `<body>` inner html of a full-document text, or undefined. */
 function extractBody(html: string | undefined): string | undefined {
   return html === undefined
     ? undefined
