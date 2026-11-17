@@ -35,9 +35,6 @@ The [api](./api) folder contains the REST API backend implementation. It is impl
 ### SDK (python)
 The [sdk/python](./sdk/python) folder contains a wrapper of the backend REST APIs in python. It is currently limited to the core endpoints and doesn't yet cover all HTTP endpoints.
 
-### Utility tools
-The [importTools](./importTools) folder has common tooling scripts for integration with SciLog, using the SDK.
-
 ### Docs
 The [docs](./docs) folder contains a preliminary and unpolished first draft of the documentation. It is made available [here](https://paulscherrerinstitute.github.io/scilog/) but still hasn't been officially maintained. To preview it locally, run `npm ci && npx honkit serve` inside the folder.
 

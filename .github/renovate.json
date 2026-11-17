@@ -9,17 +9,6 @@
     ":semanticCommits",
     "customManagers:githubActionsVersions"
   ],
-  "ignorePaths": [
-    "**/node_modules/**",
-    "**/bower_components/**",
-    "**/vendor/**",
-    "**/examples/**",
-    "**/__tests__/**",
-    "**/test/**",
-    "**/tests/**",
-    "**/__fixtures__/**",
-    "importTools/**"
-  ],
   "packageRules": [
     {
       "description": "The sdk is a library: widen ranges instead of raising the minimum",
