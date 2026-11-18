@@ -28,7 +28,13 @@ import { WidgetItemConfig } from '@model/config';
 import { Edits } from 'src/app/core/model/edits';
 import { Basesnippets } from 'src/app/core/model/basesnippets';
 import { IsAllowedService } from 'src/app/overview/is-allowed.service';
-import { MatCard, MatCardContent } from '@angular/material/card';
+import {
+  MatCard,
+  MatCardAvatar,
+  MatCardContent,
+  MatCardHeader,
+  MatCardSubtitle,
+} from '@angular/material/card';
 import { NgClass, NgIf, NgFor, DatePipe } from '@angular/common';
 import { MatIcon } from '@angular/material/icon';
 import { NgxJdenticonModule } from 'ngx-jdenticon';
@@ -60,7 +66,10 @@ import { MatMenuTrigger, MatMenu, MatMenuItem } from '@angular/material/menu';
     MatMenuTrigger,
     MatMenu,
     MatMenuItem,
+    MatCardAvatar,
     MatCardContent,
+    MatCardHeader,
+    MatCardSubtitle,
     NgFor,
     SnippetContentComponent,
     DatePipe,
@@ -104,6 +113,7 @@ export class SnippetComponent implements OnInit, AfterContentInit, AfterViewChec
   isSelected = false;
   highlightState = 'default';
   styleClass = 'snippet';
+  showHeader = true;
   isHighlighted = false;
   content: string;
   imageToShow: string | ArrayBuffer;
@@ -157,6 +167,7 @@ export class SnippetComponent implements OnInit, AfterContentInit, AfterViewChec
     } else if (this.snippet.linkType == LinkType.QUOTE) {
       this.styleClass = 'snippetQuote';
       this.showEditButtonsMenu = false;
+      this.showHeader = false;
     }
     // console.log(this.snippet);
 
