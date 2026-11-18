@@ -1,3 +1,10 @@
+## [4.1.1](https://github.com/paulscherrerinstitute/scilog/compare/v4.1.0...v4.1.1) (2026-11-18)
+
+
+### Bug Fixes
+
+* **api:** import openbis comments as rich text ([#929](https://github.com/paulscherrerinstitute/scilog/issues/929)) ([5312bc6](https://github.com/paulscherrerinstitute/scilog/commit/5312bc60d660fa79b6b8069043340866136cd060))
+
 # [4.1.0](https://github.com/paulscherrerinstitute/scilog/compare/v4.0.2...v4.1.0) (2026-11-18)
 
 
