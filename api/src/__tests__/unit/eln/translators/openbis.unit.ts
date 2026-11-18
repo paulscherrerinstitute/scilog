@@ -84,6 +84,14 @@ describe('OpenbisTranslator.validate', () => {
     ]);
   });
 
+  it('rejects a dangling file reference on a COMMENT', () => {
+    const crate = validOpenbisCrate();
+    crate.setProperty(COMMENT, 'schema:hasPart', {'@id': 'data/missing.png'});
+    expect(translator.validate(crate)).to.containDeep([
+      {code: ElnErrorCode.MISSING_ELN_ENTITY},
+    ]);
+  });
+
   it('rejects a dangling comment reference', () => {
     const crate = validOpenbisCrate();
     crate.setProperty(MESSAGE, 'openBIS:hasMESSAGE.HASCOMMENT', {
@@ -138,7 +146,7 @@ describe('OpenbisTranslator.toSciLog', () => {
     expect(message.paragraphs).to.have.length(1);
     const [comment] = message.paragraphs;
     expect(comment.fields.linkType).to.equal(LinkType.COMMENT);
-    expect(comment.files).to.be.empty();
+    expect(comment.files.map(file => file.elnId)).to.deepEqual(['data/c.png']);
     expect(comment.paragraphs).to.be.empty();
   });
 
@@ -255,12 +263,13 @@ describe('OpenbisTranslator.toSciLog', () => {
   });
 
   describe('comments', () => {
-    it('maps COMMENT fields with linkType=comment and plain, unwrapped text', () => {
+    it('maps COMMENT fields with linkType=comment and the extracted body', () => {
       const [message] = translator.toSciLog(validOpenbisCrate()).paragraphs;
       const [comment] = message.paragraphs;
       expect(comment.fields).to.deepEqual({
         linkType: LinkType.COMMENT,
-        textcontent: 'a comment',
+        textcontent:
+          '<p>a comment</p><figure class="image"><img src="data/c.png"></figure>',
         tags: [
           'eln:id:/DEMO/COMMENT1',
           'eln:author:john.doe@example.org',
@@ -270,14 +279,20 @@ describe('OpenbisTranslator.toSciLog', () => {
       });
     });
 
-    it('escapes markup so comment text renders as literal text', () => {
-      const crate = validOpenbisCrate();
-      crate.setProperty(COMMENT, 'openBIS:hasCOMMENT.TEXT', '<b>x</b> & y');
-      const [message] = translator.toSciLog(crate).paragraphs;
+    it('embeds the File entity with its name on its comment', () => {
+      const [message] = translator.toSciLog(validOpenbisCrate()).paragraphs;
       const [comment] = message.paragraphs;
-      expect(comment.fields.textcontent).to.equal(
-        '&lt;b&gt;x&lt;/b&gt; &amp; y',
-      );
+      expect(comment.files).to.deepEqual([
+        {
+          elnId: 'data/c.png',
+          fields: {
+            name: 'c.png',
+            filename: 'c.png',
+            fileExtension: 'png',
+            tags: ['eln:id:data/c.png'],
+          },
+        },
+      ]);
     });
   });
 });

@@ -1,5 +1,6 @@
 import {AnyObject} from '@loopback/repository';
 import {Client, expect} from '@loopback/testlab';
+import {JSDOM} from 'jsdom';
 import {Suite} from 'mocha';
 import crypto from 'node:crypto';
 import path from 'path';
@@ -9,6 +10,8 @@ import {Filesnippet} from '../../models/file.model';
 import {ElnError, ElnErrorCode} from '../../services/eln/errors';
 import {
   buildElnZip,
+  OPENBIS_COMMENT_IMAGE,
+  validOpenbisEntries,
   validScilogCrate,
   validScilogEntries,
 } from '../eln.helpers';
@@ -665,13 +668,10 @@ describe('Logbook .eln import', function (this: Suite) {
           ).to.equal(message1.id);
         });
 
-        it('keeps the plain comment text as its content', () => {
+        it('preserves the comment body as an html fragment', () => {
           const html = comments[0].textcontent ?? '';
-          // stored as-is: the raw text, not a <p> wrapper
-          expect(html).to.startWith(
-            'Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
-          );
-          expect(html).to.containEql('Curabitur ac molestie ex.');
+          expect(html).to.not.match(/<html|<body|&lt;/i); // wrapper stripped
+          expect(html).to.containEql('<p>my comment</p>');
         });
 
         it('tags the comment with its provenance', () => {
@@ -711,4 +711,40 @@ describe('Logbook .eln import', function (this: Suite) {
       });
     });
   }
+
+  // openBIS comments are rich text and can embed images, like messages.
+  describe('importing an openBIS comment with an image', () => {
+    let comment: Paragraph;
+
+    before(async () => {
+      const {comments} = await importEln(
+        await buildElnZip(validOpenbisEntries()),
+      );
+      expect(comments).to.have.length(1);
+      comment = comments[0];
+    });
+
+    it('imports the comment image and points the img at it', async () => {
+      expect(comment.files).to.have.length(1);
+      const [container] = comment.files!;
+      const img = new JSDOM(comment.textcontent).window.document.querySelector(
+        'img',
+      );
+      expect(img?.getAttribute('title')).to.equal(container.fileHash);
+      const file: Filesnippet = (
+        await client
+          .get(`/filesnippet/${container.fileId}`)
+          .set('Authorization', 'Bearer ' + token)
+          .expect(200)
+      ).body;
+      expect(file).to.containDeep({
+        filename: 'c.png',
+        contentSize: OPENBIS_COMMENT_IMAGE.length,
+      });
+      await expectStoredBytes(
+        file,
+        crypto.createHash('sha256').update(OPENBIS_COMMENT_IMAGE).digest('hex'),
+      );
+    });
+  });
 });

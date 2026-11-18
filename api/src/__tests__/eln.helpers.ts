@@ -142,11 +142,15 @@ export function validOpenbisCrate(): ROCrate {
         {
           '@id': '/DEMO/COMMENT1',
           '@type': 'openBIS:COMMENT',
-          'openBIS:hasCOMMENT.TEXT': 'a comment',
+          'openBIS:hasCOMMENT.TEXT':
+            '<html><head></head><body><p>a comment</p>' +
+            '<figure class="image"><img src="data/c.png"></figure></body></html>',
           'openBIS:hasCOMMENT.CREATED_AT': '2026-08-24T09:15:02Z',
           'openBIS:hasCOMMENT.AUTHOR': {'@id': '/PERSON1'},
+          'schema:hasPart': [{'@id': 'data/c.png'}],
         },
         {'@id': 'data/a%20b.png', '@type': 'File'},
+        {'@id': 'data/c.png', '@type': 'File'},
       ],
     },
     {array: true, link: true},
@@ -169,6 +173,21 @@ export function validScilogEntries(
       Buffer.from(JSON.stringify(crate.toJSON())),
     ],
     ['root/book/file.txt', fileContent],
+  ]);
+}
+
+// Bytes of `data/c.png`, the image embedded in validOpenbisCrate()'s comment.
+export const OPENBIS_COMMENT_IMAGE = Buffer.from('comment image');
+
+// Build a Map<string, Buffer> for an openBIS crate: the metadata at the
+// archive root (openBIS's flat layout) plus the bytes of each embedded file.
+export function validOpenbisEntries(
+  crate: ROCrate = validOpenbisCrate(),
+): Map<string, Buffer> {
+  return new Map([
+    ['ro-crate-metadata.json', Buffer.from(JSON.stringify(crate.toJSON()))],
+    ['data/a b.png', Buffer.from('message image')],
+    ['data/c.png', OPENBIS_COMMENT_IMAGE],
   ]);
 }
 
