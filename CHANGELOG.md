@@ -1,3 +1,10 @@
+# [4.1.0](https://github.com/paulscherrerinstitute/scilog/compare/v4.0.2...v4.1.0) (2026-11-18)
+
+
+### Features
+
+* **web:** show who wrote an entry and when ([#865](https://github.com/paulscherrerinstitute/scilog/issues/865)) ([8e52b22](https://github.com/paulscherrerinstitute/scilog/commit/8e52b22fddeef27b5068f980ab7af0a12c9a62d8)), closes [#288](https://github.com/paulscherrerinstitute/scilog/issues/288)
+
 ## [4.0.2](https://github.com/paulscherrerinstitute/scilog/compare/v4.0.1...v4.0.2) (2026-11-12)
 
 
