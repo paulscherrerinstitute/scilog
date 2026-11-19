@@ -8,7 +8,7 @@ import { ScicatService } from '@shared/scicat.service';
 import { RocrateService } from '@shared/rocrate.service';
 import { SnackbarService } from '@shared/snackbar.service';
 import { LogbookInfoService } from '@shared/logbook-info.service';
-import { of } from 'rxjs';
+import { of, throwError } from 'rxjs';
 
 describe('ScicatExportComponent', () => {
   let component: ScicatExportComponent;
@@ -22,6 +22,7 @@ describe('ScicatExportComponent', () => {
   scicatServiceSpy = jasmine.createSpyObj('ScicatService', [
     'getMyself',
     'getDatasetDetailPageUrl',
+    'getUserLinkedDatasetsSummary',
   ]);
   rocrateServiceSpy = jasmine.createSpyObj('RocrateService', ['importRoCrate']);
   snackBarSpy = jasmine.createSpyObj('SnackbarService', ['showSnackbarMessage']);
@@ -38,6 +39,7 @@ describe('ScicatExportComponent', () => {
     scicatServiceSpy.getDatasetDetailPageUrl.and.returnValue(
       'https://discovery.example/datasets/pid',
     );
+    scicatServiceSpy.getUserLinkedDatasetsSummary.and.returnValue(of([]));
     rocrateServiceSpy.importRoCrate.and.returnValue(of('20.500.11935/pid'));
 
     TestBed.configureTestingModule({
@@ -52,17 +54,19 @@ describe('ScicatExportComponent', () => {
     }).compileComponents();
   }));
 
-  beforeEach(() => {
+  beforeEach(async () => {
     fixture = TestBed.createComponent(ScicatExportComponent);
     component = fixture.componentInstance;
     component.logbookId = 'test-logbook-id';
     fixture.detectChanges();
+    await fixture.whenStable();
   });
 
   afterEach(() => {
     logbookItemDataSpy.exportScicatRoCrate.calls.reset();
     rocrateServiceSpy.importRoCrate.calls.reset();
     scicatServiceSpy.getMyself.calls.reset();
+    scicatServiceSpy.getUserLinkedDatasetsSummary.calls.reset();
     snackBarSpy.showSnackbarMessage.calls.reset();
   });
 
@@ -86,12 +90,46 @@ describe('ScicatExportComponent', () => {
   it('should show the created dataset on a successful export', async () => {
     component.ownerGroup = 'psi-demo';
     await component.submit();
-    expect(logbookItemDataSpy.exportScicatRoCrate).toHaveBeenCalledWith('test-logbook-id');
+    expect(logbookItemDataSpy.exportScicatRoCrate).toHaveBeenCalledWith('test-logbook-id', []);
     expect(rocrateServiceSpy.importRoCrate).toHaveBeenCalledWith(jasmine.any(Blob), 'psi-demo');
     expect(component.showResult).toBeTrue();
     expect(component.createdPid).toBe('20.500.11935/pid');
     expect(component.datasetUrl).toBe('https://discovery.example/datasets/pid');
     expect(snackBarSpy.showSnackbarMessage).toHaveBeenCalledWith(jasmine.any(String), 'resolved');
+  });
+
+  it('should load the linked datasets when the dialog opens and export them', async () => {
+    scicatServiceSpy.getUserLinkedDatasetsSummary.and.returnValue(
+      of([
+        { pid: 'pid/ds1', datasetName: 'ds1', creationTime: '2026-01-01' },
+        { pid: 'pid/ds2', datasetName: 'ds2', creationTime: '2026-01-02' },
+      ]),
+    );
+    await component.ngOnInit();
+    expect(scicatServiceSpy.getUserLinkedDatasetsSummary).toHaveBeenCalledWith('test-logbook-id');
+    expect(component.linkedDatasetPids).toEqual(['pid/ds1', 'pid/ds2']);
+
+    component.ownerGroup = 'psi-demo';
+    await component.submit();
+    expect(logbookItemDataSpy.exportScicatRoCrate).toHaveBeenCalledWith('test-logbook-id', [
+      'pid/ds1',
+      'pid/ds2',
+    ]);
+    expect(component.createdPid).toBe('20.500.11935/pid');
+  });
+
+  it('should block the export when the linked datasets cannot be loaded', async () => {
+    scicatServiceSpy.getUserLinkedDatasetsSummary.and.returnValue(
+      throwError(() => new HttpErrorResponse({ status: 500, error: 'SciCat down' })),
+    );
+    await component.ngOnInit();
+    component.ownerGroup = 'psi-demo';
+    expect(component.linkedDatasetsError).toBeTrue();
+    expect(component.canSubmit).toBeFalse();
+
+    await component.submit();
+    expect(logbookItemDataSpy.exportScicatRoCrate).not.toHaveBeenCalled();
+    expect(component.showResult).toBeFalse();
   });
 
   it('should surface the backend error body when the export fails', async () => {
