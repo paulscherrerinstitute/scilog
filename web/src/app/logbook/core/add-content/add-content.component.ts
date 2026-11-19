@@ -29,6 +29,7 @@ interface editorDataInput {
   defaultTags: string[];
   config: any;
   originId?: string;
+  referenceEntry?: ChangeStreamNotification;
 }
 
 @Component({
@@ -69,6 +70,7 @@ export class AddContentComponent implements OnInit, OnDestroy {
   initialized: boolean = false;
   config: any = [];
   originId: string;
+  private referenceEntry: ChangeStreamNotification;
   editor: any;
   lastEdit: { message?: string; tags?: string } = {};
   private editCleanupPublished = false;
@@ -89,6 +91,7 @@ export class AddContentComponent implements OnInit, OnDestroy {
       this.message = data.snippet;
       this.config = data.config;
       this.originId = data.originId;
+      this.referenceEntry = data.referenceEntry;
       this.data = typeof data.content == 'undefined' ? '' : data.content;
       if (typeof data.defaultTags != 'undefined') {
         this.tag = data.defaultTags;
@@ -265,8 +268,16 @@ export class AddContentComponent implements OnInit, OnDestroy {
   }
 
   sendMessage(message: ChangeStreamNotification = undefined) {
-    console.log(this.notification);
-    this.dataService.changeMessage(message ?? this.notification, this.originId);
+    const notification = message ?? this.notification;
+
+    if (this.originId) {
+      this.dataService.changeMessage(notification, this.originId);
+      return;
+    }
+
+    if (this.referenceEntry) {
+      return this.dataService.submitContent(notification, this.referenceEntry);
+    }
   }
 
   loadLastUnsavedEdit() {

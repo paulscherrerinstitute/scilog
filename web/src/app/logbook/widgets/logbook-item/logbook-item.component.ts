@@ -17,7 +17,7 @@ import { ChangeStreamNotification } from '@shared/changestreamnotification.model
 import { HttpClient } from '@angular/common/http';
 import { AddContentComponent } from '@shared/add-content/add-content.component';
 import { AddContentService } from '@shared/add-content.service';
-import { MatDialogConfig, MatDialog, MatDialogRef } from '@angular/material/dialog';
+import { MatDialogConfig, MatDialog } from '@angular/material/dialog';
 import { v4 as uuid } from 'uuid';
 import { trigger, state, style, animate, transition } from '@angular/animations';
 
@@ -151,7 +151,6 @@ export class LogbookItemComponent implements OnInit, AfterViewInit, OnDestroy {
   searchSnippetIndex: string = '';
 
   dataService: Subscription = null;
-  private editorDialogs = new Set<MatDialogRef<any, any>>();
   changeStreamSubscriptions: Subscription[] = [];
   postEntrySubscription: Subscription = null;
   currentViewSubscription: Subscription = null;
@@ -272,17 +271,9 @@ export class LogbookItemComponent implements OnInit, AfterViewInit, OnDestroy {
       }),
     );
 
+    this.dataService?.unsubscribe();
     this.dataService = this.data.handleMessages(this.originId, (message) =>
       this.submitContent(message),
-    );
-    this.subscriptions.push(
-      this.dialog.afterOpened.subscribe((dialogRef) => {
-        const editor = dialogRef.componentInstance;
-        if (editor instanceof AddContentComponent && editor.originId === this.originId) {
-          this.editorDialogs.add(dialogRef);
-          dialogRef.afterClosed().subscribe(() => this.editorDialogs.delete(dialogRef));
-        }
-      }),
     );
 
     this.updateViewSubscription();
@@ -562,23 +553,20 @@ export class LogbookItemComponent implements OnInit, AfterViewInit, OnDestroy {
   // }
 
   submitContent(msg: ChangeStreamNotification) {
-    // in the future, this should be extended to support inserting snippets below/above other snippets
-    // for now, I just take the last array entry
-    let referenceEntry: ChangeStreamNotification = {};
-    referenceEntry.ownerGroup = this.logbookInfo.logbookInfo.ownerGroup;
-    referenceEntry.accessGroups = this.logbookInfo.logbookInfo.accessGroups;
-    referenceEntry.isPrivate = this.logbookInfo.logbookInfo.isPrivate;
+    const referenceEntry: ChangeStreamNotification = {
+      ownerGroup: this.logbookInfo.logbookInfo.ownerGroup,
+      accessGroups: this.logbookInfo.logbookInfo.accessGroups,
+      isPrivate: this.logbookInfo.logbookInfo.isPrivate,
+    };
+
     if (msg.snippetType === 'edit') {
-      // POST -- EDIT SNIPPET
-      let payload: ChangeStreamNotification = this._prepareEditPostPayload(referenceEntry, msg);
+      const payload = this._prepareEditPostPayload(referenceEntry, msg);
       this.logbookItemDataService.uploadParagraph(payload);
-    } else if (typeof msg.id != 'undefined' && msg.id != '') {
-      // PATCH -- UPDATE SNIPPET
-      let payload = this._preparePatchPayload(referenceEntry, msg);
+    } else if (typeof msg.id !== 'undefined' && msg.id !== '') {
+      const payload = this._preparePatchPayload(referenceEntry, msg);
       this.logbookItemDataService.uploadParagraph(payload, msg.id);
     } else {
-      // POST -- NEW SNIPPET
-      let payload = this._preparePostPayload(referenceEntry, msg);
+      const payload = this._preparePostPayload(referenceEntry, msg);
       this.logbookItemDataService.uploadParagraph(payload);
     }
 
@@ -976,22 +964,16 @@ export class LogbookItemComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   ngOnDestroy() {
-    const dialogsToClose = new Set([
-      ...this.editorDialogs,
-      ...this.dialog.openDialogs.filter(
+    this.dialog.openDialogs
+      .filter(
         (dialogRef) =>
           dialogRef.componentInstance instanceof AddContentComponent &&
           dialogRef.componentInstance.originId === this.originId,
-      ),
-    ]);
-    dialogsToClose.forEach((dialogRef) => {
-      const editor = dialogRef.componentInstance;
-      if (editor instanceof AddContentComponent) {
-        editor.sendEditDelitionMessage();
+      )
+      .forEach((dialogRef) => {
+        dialogRef.componentInstance.sendEditDelitionMessage();
         dialogRef.close();
-      }
-    });
-    this.editorDialogs.clear();
+      });
 
     if (this.currentViewSubscription != null) {
       this.currentViewSubscription.unsubscribe();

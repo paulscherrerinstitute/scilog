@@ -248,7 +248,6 @@ export class SnippetComponent implements OnInit, AfterContentInit, AfterViewChec
   }
 
   editSnippet() {
-    if (!this.originId) return;
     console.log('edit snippet');
     console.log(this.snippet.id);
     const dialogConfig = new MatDialogConfig();
@@ -259,6 +258,11 @@ export class SnippetComponent implements OnInit, AfterContentInit, AfterViewChec
       defaultTags: this.snippet.tags,
       config: this.config,
       originId: this.originId,
+      referenceEntry: {
+        ownerGroup: this.snippet.ownerGroup,
+        accessGroups: this.snippet.accessGroups,
+        isPrivate: this.snippet.isPrivate,
+      },
     };
     const dialogRef = this.dialog.open(AddContentComponent, dialogConfig);
     this._editDialog = dialogRef;
@@ -312,7 +316,6 @@ export class SnippetComponent implements OnInit, AfterContentInit, AfterViewChec
   }
 
   addComment() {
-    if (!this.originId) return;
     console.log('adding a comment');
     console.log(this.snippet.id);
     const dialogConfig = new MatDialogConfig();
@@ -331,6 +334,11 @@ export class SnippetComponent implements OnInit, AfterContentInit, AfterViewChec
       defaultTags: this.snippet.tags,
       config: this.config,
       originId: this.originId,
+      referenceEntry: {
+        ownerGroup: this.snippet.ownerGroup,
+        accessGroups: this.snippet.accessGroups,
+        isPrivate: this.snippet.isPrivate,
+      },
     };
     this.openAddContentComponent(dialogConfig);
   }
@@ -348,7 +356,6 @@ export class SnippetComponent implements OnInit, AfterContentInit, AfterViewChec
   }
 
   async addCitation() {
-    if (!this.originId) return;
     console.log('adding a citation');
     console.log(this.snippet.id);
     const dialogConfig = new MatDialogConfig();
@@ -370,6 +377,11 @@ export class SnippetComponent implements OnInit, AfterContentInit, AfterViewChec
       defaultTags: this.snippet.tags,
       config: this.config,
       originId: this.originId,
+      referenceEntry: {
+        ownerGroup: this.snippet.ownerGroup,
+        accessGroups: this.snippet.accessGroups,
+        isPrivate: this.snippet.isPrivate,
+      },
     };
     this.openAddContentComponent(dialogConfig);
   }

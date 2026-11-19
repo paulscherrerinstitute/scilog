@@ -142,6 +142,11 @@ describe('SnippetComponent', () => {
         defaultTags: snippet_input.tags,
         config: config,
         originId: 'widget-1',
+        referenceEntry: {
+          ownerGroup: snippet_input.ownerGroup,
+          accessGroups: snippet_input.accessGroups,
+          isPrivate: snippet_input.isPrivate,
+        },
       };
 
       expect(component.openAddContentComponent).toHaveBeenCalledOnceWith(dialogConfig);
@@ -193,6 +198,11 @@ describe('SnippetComponent', () => {
         defaultTags: snippet_input.tags,
         config: config,
         originId: 'widget-1',
+        referenceEntry: {
+          ownerGroup: snippet_input.ownerGroup,
+          accessGroups: snippet_input.accessGroups,
+          isPrivate: snippet_input.isPrivate,
+        },
       };
 
       expect(component.openAddContentComponent).toHaveBeenCalledOnceWith(dialogConfig);
@@ -236,15 +246,38 @@ describe('SnippetComponent', () => {
     expect(dialogConfig.data.originId).toBe('widget-1');
   });
 
-  it('should not open editor dialogs without a LogbookItem origin', async () => {
+  it('should open editors with source permissions without a widget origin', async () => {
     component.originId = undefined;
+    component.snippet = {
+      id: 'source-entry',
+      parentId: 'source-logbook',
+      linkType: LinkType.PARAGRAPH,
+      tags: [],
+      ownerGroup: 'source-group',
+      accessGroups: ['source-access'],
+      isPrivate: false,
+    };
+
     const dialogOpenSpy = spyOn(component.dialog, 'open');
+    dialogOpenSpy.and.returnValue({
+      afterClosed: () => of(undefined),
+    } as any);
 
     component.editSnippet();
     component.addComment();
     await component.addCitation();
 
-    expect(dialogOpenSpy).not.toHaveBeenCalled();
+    expect(dialogOpenSpy).toHaveBeenCalledTimes(3);
+
+    for (const call of dialogOpenSpy.calls.all()) {
+      const config = call.args[1] as MatDialogConfig<any>;
+      expect(config.data.originId).toBeUndefined();
+      expect(config.data.referenceEntry).toEqual({
+        ownerGroup: 'source-group',
+        accessGroups: ['source-access'],
+        isPrivate: false,
+      });
+    }
   });
 
   it('should release the lock', async () => {

@@ -12,10 +12,6 @@ import { Component, input } from '@angular/core';
 import { TagEditorComponent } from '@shared/tag-editor/tag-editor.component';
 import { CKEditorModule, ChangeEvent } from '@ckeditor/ckeditor5-angular';
 
-class AddContentServiceMock {
-  changeMessage = jasmine.createSpy('changeMessage');
-}
-
 const getConfig = () => ({});
 
 @Component({ selector: 'app-tag-editor', template: '' })
@@ -26,7 +22,10 @@ class TagEditorStubComponent {}
 class CKEditorStubComponent {
   data = input<string>();
 }
-
+class AddContentServiceMock {
+  changeMessage = jasmine.createSpy('changeMessage');
+  submitContent = jasmine.createSpy('submitContent').and.returnValue(Promise.resolve());
+}
 function configureTestingModule(dialogData: object) {
   return TestBed.configureTestingModule({
     imports: [MatDialogModule, TagEditorStubComponent, AddContentComponent],
@@ -235,12 +234,17 @@ describe('AddContentComponent', () => {
     expect(setStorageSpy).toHaveBeenCalledOnceWith('123_tags', JSON.stringify(defaultTags));
   });
 
-  it('should send message', () => {
+  it('should forward the originating widget ID when sending a message', () => {
     const changeMessageSpy = component['dataService'].changeMessage as jasmine.Spy;
     changeMessageSpy.calls.reset();
-    component.originId = 'widget-1';
+
+    component.originId = 'widget-routing-test-42';
     component.sendMessage();
-    expect(changeMessageSpy).toHaveBeenCalledOnceWith(component.notification, 'widget-1');
+
+    expect(changeMessageSpy).toHaveBeenCalledOnceWith(
+      component.notification,
+      'widget-routing-test-42',
+    );
   });
 
   it('should include every attached file, not just the most recent, when preparing a message', () => {
@@ -264,7 +268,8 @@ describe('AddContentComponent', () => {
     // and only then attaches the file.
     component.onChange({ editor, event: {} as ChangeEvent['event'] });
     editor.fileAttachments = [{ fileHash: 'hashA', file: new File([], 'fileA.pdf') }];
-    const changeMessageSpy = spyOn(TestBed.inject(AddContentService), 'changeMessage');
+    const changeMessageSpy = TestBed.inject(AddContentService).changeMessage as jasmine.Spy;
+    changeMessageSpy.calls.reset();
     component.addContent('');
     expect(changeMessageSpy).toHaveBeenCalledTimes(1);
     const sent = changeMessageSpy.calls.mostRecent().args[0];
@@ -435,5 +440,72 @@ describe('AddContentComponent opened for editing', () => {
     fixture.detectChanges();
 
     expect(getEditorStub(fixture).data()).toBe('<p>message</p>');
+  });
+});
+describe('AddContentComponent without a widget origin', () => {
+  const referenceEntry = {
+    ownerGroup: 'source-group',
+    accessGroups: ['source-access'],
+    isPrivate: false,
+  };
+
+  beforeEach(waitForAsync(() =>
+    configureTestingModule({
+      snippet: { id: 'standalone-entry' },
+      content: '<p>Original content</p>',
+      defaultTags: [],
+      config: {},
+      referenceEntry,
+    })));
+
+  it('should save directly without broadcasting to widgets', () => {
+    const fixture = TestBed.createComponent(AddContentComponent);
+    fixture.detectChanges();
+    const component = fixture.componentInstance;
+    const service = TestBed.inject(AddContentService);
+    const submitSpy = service.submitContent as jasmine.Spy;
+    const changeMessageSpy = service.changeMessage as jasmine.Spy;
+    submitSpy.calls.reset();
+
+    const message = {
+      id: 'standalone-entry',
+      textcontent: 'Updated content',
+      linkType: LinkType.PARAGRAPH,
+    };
+    component.sendMessage(message);
+
+    expect(submitSpy).toHaveBeenCalledOnceWith(message, referenceEntry);
+    expect(changeMessageSpy).not.toHaveBeenCalled();
+  });
+
+  it('should send the edit lock and release it only once', () => {
+    const fixture = TestBed.createComponent(AddContentComponent);
+    fixture.detectChanges();
+    const component = fixture.componentInstance;
+    const service = TestBed.inject(AddContentService);
+    const submitSpy = service.submitContent as jasmine.Spy;
+
+    expect(submitSpy).toHaveBeenCalledOnceWith(
+      jasmine.objectContaining({
+        id: 'standalone-entry',
+        snippetType: 'edit',
+        toDelete: false,
+      }),
+      referenceEntry,
+    );
+
+    submitSpy.calls.reset();
+    component.sendEditDelitionMessage();
+    component.sendEditDelitionMessage();
+
+    expect(submitSpy).toHaveBeenCalledOnceWith(
+      jasmine.objectContaining({
+        id: 'standalone-entry',
+        snippetType: 'edit',
+        toDelete: true,
+      }),
+      referenceEntry,
+    );
+    expect(service.changeMessage).not.toHaveBeenCalled();
   });
 });

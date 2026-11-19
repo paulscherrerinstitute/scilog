@@ -1,17 +1,31 @@
 import { TestBed } from '@angular/core/testing';
 
 import { AddContentService } from './add-content.service';
-
+import { LogbookItemDataService } from '@shared/remote-data.service';
+import { UserPreferencesService } from '@shared/user-preferences.service';
 describe('AddContentService', () => {
   let service: AddContentService;
 
   beforeEach(() => {
-    TestBed.configureTestingModule({});
+    TestBed.configureTestingModule({
+      providers: [
+        {
+          provide: LogbookItemDataService,
+          useValue: {
+            uploadParagraph: jasmine
+              .createSpy('uploadParagraph')
+              .and.returnValue(Promise.resolve()),
+          },
+        },
+        {
+          provide: UserPreferencesService,
+          useValue: {
+            userInfo: { username: 'test-user' },
+          },
+        },
+      ],
+    });
     service = TestBed.inject(AddContentService);
-  });
-
-  it('should be created', () => {
-    expect(service).toBeTruthy();
   });
 
   it('should deliver a message only to the matching widget', () => {
@@ -40,13 +54,12 @@ describe('AddContentService', () => {
     subscription.unsubscribe();
   });
 
-  it('should not route a message without an origin ID', () => {
+  it('should not route a message with an empty origin ID', () => {
     const handler = jasmine.createSpy('handler');
     const subscription = service.handleMessages('widget-1', handler);
     spyOn(console, 'warn');
 
-    service.changeMessage({ textcontent: 'comment' });
-
+    service.changeMessage({ textcontent: 'comment' }, '');
     expect(handler).not.toHaveBeenCalled();
     expect(console.warn).toHaveBeenCalled();
     subscription.unsubscribe();

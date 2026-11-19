@@ -271,11 +271,12 @@ describe('LogbookItemComponent', () => {
 
   it('should route a message only to the originating widget when targets overlap', () => {
     const firstSubmitSpy = spyOn(component, 'submitContent');
+    component.config = structuredClone(component.config);
     component.config.filter.additionalLogbooks = ['shared-logbook'];
     const secondFixture = TestBed.createComponent(LogbookItemComponent);
     const secondComponent = secondFixture.componentInstance;
     secondComponent.configIndex = 1;
-    secondComponent.config = defaultConfig[1].config;
+    secondComponent.config = structuredClone(defaultConfig[1].config);
     secondComponent.config.filter.additionalLogbooks = ['shared-logbook'];
     secondComponent['renderer'] = { setStyle: () => true } as unknown as Renderer2;
     window.innerWidth = 2000;
@@ -297,19 +298,20 @@ describe('LogbookItemComponent', () => {
     const editor = Object.create(AddContentComponent.prototype) as AddContentComponent;
     editor.originId = component.originId;
     editor.sendEditDelitionMessage = cleanupSpy;
-    const closed = new Subject<void>();
+
     const closeSpy = jasmine.createSpy('close');
     const dialogRef = {
       componentInstance: editor,
-      afterClosed: () => closed,
       close: closeSpy,
     } as unknown as import('@angular/material/dialog').MatDialogRef<any, any>;
-    component.dialog.afterOpened.next(dialogRef);
+
+    spyOnProperty(component.dialog, 'openDialogs', 'get').and.returnValue([dialogRef]);
 
     component.ngOnDestroy();
 
     expect(cleanupSpy).toHaveBeenCalledTimes(1);
     expect(closeSpy).toHaveBeenCalledTimes(1);
+
     const submitContentSpy = spyOn(component, 'submitContent');
     TestBed.inject(AddContentService).changeMessage({ textcontent: 'late' }, component.originId);
     expect(submitContentSpy).not.toHaveBeenCalled();
