@@ -1,10 +1,4 @@
-import {
-  param,
-  post,
-  requestBody,
-  RestBindings,
-  Response,
-} from '@loopback/rest';
+import {param, post, requestBody, RestBindings, Response} from '@loopback/rest';
 
 import {inject, service} from '@loopback/core';
 import {OPERATION_SECURITY_SPEC} from '../utils/security-spec';
