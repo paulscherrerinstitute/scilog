@@ -362,11 +362,13 @@ export class LogbookItemDataService extends RemoteDataService {
       .toPromise();
   }
 
-  exportScicatRoCrate(logbookId: string): Promise<Blob> {
+  exportScicatRoCrate(logbookId: string, linkedDatasetPids: string[] = []): Promise<Blob> {
     return this.httpClient
-      .get(`${this.serverSettings.getServerAddress()}logbooks/export/${logbookId}/scicat-rocrate`, {
-        responseType: 'blob',
-      })
+      .post(
+        `${this.serverSettings.getServerAddress()}logbooks/export/${logbookId}/scicat-rocrate`,
+        { linkedDatasets: linkedDatasetPids },
+        { responseType: 'blob' },
+      )
       .toPromise();
   }
 }
