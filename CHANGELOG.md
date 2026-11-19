@@ -1,3 +1,10 @@
+## [4.1.2](https://github.com/paulscherrerinstitute/scilog/compare/v4.1.1...v4.1.2) (2026-11-19)
+
+
+### Bug Fixes
+
+* **web:** use Material's card padding for entries ([#867](https://github.com/paulscherrerinstitute/scilog/issues/867)) ([dc7db49](https://github.com/paulscherrerinstitute/scilog/commit/dc7db49616d96fd1c782ff7f0be129519017255a)), closes [#448](https://github.com/paulscherrerinstitute/scilog/issues/448)
+
 ## [4.1.1](https://github.com/paulscherrerinstitute/scilog/compare/v4.1.0...v4.1.1) (2026-11-18)
 
 
