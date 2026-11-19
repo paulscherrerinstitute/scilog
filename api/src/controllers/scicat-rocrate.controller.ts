@@ -43,9 +43,20 @@ export class ScicatRoCrateController {
   })
   async exportScicatRoCrate(
     @param.path.string('id') id: string,
+    @param({
+      name: 'linked-datasets',
+      in: 'query',
+      description:
+        'PIDs of SciCat datasets to record as referenced by the exported logbook',
+      schema: {type: 'array', items: {type: 'string'}},
+    })
+    linkedDatasets: string[] | undefined,
     @inject(RestBindings.Http.RESPONSE) response: Response,
   ) {
-    const zip = await this.scicatCrateService.buildCrateStream(id);
+    const zip = await this.scicatCrateService.buildCrateStream(
+      id,
+      linkedDatasets,
+    );
 
     response.set('Content-Type', 'application/zip');
     response.set(

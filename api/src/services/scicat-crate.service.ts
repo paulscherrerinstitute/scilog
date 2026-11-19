@@ -14,6 +14,8 @@ import {LogbookPdfService} from './logbook-pdf.service';
 import {ArchiveService, AssetDescriptor} from './archive.service';
 
 export const DATA_DIR = 'data';
+// Namespace of the SciCat-specific terms that scicat-rocrate reads
+export const SCICAT_NAMESPACE = 'https://scicatproject.org/';
 
 // Construct a RO-Crate to be used with scicat-rocrate service.
 // This RO-Crate represents the logbook as a SciCat Dataset.
@@ -30,8 +32,11 @@ export class ScicatCrateService {
     @service(ArchiveService) private archiveService: ArchiveService,
   ) {}
 
-  async buildCrateStream(logbookId: string): Promise<Readable> {
-    const metadataJson = await this.getMetadataJson(logbookId);
+  async buildCrateStream(
+    logbookId: string,
+    linkedDatasets: string[] = [],
+  ): Promise<Readable> {
+    const metadataJson = await this.getMetadataJson(logbookId, linkedDatasets);
 
     const {stream: pdfStream, pdfName} =
       await this.logbookPdfService.exportPdf(logbookId);
@@ -76,7 +81,10 @@ export class ScicatCrateService {
   }
 
   // @internal - left public only for unit tests
-  async getMetadataJson(logbookId: string): Promise<string> {
+  async getMetadataJson(
+    logbookId: string,
+    linkedDatasets: string[] = [],
+  ): Promise<string> {
     const logbook = await this.findLogbook(logbookId);
     const creator = await this.findCreator(logbook);
     const crate = new ROCrate();
@@ -99,6 +107,20 @@ export class ScicatCrateService {
       creator.firstName,
       creator.lastName,
     );
+    // Record each linked SciCat dataset as a scicat:Relationship on the data
+    // directory entity. scicat-rocrate turns these into the `relationships`
+    // of the SciCat dataset it creates on import.
+    if (linkedDatasets.length > 0) {
+      crate.addContext({scicat: SCICAT_NAMESPACE});
+      // Explicit ids, because ro-crate would otherwise give these entities
+      // ids like "entity-1", which read as relative file paths.
+      dsEntity['scicat:relationships'] = linkedDatasets.map((pid, i) =>
+        this.entityBuilder.buildScicatRelationship(
+          `#relationship-${i + 1}`,
+          pid,
+        ),
+      );
+    }
     return JSON.stringify(crate, null, 2);
   }
 }
