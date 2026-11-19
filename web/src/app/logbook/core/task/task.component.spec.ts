@@ -4,9 +4,17 @@ import { provideHttpClientTesting } from '@angular/common/http/testing';
 import { AppConfigService } from 'src/app/app-config.service';
 import { Tasks } from 'src/app/core/model/tasks';
 import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http';
-
+import { TasksService } from '@shared/tasks.service';
 const getConfig = () => ({});
+class TasksServiceMock {
+  getTasksByParent() {
+    return Promise.resolve([]);
+  }
 
+  async addTask() {}
+  async updateTask() {}
+  async deleteTask() {}
+}
 describe('TaskComponent', () => {
   let component: TaskComponent;
   let fixture: ComponentFixture<TaskComponent>;
@@ -18,6 +26,7 @@ describe('TaskComponent', () => {
         { provide: AppConfigService, useValue: { getConfig } },
         provideHttpClient(withInterceptorsFromDi()),
         provideHttpClientTesting(),
+        { provide: TasksService, useClass: TasksServiceMock },
       ],
     }).compileComponents();
   }));
@@ -64,20 +73,42 @@ describe('TaskComponent', () => {
     expect(component.hasLoadedSubtasks).toBeTrue();
   });
 
-  it('should addSubtask', async () => {
-    const addSpy = spyOn(component['tasksService'], 'addTask').and.returnValue(
-      Promise.resolve() as any,
-    );
-    spyOn(component['tasksService'], 'getTasksByParent').and.returnValue(Promise.resolve([]));
-    component.newSubtask = 'New sub';
+  it('should create a subtask with its parent ownership and access fields', async () => {
+    spyOn(component['isActionAllowed'], 'canUpdate').and.returnValue(true);
+    component.task = {
+      id: '123',
+      ownerGroup: 'owners',
+      accessGroups: ['readers'],
+      isPrivate: true,
+    } as Tasks;
+
+    const addSpy = spyOn(component['tasksService'], 'addTask').and.resolveTo();
+    component.newSubtask = ' New sub ';
+
     await component.addSubtask();
-    expect(addSpy).toHaveBeenCalledWith({
+
+    expect(addSpy).toHaveBeenCalledOnceWith({
+      ownerGroup: 'owners',
+      accessGroups: ['readers'],
+      isPrivate: true,
+      snippetType: 'task',
       content: 'New sub',
       parentId: '123',
       isDone: false,
-    } as Tasks);
+    });
     expect(component.newSubtask).toBe('');
     expect(component.isExpanded).toBeTrue();
+  });
+  it('should prevent subtask creation when updating is denied', async () => {
+    spyOn(component['isActionAllowed'], 'canUpdate').and.returnValue(false);
+    const addSpy = spyOn(component['tasksService'], 'addTask');
+    component.newSubtask = 'Restricted subtask';
+
+    component.toggleSubtaskInput();
+    await component.addSubtask();
+
+    expect(component.showSubtaskInput).toBeFalse();
+    expect(addSpy).not.toHaveBeenCalled();
   });
 
   it('should isAllowed', () => {

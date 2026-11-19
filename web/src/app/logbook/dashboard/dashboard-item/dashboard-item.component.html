@@ -7,10 +7,11 @@
     <button
       mat-icon-button
       *ngIf="config?.general.type === 'tasks'"
-      matTooltip="Export Tasks"
+      aria-label="Post tasks to logbook"
+      matTooltip="Post tasks to logbook"
       (click)="exportTasksFromHeader()"
     >
-      <mat-icon>arrow_forward</mat-icon>
+      <mat-icon>post_add</mat-icon>
     </button>
     <button
       mat-icon-button

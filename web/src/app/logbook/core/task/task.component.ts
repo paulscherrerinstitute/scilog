@@ -55,6 +55,7 @@ export class TaskComponent implements OnInit {
   ngOnInit(): void {
     this.isActionAllowed.snippet = this.task;
     this.isAllowed();
+    this.loadSubtasks();
   }
 
   toggleTaskIsDone() {
@@ -83,17 +84,22 @@ export class TaskComponent implements OnInit {
   }
 
   toggleSubtaskInput() {
+    if (!this.isActionAllowed.canUpdate(false)) return;
     this.showSubtaskInput = !this.showSubtaskInput;
   }
 
   async addSubtask() {
-    if (!this.newSubtask.trim()) return;
+    if (!this.isActionAllowed.canUpdate(false) || !this.newSubtask.trim()) return;
 
     const payload: Tasks = {
-      content: this.newSubtask,
+      ownerGroup: this.task.ownerGroup,
+      accessGroups: this.task.accessGroups,
+      isPrivate: this.task.isPrivate,
+      snippetType: 'task',
+      content: this.newSubtask.trim(),
       parentId: this.task.id,
       isDone: false,
-    } as Tasks;
+    };
 
     await this.tasksService.addTask(payload);
 
@@ -105,7 +111,7 @@ export class TaskComponent implements OnInit {
   }
 
   get taskHasChildren(): boolean {
-    return this.subtasks.length > 0 || !this.hasLoadedSubtasks;
+    return this.subtasks.length > 0;
   }
 
   isAllowed() {

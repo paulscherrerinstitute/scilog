@@ -31,7 +31,12 @@
       <span class="flexExpand"></span>
 
       <!-- Add Subtask -->
-      <button mat-icon-button (click)="toggleSubtaskInput()">
+      <button
+        mat-icon-button
+        (click)="toggleSubtaskInput()"
+        [disabled]="!!isActionAllowed.tooltips.update"
+        [matTooltip]="isActionAllowed.tooltips.update || ''"
+      >
         <mat-icon>add</mat-icon>
       </button>
 
@@ -57,7 +62,13 @@
         />
       </mat-form-field>
 
-      <button mat-icon-button color="primary" (click)="addSubtask()">
+      <button
+        mat-icon-button
+        color="primary"
+        (click)="addSubtask()"
+        [disabled]="!!isActionAllowed.tooltips.update"
+        [matTooltip]="isActionAllowed.tooltips.update || ''"
+      >
         <mat-icon>check</mat-icon>
       </button>
     </div>

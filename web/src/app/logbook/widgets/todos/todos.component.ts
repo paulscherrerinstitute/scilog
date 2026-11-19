@@ -11,7 +11,7 @@ import { MatInput } from '@angular/material/input';
 import { FormsModule } from '@angular/forms';
 import { TaskComponent } from '../../core/task/task.component';
 import { MatCardModule } from '@angular/material/card';
-import { AddContentService } from '@shared/add-content.service';
+import { LogbookItemDataService } from '@shared/remote-data.service';
 
 @Component({
   selector: 'app-todos',
@@ -34,14 +34,15 @@ export class TodosComponent implements OnInit, OnDestroy {
     private tasksService: TasksService,
     private logbookInfo: LogbookInfoService,
     private notificationService: ChangeStreamService,
-    private addContentService: AddContentService,
+    private logbookItemDataService: LogbookItemDataService,
     private views: ViewsService,
   ) {}
 
   async buildTaskTree(task: Tasks, level: number = 0): Promise<string> {
     const indent = '&nbsp;'.repeat(level * 4);
     const statusIcon = task.isDone ? '✅' : '⬜';
-    let html = `${indent}${statusIcon} ${task.content}<br>`;
+    const content = task.content.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+    let html = `${indent}${statusIcon} ${content}<br>`;
     const children = await this.tasksService.getTasksByParent(task.id);
     for (const child of children) {
       html += await this.buildTaskTree(child, level + 1);
@@ -73,7 +74,7 @@ export class TodosComponent implements OnInit, OnDestroy {
     `,
     };
 
-    this.addContentService.changeMessage(notification);
+    await this.logbookItemDataService.uploadParagraph(notification);
   }
 
   ngOnInit(): void {

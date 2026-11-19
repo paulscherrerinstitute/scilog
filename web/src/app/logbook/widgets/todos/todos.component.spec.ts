@@ -9,7 +9,7 @@ import { AppConfigService } from 'src/app/app-config.service';
 import { provideHttpClientTesting } from '@angular/common/http/testing';
 import { ViewsService } from '@shared/views.service';
 import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http';
-import { AddContentService } from '@shared/add-content.service';
+import { LogbookItemDataService } from '@shared/remote-data.service';
 import { Tasks } from '@model/tasks';
 
 class ChangeStreamServiceMock {
@@ -32,10 +32,9 @@ class ViewsServiceMock {
   currentWidgetConfigs = of([{ config: { filter: {} } }]);
 }
 
-class AddContentServiceMock {
-  changeMessage(message: any) {}
+class LogbookItemDataServiceMock {
+  uploadParagraph = jasmine.createSpy('uploadParagraph').and.returnValue(Promise.resolve());
 }
-
 class LogbookInfoMock {
   logbookInfo = {
     id: '1234',
@@ -68,7 +67,7 @@ describe('TodosComponent', () => {
         { provide: LogbookInfoService, useClass: LogbookInfoMock },
         { provide: TasksService, useClass: TasksServiceMock },
         { provide: ChangeStreamService, useClass: ChangeStreamServiceMock },
-        { provide: AddContentService, useClass: AddContentServiceMock },
+        { provide: LogbookItemDataService, useClass: LogbookItemDataServiceMock },
         { provide: AppConfigService, useValue: { getConfig } },
         { provide: ViewsService, useClass: ViewsServiceMock },
         provideHttpClient(withInterceptorsFromDi()),
@@ -128,15 +127,20 @@ describe('TodosComponent', () => {
     expect(html).toContain('&nbsp;&nbsp;&nbsp;&nbsp;✅ Child task');
   });
 
-  it('should exportTasksToLogbook using AddContentService', async () => {
-    const changeMessageSpy = spyOn(component['addContentService'], 'changeMessage');
+  it('should post tasks directly without a logbook widget', async () => {
+    const uploadSpy = TestBed.inject(LogbookItemDataService).uploadParagraph as jasmine.Spy;
     component.tasks = [{ id: '1', content: 'Task 1', isDone: false } as Tasks];
+
     await component.exportTasksToLogbook();
-    expect(changeMessageSpy).toHaveBeenCalledWith(
+
+    expect(uploadSpy).toHaveBeenCalledOnceWith(
       jasmine.objectContaining({
         snippetType: 'paragraph',
         parentId: '1234',
         linkType: 'paragraph',
+        ownerGroup: 'some',
+        accessGroups: ['someAccess'],
+        isPrivate: false,
       }),
     );
   });

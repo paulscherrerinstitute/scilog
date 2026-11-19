@@ -42,7 +42,13 @@ export class TasksService implements OnDestroy {
     await this.dataService.addTask(task);
   }
 
-  async deleteTask(id: string) {
+  async deleteTask(id: string): Promise<void> {
+    const children = await this.getTasksByParent(id);
+
+    for (const child of children) {
+      await this.deleteTask(child.id);
+    }
+
     await this.dataService.deleteTask(id);
   }
 
