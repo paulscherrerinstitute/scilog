@@ -79,7 +79,9 @@ export class ScicatService {
 
   getUserLinkedDatasetsSummary(logbookId: string): Observable<DatasetSummary[]> {
     const filter = JSON.stringify({
-      where: { 'relationships.relationship': 'Logbook', 'relationships.externalId': logbookId },
+      where: {
+        relationships: { $elemMatch: { relationship: 'Logbook', externalId: logbookId } },
+      },
       fields: ['pid', 'datasetName', 'creationTime'],
     });
     return this.datasetsService.datasetsControllerFindAllV3(filter);
