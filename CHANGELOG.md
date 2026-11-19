@@ -1,3 +1,10 @@
+# [4.2.0](https://github.com/paulscherrerinstitute/scilog/compare/v4.1.2...v4.2.0) (2026-11-19)
+
+
+### Features
+
+* **web:** use outlined cards for entries ([#868](https://github.com/paulscherrerinstitute/scilog/issues/868)) ([4f26c94](https://github.com/paulscherrerinstitute/scilog/commit/4f26c9404a7c490272d5ff4b770023a7f7c69e11))
+
 ## [4.1.2](https://github.com/paulscherrerinstitute/scilog/compare/v4.1.1...v4.1.2) (2026-11-19)
 
 
