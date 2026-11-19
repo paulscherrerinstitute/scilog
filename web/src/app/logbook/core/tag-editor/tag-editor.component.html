@@ -14,13 +14,14 @@
   </button>
   <mat-form-field [floatLabel]="'auto'" subscriptSizing="dynamic">
     <mat-chip-grid #chipList aria-label="Tag selection">
-      <mat-chip-row *ngFor="let tagItem of tag; let i = index" (removed)="remove(tagItem)">
-        <input
-          [(ngModel)]="tagItem.name"
-          (blur)="tagsUpdate.emit(tagsToStrings(this.tag))"
-          style="border: none; background: transparent; width: 80px"
-        />
-
+      <mat-chip-row
+        *ngFor="let tagItem of tag"
+        [editable]="true"
+        (edited)="edit(tagItem, $event)"
+        (removed)="remove(tagItem)"
+        matTooltip="Double-click to edit tag"
+      >
+        {{ tagItem.name }}
         <button matChipRemove>
           <mat-icon>cancel</mat-icon>
         </button>
