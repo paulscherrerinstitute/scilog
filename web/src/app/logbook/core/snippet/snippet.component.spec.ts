@@ -14,6 +14,7 @@ import { UserPreferencesService } from '@shared/user-preferences.service';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { WidgetItemConfig } from '@model/config';
 import { AppConfigService } from 'src/app/app-config.service';
+import { By } from '@angular/platform-browser';
 
 describe('SnippetComponent', () => {
   let component: SnippetComponent;
@@ -75,6 +76,7 @@ describe('SnippetComponent', () => {
     fixture = TestBed.createComponent(SnippetComponent);
     component = fixture.componentInstance;
     component['snippet'] = snippetMock;
+    component.originId = 'widget-1';
     component['snippetContainerRef'] = {
       nativeElement: {
         parentElement: {
@@ -135,7 +137,17 @@ describe('SnippetComponent', () => {
         filter: {},
         view: {},
       };
-      dialogConfig.data = { snippet: snippet, defaultTags: snippet_input.tags, config: config };
+      dialogConfig.data = {
+        snippet: snippet,
+        defaultTags: snippet_input.tags,
+        config: config,
+        originId: 'widget-1',
+        referenceEntry: {
+          ownerGroup: snippet_input.ownerGroup,
+          accessGroups: snippet_input.accessGroups,
+          isPrivate: snippet_input.isPrivate,
+        },
+      };
 
       expect(component.openAddContentComponent).toHaveBeenCalledOnceWith(dialogConfig);
     });
@@ -181,11 +193,92 @@ describe('SnippetComponent', () => {
         filter: {},
         view: {},
       };
-      dialogConfig.data = { snippet: snippet, defaultTags: snippet_input.tags, config: config };
+      dialogConfig.data = {
+        snippet: snippet,
+        defaultTags: snippet_input.tags,
+        config: config,
+        originId: 'widget-1',
+        referenceEntry: {
+          ownerGroup: snippet_input.ownerGroup,
+          accessGroups: snippet_input.accessGroups,
+          isPrivate: snippet_input.isPrivate,
+        },
+      };
 
       expect(component.openAddContentComponent).toHaveBeenCalledOnceWith(dialogConfig);
     });
   }));
+
+  it('should include the originating widget when editing a snippet', () => {
+    const dialogOpenSpy = spyOn(component.dialog, 'open');
+    dialogOpenSpy.and.returnValue({ afterClosed: () => of(undefined) } as any);
+
+    component.editSnippet();
+
+    const dialogConfig = dialogOpenSpy.calls.mostRecent().args[1] as MatDialogConfig<any>;
+    expect(dialogConfig.data.originId).toBe('widget-1');
+  });
+
+  it('should include the originating widget when adding a comment', () => {
+    component.snippet = { id: 'parent-id', tags: [] };
+    const openEditorSpy = spyOn(component, 'openAddContentComponent');
+
+    component.addComment();
+
+    expect(openEditorSpy.calls.mostRecent().args[0].data.originId).toBe('widget-1');
+  });
+
+  it('should propagate the originating widget to nested snippet editors', () => {
+    component.snippet = {
+      ...snippetMock,
+      subsnippets: [{ id: 'nested-id', snippetType: 'paragraph', linkType: 'paragraph' }],
+    };
+    fixture.detectChanges();
+    const nestedSnippet = fixture.debugElement.query(By.directive(SnippetComponent))
+      .componentInstance as SnippetComponent;
+    const dialogOpenSpy = spyOn(component.dialog, 'open');
+    dialogOpenSpy.and.returnValue({ afterClosed: () => of(undefined) } as any);
+
+    nestedSnippet.editSnippet();
+
+    expect(nestedSnippet.originId).toBe('widget-1');
+    const dialogConfig = dialogOpenSpy.calls.mostRecent().args[1] as MatDialogConfig<any>;
+    expect(dialogConfig.data.originId).toBe('widget-1');
+  });
+
+  it('should open editors with source permissions without a widget origin', async () => {
+    component.originId = undefined;
+    component.snippet = {
+      id: 'source-entry',
+      parentId: 'source-logbook',
+      linkType: LinkType.PARAGRAPH,
+      tags: [],
+      ownerGroup: 'source-group',
+      accessGroups: ['source-access'],
+      isPrivate: false,
+    };
+
+    const dialogOpenSpy = spyOn(component.dialog, 'open');
+    dialogOpenSpy.and.returnValue({
+      afterClosed: () => of(undefined),
+    } as any);
+
+    component.editSnippet();
+    component.addComment();
+    await component.addCitation();
+
+    expect(dialogOpenSpy).toHaveBeenCalledTimes(3);
+
+    for (const call of dialogOpenSpy.calls.all()) {
+      const config = call.args[1] as MatDialogConfig<any>;
+      expect(config.data.originId).toBeUndefined();
+      expect(config.data.referenceEntry).toEqual({
+        ownerGroup: 'source-group',
+        accessGroups: ['source-access'],
+        isPrivate: false,
+      });
+    }
+  });
 
   it('should release the lock', async () => {
     component._enableEdit = { update: false, delete: false };

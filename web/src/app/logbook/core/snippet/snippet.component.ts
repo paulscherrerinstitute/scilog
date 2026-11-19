@@ -99,6 +99,9 @@ export class SnippetComponent implements OnInit, AfterContentInit, AfterViewChec
   };
 
   @Input()
+  originId: string;
+
+  @Input()
   showEditButtonsMenu: boolean = true;
 
   @Input()
@@ -254,6 +257,12 @@ export class SnippetComponent implements OnInit, AfterContentInit, AfterViewChec
       content: this.content,
       defaultTags: this.snippet.tags,
       config: this.config,
+      originId: this.originId,
+      referenceEntry: {
+        ownerGroup: this.snippet.ownerGroup,
+        accessGroups: this.snippet.accessGroups,
+        isPrivate: this.snippet.isPrivate,
+      },
     };
     const dialogRef = this.dialog.open(AddContentComponent, dialogConfig);
     this._editDialog = dialogRef;
@@ -320,7 +329,17 @@ export class SnippetComponent implements OnInit, AfterContentInit, AfterViewChec
       parentId: parentId,
       linkType: LinkType.COMMENT,
     };
-    dialogConfig.data = { snippet: snippet, defaultTags: this.snippet.tags, config: this.config };
+    dialogConfig.data = {
+      snippet: snippet,
+      defaultTags: this.snippet.tags,
+      config: this.config,
+      originId: this.originId,
+      referenceEntry: {
+        ownerGroup: this.snippet.ownerGroup,
+        accessGroups: this.snippet.accessGroups,
+        isPrivate: this.snippet.isPrivate,
+      },
+    };
     this.openAddContentComponent(dialogConfig);
   }
 
@@ -353,7 +372,17 @@ export class SnippetComponent implements OnInit, AfterContentInit, AfterViewChec
       linkType: LinkType.QUOTE,
       subsnippets: [this.snippet],
     };
-    dialogConfig.data = { snippet: snippet, defaultTags: this.snippet.tags, config: this.config };
+    dialogConfig.data = {
+      snippet: snippet,
+      defaultTags: this.snippet.tags,
+      config: this.config,
+      originId: this.originId,
+      referenceEntry: {
+        ownerGroup: this.snippet.ownerGroup,
+        accessGroups: this.snippet.accessGroups,
+        isPrivate: this.snippet.isPrivate,
+      },
+    };
     this.openAddContentComponent(dialogConfig);
   }
 

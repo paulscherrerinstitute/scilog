@@ -95,6 +95,7 @@
           [updatedAt]="snippet?.updatedAt"
           [index]="i"
           [hideMetadata]="hideMetadata"
+          [originId]="originId"
         ></app-snippet>
       </ng-container>
     </div>
@@ -123,6 +124,7 @@
       [updatedAt]="snippet.updatedAt"
       [index]="i"
       [config]="config"
+      [originId]="originId"
       [hideMetadata]="hideMetadata"
       [subsnippets]="snippet.subsnippets"
     ></app-snippet>

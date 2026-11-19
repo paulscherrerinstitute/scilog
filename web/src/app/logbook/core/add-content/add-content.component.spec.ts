@@ -4,7 +4,6 @@ import { MatDialogModule, MAT_DIALOG_DATA, MatDialogRef } from '@angular/materia
 import { provideHttpClientTesting } from '@angular/common/http/testing';
 import { AddContentComponent } from './add-content.component';
 import { AddContentService } from '@shared/add-content.service';
-import { of } from 'rxjs';
 import { ChangeStreamNotification } from '@shared/changestreamnotification.model';
 import { LinkType, Paragraphs } from '@model/paragraphs';
 import { AppConfigService } from 'src/app/app-config.service';
@@ -12,11 +11,6 @@ import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http'
 import { Component, input } from '@angular/core';
 import { TagEditorComponent } from '@shared/tag-editor/tag-editor.component';
 import { CKEditorModule, ChangeEvent } from '@ckeditor/ckeditor5-angular';
-
-class AddContentServiceMock {
-  currentMessage = of({});
-  changeMessage(notification: ChangeStreamNotification) {}
-}
 
 const getConfig = () => ({});
 
@@ -28,7 +22,10 @@ class TagEditorStubComponent {}
 class CKEditorStubComponent {
   data = input<string>();
 }
-
+class AddContentServiceMock {
+  changeMessage = jasmine.createSpy('changeMessage');
+  submitContent = jasmine.createSpy('submitContent').and.returnValue(Promise.resolve());
+}
 function configureTestingModule(dialogData: object) {
   return TestBed.configureTestingModule({
     imports: [MatDialogModule, TagEditorStubComponent, AddContentComponent],
@@ -96,7 +93,7 @@ describe('AddContentComponent', () => {
     ],
   };
 
-  beforeEach(waitForAsync(() => configureTestingModule({})));
+  beforeEach(waitForAsync(() => configureTestingModule({ originId: 'widget-1' })));
 
   beforeEach(() => {
     fixture = TestBed.createComponent(AddContentComponent);
@@ -138,6 +135,19 @@ describe('AddContentComponent', () => {
     expect(component.addButtonLabel).toBe('Done');
     expect(component.sendMessage).toHaveBeenCalledTimes(1);
     expect(setFromLocalStorageSpy).toHaveBeenCalledTimes(1);
+  });
+
+  it('should route the initial edit lock and autosave using the originating widget ID', () => {
+    component.message = { id: 'snippet-1' };
+    const changeMessageSpy = component['dataService'].changeMessage as jasmine.Spy;
+    changeMessageSpy.calls.reset();
+
+    component.setupComponent();
+    expect(changeMessageSpy).toHaveBeenCalledOnceWith(component.notification, 'widget-1');
+
+    changeMessageSpy.calls.reset();
+    component.changeChain('<p>autosaved</p>');
+    expect(changeMessageSpy).toHaveBeenCalledOnceWith(component.notification, 'widget-1');
   });
 
   it('should get data from editor before sending', () => {
@@ -224,10 +234,17 @@ describe('AddContentComponent', () => {
     expect(setStorageSpy).toHaveBeenCalledOnceWith('123_tags', JSON.stringify(defaultTags));
   });
 
-  it('should send message', () => {
-    spyOn(component['dataService'], 'changeMessage');
+  it('should forward the originating widget ID when sending a message', () => {
+    const changeMessageSpy = component['dataService'].changeMessage as jasmine.Spy;
+    changeMessageSpy.calls.reset();
+
+    component.originId = 'widget-routing-test-42';
     component.sendMessage();
-    expect(component['dataService'].changeMessage).toHaveBeenCalledWith(component.notification);
+
+    expect(changeMessageSpy).toHaveBeenCalledOnceWith(
+      component.notification,
+      'widget-routing-test-42',
+    );
   });
 
   it('should include every attached file, not just the most recent, when preparing a message', () => {
@@ -251,7 +268,8 @@ describe('AddContentComponent', () => {
     // and only then attaches the file.
     component.onChange({ editor, event: {} as ChangeEvent['event'] });
     editor.fileAttachments = [{ fileHash: 'hashA', file: new File([], 'fileA.pdf') }];
-    const changeMessageSpy = spyOn(TestBed.inject(AddContentService), 'changeMessage');
+    const changeMessageSpy = TestBed.inject(AddContentService).changeMessage as jasmine.Spy;
+    changeMessageSpy.calls.reset();
     component.addContent('');
     expect(changeMessageSpy).toHaveBeenCalledTimes(1);
     const sent = changeMessageSpy.calls.mostRecent().args[0];
@@ -313,6 +331,19 @@ describe('AddContentComponent', () => {
     component['sendEditDelitionMessage']();
     expect(component.sendMessage).toHaveBeenCalledTimes(1);
     expect(component.notification.toDelete).toEqual(true);
+  });
+
+  it('should publish edit cleanup only once', () => {
+    component.dialogTitle = 'Modify data snippet';
+    component.originId = 'widget-1';
+    const changeMessageSpy = component['dataService'].changeMessage as jasmine.Spy;
+    changeMessageSpy.calls.reset();
+
+    component.sendEditDelitionMessage();
+    component.sendEditDelitionMessage();
+
+    expect(changeMessageSpy).toHaveBeenCalledOnceWith(component.notification, 'widget-1');
+    expect(component.notification.toDelete).toBe(true);
   });
 
   it('should not mark for deletion and send message', () => {
@@ -398,12 +429,83 @@ describe('AddContentComponent', () => {
 
 describe('AddContentComponent opened for editing', () => {
   beforeEach(waitForAsync(() =>
-    configureTestingModule({ snippet: { id: '123' }, content: '<p>message</p>' })));
+    configureTestingModule({
+      snippet: { id: '123' },
+      content: '<p>message</p>',
+      originId: 'widget-1',
+    })));
 
   it('should give the editor the message content', () => {
     const fixture = TestBed.createComponent(AddContentComponent);
     fixture.detectChanges();
 
     expect(getEditorStub(fixture).data()).toBe('<p>message</p>');
+  });
+});
+describe('AddContentComponent without a widget origin', () => {
+  const referenceEntry = {
+    ownerGroup: 'source-group',
+    accessGroups: ['source-access'],
+    isPrivate: false,
+  };
+
+  beforeEach(waitForAsync(() =>
+    configureTestingModule({
+      snippet: { id: 'standalone-entry' },
+      content: '<p>Original content</p>',
+      defaultTags: [],
+      config: {},
+      referenceEntry,
+    })));
+
+  it('should save directly without broadcasting to widgets', () => {
+    const fixture = TestBed.createComponent(AddContentComponent);
+    fixture.detectChanges();
+    const component = fixture.componentInstance;
+    const service = TestBed.inject(AddContentService);
+    const submitSpy = service.submitContent as jasmine.Spy;
+    const changeMessageSpy = service.changeMessage as jasmine.Spy;
+    submitSpy.calls.reset();
+
+    const message = {
+      id: 'standalone-entry',
+      textcontent: 'Updated content',
+      linkType: LinkType.PARAGRAPH,
+    };
+    component.sendMessage(message);
+
+    expect(submitSpy).toHaveBeenCalledOnceWith(message, referenceEntry);
+    expect(changeMessageSpy).not.toHaveBeenCalled();
+  });
+
+  it('should send the edit lock and release it only once', () => {
+    const fixture = TestBed.createComponent(AddContentComponent);
+    fixture.detectChanges();
+    const component = fixture.componentInstance;
+    const service = TestBed.inject(AddContentService);
+    const submitSpy = service.submitContent as jasmine.Spy;
+
+    expect(submitSpy).toHaveBeenCalledOnceWith(
+      jasmine.objectContaining({
+        id: 'standalone-entry',
+        snippetType: 'edit',
+        toDelete: false,
+      }),
+      referenceEntry,
+    );
+
+    submitSpy.calls.reset();
+    component.sendEditDelitionMessage();
+    component.sendEditDelitionMessage();
+
+    expect(submitSpy).toHaveBeenCalledOnceWith(
+      jasmine.objectContaining({
+        id: 'standalone-entry',
+        snippetType: 'edit',
+        toDelete: true,
+      }),
+      referenceEntry,
+    );
+    expect(service.changeMessage).not.toHaveBeenCalled();
   });
 });

@@ -135,9 +135,10 @@ export class LogbookItemComponent implements OnInit, AfterViewInit, OnDestroy {
   @Input()
   configIndex: number;
 
+  readonly originId = uuid();
+
   showLoadingCircle = true;
   viewOption = 'widgets';
-  message: ChangeStreamNotification;
   notifications: ChangeStreamNotification[] = [];
   array: ChangeStreamNotification[];
   key = 'defaultOrder';
@@ -270,6 +271,11 @@ export class LogbookItemComponent implements OnInit, AfterViewInit, OnDestroy {
       }),
     );
 
+    this.dataService?.unsubscribe();
+    this.dataService = this.data.handleMessages(this.originId, (message) =>
+      this.submitContent(message),
+    );
+
     this.updateViewSubscription();
 
     this.scrollToElement();
@@ -332,18 +338,6 @@ export class LogbookItemComponent implements OnInit, AfterViewInit, OnDestroy {
           }),
         );
       });
-
-      if (this.dataService == null) {
-        this.dataService = this.data.currentMessage.subscribe((message) => {
-          // console.log(message);
-          this.message = message;
-          if (message != null && Object.keys(this.message).length != 0) {
-            // console.log(this.message);
-            this.submitContent(message);
-            this.message = null;
-          }
-        });
-      }
     }
   }
 
@@ -559,23 +553,20 @@ export class LogbookItemComponent implements OnInit, AfterViewInit, OnDestroy {
   // }
 
   submitContent(msg: ChangeStreamNotification) {
-    // in the future, this should be extended to support inserting snippets below/above other snippets
-    // for now, I just take the last array entry
-    let referenceEntry: ChangeStreamNotification = {};
-    referenceEntry.ownerGroup = this.logbookInfo.logbookInfo.ownerGroup;
-    referenceEntry.accessGroups = this.logbookInfo.logbookInfo.accessGroups;
-    referenceEntry.isPrivate = this.logbookInfo.logbookInfo.isPrivate;
+    const referenceEntry: ChangeStreamNotification = {
+      ownerGroup: this.logbookInfo.logbookInfo.ownerGroup,
+      accessGroups: this.logbookInfo.logbookInfo.accessGroups,
+      isPrivate: this.logbookInfo.logbookInfo.isPrivate,
+    };
+
     if (msg.snippetType === 'edit') {
-      // POST -- EDIT SNIPPET
-      let payload: ChangeStreamNotification = this._prepareEditPostPayload(referenceEntry, msg);
+      const payload = this._prepareEditPostPayload(referenceEntry, msg);
       this.logbookItemDataService.uploadParagraph(payload);
-    } else if (typeof msg.id != 'undefined' && msg.id != '') {
-      // PATCH -- UPDATE SNIPPET
-      let payload = this._preparePatchPayload(referenceEntry, msg);
+    } else if (typeof msg.id !== 'undefined' && msg.id !== '') {
+      const payload = this._preparePatchPayload(referenceEntry, msg);
       this.logbookItemDataService.uploadParagraph(payload, msg.id);
     } else {
-      // POST -- NEW SNIPPET
-      let payload = this._preparePostPayload(referenceEntry, msg);
+      const payload = this._preparePostPayload(referenceEntry, msg);
       this.logbookItemDataService.uploadParagraph(payload);
     }
 
@@ -764,6 +755,7 @@ export class LogbookItemComponent implements OnInit, AfterViewInit, OnDestroy {
     dialogConfig.data = {
       defaultTags: this.childSnippets?.last?.snippet?.tags,
       config: this.config,
+      originId: this.originId,
     };
     const dialogRef = this.dialog.open(AddContentComponent, dialogConfig);
   }
@@ -972,6 +964,17 @@ export class LogbookItemComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   ngOnDestroy() {
+    this.dialog.openDialogs
+      .filter(
+        (dialogRef) =>
+          dialogRef.componentInstance instanceof AddContentComponent &&
+          dialogRef.componentInstance.originId === this.originId,
+      )
+      .forEach((dialogRef) => {
+        dialogRef.componentInstance.sendEditDelitionMessage();
+        dialogRef.close();
+      });
+
     if (this.currentViewSubscription != null) {
       this.currentViewSubscription.unsubscribe();
     }
