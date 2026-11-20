@@ -1,3 +1,11 @@
+# [4.3.0](https://github.com/paulscherrerinstitute/scilog/compare/v4.2.0...v4.3.0) (2026-11-20)
+
+
+### Features
+
+* **web:** show comments inside their entry ([#869](https://github.com/paulscherrerinstitute/scilog/issues/869)) ([528d9dd](https://github.com/paulscherrerinstitute/scilog/commit/528d9ddfb84a9541947955bfc36ad1e5af1a4e3b))
+* **web:** show the edited note next to the time ([#866](https://github.com/paulscherrerinstitute/scilog/issues/866)) ([5a7e69f](https://github.com/paulscherrerinstitute/scilog/commit/5a7e69fe2e49d345d323bc2313306f7ca7b66268)), closes [#222](https://github.com/paulscherrerinstitute/scilog/issues/222) [#873](https://github.com/paulscherrerinstitute/scilog/issues/873)
+
 # [4.2.0](https://github.com/paulscherrerinstitute/scilog/compare/v4.1.2...v4.2.0) (2026-11-19)
 
 
