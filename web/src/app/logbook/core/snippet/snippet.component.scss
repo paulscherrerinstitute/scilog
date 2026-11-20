@@ -47,6 +47,11 @@
   background-color: #ebebeb !important;
 }
 
+/* a narrow header breaks the line only between the time and the note */
+.no-wrap {
+  white-space: nowrap;
+}
+
 .mat-fab-top-right {
   margin-left: auto;
   opacity: 0.1;

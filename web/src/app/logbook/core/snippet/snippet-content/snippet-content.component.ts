@@ -36,7 +36,6 @@ export class SnippetContentComponent implements OnInit, AfterViewInit, AfterView
   files: string[] = [];
   contentWidth = null;
   _prismed = false;
-  _edited = '';
 
   @ViewChild('contentDiv') contentRef: ElementRef;
 
@@ -101,21 +100,6 @@ export class SnippetContentComponent implements OnInit, AfterViewInit, AfterView
     this.content = this.span.innerHTML;
   }
 
-  private setEdited(content: string) {
-    if (this.snippet?.updatedAt === this.snippet?.createdAt || !this.snippet?.id_session)
-      return content;
-    const emptyElement = parseInertHtml('');
-    const edited = document.createElement('span');
-    edited.classList.add('snippet-edited');
-    edited.innerHTML = '(edited)';
-    emptyElement.appendChild(edited);
-    if (content) {
-      edited.insertAdjacentHTML('beforebegin', content);
-      emptyElement.firstElementChild.classList.add('snippet-content-edited');
-    }
-    return emptyElement.innerHTML;
-  }
-
   private setImageUrl(img: HTMLImageElement, id: string) {
     const srcUrl = this._srcUrlFromImageId(id);
     img.src = srcUrl;
@@ -141,7 +125,7 @@ export class SnippetContentComponent implements OnInit, AfterViewInit, AfterView
 
   set content(value: string) {
     this._content = value;
-    this.html = this.htmlSanitizer.sanitize(this.setEdited(value ?? ''));
+    this.html = this.htmlSanitizer.sanitize(value ?? '');
     this.htmlContent.emit(this._content);
     this._prismed = false;
   }
