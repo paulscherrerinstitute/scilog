@@ -1,6 +1,7 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Subscription } from 'rxjs';
+import { ScicatAuthService } from '@shared/auth-services/scicat-auth.service';
 
 @Component({
   selector: 'app-auth-callback',
@@ -11,6 +12,7 @@ export class AuthCallbackComponent implements OnInit, OnDestroy {
   constructor(
     private route: ActivatedRoute,
     private router: Router,
+    private scicatAuth: ScicatAuthService,
   ) {}
 
   subscriptions: Subscription[] = [];
@@ -21,7 +23,7 @@ export class AuthCallbackComponent implements OnInit, OnDestroy {
       const returnUrl = params['returnUrl'];
 
       if (token) {
-        localStorage.setItem('scicat_token', token);
+        this.scicatAuth.setToken(token);
       }
 
       if (returnUrl) {

@@ -1,5 +1,6 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { AuthCallbackComponent } from './auth-callback.component';
+import { ScicatAuthService } from '@shared/auth-services/scicat-auth.service';
 import { provideRouter, Router } from '@angular/router';
 import { Component } from '@angular/core';
 
@@ -20,6 +21,12 @@ describe('AuthCallbackComponent', () => {
           { path: 'auth-callback', component: AuthCallbackComponent },
           { path: 'dashboard', component: DummyComponent },
         ]),
+        {
+          provide: ScicatAuthService,
+          useValue: {
+            setToken: (token: string) => localStorage.setItem('scicat_token', token),
+          },
+        },
       ],
     }).compileComponents();
 

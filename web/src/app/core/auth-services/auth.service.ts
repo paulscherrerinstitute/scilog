@@ -2,13 +2,17 @@ import { Injectable } from '@angular/core';
 import { shareReplay, timeout } from 'rxjs/operators';
 import { tap } from 'rxjs/operators';
 import { AuthDataService } from '@shared/remote-data.service';
+import { ScicatAuthService } from './scicat-auth.service';
 
 @Injectable({
   providedIn: 'root',
 })
 export class AuthService {
   forceReload = false;
-  constructor(private dataService: AuthDataService) {}
+  constructor(
+    private dataService: AuthDataService,
+    private scicatAuth: ScicatAuthService,
+  ) {}
 
   login(principal: string, password: string) {
     return this.dataService.login(principal, password).pipe(
@@ -29,7 +33,7 @@ export class AuthService {
   logout() {
     localStorage.removeItem('id_token');
     localStorage.removeItem('id_session');
-    localStorage.removeItem('scicat_token');
+    this.scicatAuth.markLoggedOut();
     sessionStorage.removeItem('scilog-auto-selection-logbook');
     this.forceReload = true;
   }
