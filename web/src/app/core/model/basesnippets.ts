@@ -31,4 +31,5 @@ export interface Basesnippets {
   linkType?: string;
   versionable?: boolean;
   deleted?: boolean;
+  importance?: number;
 }

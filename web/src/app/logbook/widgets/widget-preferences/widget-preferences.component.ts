@@ -24,6 +24,7 @@ import {
   MatChipRemove,
   MatChipInput,
 } from '@angular/material/chips';
+import { MatCheckbox } from '@angular/material/checkbox';
 import { COMMA, ENTER, SPACE } from '@angular/cdk/keycodes';
 import {
   MatDialogRef,
@@ -88,6 +89,7 @@ import { MatButton } from '@angular/material/button';
     MatChipInput,
     MatDialogActions,
     MatButton,
+    MatCheckbox,
     AsyncPipe,
   ],
 })
@@ -110,6 +112,8 @@ export class WidgetPreferencesComponent implements OnInit, AfterViewInit, OnDest
   snippetViewerControl = new UntypedFormControl();
   plotControl = new UntypedFormControl();
   additionalLogbooksCtrl = new UntypedFormControl();
+  importanceLevels = [1, 2, 3, 4, 5];
+  importance = new UntypedFormControl([]);
 
   visible = true;
   removable = true;
@@ -155,6 +159,7 @@ export class WidgetPreferencesComponent implements OnInit, AfterViewInit, OnDest
       ownerGroup: new UntypedFormControl(''),
       logbook: new UntypedFormControl(''),
       description: new UntypedFormControl({ value: '', disabled: true }),
+      importance: this.importance,
     });
     this.scicatWidgetEnabled =
       this.appConfigService.getScicatSettings()?.scicatWidgetEnabled || false;
@@ -169,6 +174,9 @@ export class WidgetPreferencesComponent implements OnInit, AfterViewInit, OnDest
         console.log(tag);
         this.tag.push({ name: tag });
       });
+    }
+    if (Array.isArray(this.data.filter.importance)) {
+      this.importance.setValue(this.data.filter.importance);
     }
     if (this.data.filter.excludeTags?.length > 0) {
       this.data.filter.excludeTags.forEach((tag: string) => {
@@ -249,6 +257,17 @@ export class WidgetPreferencesComponent implements OnInit, AfterViewInit, OnDest
   ngAfterViewInit() {
     // basic filter forms
     this.setupLogbookSelection();
+  }
+
+  onImportanceChange(level: number, checked: boolean) {
+    const current: number[] = this.importance.value || [];
+    if (checked) {
+      if (!current.includes(level)) {
+        this.importance.setValue([...current, level]);
+      }
+    } else {
+      this.importance.setValue(current.filter((v) => v !== level));
+    }
   }
 
   async getSnippetViewerOptions() {
@@ -491,6 +510,11 @@ export class WidgetPreferencesComponent implements OnInit, AfterViewInit, OnDest
     this.data.general.readonly = this.readOnlyLogbook.value;
     this.data.view.order = ['defaultOrder ' + this.booleanToOrderTag(this.descendingOrder.value)];
     console.log(this.data);
+    if (this.importance.value && this.importance.value.length > 0) {
+      this.data.filter.importance = this.importance.value;
+    } else {
+      delete this.data.filter.importance;
+    }
     this.dialogRef.close(this.data);
   }
 

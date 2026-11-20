@@ -162,6 +162,18 @@ export class Basesnippet extends Entity {
   tags?: string[];
 
   @property({
+    type: 'number',
+    jsonSchema: {
+      type: 'integer',
+      minimum: 1,
+      maximum: 5,
+    },
+    description: 'Importance level of snippet (1–5)',
+    index: true,
+  })
+  importance?: number;
+
+  @property({
     type: 'string',
     description: 'Human readable name of single snippet',
     index: true,
