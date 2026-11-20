@@ -113,7 +113,6 @@ export class SnippetComponent implements OnInit, AfterContentInit, AfterViewChec
   isSelected = false;
   highlightState = 'default';
   styleClass = 'snippet';
-  showHeader = true;
   isHighlighted = false;
   content: string;
   imageToShow: string | ArrayBuffer;
@@ -164,10 +163,6 @@ export class SnippetComponent implements OnInit, AfterContentInit, AfterViewChec
     if (this.snippet.linkType == LinkType.COMMENT) {
       this.styleClass = 'snippetComment';
       this.enableComments = false;
-    } else if (this.snippet.linkType == LinkType.QUOTE) {
-      this.styleClass = 'snippetQuote';
-      this.showEditButtonsMenu = false;
-      this.showHeader = false;
     }
     // console.log(this.snippet);
 
@@ -200,6 +195,11 @@ export class SnippetComponent implements OnInit, AfterContentInit, AfterViewChec
   // `id_session` only when it saves an edited entry, so check that too.
   get isEdited() {
     return this.snippet?.updatedAt !== this.snippet?.createdAt && !!this.snippet?.id_session;
+  }
+
+  // The entries this entry replies to, shown before its text.
+  get quotes() {
+    return this.snippet?.subsnippets?.filter((child) => child.linkType === LinkType.QUOTE) ?? [];
   }
 
   // An entry's children are quotes, comments and 'edit' locks. Keep every
