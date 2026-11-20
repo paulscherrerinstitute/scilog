@@ -29,66 +29,7 @@
           &ngsp;<span class="no-wrap">· edited</span>
         }
       </mat-card-subtitle>
-      @if (showEditButtonsMenu) {
-        <button
-          mat-icon-button
-          [matMenuTriggerFor]="menu"
-          aria-label="Entry actions"
-          class="mat-fab-top-right"
-        >
-          <mat-icon>more_vert</mat-icon>
-        </button>
-        <mat-menu #menu="matMenu">
-          @if (showInfoButton) {
-            <button mat-menu-item (click)="showInfo()">
-              <mat-icon>info</mat-icon>
-              <span>Info</span>
-            </button>
-          }
-          @if (showEditButtons) {
-            <button
-              mat-menu-item
-              (click)="editSnippet()"
-              [disabled]="!enableEdit.update"
-              matTooltip="{{ isActionAllowed.tooltips.update }}"
-            >
-              <mat-icon>edit</mat-icon>
-              <span>Edit</span>
-            </button>
-          }
-          <button
-            mat-menu-item
-            (click)="setDashboardName()"
-            [disabled]="!enableEdit.update"
-            matTooltip="{{ isActionAllowed.tooltips.update }}"
-          >
-            <mat-icon>assistant</mat-icon>
-            <span>Dashboard name</span>
-          </button>
-          @if (enableComments) {
-            <button mat-menu-item (click)="addComment()">
-              <mat-icon>note_add</mat-icon>
-              <span>Add comment</span>
-            </button>
-          }
-          <button mat-menu-item (click)="addCitation()">
-            <mat-icon>reply</mat-icon>
-            <span>Reply</span>
-          </button>
-          <!-- <button mat-menu-item disabled> -->
-          @if (showEditButtons) {
-            <button
-              mat-menu-item
-              (click)="deleteSnippet()"
-              [disabled]="!enableEdit.delete"
-              matTooltip="{{ isActionAllowed.tooltips.delete }}"
-            >
-              <mat-icon>delete</mat-icon>
-              <span>Delete</span>
-            </button>
-          }
-        </mat-menu>
-      }
+      <ng-container *ngTemplateOutlet="actions"></ng-container>
     </mat-card-header>
   }
 
@@ -132,3 +73,67 @@
     </mat-card-footer>
   }
 </mat-card>
+
+<!-- The menu of actions on this entry or comment -->
+<ng-template #actions>
+  @if (showEditButtonsMenu) {
+    <button
+      mat-icon-button
+      [matMenuTriggerFor]="menu"
+      aria-label="Entry actions"
+      class="mat-fab-top-right"
+    >
+      <mat-icon>more_vert</mat-icon>
+    </button>
+    <mat-menu #menu="matMenu">
+      @if (showInfoButton) {
+        <button mat-menu-item (click)="showInfo()">
+          <mat-icon>info</mat-icon>
+          <span>Info</span>
+        </button>
+      }
+      @if (showEditButtons) {
+        <button
+          mat-menu-item
+          (click)="editSnippet()"
+          [disabled]="!enableEdit.update"
+          matTooltip="{{ isActionAllowed.tooltips.update }}"
+        >
+          <mat-icon>edit</mat-icon>
+          <span>Edit</span>
+        </button>
+      }
+      <button
+        mat-menu-item
+        (click)="setDashboardName()"
+        [disabled]="!enableEdit.update"
+        matTooltip="{{ isActionAllowed.tooltips.update }}"
+      >
+        <mat-icon>assistant</mat-icon>
+        <span>Dashboard name</span>
+      </button>
+      @if (enableComments) {
+        <button mat-menu-item (click)="addComment()">
+          <mat-icon>note_add</mat-icon>
+          <span>Add comment</span>
+        </button>
+      }
+      <button mat-menu-item (click)="addCitation()">
+        <mat-icon>reply</mat-icon>
+        <span>Reply</span>
+      </button>
+      <!-- <button mat-menu-item disabled> -->
+      @if (showEditButtons) {
+        <button
+          mat-menu-item
+          (click)="deleteSnippet()"
+          [disabled]="!enableEdit.delete"
+          matTooltip="{{ isActionAllowed.tooltips.delete }}"
+        >
+          <mat-icon>delete</mat-icon>
+          <span>Delete</span>
+        </button>
+      }
+    </mat-menu>
+  }
+</ng-template>
