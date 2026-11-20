@@ -105,6 +105,11 @@ export class SnippetComponent implements OnInit, AfterContentInit, AfterViewChec
   @Input()
   linkType: LinkType = LinkType.PARAGRAPH;
 
+  // Set by the entry for its comments: a comment in its entry is a row,
+  // not a card. A comment on its own, such as in the search, is a card.
+  @Input()
+  inEntry = false;
+
   @Output()
   selected = new EventEmitter<ChangeStreamNotification>();
 

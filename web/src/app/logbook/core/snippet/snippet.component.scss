@@ -29,6 +29,21 @@
   /* float: left; */
 }
 
+/* A comment in its entry. For now it looks like the comment card it
+   replaces: an outlined box on yellow. */
+.comment {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  margin: 8px 0;
+  border: 1px solid var(--mdc-outlined-card-outline-color);
+  border-radius: var(--mdc-outlined-card-container-shape);
+  text-align: left;
+  /* the highlight animation writes a background color on every comment */
+  background-color: rgb(247, 242, 197) !important;
+}
+
+/* A comment on its own, such as in the search results */
 .snippetComment {
   margin: 8px 0;
   min-height: 100%;

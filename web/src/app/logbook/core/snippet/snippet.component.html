@@ -1,10 +1,51 @@
-<mat-card
-  appearance="outlined"
-  #snippetContainer
-  [ngClass]="styleClass"
-  (click)="selectSnippet($event)"
-  [@highlightSnippet]="highlightState"
->
+@if (inEntry) {
+  <!-- A comment, shown as a row in its entry -->
+  <article
+    class="comment"
+    #snippetContainer
+    (click)="selectSnippet($event)"
+    [@highlightSnippet]="highlightState"
+  >
+    <ng-container *ngTemplateOutlet="header"></ng-container>
+    <mat-card-content>
+      <ng-container *ngTemplateOutlet="body"></ng-container>
+    </mat-card-content>
+    <ng-container *ngTemplateOutlet="footer"></ng-container>
+  </article>
+} @else {
+  <mat-card
+    appearance="outlined"
+    #snippetContainer
+    [ngClass]="styleClass"
+    (click)="selectSnippet($event)"
+    [@highlightSnippet]="highlightState"
+  >
+    <ng-container *ngTemplateOutlet="header"></ng-container>
+    <mat-card-content>
+      <ng-container *ngTemplateOutlet="body"></ng-container>
+    </mat-card-content>
+    @if (comments.length) {
+      <!-- A click on a comment bubbles up to this card, so it selects the entry. -->
+      <section class="snippet-comments" aria-label="Comments">
+        @for (comment of comments; track comment.id; let i = $index) {
+          <app-snippet
+            [snippet]="comment"
+            [updatedAt]="comment.updatedAt"
+            [index]="i"
+            [config]="config"
+            [showEditButtonsMenu]="showEditButtonsMenu"
+            [subsnippets]="comment.subsnippets"
+            [inEntry]="true"
+          ></app-snippet>
+        }
+      </section>
+    }
+    <ng-container *ngTemplateOutlet="footer"></ng-container>
+  </mat-card>
+}
+
+<!-- The author, the time and the menu of this entry or comment -->
+<ng-template #header>
   @if (showHeader) {
     <mat-card-header>
       @if (isHighlighted) {
@@ -32,39 +73,26 @@
       <ng-container *ngTemplateOutlet="actions"></ng-container>
     </mat-card-header>
   }
+</ng-template>
 
-  <mat-card-content>
-    @for (quote of quotes; track quote.id) {
-      <blockquote class="quote">
-        <app-snippet-content [snippet]="quote"></app-snippet-content>
-      </blockquote>
-    }
-    <app-snippet-content
-      #snippetContent
-      [snippet]="snippet"
-      (htmlContent)="updateHtmlContent($event)"
-      (isLoading)="setElementLoading($event)"
-    >
-    </app-snippet-content>
-  </mat-card-content>
-  @if (comments.length) {
-    <!-- A click on a comment bubbles up to this card, so it selects the entry. -->
-    <div class="snippet-comments">
-      @for (comment of comments; track comment.id; let i = $index) {
-        <div>
-          <app-snippet
-            [snippet]="comment"
-            [updatedAt]="comment.updatedAt"
-            [index]="i"
-            [config]="config"
-            [hideMetadata]="hideMetadata"
-            [showEditButtonsMenu]="showEditButtonsMenu"
-            [subsnippets]="comment.subsnippets"
-          ></app-snippet>
-        </div>
-      }
-    </div>
+<!-- The quotes and the text of this entry or comment -->
+<ng-template #body>
+  @for (quote of quotes; track quote.id) {
+    <blockquote class="quote">
+      <app-snippet-content [snippet]="quote"></app-snippet-content>
+    </blockquote>
   }
+  <app-snippet-content
+    #snippetContent
+    [snippet]="snippet"
+    (htmlContent)="updateHtmlContent($event)"
+    (isLoading)="setElementLoading($event)"
+  >
+  </app-snippet-content>
+</ng-template>
+
+<!-- The tags of this entry or comment -->
+<ng-template #footer>
   @if (!_hideMetadata) {
     <mat-card-footer class="snippet-tags-container">
       @for (tag of snippet?.tags; track $index) {
@@ -72,7 +100,7 @@
       }
     </mat-card-footer>
   }
-</mat-card>
+</ng-template>
 
 <!-- The menu of actions on this entry or comment -->
 <ng-template #actions>
