@@ -21,6 +21,7 @@ describe('TasksService', () => {
     'getTasksData',
     'addTask',
     'patchTask',
+    'deleteTask',
   ]);
 
   beforeEach(() => {
@@ -35,5 +36,26 @@ describe('TasksService', () => {
 
   it('should be created', () => {
     expect(service).toBeTruthy();
+  });
+  it('should delete descendants before their parent', async () => {
+    taskDataServiceSpy.getTasksData.and.callFake((id: string) => {
+      if (id === 'parent') {
+        return Promise.resolve([{ id: 'child' }]);
+      }
+      if (id === 'child') {
+        return Promise.resolve([{ id: 'grandchild' }]);
+      }
+      return Promise.resolve([]);
+    });
+    taskDataServiceSpy.deleteTask.and.returnValue(Promise.resolve());
+    taskDataServiceSpy.deleteTask.calls.reset();
+
+    await service.deleteTask('parent');
+
+    expect(taskDataServiceSpy.deleteTask.calls.allArgs()).toEqual([
+      ['grandchild'],
+      ['child'],
+      ['parent'],
+    ]);
   });
 });
