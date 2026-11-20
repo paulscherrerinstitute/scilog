@@ -30,7 +30,7 @@
 }
 
 .snippetComment {
-  margin: 8px 8px 8px 32px;
+  margin: 8px 0;
   min-height: 100%;
   text-align: left;
   background-color: rgb(247, 242, 197) !important;
@@ -95,3 +95,7 @@
   padding: 10px 15px;
   color: #ffffff;
 } */
+
+.snippet-comments {
+  margin: 0 16px 8px;
+}

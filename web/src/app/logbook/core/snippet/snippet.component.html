@@ -119,17 +119,22 @@
       </span>
     </div>
   </mat-card-content>
+  @if (comments.length) {
+    <!-- A click on a comment bubbles up to this card, so it selects the entry. -->
+    <div class="snippet-comments">
+      @for (comment of comments; track comment.id; let i = $index) {
+        <div>
+          <app-snippet
+            [snippet]="comment"
+            [updatedAt]="comment.updatedAt"
+            [index]="i"
+            [config]="config"
+            [hideMetadata]="hideMetadata"
+            [showEditButtonsMenu]="showEditButtonsMenu"
+            [subsnippets]="comment.subsnippets"
+          ></app-snippet>
+        </div>
+      }
+    </div>
+  }
 </mat-card>
-
-<div *ngFor="let snippet of snippet?.subsnippets; let i = index">
-  <ng-container *ngIf="snippet.linkType !== 'quote' && snippet.snippetType === 'paragraph'">
-    <app-snippet
-      [snippet]="snippet"
-      [updatedAt]="snippet.updatedAt"
-      [index]="i"
-      [config]="config"
-      [hideMetadata]="hideMetadata"
-      [subsnippets]="snippet.subsnippets"
-    ></app-snippet>
-  </ng-container>
-</div>

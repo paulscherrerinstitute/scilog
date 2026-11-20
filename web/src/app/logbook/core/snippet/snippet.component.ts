@@ -202,6 +202,17 @@ export class SnippetComponent implements OnInit, AfterContentInit, AfterViewChec
     return this.snippet?.updatedAt !== this.snippet?.createdAt && !!this.snippet?.id_session;
   }
 
+  // An entry's children are quotes, comments and 'edit' locks. Keep every
+  // paragraph that isn't a quote, not only `LinkType.COMMENT`: the API
+  // stores a child without a `linkType` as `LinkType.PARAGRAPH`.
+  get comments() {
+    return (
+      this.snippet?.subsnippets?.filter(
+        (snippet) => snippet.linkType !== LinkType.QUOTE && snippet.snippetType === 'paragraph',
+      ) ?? []
+    );
+  }
+
   ngAfterContentInit() {
     this._subsnippets.subscribe(() => {
       this.setLocked();
