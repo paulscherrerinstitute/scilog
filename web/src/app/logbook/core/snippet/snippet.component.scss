@@ -36,15 +36,19 @@
   background-color: rgb(247, 242, 197) !important;
 }
 
-.snippetQuote {
-  /* the text below the quote brings its own top margin */
-  margin-top: 1em;
-  min-height: 100%;
-  text-align: left;
-  opacity: 0.9;
+/* An entry this entry replies to. It looks like the quote card it
+   replaces: an outlined box on gray, with a bar on each side. The
+   outline color and the corner radius are those of Material's
+   outlined card. */
+.quote {
+  margin: 1em 0 0;
+  padding: 16px;
+  border: 1px solid rgba(0, 0, 0, 0.12);
   border-left: 4px solid #86a7b1;
   border-right: 4px solid #86a7b1;
-  background-color: #ebebeb !important;
+  border-radius: 4px;
+  background-color: #ebebeb;
+  opacity: 0.9;
 }
 
 /* a narrow header breaks the line only between the time and the note */
