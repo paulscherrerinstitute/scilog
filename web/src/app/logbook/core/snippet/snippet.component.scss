@@ -86,12 +86,13 @@
   /* background-size: cover; */
 }
 
+/* The tags in the card's footer, with the spacing the card's content has.
+   flow-root keeps the floating tags inside the footer. */
 .snippet-tags-container {
+  display: flow-root;
+  padding: 0 16px 16px;
   font-size-adjust: 0.4;
-  text-align: right;
-  padding-right: 45px;
   opacity: 0.4;
-  display: inline;
 }
 
 .snippet-tag {
