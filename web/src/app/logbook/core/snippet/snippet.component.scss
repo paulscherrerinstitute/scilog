@@ -36,6 +36,20 @@
   background-color: rgb(247, 242, 197) !important;
 }
 
+/* An entry this entry replies to. It looks like the quote card it
+   replaces: an outlined box on gray, with a bar on each side. */
+.quote {
+  margin: 1em 0 0;
+  padding: 16px;
+  border: 1px solid var(--mdc-outlined-card-outline-color);
+  border-left: 4px solid #86a7b1;
+  border-right: 4px solid #86a7b1;
+  border-radius: var(--mdc-outlined-card-container-shape);
+  background-color: #ebebeb;
+  opacity: 0.9;
+}
+
+/* A quote shown on its own, such as in the search results */
 .snippetQuote {
   /* the text below the quote brings its own top margin */
   margin-top: 1em;

@@ -93,19 +93,11 @@
   }
 
   <mat-card-content>
-    <div *ngFor="let snippet of snippet?.subsnippets; let i = index">
-      <ng-container *ngIf="snippet?.linkType === 'quote'">
-        <app-snippet
-          [snippet]="snippet"
-          [updatedAt]="snippet?.updatedAt"
-          [index]="i"
-          [hideMetadata]="hideMetadata"
-        ></app-snippet>
-      </ng-container>
-    </div>
-    <!-- <div *ngIf="snippet.quote">
-      <snippet [snippet]="snippet.quote" [updatedAt]="snippet.quote?.updatedAt" [index]="index" [linkType]="'QUOTE'" [showEditButtonsMenu]="false"></snippet>
-    </div> -->
+    @for (quote of quotes; track quote.id) {
+      <blockquote class="quote">
+        <app-snippet-content [snippet]="quote"></app-snippet-content>
+      </blockquote>
+    }
     <app-snippet-content
       #snippetContent
       [snippet]="snippet"
