@@ -35,7 +35,7 @@ import {
   MatCardHeader,
   MatCardSubtitle,
 } from '@angular/material/card';
-import { NgClass, DatePipe } from '@angular/common';
+import { NgClass, NgTemplateOutlet, DatePipe } from '@angular/common';
 import { MatIcon } from '@angular/material/icon';
 import { NgxJdenticonModule } from 'ngx-jdenticon';
 import { MatTooltip } from '@angular/material/tooltip';
@@ -58,6 +58,7 @@ import { MatMenuTrigger, MatMenu, MatMenuItem } from '@angular/material/menu';
   imports: [
     MatCard,
     NgClass,
+    NgTemplateOutlet,
     MatIcon,
     NgxJdenticonModule,
     MatTooltip,
