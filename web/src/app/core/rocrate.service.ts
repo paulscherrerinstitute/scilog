@@ -2,6 +2,7 @@ import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { map, Observable } from 'rxjs';
 import { ServerSettingsService } from './config/server-settings.service';
+import { ScicatAuthService } from './auth-services/scicat-auth.service';
 
 // The scicat-rocrate service's response is of the form
 //  { "data/": "20.500.11935/PID" }.
@@ -14,6 +15,7 @@ export class RocrateService {
   constructor(
     private httpClient: HttpClient,
     private serverSettings: ServerSettingsService,
+    private scicatAuth: ScicatAuthService,
   ) {}
 
   // POST a logbook RO-Crate zip to the scicat-rocrate service, which creates a SciCat
@@ -21,7 +23,7 @@ export class RocrateService {
   importRoCrate(zip: Blob, ownerGroup: string): Observable<string> {
     const headers = new HttpHeaders({
       accept: 'application/json',
-      'api-key': localStorage.getItem('scicat_token') ?? '',
+      'api-key': this.scicatAuth.token ?? '',
       ownerGroup: ownerGroup,
       'Content-Type': 'application/zip',
     });

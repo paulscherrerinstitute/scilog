@@ -2,7 +2,10 @@
   <p>Hello, {{ scicatUser.profile.displayName || scicatUser.profile.username }}!</p>
 </div>
 <ng-template #unauthenticated>
-  <p>Not authenticated with SciCat, showing only public datasets:</p>
+  <p>Not connected to SciCat, showing only public datasets.</p>
+  <button mat-stroked-button class="connect-scicat" (click)="scicatAuth.connect()">
+    <mat-icon>link</mat-icon> Connect SciCat
+  </button>
 </ng-template>
 <div>
   <mat-form-field

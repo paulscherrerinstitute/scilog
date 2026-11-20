@@ -3,6 +3,8 @@ import { ScicatViewerComponent } from './scicat-viewer.component';
 import { Dataset, ScicatService, ScicatUser } from '@shared/scicat.service';
 import { of } from 'rxjs';
 import { LogbookInfoService } from '@shared/logbook-info.service';
+import { ScicatAuthService } from '@shared/auth-services/scicat-auth.service';
+import { signal } from '@angular/core';
 import { Logbooks } from '@model/logbooks';
 
 describe('ScicatViewerComponent', () => {
@@ -39,6 +41,10 @@ describe('ScicatViewerComponent', () => {
         {
           provide: LogbookInfoService,
           useValue: logbookInfoServiceSpy,
+        },
+        {
+          provide: ScicatAuthService,
+          useValue: { loggedIn: signal(false), connect: () => {}, markLoggedOut: () => {} },
         },
       ],
     }).compileComponents();
