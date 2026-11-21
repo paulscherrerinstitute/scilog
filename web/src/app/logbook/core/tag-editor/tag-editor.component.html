@@ -16,12 +16,15 @@
     <mat-chip-grid #chipList aria-label="Tag selection">
       <mat-chip-row
         *ngFor="let tagItem of tag"
-        [removable]="removable"
+        [editable]="true"
+        (edited)="edit(tagItem, $event)"
         (removed)="remove(tagItem)"
-        class="tag"
+        matTooltip="Double-click to edit tag"
       >
         {{ tagItem.name }}
-        <mat-icon matChipRemove *ngIf="removable">cancel</mat-icon>
+        <button matChipRemove>
+          <mat-icon>cancel</mat-icon>
+        </button>
       </mat-chip-row>
       <input
         matInput

@@ -203,6 +203,7 @@ export class AddContentComponent implements OnInit, OnDestroy {
       linkType: LinkType.PARAGRAPH,
       textcontent: content.textcontent,
       files: content.files,
+      tags: [...this.tag],
     };
     notification.id = this.notification.id;
     this.sendMessage(notification);

@@ -10,6 +10,7 @@ import {
   OnChanges,
 } from '@angular/core';
 import {
+  MatChipEditedEvent,
   MatChipInputEvent,
   MatChipGrid,
   MatChipRow,
@@ -147,6 +148,17 @@ export class TagEditorComponent implements OnInit, OnChanges {
     if (input) {
       input.value = '';
     }
+    this.tagsUpdate.emit(this.tagsToStrings(this.tag));
+  }
+  edit(tagItem: Tags, event: MatChipEditedEvent): void {
+    const name = event.value.trim();
+
+    if (!name) {
+      this.remove(tagItem);
+      return;
+    }
+
+    tagItem.name = name;
     this.tagsUpdate.emit(this.tagsToStrings(this.tag));
   }
 
