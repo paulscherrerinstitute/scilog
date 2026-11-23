@@ -18,6 +18,14 @@ body {
   max-width: 100%;
   height: auto;
 }
+/* Material removes the bottom margin of the last element in each card
+   content section. The entry text sits deeper, inside its own component,
+   so Material's rule doesn't reach it. Do the same for it, but only when
+   the text ends the card, so it keeps its 16px gap to tags or comments
+   below it. */
+mat-card-content:last-child > app-snippet-content > .snippet-content > :last-child {
+  margin-bottom: 0;
+}
 @import 'styles/colors';
 @import 'styles/animations';
 @import 'styles/theme';
