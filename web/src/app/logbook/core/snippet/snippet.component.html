@@ -20,10 +20,8 @@
       @if (config?.view?.showSnippetHeader && indexOrdered) {
         #{{ indexOrdered }} ·
       }
-      {{ snippet.createdBy }}
-    </mat-card-subtitle>
-    <mat-card-subtitle>
-      <span class="no-wrap">{{ snippet.createdAt | date: 'medium' }}</span>
+      <span class="no-wrap">{{ snippet.createdBy }}</span>
+      &ngsp;<span class="no-wrap">· {{ snippet.createdAt | date: 'medium' }}</span>
       @if (isEdited) {
         &ngsp;<span class="no-wrap">· edited</span>
       }
