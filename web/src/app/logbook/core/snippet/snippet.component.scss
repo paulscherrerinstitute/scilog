@@ -1,3 +1,5 @@
+@use '@angular/material' as mat;
+
 .snippet {
   margin: 8px;
   min-height: 100%;
@@ -51,9 +53,24 @@
   opacity: 0.9;
 }
 
-/* a narrow header breaks the line only between the time and the note */
+/* a narrow header breaks the line only between the author, the time
+   and the note */
 .no-wrap {
   white-space: nowrap;
+}
+
+/* The menu button sets the header's height. Center the shorter
+   author line next to it. */
+mat-card-header {
+  align-items: center;
+}
+
+/* With a mouse, the menu button is 32px instead of 48px. Touch screens
+   keep the 48px tap area. */
+@media (pointer: fine) {
+  mat-card-header {
+    @include mat.icon-button-density(-4);
+  }
 }
 
 .mat-fab-top-right {
