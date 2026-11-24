@@ -103,12 +103,14 @@
       (isLoading)="setElementLoading($event)"
     >
     </app-snippet-content>
-    <div class="snippet-tags-container" *ngIf="!_hideMetadata">
-      <span class="snippet-tag" *ngFor="let tag of snippet?.tags">
-        {{ tag }}
-      </span>
-    </div>
   </mat-card-content>
+  @if (!_hideMetadata && snippet?.tags?.length) {
+    <mat-card-content class="snippet-tags-container">
+      @for (tag of snippet.tags; track $index) {
+        <span class="snippet-tag">{{ tag }}</span>
+      }
+    </mat-card-content>
+  }
   @if (comments.length) {
     <!-- A click on a comment bubbles up to this card, so it selects the entry. -->
     <div class="snippet-comments">
