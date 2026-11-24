@@ -1,3 +1,11 @@
+## [4.4.1](https://github.com/paulscherrerinstitute/scilog/compare/v4.4.0...v4.4.1) (2026-11-24)
+
+
+### Bug Fixes
+
+* **web:** remove the extra space below the entry text ([#943](https://github.com/paulscherrerinstitute/scilog/issues/943)) ([359d4ea](https://github.com/paulscherrerinstitute/scilog/commit/359d4ea451938bb5a05981d5bdfb9e804255c95c))
+* **web:** remove the extra space inside a quote ([#944](https://github.com/paulscherrerinstitute/scilog/issues/944)) ([ef4a818](https://github.com/paulscherrerinstitute/scilog/commit/ef4a81870b48af1d4bb783e0bca427618ee7d00e))
+
 # [4.4.0](https://github.com/paulscherrerinstitute/scilog/compare/v4.3.0...v4.4.0) (2026-11-24)
 
 
