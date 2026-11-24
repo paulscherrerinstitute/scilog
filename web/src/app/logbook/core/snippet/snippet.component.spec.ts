@@ -253,7 +253,7 @@ describe('SnippetComponent', () => {
       component.snippetIsAccessedByAnotherUser = true;
       fixture.detectChanges();
       expect(subtitle()).toContain('alice@psi.ch is editing');
-      expect(subtitle()).not.toContain('· edited');
+      expect(subtitle()).not.toContain('edited');
     });
   });
 
