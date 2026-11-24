@@ -1,3 +1,10 @@
+# [4.4.0](https://github.com/paulscherrerinstitute/scilog/compare/v4.3.0...v4.4.0) (2026-11-24)
+
+
+### Features
+
+* **web:** show the author and the time on one line ([#942](https://github.com/paulscherrerinstitute/scilog/issues/942)) ([29c6759](https://github.com/paulscherrerinstitute/scilog/commit/29c6759c19eb1d79cec12177dc850c3cd0809b7e))
+
 # [4.3.0](https://github.com/paulscherrerinstitute/scilog/compare/v4.2.0...v4.3.0) (2026-11-20)
 
 
