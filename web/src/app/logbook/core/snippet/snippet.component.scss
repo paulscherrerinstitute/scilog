@@ -1,5 +1,17 @@
 @use '@angular/material' as mat;
 
+/* Subtitles hold the author and the time. Material's grey (black at
+   0.54) is raised to 0.6 to reach WCAG 4.5:1 on chat messages. Card
+   tokens are CSS variables, so this reaches every card inside an
+   entry, including comments. */
+:host {
+  @include mat.card-overrides(
+    (
+      subtitle-text-color: rgba(0, 0, 0, 0.6),
+    )
+  );
+}
+
 .snippet {
   margin: 8px;
   min-height: 100%;
@@ -9,12 +21,11 @@
 }
 
 .messages {
-  background-color: rgb(39, 117, 163) !important;
+  background-color: rgb(179, 201, 208) !important;
   margin: 8px 8px 8px 32px;
   min-height: 100%;
   text-align: left;
   border-radius: 10px;
-  border-color: rgb(39, 117, 163);
   color: var(--default-text-color);
   /* width: fit-content; */
   /* float:right; */
@@ -35,7 +46,7 @@
   margin: 8px 0;
   min-height: 100%;
   text-align: left;
-  background-color: rgb(247, 242, 197) !important;
+  background-color: rgb(251, 249, 226) !important;
 }
 
 /* The entry a reply quotes. Outline color and radius are those of
@@ -72,13 +83,15 @@ mat-card-header {
   }
 }
 
+/* The menu button uses the same color as the subtitle beside it */
 .mat-fab-top-right {
   margin-left: auto;
-  opacity: 0.1;
-}
 
-.mat-fab-top-right:hover {
-  opacity: 1;
+  @include mat.icon-button-overrides(
+    (
+      icon-color: rgba(0, 0, 0, 0.6),
+    )
+  );
 }
 
 .imageSnippet {
