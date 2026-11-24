@@ -1,3 +1,10 @@
+## [4.4.2](https://github.com/paulscherrerinstitute/scilog/compare/v4.4.1...v4.4.2) (2026-11-24)
+
+
+### Bug Fixes
+
+* **web:** make chat messages and comments readable ([#870](https://github.com/paulscherrerinstitute/scilog/issues/870)) ([5d768d8](https://github.com/paulscherrerinstitute/scilog/commit/5d768d8a3c3245252a1d33c3d3a3d56e5837ee14))
+
 ## [4.4.1](https://github.com/paulscherrerinstitute/scilog/compare/v4.4.0...v4.4.1) (2026-11-24)
 
 
