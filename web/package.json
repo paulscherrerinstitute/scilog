@@ -33,7 +33,7 @@
     "chart.js": "4.5.1",
     "ckeditor5": "48.5.2",
     "dompurify": "3.4.17",
-    "ng2-charts": "4.1.1",
+    "ng2-charts": "11.0.0",
     "ngx-cookie-service": "19.1.2",
     "ngx-ui-scroll": "3.2.2",
     "prismjs": "1.30.0",
