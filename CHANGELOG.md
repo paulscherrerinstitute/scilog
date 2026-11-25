@@ -1,3 +1,10 @@
+## [4.4.3](https://github.com/paulscherrerinstitute/scilog/compare/v4.4.2...v4.4.3) (2026-11-25)
+
+
+### Bug Fixes
+
+* **web:** replace the identicons with Material icons ([#871](https://github.com/paulscherrerinstitute/scilog/issues/871)) ([4df8f49](https://github.com/paulscherrerinstitute/scilog/commit/4df8f49037f3e734f6055cab100cc6ff12ea7334))
+
 ## [4.4.2](https://github.com/paulscherrerinstitute/scilog/compare/v4.4.1...v4.4.2) (2026-11-24)
 
 
