@@ -3,6 +3,8 @@ import { ScicatViewerComponent } from './scicat-viewer.component';
 import { Dataset, ScicatService, ScicatUser } from '@shared/scicat.service';
 import { of } from 'rxjs';
 import { LogbookInfoService } from '@shared/logbook-info.service';
+import { ScicatAuthService } from '@shared/auth-services/scicat-auth.service';
+import { signal, WritableSignal } from '@angular/core';
 import { Logbooks } from '@model/logbooks';
 
 describe('ScicatViewerComponent', () => {
@@ -10,8 +12,10 @@ describe('ScicatViewerComponent', () => {
   let fixture: ComponentFixture<ScicatViewerComponent>;
   let scicatServiceSpy: jasmine.SpyObj<ScicatService>;
   let logbookInfoServiceSpy: jasmine.SpyObj<LogbookInfoService>;
+  let loggedIn: WritableSignal<boolean>;
 
   beforeEach(async () => {
+    loggedIn = signal(false);
     scicatServiceSpy = jasmine.createSpyObj('ScicatService', [
       'getMyself',
       'getDatasetsSummary',
@@ -39,6 +43,10 @@ describe('ScicatViewerComponent', () => {
         {
           provide: LogbookInfoService,
           useValue: logbookInfoServiceSpy,
+        },
+        {
+          provide: ScicatAuthService,
+          useValue: { loggedIn, connect: () => {}, markLoggedOut: () => {} },
         },
       ],
     }).compileComponents();
@@ -182,6 +190,7 @@ describe('ScicatViewerComponent', () => {
     });
 
     it('returns true when the user access groups include the dataset owner group', () => {
+      loggedIn.set(true);
       scicatServiceSpy.getMyself.and.returnValue(
         of({ profile: { accessGroups: ['group2', 'group1'] } } as ScicatUser),
       );
@@ -191,7 +200,20 @@ describe('ScicatViewerComponent', () => {
       expect(component.hasWriteAccess(dataset)).toBeTrue();
     });
 
+    it('returns false after being logged out of SciCat, even with a stale user', () => {
+      loggedIn.set(true);
+      scicatServiceSpy.getMyself.and.returnValue(
+        of({ profile: { accessGroups: ['group1'] } } as ScicatUser),
+      );
+      component.ngOnInit();
+
+      loggedIn.set(false);
+
+      expect(component.hasWriteAccess(dataset)).toBeFalse();
+    });
+
     it('returns false when the user access groups do not include the dataset owner group', () => {
+      loggedIn.set(true);
       scicatServiceSpy.getMyself.and.returnValue(
         of({ profile: { accessGroups: ['group2'] } } as ScicatUser),
       );

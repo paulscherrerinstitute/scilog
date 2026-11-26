@@ -11,17 +11,19 @@ import {
 import { Observable } from 'rxjs';
 import { tap } from 'rxjs/operators';
 import { ServerSettingsService } from '@shared/config/server-settings.service';
+import { ScicatAuthService } from './scicat-auth.service';
 import { isAuthPage, loginUrl } from './return-url';
 
 @Injectable()
 export class AuthInterceptor implements HttpInterceptor {
   private serverSettingsService = inject(ServerSettingsService);
+  private scicatAuth = inject(ScicatAuthService);
   private location = inject(DOCUMENT).location;
 
   private logout() {
     localStorage.removeItem('id_token');
     localStorage.removeItem('id_session');
-    localStorage.removeItem('scicat_token');
+    this.scicatAuth.markLoggedOut();
     sessionStorage.removeItem('scilog-auto-selection-logbook');
     // a wrong password on the login page also answers 401; stay there so the
     // message and the return address are kept. Also stay on the SciCat
@@ -53,9 +55,15 @@ export class AuthInterceptor implements HttpInterceptor {
           if (err instanceof HttpErrorResponse) {
             console.log('err.status', err);
             if (err.status === 401) {
-              if (this.isSameOrigin(err.url, this.serverSettingsService.getSciCatServerAddress())) {
-                const returnUrl = this.location.pathname + this.location.search;
-                this.location.href = this.serverSettingsService.getScicatLoginUrl(returnUrl);
+              if (
+                this.isSameOrigin(err.url, this.serverSettingsService.getSciCatServerAddress()) ||
+                this.isSameOrigin(err.url, this.serverSettingsService.getScicatRocrateBaseUrl())
+              ) {
+                // SciCat rejected our token, directly or via the rocrate service
+                // (which authenticates with the same token). Drop the SciCat
+                // session so features offer to reconnect; the user signs in again
+                // when they choose, without interrupting their SciLog work.
+                this.scicatAuth.markLoggedOut();
               } else if (
                 this.isSameOrigin(err.url, this.serverSettingsService.getServerAddress())
               ) {
@@ -73,7 +81,7 @@ export class AuthInterceptor implements HttpInterceptor {
     // Check if request is to scicat or scilog backend and include their respective tokens.
     // Requests to any other origin (e.g. scicat-rocrate service) should include neither token.
     if (this.isSameOrigin(req.url, this.serverSettingsService.getSciCatServerAddress())) {
-      idToken = localStorage.getItem('scicat_token');
+      idToken = this.scicatAuth.token;
     } else if (this.isSameOrigin(req.url, this.serverSettingsService.getServerAddress())) {
       idToken = localStorage.getItem('id_token');
     }

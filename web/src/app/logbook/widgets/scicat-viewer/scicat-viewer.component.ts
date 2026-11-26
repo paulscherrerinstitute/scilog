@@ -13,6 +13,7 @@ import { MatAnchor, MatButton } from '@angular/material/button';
 import { MatIcon } from '@angular/material/icon';
 import { MatProgressSpinner } from '@angular/material/progress-spinner';
 import { LogbookInfoService } from '@shared/logbook-info.service';
+import { ScicatAuthService } from '@shared/auth-services/scicat-auth.service';
 import { switchMap } from 'rxjs/operators';
 import { MatTooltip } from '@angular/material/tooltip';
 import { MatCheckboxModule } from '@angular/material/checkbox';
@@ -45,6 +46,7 @@ export class ScicatViewerComponent implements OnInit {
     private scicatService: ScicatService,
     private logbookInfoService: LogbookInfoService,
     private snackbarService: SnackbarService,
+    protected scicatAuth: ScicatAuthService,
   ) {}
 
   scicatUser: ScicatUser | null = null;
@@ -140,7 +142,7 @@ export class ScicatViewerComponent implements OnInit {
   }
 
   hasWriteAccess(dataset: Dataset): boolean {
-    if (!this.scicatUser) return false;
+    if (!this.scicatAuth.loggedIn() || !this.scicatUser) return false;
     return this.scicatUser.profile.accessGroups.includes(dataset.ownerGroup);
   }
 

@@ -2,25 +2,23 @@ import { TestBed } from '@angular/core/testing';
 
 import { AuthInterceptor } from './auth.interceptor';
 import { ServerSettingsService } from '@shared/config/server-settings.service';
+import { ScicatAuthService } from './scicat-auth.service';
 import { HttpErrorResponse, HttpEvent, HttpHandler, HttpRequest } from '@angular/common/http';
 import { DOCUMENT } from '@angular/common';
 import { of, throwError } from 'rxjs';
 
 describe('AuthInterceptor', () => {
-  const SCICAT_LOGIN_URL =
-    'https://scicat-backend.psi.ch/api/v3/auth/oidc?client=scilog&returnUrl=/foo';
-
   let serverSettingsService: jasmine.SpyObj<ServerSettingsService>;
 
   beforeEach(() => {
     serverSettingsService = jasmine.createSpyObj<ServerSettingsService>('ServerSettingsService', [
       'getServerAddress',
       'getSciCatServerAddress',
-      'getScicatLoginUrl',
+      'getScicatRocrateBaseUrl',
     ]);
     serverSettingsService.getServerAddress.and.returnValue('https://scilog-backend.psi.ch/api/v1/');
     serverSettingsService.getSciCatServerAddress.and.returnValue('https://scicat-backend.psi.ch');
-    serverSettingsService.getScicatLoginUrl.and.returnValue(SCICAT_LOGIN_URL);
+    serverSettingsService.getScicatRocrateBaseUrl.and.returnValue('https://scicat-rocrate.psi.ch');
 
     TestBed.configureTestingModule({
       providers: [
@@ -138,18 +136,36 @@ describe('AuthInterceptor', () => {
     return next;
   }
 
-  it('redirects to the SciCat login on a 401 from the SciCat backend', () => {
+  it('clears the SciCat session and stays put on a 401 from the SciCat backend', () => {
+    localStorage.setItem('scicat_token', 'test_scicat_token');
     const location = { pathname: '/logbooks/1/dashboard', search: '?x=1', hash: '', href: '' };
     TestBed.overrideProvider(DOCUMENT, { useValue: { location } });
+    const scicatAuth = TestBed.inject(ScicatAuthService);
     const interceptor = TestBed.inject(AuthInterceptor);
     const url = 'https://scicat-backend.psi.ch/api/v3/datasets';
     interceptor
       .intercept(new HttpRequest('GET', url), handlerReturning401(url))
       .subscribe({ error: () => undefined });
-    expect(serverSettingsService.getScicatLoginUrl).toHaveBeenCalledOnceWith(
-      '/logbooks/1/dashboard?x=1',
-    );
-    expect(location.href).toEqual(SCICAT_LOGIN_URL);
+    expect(scicatAuth.loggedIn()).toBeFalse();
+    expect(localStorage.getItem('scicat_token')).toBeNull();
+    // the user is not redirected; they reconnect to SciCat when they choose to
+    expect(location.href).toEqual('');
+  });
+
+  it('clears the SciCat session on a 401 from the scicat-rocrate service', () => {
+    localStorage.setItem('scicat_token', 'test_scicat_token');
+    const location = { pathname: '/logbooks/1/dashboard', search: '', hash: '', href: '' };
+    TestBed.overrideProvider(DOCUMENT, { useValue: { location } });
+    const scicatAuth = TestBed.inject(ScicatAuthService);
+    const interceptor = TestBed.inject(AuthInterceptor);
+    const url = 'https://scicat-rocrate.psi.ch/api/v1/ro-crate/import';
+    interceptor
+      .intercept(new HttpRequest('POST', url, null), handlerReturning401(url))
+      .subscribe({ error: () => undefined });
+    expect(scicatAuth.loggedIn()).toBeFalse();
+    expect(localStorage.getItem('scicat_token')).toBeNull();
+    // the user is not redirected; they reconnect to SciCat when they choose to
+    expect(location.href).toEqual('');
   });
 
   it('neither logs out nor redirects on a 401 from another origin', () => {

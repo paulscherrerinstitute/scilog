@@ -11,6 +11,7 @@ import { ScicatService } from '@shared/scicat.service';
 import { RocrateService } from '@shared/rocrate.service';
 import { SnackbarService } from '@shared/snackbar.service';
 import { LogbookInfoService } from '@shared/logbook-info.service';
+import { ScicatAuthService } from '@shared/auth-services/scicat-auth.service';
 
 @Component({
   selector: 'app-scicat-export',
@@ -45,10 +46,13 @@ export class ScicatExportComponent implements OnInit {
     private rocrateService: RocrateService,
     private snackBar: SnackbarService,
     private logbookInfoService: LogbookInfoService,
+    protected scicatAuth: ScicatAuthService,
   ) {}
 
   async ngOnInit(): Promise<void> {
-    await this.loadAccessGroups();
+    if (this.scicatAuth.loggedIn()) {
+      await this.loadAccessGroups();
+    }
   }
 
   private async loadAccessGroups(): Promise<void> {

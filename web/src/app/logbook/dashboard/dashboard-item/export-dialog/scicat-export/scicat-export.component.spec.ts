@@ -8,6 +8,8 @@ import { ScicatService } from '@shared/scicat.service';
 import { RocrateService } from '@shared/rocrate.service';
 import { SnackbarService } from '@shared/snackbar.service';
 import { LogbookInfoService } from '@shared/logbook-info.service';
+import { ScicatAuthService } from '@shared/auth-services/scicat-auth.service';
+import { signal } from '@angular/core';
 import { of } from 'rxjs';
 
 describe('ScicatExportComponent', () => {
@@ -48,6 +50,10 @@ describe('ScicatExportComponent', () => {
         { provide: RocrateService, useValue: rocrateServiceSpy },
         { provide: SnackbarService, useValue: snackBarSpy },
         { provide: LogbookInfoService, useValue: logbookInfoService },
+        {
+          provide: ScicatAuthService,
+          useValue: { loggedIn: signal(true), connect: () => {}, markLoggedOut: () => {} },
+        },
       ],
     }).compileComponents();
   }));
