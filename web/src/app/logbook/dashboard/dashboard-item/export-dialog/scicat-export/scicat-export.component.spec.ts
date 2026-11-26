@@ -111,6 +111,7 @@ describe('ScicatExportComponent', () => {
       component.maxLinkedDatasets,
     );
     expect(component.linkedDatasetPids).toEqual(['pid/ds1', 'pid/ds2']);
+    expect(component.linkedDatasetsLimitReached).toBeFalse();
 
     component.ownerGroup = 'psi-demo';
     await component.submit();
@@ -119,6 +120,17 @@ describe('ScicatExportComponent', () => {
       'pid/ds2',
     ]);
     expect(component.createdPid).toBe('20.500.11935/pid');
+  });
+
+  it('should note the limit when maxLinkedDatasets were loaded', async () => {
+    const datasets = Array.from({ length: component.maxLinkedDatasets }, (_, i) => ({
+      pid: `pid/ds${i}`,
+      datasetName: `ds${i}`,
+      creationTime: '2026-01-01',
+    }));
+    scicatServiceSpy.getUserLinkedDatasetsSummary.and.returnValue(of(datasets));
+    await component.ngOnInit();
+    expect(component.linkedDatasetsLimitReached).toBeTrue();
   });
 
   it('should block the export when the linked datasets cannot be loaded', async () => {

@@ -64,6 +64,10 @@ export class ScicatExportComponent implements OnInit {
     );
   }
 
+  get linkedDatasetsLimitReached(): boolean {
+    return this.linkedDatasetPids.length >= this.maxLinkedDatasets;
+  }
+
   private async loadLinkedDatasets(): Promise<void> {
     this.loadingLinkedDatasets = true;
     this.linkedDatasetsError = false;
