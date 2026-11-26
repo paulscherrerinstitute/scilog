@@ -77,10 +77,13 @@ export class ScicatService {
     );
   }
 
-  getUserLinkedDatasetsSummary(logbookId: string): Observable<DatasetSummary[]> {
+  getUserLinkedDatasetsSummary(logbookId: string, limit?: number): Observable<DatasetSummary[]> {
     const filter = JSON.stringify({
-      where: { 'relationships.relationship': 'Logbook', 'relationships.externalId': logbookId },
+      where: {
+        relationships: { $elemMatch: { relationship: 'Logbook', externalId: logbookId } },
+      },
       fields: ['pid', 'datasetName', 'creationTime'],
+      ...(limit ? { limits: { limit, order: 'creationTime:desc' } } : {}),
     });
     return this.datasetsService.datasetsControllerFindAllV3(filter);
   }

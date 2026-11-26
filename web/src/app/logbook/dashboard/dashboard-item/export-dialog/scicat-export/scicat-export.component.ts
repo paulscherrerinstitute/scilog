@@ -5,7 +5,7 @@ import { MatAnchor, MatButton } from '@angular/material/button';
 import { MatFormField, MatLabel } from '@angular/material/form-field';
 import { MatSelect, MatOption } from '@angular/material/select';
 import { MatIcon } from '@angular/material/icon';
-import { firstValueFrom } from 'rxjs';
+import { firstValueFrom, map } from 'rxjs';
 import { LogbookItemDataService } from '@shared/remote-data.service';
 import { ScicatService } from '@shared/scicat.service';
 import { RocrateService } from '@shared/rocrate.service';
@@ -34,6 +34,10 @@ export class ScicatExportComponent implements OnInit {
   loadingGroups = false;
   accessGroups: string[] = [];
   ownerGroup: string | null = null;
+  readonly maxLinkedDatasets = 100;
+  loadingLinkedDatasets = false;
+  linkedDatasetPids: string[] = [];
+  linkedDatasetsError = false;
   createdPid: string | null = null;
   datasetUrl: string | null = null;
   errorMessage: string | null = null;
@@ -48,7 +52,37 @@ export class ScicatExportComponent implements OnInit {
   ) {}
 
   async ngOnInit(): Promise<void> {
-    await this.loadAccessGroups();
+    await Promise.all([this.loadAccessGroups(), this.loadLinkedDatasets()]);
+  }
+
+  get canSubmit(): boolean {
+    return (
+      !!this.ownerGroup &&
+      !this.inProgress &&
+      !this.loadingLinkedDatasets &&
+      !this.linkedDatasetsError
+    );
+  }
+
+  get linkedDatasetsLimitReached(): boolean {
+    return this.linkedDatasetPids.length >= this.maxLinkedDatasets;
+  }
+
+  private async loadLinkedDatasets(): Promise<void> {
+    this.loadingLinkedDatasets = true;
+    this.linkedDatasetsError = false;
+    try {
+      this.linkedDatasetPids = await firstValueFrom(
+        this.scicatService
+          .getUserLinkedDatasetsSummary(this.logbookId, this.maxLinkedDatasets)
+          .pipe(map((datasets) => datasets.map((dataset) => dataset.pid))),
+      );
+    } catch (err) {
+      this.linkedDatasetPids = [];
+      this.linkedDatasetsError = true;
+    } finally {
+      this.loadingLinkedDatasets = false;
+    }
   }
 
   private async loadAccessGroups(): Promise<void> {
@@ -73,11 +107,14 @@ export class ScicatExportComponent implements OnInit {
   }
 
   async submit(): Promise<void> {
-    if (!this.ownerGroup || this.inProgress) return;
+    if (!this.canSubmit) return;
     this.inProgress = true;
     this.errorMessage = null;
     try {
-      const zip = await this.logbookItemDataService.exportScicatRoCrate(this.logbookId);
+      const zip = await this.logbookItemDataService.exportScicatRoCrate(
+        this.logbookId,
+        this.linkedDatasetPids,
+      );
       const pid = await firstValueFrom(this.rocrateService.importRoCrate(zip, this.ownerGroup));
       this.createdPid = pid;
       this.datasetUrl = this.scicatService.getDatasetDetailPageUrl(pid);

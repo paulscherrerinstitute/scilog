@@ -1,4 +1,4 @@
-@if (inProgress || loadingGroups) {
+@if (inProgress || loadingGroups || loadingLinkedDatasets) {
   <div>
     <mat-progress-bar mode="query" [color]="'accent'"></mat-progress-bar>
   </div>
@@ -19,11 +19,21 @@
   @if (!loadingGroups && !accessGroups.length) {
     <p>No SciCat access groups were found for your account.</p>
   }
+  @if (!loadingLinkedDatasets) {
+    @if (linkedDatasetsError) {
+      <p>Could not load the SciCat datasets linked to this logbook.</p>
+    } @else if (linkedDatasetsLimitReached) {
+      <p>
+        The {{ maxLinkedDatasets }} most recent linked datasets will be added as relationships. Any
+        older ones will be left out.
+      </p>
+    } @else if (linkedDatasetPids.length) {
+      <p>{{ linkedDatasetPids.length }} linked dataset(s) will be added as relationship(s).</p>
+    }
+  }
   <div>
     <button mat-button (click)="close()" [disabled]="inProgress">Cancel</button>
-    <button mat-button (click)="submit()" [disabled]="!ownerGroup || inProgress">
-      Export to SciCat
-    </button>
+    <button mat-button (click)="submit()" [disabled]="!canSubmit">Export to SciCat</button>
   </div>
 } @else if (createdPid) {
   <h2>Dataset created</h2>
