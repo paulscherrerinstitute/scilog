@@ -142,7 +142,7 @@ export class ScicatViewerComponent implements OnInit {
   }
 
   hasWriteAccess(dataset: Dataset): boolean {
-    if (!this.scicatUser) return false;
+    if (!this.scicatAuth.loggedIn() || !this.scicatUser) return false;
     return this.scicatUser.profile.accessGroups.includes(dataset.ownerGroup);
   }
 

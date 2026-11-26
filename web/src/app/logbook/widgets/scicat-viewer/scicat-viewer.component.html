@@ -1,4 +1,4 @@
-<div *ngIf="scicatUser; else unauthenticated">
+<div *ngIf="scicatAuth.loggedIn() && scicatUser; else unauthenticated">
   <p>Hello, {{ scicatUser.profile.displayName || scicatUser.profile.username }}!</p>
 </div>
 <ng-template #unauthenticated>
