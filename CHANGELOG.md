@@ -1,3 +1,10 @@
+# [5.1.0](https://github.com/paulscherrerinstitute/scilog/compare/v5.0.0...v5.1.0) (2026-11-26)
+
+
+### Features
+
+* **web:** send linked datasets from scicat-export ([#931](https://github.com/paulscherrerinstitute/scilog/issues/931)) ([12ce472](https://github.com/paulscherrerinstitute/scilog/commit/12ce4726dba9cdc0d7aa7a1b6c2870745eb0f408)), closes [#930](https://github.com/paulscherrerinstitute/scilog/issues/930)
+
 # [5.0.0](https://github.com/paulscherrerinstitute/scilog/compare/v4.4.3...v5.0.0) (2026-11-26)
 
 
