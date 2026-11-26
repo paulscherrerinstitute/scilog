@@ -42,7 +42,13 @@ export class TasksService implements OnDestroy {
     await this.dataService.addTask(task);
   }
 
-  async deleteTask(id: string) {
+  async deleteTask(id: string): Promise<void> {
+    const children = await this.getTasksByParent(id);
+
+    for (const child of children) {
+      await this.deleteTask(child.id);
+    }
+
     await this.dataService.deleteTask(id);
   }
 
@@ -63,9 +69,12 @@ export class TasksService implements OnDestroy {
     }
     switch (data.operationType) {
       case 'insert':
-        if (data.content.snippetType == 'task') {
-          this.tasks.push(data.content);
-          this.tasksSource.next(this.tasks);
+        if (data.content.snippetType === 'task') {
+          // Only push root-level tasks
+          if (data.content.parentId === this.logbookInfo?.logbookInfo?.id) {
+            this.tasks.push(data.content);
+            this.tasksSource.next(this.tasks);
+          }
         }
         break;
       case 'update':
@@ -94,6 +103,10 @@ export class TasksService implements OnDestroy {
       default:
         break;
     }
+  }
+
+  getTasksByParent(parentId: string): Promise<Tasks[]> {
+    return this.dataService.getTasksData(parentId);
   }
 
   ngOnDestroy(): void {

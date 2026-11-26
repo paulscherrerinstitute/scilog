@@ -10,12 +10,14 @@ import { MatFormField } from '@angular/material/form-field';
 import { MatInput } from '@angular/material/input';
 import { FormsModule } from '@angular/forms';
 import { TaskComponent } from '../../core/task/task.component';
+import { MatCardModule } from '@angular/material/card';
+import { LogbookItemDataService } from '@shared/remote-data.service';
 
 @Component({
   selector: 'app-todos',
   templateUrl: './todos.component.html',
   styleUrls: ['./todos.component.scss'],
-  imports: [NgIf, MatFormField, MatInput, FormsModule, NgFor, TaskComponent],
+  imports: [NgIf, MatFormField, MatInput, FormsModule, NgFor, TaskComponent, MatCardModule],
 })
 export class TodosComponent implements OnInit, OnDestroy {
   @Input()
@@ -32,34 +34,67 @@ export class TodosComponent implements OnInit, OnDestroy {
     private tasksService: TasksService,
     private logbookInfo: LogbookInfoService,
     private notificationService: ChangeStreamService,
+    private logbookItemDataService: LogbookItemDataService,
     private views: ViewsService,
-  ) {
-    console.log('constructor called');
+  ) {}
+
+  async buildTaskTree(task: Tasks, level: number = 0): Promise<string> {
+    const indent = '&nbsp;'.repeat(level * 4);
+    const statusIcon = task.isDone ? '✅' : '⬜';
+    const content = task.content.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+    let html = `${indent}${statusIcon} ${content}<br>`;
+    const children = await this.tasksService.getTasksByParent(task.id);
+    for (const child of children) {
+      html += await this.buildTaskTree(child, level + 1);
+    }
+    return html;
+  }
+
+  async exportTasksToLogbook() {
+    if (!this.tasks?.length || !this.logbookInfo?.logbookInfo) return;
+
+    let bulletHTML = '';
+    for (const task of this.tasks) {
+      bulletHTML += await this.buildTaskTree(task);
+      bulletHTML += '<br>';
+    }
+
+    const notification = {
+      ownerGroup: this.logbookInfo.logbookInfo.ownerGroup,
+      accessGroups: this.logbookInfo.logbookInfo.accessGroups,
+      isPrivate: this.logbookInfo.logbookInfo.isPrivate,
+      snippetType: 'paragraph',
+      parentId: this.logbookInfo.logbookInfo.id,
+      linkType: 'paragraph',
+      tags: [],
+      id_session: localStorage.getItem('id_session'),
+      textcontent: `
+      <p><strong>Tasks</strong></p>
+      <p>${bulletHTML}</p>
+    `,
+    };
+
+    await this.logbookItemDataService.uploadParagraph(notification);
   }
 
   ngOnInit(): void {
     // get TODOs from server
-    console.log('todo: adding subscriptions');
     this.subscriptions.push(
       this.tasksService.currentTasks.subscribe((tasks) => {
         this.tasks = tasks;
         this.numTasks = this.tasksService.numTasks;
-        console.log('tasks:', this.tasks);
-        console.log(this.logbookInfo.logbookInfo);
       }),
     );
 
     this.subscriptions.push(
       this.views.currentWidgetConfigs.subscribe((config) => {
         if (this.notificationSubscription == null) {
-          console.log(this.logbookInfo.logbookInfo);
           let configTasks = config[this.configIndex].config;
           configTasks.filter.snippetType = ['task'];
 
           this.notificationSubscription = this.notificationService
             .getNotification(this.logbookInfo.logbookInfo.id, configTasks)
             .subscribe((data) => {
-              console.log(data);
               this.tasksService.taskChange(data);
             });
         }
@@ -77,14 +112,11 @@ export class TodosComponent implements OnInit, OnDestroy {
       content: this.newTask,
       isDone: false,
     };
-    console.log('adding new task');
     this.tasksService.addTask(newTask);
     this.newTask = '';
   }
 
   ngOnDestroy(): void {
-    //Called once, before the instance is destroyed.
-    //Add 'implements OnDestroy' to the class.
     this.subscriptions.forEach((sub) => {
       sub.unsubscribe();
     });
