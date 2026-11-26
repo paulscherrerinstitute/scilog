@@ -1,3 +1,15 @@
+# [5.0.0](https://github.com/paulscherrerinstitute/scilog/compare/v4.4.3...v5.0.0) (2026-11-26)
+
+
+* feat!: add support for relationships in scicat-rocrate ([#930](https://github.com/paulscherrerinstitute/scilog/issues/930)) ([408236a](https://github.com/paulscherrerinstitute/scilog/commit/408236a9eafc51025679fc9f61108d18d1ca3a26))
+
+
+### BREAKING CHANGES
+
+* `GET /logbooks/export/{id}/scicat-rocrate` is removed.
+Use `POST` on the same path instead. The JSON body
+`{ "linkedDatasets": [...] }` is optional.
+
 ## [4.4.3](https://github.com/paulscherrerinstitute/scilog/compare/v4.4.2...v4.4.3) (2026-11-25)
 
 
