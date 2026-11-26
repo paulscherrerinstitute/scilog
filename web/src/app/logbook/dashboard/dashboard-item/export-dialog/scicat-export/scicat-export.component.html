@@ -23,7 +23,10 @@
     @if (linkedDatasetsError) {
       <p>Could not load the SciCat datasets linked to this logbook.</p>
     } @else if (linkedDatasetPids.length) {
-      <p>{{ linkedDatasetPids.length }} linked dataset(s) will be added as relationship(s).</p>
+      <p>
+        {{ linkedDatasetPids.length }} linked dataset(s) will be added as relationship(s), up to the
+        {{ maxLinkedDatasets }} most recent.
+      </p>
     }
   }
   <div>

@@ -34,6 +34,7 @@ export class ScicatExportComponent implements OnInit {
   loadingGroups = false;
   accessGroups: string[] = [];
   ownerGroup: string | null = null;
+  readonly maxLinkedDatasets = 100;
   loadingLinkedDatasets = false;
   linkedDatasetPids: string[] = [];
   linkedDatasetsError = false;
@@ -69,7 +70,7 @@ export class ScicatExportComponent implements OnInit {
     try {
       this.linkedDatasetPids = await firstValueFrom(
         this.scicatService
-          .getUserLinkedDatasetsSummary(this.logbookId)
+          .getUserLinkedDatasetsSummary(this.logbookId, this.maxLinkedDatasets)
           .pipe(map((datasets) => datasets.map((dataset) => dataset.pid))),
       );
     } catch (err) {

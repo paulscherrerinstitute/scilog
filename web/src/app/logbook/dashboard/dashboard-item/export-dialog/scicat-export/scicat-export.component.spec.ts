@@ -106,7 +106,10 @@ describe('ScicatExportComponent', () => {
       ]),
     );
     await component.ngOnInit();
-    expect(scicatServiceSpy.getUserLinkedDatasetsSummary).toHaveBeenCalledWith('test-logbook-id');
+    expect(scicatServiceSpy.getUserLinkedDatasetsSummary).toHaveBeenCalledWith(
+      'test-logbook-id',
+      component.maxLinkedDatasets,
+    );
     expect(component.linkedDatasetPids).toEqual(['pid/ds1', 'pid/ds2']);
 
     component.ownerGroup = 'psi-demo';
