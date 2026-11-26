@@ -12,6 +12,7 @@ import {LogbookRepository, UserRepository} from '../../repositories';
 import {EntityBuilderService} from '../../services';
 import {
   DATA_DIR,
+  SCICAT_NAMESPACE,
   ScicatCrateService,
 } from '../../services/scicat-crate.service';
 import {ElnExportService} from '../../services/eln/export.service';
@@ -63,7 +64,7 @@ describe('ScicatCrateService (unit)', () => {
 
   it('creates ro-crate with basic metadata and data directory', async () => {
     const crate = new ROCrate(
-      JSON.parse(await service.getMetadataJson('logbook-1')),
+      JSON.parse(await service.getMetadataJson('logbook-1', [])),
     );
     expect(crate.root.name).to.equal('A logbook');
     expect(crate.root.description).to.equal('A description');
@@ -86,19 +87,54 @@ describe('ScicatCrateService (unit)', () => {
     expect(creator?.familyName).to.equal('test-ln');
   });
 
+  it('adds a scicat relationship for each linked dataset', async () => {
+    const metadata = JSON.parse(
+      await service.getMetadataJson('logbook-1', ['pid/ds1', 'pid/ds2']),
+    );
+    expect(metadata['@context']).to.containEql({scicat: SCICAT_NAMESPACE});
+
+    // Read the plain JSON graph: ROCrate.getEntity returns a proxy, which
+    // does not compare equal to a plain object.
+    const findEntity = (id: string) =>
+      metadata['@graph'].find(
+        (entity: {[key: string]: unknown}) => entity['@id'] === id,
+      );
+    expect(findEntity('data/')['scicat:relationships']).to.eql([
+      {'@id': '#relationship-1'},
+      {'@id': '#relationship-2'},
+    ]);
+    expect(findEntity('#relationship-2')).to.eql({
+      '@id': '#relationship-2',
+      '@type': 'scicat:Relationship',
+      'scicat:identifier': 'pid/ds2',
+      'scicat:identifierType': 'Local',
+      'scicat:relationship': 'References',
+      'scicat:entityType': 'Dataset',
+    });
+  });
+
+  it('adds no scicat terms when there are no linked datasets', async () => {
+    const metadata = JSON.parse(await service.getMetadataJson('logbook-1'));
+    expect(metadata['@context']).to.not.containEql({scicat: SCICAT_NAMESPACE});
+    const crate = new ROCrate(metadata);
+    expect(crate.getEntity('data/')).to.not.have.property(
+      'scicat:relationships',
+    );
+  });
+
   it('rejects a logbook whose creator has no name on record', async () => {
     userRepository.stubs.findOne
       .withArgs({where: {email: 'creator@example.com'}})
       .resolves({} as User);
 
     const error = await expect(
-      service.getMetadataJson('logbook-1'),
+      service.getMetadataJson('logbook-1', []),
     ).to.be.rejectedWith(/first and last name/);
     expect((error as {statusCode?: number}).statusCode).to.equal(409);
   });
 
   it('builds a crate zip containing the pdf, eln and metadata', async () => {
-    const zip = await service.buildCrateStream('logbook-1');
+    const zip = await service.buildCrateStream('logbook-1', []);
     const entries = await listZipEntries(await buffer(zip));
 
     expect(entries.sort()).to.eql(

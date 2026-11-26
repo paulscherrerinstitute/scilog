@@ -4,7 +4,7 @@ import {Readable} from 'node:stream';
 import {SciLogDbApplication} from '../..';
 import {clearDatabase, createUserToken, setupApplication} from './test-helper';
 import {DatabaseHelper} from '../database.helpers';
-import {listZipEntries} from '../zip.helpers';
+import {listZipEntries, readZipEntries} from '../zip.helpers';
 import {LogbookPdfService} from '../../services/logbook-pdf.service';
 
 describe('ScicatRoCrateController', function (this: Suite) {
@@ -67,7 +67,7 @@ describe('ScicatRoCrateController', function (this: Suite) {
       currentUser: user,
     });
     await client
-      .get(`/logbooks/export/${logbook.id}/scicat-rocrate`)
+      .post(`/logbooks/export/${logbook.id}/scicat-rocrate`)
       .set('Authorization', 'Bearer ' + token)
       .responseType('blob')
       .expect(200)
@@ -83,6 +83,31 @@ describe('ScicatRoCrateController', function (this: Suite) {
       .catch(error => {
         throw error;
       });
+  });
+
+  it('exports a relationship for each linked dataset in the body', async () => {
+    const logbook = await databaseHelper.givenLogbook(logbookSnippet, {
+      currentUser: user,
+    });
+    const linkedDatasets = Array.from({length: 25}, (_, i) => `pid/ds${i}`);
+    const response = await client
+      .post(`/logbooks/export/${logbook.id}/scicat-rocrate`)
+      .set('Authorization', 'Bearer ' + token)
+      .send({linkedDatasets})
+      .responseType('blob')
+      .expect(200);
+
+    const entries = await readZipEntries(response.body);
+    const metadata = JSON.parse(
+      entries.get('ro-crate-metadata.json')!.toString(),
+    );
+    const pids = metadata['@graph']
+      .filter(
+        (entity: {[key: string]: unknown}) =>
+          entity['@type'] === 'scicat:Relationship',
+      )
+      .map((entity: {[key: string]: unknown}) => entity['scicat:identifier']);
+    expect(pids).to.eql(linkedDatasets);
   });
 
   it('returns 404 when exporting a logbook the user cannot read', async () => {
@@ -102,7 +127,7 @@ describe('ScicatRoCrateController', function (this: Suite) {
     // the read ACL filters the logbook out for this user, so it looks absent
     // as the created logbook's readACL is:	['scicatRoCrateAcceptance']
     await client
-      .get(`/logbooks/export/${logbook.id}/scicat-rocrate`)
+      .post(`/logbooks/export/${logbook.id}/scicat-rocrate`)
       .set('Authorization', 'Bearer ' + otherToken)
       .set('Content-Type', 'application/json')
       .expect(404);
@@ -110,7 +135,7 @@ describe('ScicatRoCrateController', function (this: Suite) {
 
   it('throws 404 for non-existing logbook', async () => {
     await client
-      .get('/logbooks/export/nosuchlogbook/scicat-rocrate')
+      .post('/logbooks/export/nosuchlogbook/scicat-rocrate')
       .set('Authorization', 'Bearer ' + token)
       .set('Content-Type', 'application/json')
       .expect(404);

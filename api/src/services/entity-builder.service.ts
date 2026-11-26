@@ -120,6 +120,17 @@ export class EntityBuilderService {
     };
   }
 
+  buildScicatRelationship(id: string, pid: string) {
+    return {
+      '@id': id,
+      '@type': 'scicat:Relationship',
+      'scicat:identifier': pid,
+      'scicat:identifierType': 'Local',
+      'scicat:relationship': 'References',
+      'scicat:entityType': 'Dataset',
+    };
+  }
+
   buildOrganizationEntity() {
     return {
       '@id': 'https://github.com/paulscherrerinstitute/scilog',
