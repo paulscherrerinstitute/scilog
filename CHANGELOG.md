@@ -1,3 +1,44 @@
+# [5.0.0](https://github.com/paulscherrerinstitute/scilog/compare/v4.4.3...v5.0.0) (2026-11-26)
+
+
+* feat!: add support for relationships in scicat-rocrate ([#930](https://github.com/paulscherrerinstitute/scilog/issues/930)) ([408236a](https://github.com/paulscherrerinstitute/scilog/commit/408236a9eafc51025679fc9f61108d18d1ca3a26))
+
+
+### BREAKING CHANGES
+
+* `GET /logbooks/export/{id}/scicat-rocrate` is removed.
+Use `POST` on the same path instead. The JSON body
+`{ "linkedDatasets": [...] }` is optional.
+
+## [4.4.3](https://github.com/paulscherrerinstitute/scilog/compare/v4.4.2...v4.4.3) (2026-11-25)
+
+
+### Bug Fixes
+
+* **web:** replace the identicons with Material icons ([#871](https://github.com/paulscherrerinstitute/scilog/issues/871)) ([4df8f49](https://github.com/paulscherrerinstitute/scilog/commit/4df8f49037f3e734f6055cab100cc6ff12ea7334))
+
+## [4.4.2](https://github.com/paulscherrerinstitute/scilog/compare/v4.4.1...v4.4.2) (2026-11-24)
+
+
+### Bug Fixes
+
+* **web:** make chat messages and comments readable ([#870](https://github.com/paulscherrerinstitute/scilog/issues/870)) ([5d768d8](https://github.com/paulscherrerinstitute/scilog/commit/5d768d8a3c3245252a1d33c3d3a3d56e5837ee14))
+
+## [4.4.1](https://github.com/paulscherrerinstitute/scilog/compare/v4.4.0...v4.4.1) (2026-11-24)
+
+
+### Bug Fixes
+
+* **web:** remove the extra space below the entry text ([#943](https://github.com/paulscherrerinstitute/scilog/issues/943)) ([359d4ea](https://github.com/paulscherrerinstitute/scilog/commit/359d4ea451938bb5a05981d5bdfb9e804255c95c))
+* **web:** remove the extra space inside a quote ([#944](https://github.com/paulscherrerinstitute/scilog/issues/944)) ([ef4a818](https://github.com/paulscherrerinstitute/scilog/commit/ef4a81870b48af1d4bb783e0bca427618ee7d00e))
+
+# [4.4.0](https://github.com/paulscherrerinstitute/scilog/compare/v4.3.0...v4.4.0) (2026-11-24)
+
+
+### Features
+
+* **web:** show the author and the time on one line ([#942](https://github.com/paulscherrerinstitute/scilog/issues/942)) ([29c6759](https://github.com/paulscherrerinstitute/scilog/commit/29c6759c19eb1d79cec12177dc850c3cd0809b7e))
+
 # [4.3.0](https://github.com/paulscherrerinstitute/scilog/compare/v4.2.0...v4.3.0) (2026-11-20)
 
 

@@ -1,3 +1,17 @@
+@use '@angular/material' as mat;
+
+/* Subtitles hold the author and the time. Material's grey (black at
+   0.54) is raised to 0.6 to reach WCAG 4.5:1 on chat messages. Card
+   tokens are CSS variables, so this reaches every card inside an
+   entry, including comments. */
+:host {
+  @include mat.card-overrides(
+    (
+      subtitle-text-color: rgba(0, 0, 0, 0.6),
+    )
+  );
+}
+
 .snippet {
   margin: 8px;
   min-height: 100%;
@@ -7,12 +21,11 @@
 }
 
 .messages {
-  background-color: rgb(39, 117, 163) !important;
+  background-color: rgb(179, 201, 208) !important;
   margin: 8px 8px 8px 32px;
   min-height: 100%;
   text-align: left;
   border-radius: 10px;
-  border-color: rgb(39, 117, 163);
   color: var(--default-text-color);
   /* width: fit-content; */
   /* float:right; */
@@ -33,32 +46,59 @@
   margin: 8px 0;
   min-height: 100%;
   text-align: left;
-  background-color: rgb(247, 242, 197) !important;
+  background-color: rgb(251, 249, 226) !important;
 }
 
-.snippetQuote {
-  /* the text below the quote brings its own top margin */
-  margin-top: 1em;
-  min-height: 100%;
-  text-align: left;
-  opacity: 0.9;
+/* The entry a reply quotes. Outline color and radius are those of
+   Material's outlined card. No vertical padding, as in the editor's
+   quote style: the quoted paragraphs' margins make that space. */
+.quote {
+  margin: 1em 0 0;
+  padding: 0 1.5em;
+  border: 1px solid rgba(0, 0, 0, 0.12);
   border-left: 4px solid #86a7b1;
   border-right: 4px solid #86a7b1;
-  background-color: #ebebeb !important;
+  border-radius: 4px;
+  background-color: #ebebeb;
+  opacity: 0.9;
 }
 
-/* a narrow header breaks the line only between the time and the note */
+/* a narrow header breaks the line only between the author, the time
+   and the note */
 .no-wrap {
   white-space: nowrap;
 }
 
-.mat-fab-top-right {
-  margin-left: auto;
-  opacity: 0.1;
+/* The menu button sets the header's height. Center the shorter
+   author line next to it. */
+mat-card-header {
+  align-items: center;
 }
 
-.mat-fab-top-right:hover {
-  opacity: 1;
+/* With a mouse, the menu button is 32px instead of 48px. Touch screens
+   keep the 48px tap area. */
+@media (pointer: fine) {
+  mat-card-header {
+    @include mat.icon-button-density(-4);
+  }
+}
+
+// the pencil's tip sits on the baseline and its top at the height of digits
+.editing mat-icon {
+  height: 1em;
+  line-height: 1;
+  vertical-align: -0.125em;
+}
+
+/* The menu button uses the same color as the subtitle beside it */
+.mat-fab-top-right {
+  margin-left: auto;
+
+  @include mat.icon-button-overrides(
+    (
+      icon-color: rgba(0, 0, 0, 0.6),
+    )
+  );
 }
 
 .imageSnippet {
@@ -74,10 +114,7 @@
 
 .snippet-tags-container {
   font-size-adjust: 0.4;
-  text-align: right;
-  padding-right: 45px;
   opacity: 0.4;
-  display: inline;
 }
 
 .snippet-tag {

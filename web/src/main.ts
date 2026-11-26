@@ -6,7 +6,6 @@ import { HTTP_INTERCEPTORS, provideHttpClient, withInterceptorsFromDi } from '@a
 import { AuthInterceptor } from '@shared/auth-services/auth.interceptor';
 import { ConditionalHeadersInterceptor } from '@shared/auth-services/conditional-headers.interceptor';
 import { CookieService } from 'ngx-cookie-service';
-import { JDENTICON_CONFIG } from 'ngx-jdenticon';
 import { BrowserModule, bootstrapApplication } from '@angular/platform-browser';
 import { AppRoutingModule } from './app/app-routing.module';
 import { provideAnimations } from '@angular/platform-browser/animations';
@@ -45,21 +44,6 @@ bootstrapApplication(AppComponent, {
       multi: true,
     },
     CookieService,
-    {
-      // Custom identicon style
-      provide: JDENTICON_CONFIG,
-      useValue: {
-        lightness: {
-          color: [0.31, 0.54],
-          grayscale: [0.63, 0.82],
-        },
-        saturation: {
-          color: 0.5,
-          grayscale: 0.5,
-        },
-        backColor: '#222',
-      },
-    },
     provideHttpClient(withInterceptorsFromDi()),
     provideAnimations(),
     {

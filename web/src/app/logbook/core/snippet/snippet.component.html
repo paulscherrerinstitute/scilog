@@ -5,107 +5,92 @@
   (click)="selectSnippet($event)"
   [@highlightSnippet]="highlightState"
 >
-  @if (showHeader) {
-    <mat-card-header>
-      @if (isHighlighted) {
-        <mat-icon>star</mat-icon>
+  <mat-card-header>
+    @if (isHighlighted) {
+      <mat-icon>star</mat-icon>
+    }
+    <mat-card-subtitle>
+      @if (config?.view?.showSnippetHeader && indexOrdered) {
+        #{{ indexOrdered }} ·
       }
+      <span class="no-wrap">{{ snippet.createdBy }}</span>
+      &ngsp;<span class="no-wrap">· {{ snippet.createdAt | date: 'medium' }}</span>
       @if (snippetIsAccessedByAnotherUser && !snippet.isMessage) {
-        <svg
-          mat-card-avatar
-          [data-jdenticon-value]="avatarHash"
-          matTooltip="Another user is currently editing this snippet."
-        ></svg>
-      }
-      <mat-card-subtitle>
-        @if (config?.view?.showSnippetHeader && indexOrdered) {
-          #{{ indexOrdered }} ·
-        }
-        {{ snippet.createdBy }}
-      </mat-card-subtitle>
-      <mat-card-subtitle>
-        <span class="no-wrap">{{ snippet.createdAt | date: 'medium' }}</span>
-        @if (isEdited) {
-          &ngsp;<span class="no-wrap">· edited</span>
-        }
-      </mat-card-subtitle>
-      @if (showEditButtonsMenu) {
-        <button
-          mat-icon-button
-          [matMenuTriggerFor]="menu"
-          aria-label="Entry actions"
-          class="mat-fab-top-right"
+        &ngsp;<span class="no-wrap editing"
+          >· <mat-icon inline>edit</mat-icon> {{ editingBy }} is editing</span
         >
-          <mat-icon>more_vert</mat-icon>
-        </button>
-        <mat-menu #menu="matMenu">
-          @if (showInfoButton) {
-            <button mat-menu-item (click)="showInfo()">
-              <mat-icon>info</mat-icon>
-              <span>Info</span>
-            </button>
-          }
-          @if (showEditButtons) {
-            <button
-              mat-menu-item
-              (click)="editSnippet()"
-              [disabled]="!enableEdit.update"
-              matTooltip="{{ isActionAllowed.tooltips.update }}"
-            >
-              <mat-icon>edit</mat-icon>
-              <span>Edit</span>
-            </button>
-          }
+      } @else if (isEdited) {
+        &ngsp;<span class="no-wrap">· edited</span>
+      }
+    </mat-card-subtitle>
+    @if (showEditButtonsMenu) {
+      <button
+        mat-icon-button
+        [matMenuTriggerFor]="menu"
+        aria-label="Entry actions"
+        class="mat-fab-top-right"
+      >
+        <mat-icon>more_vert</mat-icon>
+      </button>
+      <mat-menu #menu="matMenu">
+        @if (showInfoButton) {
+          <button mat-menu-item (click)="showInfo()">
+            <mat-icon>info</mat-icon>
+            <span>Info</span>
+          </button>
+        }
+        @if (showEditButtons) {
           <button
             mat-menu-item
-            (click)="setDashboardName()"
+            (click)="editSnippet()"
             [disabled]="!enableEdit.update"
             matTooltip="{{ isActionAllowed.tooltips.update }}"
           >
-            <mat-icon>assistant</mat-icon>
-            <span>Dashboard name</span>
+            <mat-icon>edit</mat-icon>
+            <span>Edit</span>
           </button>
-          @if (enableComments) {
-            <button mat-menu-item (click)="addComment()">
-              <mat-icon>note_add</mat-icon>
-              <span>Add comment</span>
-            </button>
-          }
-          <button mat-menu-item (click)="addCitation()">
-            <mat-icon>reply</mat-icon>
-            <span>Reply</span>
+        }
+        <button
+          mat-menu-item
+          (click)="setDashboardName()"
+          [disabled]="!enableEdit.update"
+          matTooltip="{{ isActionAllowed.tooltips.update }}"
+        >
+          <mat-icon>assistant</mat-icon>
+          <span>Dashboard name</span>
+        </button>
+        @if (enableComments) {
+          <button mat-menu-item (click)="addComment()">
+            <mat-icon>note_add</mat-icon>
+            <span>Add comment</span>
           </button>
-          <!-- <button mat-menu-item disabled> -->
-          @if (showEditButtons) {
-            <button
-              mat-menu-item
-              (click)="deleteSnippet()"
-              [disabled]="!enableEdit.delete"
-              matTooltip="{{ isActionAllowed.tooltips.delete }}"
-            >
-              <mat-icon>delete</mat-icon>
-              <span>Delete</span>
-            </button>
-          }
-        </mat-menu>
-      }
-    </mat-card-header>
-  }
+        }
+        <button mat-menu-item (click)="addCitation()">
+          <mat-icon>reply</mat-icon>
+          <span>Reply</span>
+        </button>
+        <!-- <button mat-menu-item disabled> -->
+        @if (showEditButtons) {
+          <button
+            mat-menu-item
+            (click)="deleteSnippet()"
+            [disabled]="!enableEdit.delete"
+            matTooltip="{{ isActionAllowed.tooltips.delete }}"
+          >
+            <mat-icon>delete</mat-icon>
+            <span>Delete</span>
+          </button>
+        }
+      </mat-menu>
+    }
+  </mat-card-header>
 
   <mat-card-content>
-    <div *ngFor="let snippet of snippet?.subsnippets; let i = index">
-      <ng-container *ngIf="snippet?.linkType === 'quote'">
-        <app-snippet
-          [snippet]="snippet"
-          [updatedAt]="snippet?.updatedAt"
-          [index]="i"
-          [hideMetadata]="hideMetadata"
-        ></app-snippet>
-      </ng-container>
-    </div>
-    <!-- <div *ngIf="snippet.quote">
-      <snippet [snippet]="snippet.quote" [updatedAt]="snippet.quote?.updatedAt" [index]="index" [linkType]="'QUOTE'" [showEditButtonsMenu]="false"></snippet>
-    </div> -->
+    @for (quote of quotes; track quote.id) {
+      <blockquote class="quote">
+        <app-snippet-content [snippet]="quote"></app-snippet-content>
+      </blockquote>
+    }
     <app-snippet-content
       #snippetContent
       [snippet]="snippet"
@@ -113,12 +98,14 @@
       (isLoading)="setElementLoading($event)"
     >
     </app-snippet-content>
-    <div class="snippet-tags-container" *ngIf="!_hideMetadata">
-      <span class="snippet-tag" *ngFor="let tag of snippet?.tags">
-        {{ tag }}
-      </span>
-    </div>
   </mat-card-content>
+  @if (!_hideMetadata && snippet?.tags?.length) {
+    <mat-card-content class="snippet-tags-container">
+      @for (tag of snippet.tags; track $index) {
+        <span class="snippet-tag">{{ tag }}</span>
+      }
+    </mat-card-content>
+  }
   @if (comments.length) {
     <!-- A click on a comment bubbles up to this card, so it selects the entry. -->
     <div class="snippet-comments">

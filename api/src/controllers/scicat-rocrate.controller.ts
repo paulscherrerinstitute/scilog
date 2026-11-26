@@ -1,4 +1,4 @@
-import {get, param, RestBindings, Response} from '@loopback/rest';
+import {param, post, requestBody, RestBindings, Response} from '@loopback/rest';
 
 import {inject, service} from '@loopback/core';
 import {OPERATION_SECURITY_SPEC} from '../utils/security-spec';
@@ -18,8 +18,8 @@ export class ScicatRoCrateController {
     @service(ScicatCrateService) private scicatCrateService: ScicatCrateService,
   ) {}
 
-  // GET /logbooks/export/{id}/scicat-rocrate
-  @get('/logbooks/export/{id}/scicat-rocrate', {
+  // POST /logbooks/export/{id}/scicat-rocrate
+  @post('/logbooks/export/{id}/scicat-rocrate', {
     security: OPERATION_SECURITY_SPEC,
     responses: {
       '200': {
@@ -43,9 +43,32 @@ export class ScicatRoCrateController {
   })
   async exportScicatRoCrate(
     @param.path.string('id') id: string,
+    @requestBody({
+      required: false,
+      content: {
+        'application/json': {
+          schema: {
+            type: 'object',
+            properties: {
+              linkedDatasets: {
+                type: 'array',
+                items: {type: 'string'},
+                description:
+                  'PIDs of SciCat datasets to record as referenced by the exported logbook',
+              },
+            },
+            additionalProperties: false,
+          },
+        },
+      },
+    })
+    body: {linkedDatasets?: string[]} | undefined,
     @inject(RestBindings.Http.RESPONSE) response: Response,
   ) {
-    const zip = await this.scicatCrateService.buildCrateStream(id);
+    const zip = await this.scicatCrateService.buildCrateStream(
+      id,
+      body?.linkedDatasets,
+    );
 
     response.set('Content-Type', 'application/zip');
     response.set(
